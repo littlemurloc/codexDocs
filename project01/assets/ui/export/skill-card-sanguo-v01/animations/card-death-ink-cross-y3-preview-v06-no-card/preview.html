@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Death Ink Cross V06</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif;
+      background: #14110e;
+      color: #f3ead8;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: minmax(360px, 460px) 1fr;
+      gap: 28px;
+      padding: 28px;
+      box-sizing: border-box;
+      background:
+        radial-gradient(circle at 24% 18%, rgba(232, 24, 8, .18), transparent 30%),
+        radial-gradient(circle at 76% 62%, rgba(28, 20, 17, .42), transparent 34%),
+        linear-gradient(135deg, #14110e 0%, #24211d 100%);
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    p {
+      margin: 0 0 18px;
+      color: #c9beac;
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .checker {
+      width: min(384px, 100%);
+      aspect-ratio: 384 / 640;
+      display: grid;
+      place-items: center;
+      background-color: #d7d3c8;
+      background-image:
+        linear-gradient(45deg, #eeeae0 25%, transparent 25%),
+        linear-gradient(-45deg, #eeeae0 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #eeeae0 75%),
+        linear-gradient(-45deg, transparent 75%, #eeeae0 75%);
+      background-size: 28px 28px;
+      background-position: 0 0, 0 14px, 14px -14px, -14px 0;
+      border: 1px solid rgba(255, 255, 255, .12);
+      box-shadow: 0 16px 44px rgba(0, 0, 0, .38);
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .meta {
+      margin-top: 14px;
+      font-size: 13px;
+      color: #b7aa97;
+    }
+
+    .sheet img {
+      width: 100%;
+      max-width: 760px;
+      height: auto;
+      border: 1px solid rgba(255, 255, 255, .12);
+      box-shadow: 0 16px 44px rgba(0, 0, 0, .32);
+    }
+
+    @media (max-width: 900px) {
+      body {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>死亡划除特效 V06</h1>
+    <p>减少小墨点，改为 4 处大甩墨；红刷 X 增加金描边，并在落笔完成后短促震动。</p>
+    <div class="checker">
+      <canvas id="player" width="384" height="640" aria-label="死亡划除特效 V06 PNG 序列预览"></canvas>
+    </div>
+    <div class="meta">序列：png_frames/card_death_ink_cross_v06_%03d.png</div>
+  </main>
+  <section class="sheet">
+    <h1>关键帧联系表</h1>
+    <p>用于检查大墨点、金描边、X 震动和消散节奏。</p>
+    <img src="contact_sheet_card_death_ink_cross_y3_v06.png" alt="死亡划除特效 V06 关键帧联系表">
+  </section>
+  <script>
+    const frameCount = 42;
+    const frameMs = 1000 / 24;
+    const canvas = document.getElementById("player");
+    const ctx = canvas.getContext("2d");
+    const frames = [];
+    let loaded = 0;
+    let frame = 0;
+    let lastTime = performance.now();
+
+    for (let i = 0; i < frameCount; i += 1) {
+      const img = new Image();
+      img.onload = () => {
+        loaded += 1;
+        if (loaded === frameCount) requestAnimationFrame(tick);
+      };
+      img.src = `png_frames/card_death_ink_cross_v06_${String(i).padStart(3, "0")}.png`;
+      frames.push(img);
+    }
+
+    function tick(now) {
+      if (now - lastTime >= frameMs) {
+        frame = (frame + 1) % frameCount;
+        lastTime = now;
+      }
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(frames[frame], 0, 0);
+      requestAnimationFrame(tick);
+    }
+  </script>
+</body>
+</html>
