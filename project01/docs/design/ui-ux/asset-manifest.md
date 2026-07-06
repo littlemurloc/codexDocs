@@ -25,6 +25,10 @@
 | `assets/ui/preview/challenge-failure-settlement-v03.png` | 挑战失败结算 | 已确认 | [challenge-failure-settlement-v03.md](challenge-failure-settlement-v03.md) | 我方全灭后的失败结算界面，与通关奖励页共享结算框架，中央使用战败静态图，右侧展示少量获得和调整建议 | 否 | 作为失败分支结算视觉基准 |
 | `assets/ui/preview/meta-upgrade-v02.png` | 兵书成长 | 已确认 | [meta-upgrade-v02.md](meta-upgrade-v02.md) | 局外兵书弱成长界面，一页展示通用、战备、奖励、阵营四条路线，强调非强前置技能树和弱成长边界 | 否 | 作为局外成长界面视觉基准 |
 | `assets/ui/icon/skill-select-v02/` | 技能装配 / 武将头像矩阵 | 草图 | [skill-loadout-v04.md](skill-loadout-v04.md) | 从技能装配中间稿裁切的 24 个武将头像占位素材，含宽裁切与 face-crops 两套 | 否 | 概念素材，不是正式立绘 skill 输出 |
+| `assets/ui/processed/p0/` | P0 核心闭环 UI | 已确认 | `assets/ui/export/p0-processing-plan.md` | 首轮 Y3 原型快速占位资源，覆盖阵容、战斗、战备、结算关键整块控件 | 否 | 只作快速布局和整体比例参考，不作为最终组件拆分标准 |
+| `assets/ui/processed/p0_components/` | P0 核心闭环 UI | 已确认 | `assets/ui/processed/p0_components/README.md` | 首轮 Y3 原型正式拼接资源，按外框、槽位、行组件、状态件组合控件 | 否 | 阵容、战斗 HUD、战备三选一、通关奖励、失败结算优先使用该目录 |
+| `assets/ui/export/basic-ui-kits-sanguo-v01/preview_basic_ui_kits_A-D.png` | 基础 UI 控件探索 | 待评审 | `assets/ui/export/basic-ui-kits-sanguo-v01/manifest.json` | 2026-07-06 基础控件审美方向总览，包含 A/B/C/D 四个概念方向 | 是 | A/C 保留为轻量策略 UI 参考，B 仅作重控件参考，D 暂不作为主方向 |
+| `assets/ui/export/basic-ui-kits-sanguo-v01/extracted-controls-v12-imagegen-reference-redraw/` | 基础 UI 控件候选切片 | 待评审 | `assets/ui/export/basic-ui-kits-sanguo-v01/extracted-controls-v12-imagegen-reference-redraw/README.md` | 基于图像生成参考图清稿后的无字透明 PNG 控件候选，含 manifest、透明检查和组合预览 | 是 | 下一步只做审美、透明边缘和九宫格复核；通过前不直接替换 P0 组件 |
 
 ## 记录规则
 
@@ -34,3 +38,5 @@
 - 已废弃但需要留档的资源必须有明确保留理由；否则默认清理，避免后续误用。
 - 同一界面的多个版本建议使用 `v01`、`v02`、`v03` 命名。
 - 每张已确认图必须有独立说明文档，否则不能作为后续设计基准引用。
+- 基础 UI 控件资源必须先按 [art-asset-generation-workflow.md](art-asset-generation-workflow.md) 完成效果图、清稿和切片阶段判断，再进入正式资源替换。
+- 脚本生成物只有在来源图已确认、透明检查通过、manifest 完整且预览图可复核时，才允许从“待评审”改为“已确认”。

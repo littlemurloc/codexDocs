@@ -58,6 +58,15 @@
 - 关卡：首批 4 个关卡，每关 10 个难度。
 - 局外兵书：弱幅度成长，不作为硬通关门槛。
 
+## 当前 UI 资源工作状态
+
+- 当前不是进入完整 Y3 工程实装，而是继续 UI 资源整理与首轮 Y3 原型拼接准备。
+- `assets/ui/processed/p0/` 是首轮原型快速占位资源，只用于布局比例和整块对照。
+- `assets/ui/processed/p0_components/` 是首轮 Y3 原型拼接主资源，阵容、战斗 HUD、战备三选一、通关奖励、失败结算优先使用该目录组件。
+- `assets/ui/export/basic-ui-kits-sanguo-v01/` 是 2026-07-06 的基础 UI 控件审美探索；A/C 方向偏轻量策略界面，B 方向可参考战斗、确认、奖励等重控件，D 方向暂不作为主方向。
+- `assets/ui/export/basic-ui-kits-sanguo-v01/extracted-controls-v12-imagegen-reference-redraw/` 是基础控件候选切片资源，下一步只做审美、透明边缘和九宫格复核，不直接替换 P0 组件。
+- UI 美术资源生产遵守 `docs/design/ui-ux/art-asset-generation-workflow.md`：先效果图确认，再无字清稿，最后工程切片和校验。脚本只用于切片、透明处理、预览、manifest 和验证，不再承担主要美术设计。
+
 ## 文档入口
 
 - 总纲与索引：`docs/game-design.md`
@@ -76,6 +85,7 @@
 - 兵书成长：`docs/design/meta-upgrade-design.md`
 - Y3 策划字段：`docs/design/y3-table-field-design.md`
 - UI/UX 索引：`docs/design/ui-ux/ui-index.md`
+- UI 美术资源流程：`docs/design/ui-ux/art-asset-generation-workflow.md`
 - Y3 实装对齐：`docs/y3-implementation-alignment.md`
 - Y3 一致性审查：`docs/y3-design-consistency-review.md`
 - 战斗模拟验证规程：`tests/combat-sim-validation.md`
