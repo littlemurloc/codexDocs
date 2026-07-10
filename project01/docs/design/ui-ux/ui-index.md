@@ -9,3 +9,4 @@
 | [battle-prep-choice-v04.md](battle-prep-choice-v04.md) | 备战状态视觉参考，旧三选一规则已废弃。 |
 | [screen-flow.md](screen-flow.md) | 当前首轮流程。 |
 | [asset-manifest.md](asset-manifest.md) | UI 资源状态索引。 |
+| [character-portrait-production-rules.md](character-portrait-production-rules.md) | 三国角色半身立绘、头像规格与审批门槛。 |

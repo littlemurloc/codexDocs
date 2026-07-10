@@ -1,87 +1,121 @@
 ---
 name: generate-sanguo-portrait-images
-description: Generate Three Kingdoms character portrait images or image-generation prompts in a consistent Chinese historical fantasy, anime, semi-realistic style. Use when the user asks for 三国/Sanguo character standing art, character portraits, direct image generation, role-based visual design, or prompts for 武将、智将、敏将、辅将 characters with randomized costume, armor, hair, color, and lighting details. Prefer the available image-generation workflow, including gpt-image-2/image_gen when active, unless the user asks for prompt text only.
+description: Generate production-ready Three Kingdoms character half-body illustrations and avatar icons from one full-body 45-degree game-model reference. Use for batch character art, half-body portraits, square avatars, or circular avatars in this project. Enforce the required approval gate: generate no downstream avatar assets until the user explicitly approves the character's half-body illustration.
 ---
 
-# 三国人物立绘图片生成
+# Three Kingdoms Character Asset Pipeline
+
+Create reusable character UI assets from a single full-body 45-degree model screenshot.
+
+## Non-Negotiable Rules
+
+- Accept one full-body 45-degree model image as the required visual source. Do not require face close-ups or upper-body source images.
+- Do not generate or deliver full-body illustrations. The approved character illustration format is upper body only.
+- Preserve the approved project direction: dark Chinese historical-fantasy game art; concise angular brushwork; controlled ink texture; readable red, black, and antique-gold accents; no glossy 3D-render look.
+- Create the half-body illustration first. Stop and request explicit user approval.
+- Do not generate square or circular avatars until the user explicitly approves that half-body illustration. Treat revisions as still pending approval.
+- Use the approved half-body illustration as the visual source for every downstream avatar. Do not ask for additional face reference images.
+- Save final assets as transparent PNG files. Do not include text, frames, watermarks, scenery, floor planes, cast shadows, or visible background color.
+- Do not default to a centered front-facing, level-shouldered, stern passport-photo pose. Use that composition only when the character direction explicitly calls for formal authority or implacable restraint.
+
+## Required Output Set
+
+| Asset | Size | Composition |
+| --- | --- | --- |
+| Half-body illustration | 512 x 1156 | Crown/head, face, shoulders, chest, and upper abdomen. Narrow portrait composition. |
+| Square avatar | 256 x 256 | Large face. Eyes near the image center. Crown and shoulders support recognition without empty space. |
+| Circular avatar | 256 x 256 | Derived from the approved avatar composition. Keep face and recognition features inside the circle-safe area. Pixels outside the circle are transparent. |
+
+Do not add full-body art to the standard set. Produce legacy 128 x 128 or 32 x 32 avatar variants only when the user explicitly requests them.
 
 ## Workflow
 
-Collect or infer these inputs before composing the image prompt:
+### 1. Intake
 
-- `角色名`: required.
-- `职业类型`: required; choose one of `武将`, `智将`, `敏将`, `辅将`.
-- `姿势`: optional; infer a subtle head-and-shoulders pose when absent.
-- `武器/道具`: optional; omit this phrase cleanly when absent.
-- `表情/气质`: required.
-- `构图范围`: optional; default to `头肩特写`. Do not use full-body standing art.
+Collect:
 
-If required inputs are missing, infer reasonable defaults from the character, role, or user request when possible. Ask a concise question only when the missing detail would materially change the image.
+- Character id and display name.
+- One full-body 45-degree model screenshot.
+- Optional personality, mood, or pose note.
 
-Use the fixed visual direction:
+Infer face, costume, hair, weapon, palette, silhouette, and iconic accessories from the model reference. Vary the half-body pose to fit the character's personality, but retain all visible identity anchors.
 
-- Style: `国风`, `二次元`, `半写实`.
-- Background: fully transparent cutout background with alpha channel, described as `透明背景/镂空背景`. Do not use a visible solid-color backdrop.
-- Rendering: details rich, strong layering, lighting that emphasizes metal or fabric texture.
-- Palette pool: `深红`, `金色`, `暗灰`, `青色`.
-- Composition: always `头肩特写`, showing only head, neck, and shoulders. Prioritize the face, eyes, and expression.
-- Camera/view angle: vary by character and request; choose from `正脸`, `左侧脸`, `右侧脸`, `轻微俯视`, `轻微仰视`, `三分之二侧脸`. Do not default every portrait to side-facing or top-down.
-- Expression: match the character's personality, reputation, and role. Use calm, stern, heroic, fierce, confident, cunning, gentle, mysterious, or dignified expressions as appropriate instead of using the same expression for every character.
-- Weapons/props: optional. If shown, the weapon must be held naturally by a visible hand with anatomically plausible grip. If a normal grip is unnecessary or would crowd the portrait, omit the weapon entirely.
+### Character Direction Brief
 
-## Output Mode
+Before every half-body prompt, derive a compact direction brief from the character's historical reputation, combat identity, model silhouette, and any user note:
 
-Default to direct image generation.
+- `temperament`: for example, arrogant, calculating, reckless, composed, veteran, watchful, benevolent, or severe.
+- `pose`: choose a three-quarter turn, shoulder lead, forward lean, relaxed backward tilt, guarded half-turn, weapon-led diagonal, or other personality-appropriate upper-body action.
+- `eye line`: choose direct challenge, sidelong appraisal, lowered concentration, upward resolve, or a controlled off-camera look.
+- `expression`: choose a specific emotional read rather than generic severity: restrained confidence, predatory focus, contempt, calm calculation, battle joy, wary patience, or quiet fatigue.
 
-1. Compose a polished Chinese image prompt using the template below.
-2. Use the available image-generation workflow to create the image. Prefer the built-in `image_gen` path / gpt-image-2 behavior when available.
-3. Return the generated image and the final prompt used. The image should be a transparent-background portrait whenever the available image-generation workflow supports it.
+Keep the action inside the narrow upper-body crop. Use head yaw, torso angle, shoulder height, cloak/weapon direction, and eye line to create energy; do not solve pose variety by adding a full body or random effects.
 
-If the user asks for `只要提示词`, `prompt only`, or asks to revise prompt text without drawing, return only the polished prompt.
+Use these direction families as starting points, not rigid character classes:
 
-If the image-generation workflow is unavailable, return the polished prompt and briefly say that the prompt is ready for image generation.
+| Character read | Suitable pose and expression direction |
+| --- | --- |
+| Proud warlord | Forward three-quarter lean, lifted chin, direct challenge or a restrained smirk. |
+| Cunning strategist | Controlled half-turn, one shoulder leading, sidelong appraisal, quiet calculation. |
+| Veteran general | Grounded asymmetric shoulders, calm direct gaze, seasoned patience rather than blank seriousness. |
+| Agile fighter or assassin | Guarded twist, lowered center through shoulder angle, watchful eyes, poised tension. |
+| Noble commander | Relaxed upright posture, slightly raised chin, composed authority. |
+| Fierce berserker | Weapon-led diagonal, compressed brow, visible aggression or battle joy. |
 
-## Random Elements
+For characters produced in the same batch, change at least two of these axes between adjacent characters: head yaw, shoulder line, torso inclination, eye line, weapon/cloak direction, and expression. Do not reveal this selection process unless the user asks.
 
-Select one value from each category. For职业关联 categories, select from the matching `职业类型`.
+### 2. Half-Body Approval Gate
 
-| Category | 武将 | 智将 | 敏将 | 辅将 |
-| --- | --- | --- | --- | --- |
-| 披风/披肩 | 红色厚重披风, 暗红长披风 | 青灰长袍披肩, 深蓝长袍飘带 | 暗红轻便披风, 深蓝轻披风 | 明亮轻飘披风, 华丽轻披风 |
-| 头饰/发饰 | 战盔, 羽毛冠 | 法冠, 流苏头饰 | 轻盔, 无饰头盔 | 发簪头饰, 神秘头饰 |
-| 服装/甲胄 | 龙鳞胸甲配战袍, 虎纹肩甲配劲装, 轻型锁子甲, 武将披挂战袍, 皮革护肩与束袖战衣, 金属护心镜配锦袍 | 绣花长袍, 锦缎法袍, 羽纹宽袖谋士袍, 青灰文士长衫, 轻薄披肩礼服, 暗纹丝绸官服 | 轻甲皮革, 护腕装甲, 短打劲装配软甲, 贴身骑射战衣, 暗纹披肩轻甲, 便捷束腰战袍 | 饰纹丰富布料, 轻甲绣饰, 华丽礼袍配护肩, 柔软丝绸披挂, 神秘纹样长袍, 辅臣锦衣配轻护甲 |
-| 色彩点缀 | 金色盔甲边缘, 宝石红披风 | 青灰丝绸装饰, 暗灰腰带 | 深色披风点缀, 暗红腰带 | 明亮丝绸点缀, 柔和装饰色 |
+Generate only the half-body illustration. Compose it for a 140:316-like narrow portrait, then export it at 512 x 1156.
 
-Select one from each global category:
+Show the result and ask for approval. Mark the asset state as `half_body_pending` until the user explicitly says it is approved.
 
-- 发型/头发流动: `长发飘动`, `短发整齐`, `辫发`, `飘散刘海`.
-- 光影特效: `暗光`, `柔光`, `背光`, `微光反射`.
-- 镜头/视角: `正脸`, `左侧脸`, `右侧脸`, `轻微俯视`, `轻微仰视`, `三分之二侧脸`.
+When the user asks for a revision, revise only the half-body illustration and return to `half_body_pending`. Do not create avatars.
 
-## Image Prompt Template
+Only after explicit approval, mark the state as `half_body_approved` and continue.
 
-Compose a polished prompt in Chinese. Keep the order close to:
+### 3. Avatar Production
 
-```text
-{角色名}，头肩特写立绘，{姿势}，{镜头/视角}，重点展示面部、眼神和表情，{职业类型}，国风、二次元、半写实风格，{符合人物性格的表情/气质}，{武器/道具展示规则}，{随机披风}，{随机头饰}，{随机服装/甲胄}，{随机发型}，{随机色彩点缀}，{随机光影特效}，透明背景/镂空背景，参考光荣三国志10美术风格
-```
+Use the approved half-body image as an identity and style reference.
 
-For `武器/道具展示规则`, use one of:
+- Generate a close face-and-shoulders avatar master with the face large enough to remain readable at 256 px.
+- Export the square avatar at 256 x 256.
+- Create the circular avatar at 256 x 256 from the same approved avatar composition. Use a circular alpha mask; do not bake a circular frame or background.
 
-- If the weapon should be visible: `{武器/道具}由画面内可见的手自然握持，手指结构正确，握持姿势合理`.
-- If the weapon is not necessary for the portrait: `不展示武器，避免武器遮挡面部和表情`.
-- If `武器/道具` is missing, remove that segment and its extra comma.
+### 4. Transparency and QA
 
-Append these generation constraints when creating an image:
+Use a flat #00ff00 chroma-key background during image generation. Explicitly remove #00ff00 afterwards; do not rely on automatic border-color selection when the subject touches the edge.
 
-```text
-高质量角色头像设定图，画面只包含头部至肩部，人物面部完整清晰，眼神和表情明确，服饰层次丰富，金属、皮革、丝绸或布料质感明确，透明背景，alpha通道，镂空背景，无任何可见背景色、底色、渐变、阴影底板、场景或边框，无文字，无水印，不要全身，不要半身到腰，不要现代服饰，不要照片写实脸。若展示武器，必须出现正常握持武器的手；否则不要展示武器。
-```
+Validate every final asset:
 
-Do not expose the random selection process unless the user asks for variants or the selected elements.
+- Exact required pixel dimensions.
+- RGBA alpha channel present.
+- Transparent outer corners for the circular avatar.
+- No visible green key-color fringe, especially around hair, plumes, sharp armor, and gold highlights.
+- No clipped face, crown, or primary shoulder identifier.
+- No accidental text, UI, weapon fragments, or background.
+- Pose and expression communicate the direction brief; the result does not read as a generic ID-photo stance.
 
-## Variants
+Use a temporary preview only for QA. Do not combine final deliverables into a contact sheet.
 
-When the user asks for multiple versions, vary the random elements while keeping the same core style. For each variant, include a compact label such as `版本A` and then the prompt.
+## Storage
 
-For multiple generated images, create one prompt per version and run one image-generation call per version. Keep character identity and core request stable; vary costume, hair, colors, and lighting.
+Store final files together at:
+
+`assets/characters/{character_id}/vNN-halfbody-avatar-256/`
+
+Use these filenames:
+
+- `{character_id}-upperbody-512x1156.png`
+- `{character_id}-avatar-square-256.png`
+- `{character_id}-avatar-circle-256.png`
+
+Keep a short `manifest.json` in the same version folder with the model source path, the approved half-body source path, output dimensions, `approval_state`, and the selected `character_direction` brief.
+
+## Prompt Constraints
+
+For half-body art, specify a narrow vertical crop, the selected direction brief, large shoulder identifiers, chest and upper abdomen, and no legs or full-body pose. Center the face only when the pose direction calls for it; otherwise preserve a deliberate three-quarter or asymmetrical composition.
+
+For avatars, specify a large face, eyes near center, minimal empty space, and a circle-safe margin. Preserve the approved half-body's emotional read instead of reverting to a neutral expression. Never simply shrink a distant full-body illustration into an icon.
+
+State the identity anchors from the model reference in every prompt. Use the approved half-body asset as the strongest style and facial reference after approval.

@@ -16,7 +16,7 @@
 | --- | --- | --- | --- |
 | 主策划 | `docs/project-context.md` | `README.md`、`docs/game-design.md`、`docs/design/`、`tests/acceptance-checklist.md`、必要索引文档 | UI 图片资源本体、工程代码、音频资源，除非任务明确要求 |
 | UI/UX | `docs/project-context.md`、`docs/design/ui-ux/ui-index.md` | `docs/design/ui-ux/`、`docs/design/ui-ux/asset-manifest.md`、任务指定 UI 资源说明 | 核心玩法、数值、关卡、英雄技能细案全文，除非获许可 |
-| UI 美术资源 | `docs/design/ui-ux/art-asset-generation-workflow.md`、`docs/design/ui-ux/asset-manifest.md` | `assets/ui/` 指定目录、资源 README/manifest | 核心玩法、英雄技能、数值、关卡 |
+| UI 美术资源 | `docs/design/ui-ux/art-asset-generation-workflow.md`、`docs/design/ui-ux/character-portrait-production-rules.md`、`docs/design/ui-ux/asset-manifest.md` | `assets/ui/`、`assets/characters/` 指定目录、资源 README/manifest | 核心玩法、英雄技能、数值、关卡 |
 | 程序顾问 | `docs/project-context.md`、`docs/y3-implementation-alignment.md` | 技术咨询文档、表字段、原型或工具说明 | 擅自决定 Y3 工程架构、擅自改核心玩法 |
 | 数值/战斗验证 | `docs/project-context.md`、`tests/combat-sim-validation.md` | 战斗验证记录、模拟器规程、必要战斗细案 | UI 资源、非战斗文档全文 |
 | 测试验收 | `tests/acceptance-checklist.md` | `tests/`、任务相关设计文档 | 擅自修改玩法细案、UI 资源、工程代码 |
