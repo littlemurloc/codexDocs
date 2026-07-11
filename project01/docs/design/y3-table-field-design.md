@@ -2,7 +2,7 @@
 
 本文定义后续在 Y3 中落表时建议使用的策划表字段。当前优先服务新版第一版 8 英雄、3x3 站位、英雄小队、技能升星解锁和技能卡牌池。旧版装备、旧版战备 3 选 1 和旧版羁绊字段不作为当前落表优先级。
 
-当前第一批 8 英雄技能落表草案见 [first-batch-8-heroes-y3-skill-table-v0.md](first-batch-8-heroes-y3-skill-table-v0.md)。
+当前第一批 10 英雄技能配置入口见 [first-batch-10-heroes-skill-config-v1.md](first-batch-10-heroes-skill-config-v1.md)。旧 8 英雄落表草案见 [first-batch-8-heroes-y3-skill-table-v0.md](first-batch-8-heroes-y3-skill-table-v0.md)，仅作历史参考。
 
 ## 表格总览
 

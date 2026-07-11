@@ -11,7 +11,7 @@ Create reusable character UI assets from a single full-body 45-degree model scre
 
 - Accept one full-body 45-degree model image as the required visual source. Do not require face close-ups or upper-body source images.
 - Do not generate or deliver full-body illustrations. The approved character illustration format is upper body only.
-- Preserve the approved project direction: dark Chinese historical-fantasy game art; concise angular brushwork; controlled ink texture; readable red, black, and antique-gold accents; no glossy 3D-render look.
+- Preserve the approved project direction: Chinese ink-and-wash digital character painting. Use realistic bone structure, decisive calligraphic brushwork, an ink-led value hierarchy, selective antique-gold accents, and clear lost-and-found edges. Do not use glossy 3D-render treatment.
 - Create the half-body illustration first. Stop and request explicit user approval.
 - Do not generate square or circular avatars until the user explicitly approves that half-body illustration. Treat revisions as still pending approval.
 - Use the approved half-body illustration as the visual source for every downstream avatar. Do not ask for additional face reference images.
@@ -39,6 +39,21 @@ Collect:
 - Optional personality, mood, or pose note.
 
 Infer face, costume, hair, weapon, palette, silhouette, and iconic accessories from the model reference. Vary the half-body pose to fit the character's personality, but retain all visible identity anchors.
+
+Treat hair, crowns, helmets, hairpins, eyepatches, and other headwear as character-specific identity anchors. Preserve the model's head design by default; apply a head-design change only when the user explicitly requests it for that character. Never generalize one character's approved exception to later characters.
+
+### Style Master: Chinese Ink-and-Wash Digital Portrait
+
+Apply the following visual language to every new character asset unless the user explicitly requests an exception:
+
+- **Bone structure first:** design the brow ridge, cheekbone, nose bridge, jaw, and neck as a few clear planes. Do not rely on smooth airbrushed skin gradients.
+- **Brushwork with direction:** hair, beard, plumes, fabric folds, and armor edges use visible calligraphic dry-brush strokes, broken strokes, and restrained flying-white texture. Brush marks must follow form and motion rather than read as random splatter.
+- **Ink-led value structure:** establish charcoal, ink-black, warm umber, and smoky gray masses before local color. Keep chroma subordinate to value; use cinnabar, muted green/blue, and antique gold as controlled accents.
+- **Materials by mass, not simulation:** render armor with broad ink-dark and umber planes plus sparse gold edge accents. Avoid chrome-like reflections, uniform bevel highlights, dense engraved micro-detail, and glossy plastic surfaces.
+- **Lost-and-found edges:** keep eyes, brows, face silhouette, and identity anchors crisp; let selected robe, hair, plume, cloak, and armor edges dissolve into softer ink-wash or broken-brush edges. Do not make every contour equally sharp.
+- **Composed restraint:** preserve negative space and do not explain every surface. Put the highest rendering density only on face, emotional read, and the character's key identifiers.
+
+For transparent assets, use the same ink-wash treatment inside the character silhouette. The external background remains removable chroma key; never add unrelated paper texture, scene, smoke, or splashes outside the silhouette.
 
 ### Character Direction Brief
 
@@ -92,7 +107,7 @@ Validate every final asset:
 - RGBA alpha channel present.
 - Transparent outer corners for the circular avatar.
 - No visible green key-color fringe, especially around hair, plumes, sharp armor, and gold highlights.
-- No clipped face, crown, or primary shoulder identifier.
+- No clipped face or primary shoulder identifier. In avatar framing, a tall crown plume may crop beyond the frame only when its recognisable crown base remains visible and the larger face materially improves small-size readability.
 - No accidental text, UI, weapon fragments, or background.
 - Pose and expression communicate the direction brief; the result does not read as a generic ID-photo stance.
 
@@ -114,7 +129,7 @@ Keep a short `manifest.json` in the same version folder with the model source pa
 
 ## Prompt Constraints
 
-For half-body art, specify a narrow vertical crop, the selected direction brief, large shoulder identifiers, chest and upper abdomen, and no legs or full-body pose. Center the face only when the pose direction calls for it; otherwise preserve a deliberate three-quarter or asymmetrical composition.
+For half-body art, specify a narrow vertical crop, the selected direction brief, large shoulder identifiers, chest and upper abdomen, and no legs or full-body pose. Center the face only when the pose direction calls for it; otherwise preserve a deliberate three-quarter or asymmetrical composition. Include the Style Master constraints in every prompt: realistic bone planes, calligraphic dry-brush direction, ink-led value masses, selective antique-gold accents, and lost-and-found edges.
 
 For avatars, specify a large face, eyes near center, minimal empty space, and a circle-safe margin. Preserve the approved half-body's emotional read instead of reverting to a neutral expression. Never simply shrink a distant full-body illustration into an icon.
 

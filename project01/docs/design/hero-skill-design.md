@@ -4,7 +4,7 @@
 
 ## 当前主源
 
-当前第一版只以 8 个英雄为主：
+当前第一版已有 10 个英雄进入技能配置准备：
 
 - 吕布
 - 张飞
@@ -14,14 +14,18 @@
 - 赵云
 - 刘备
 - 夏侯惇
+- 司马懿
+- 甘宁
 
-上述 8 人的定位、核心职责、专属循环、阶段技能、主动/被动划分，以 [first-batch-8-heroes-latest-skills.md](first-batch-8-heroes-latest-skills.md) 为准。
+已通过的 8 人定位、核心职责、专属循环、阶段技能、主动/被动划分，以 [first-batch-8-heroes-latest-skills.md](first-batch-8-heroes-latest-skills.md) 为准。司马懿、甘宁的正式配置入口为 [first-batch-10-heroes-skill-config-v1.md](first-batch-10-heroes-skill-config-v1.md)。
 
 后续新增英雄、复盘英雄或审查技能稿时，先参考 [hero-skill-template-guideline.md](hero-skill-template-guideline.md)。
 
 落表审查、目标对象、卡牌池价值和规则注释见 [first-batch-8-heroes-skill-implementation-audit.md](first-batch-8-heroes-skill-implementation-audit.md)。
 
 接近 Y3 表字段的 48 技能落表草案见 [first-batch-8-heroes-y3-skill-table-v0.md](first-batch-8-heroes-y3-skill-table-v0.md)。
+
+首批 10 人共 60 个技能的 v1 配置入口见 [first-batch-10-heroes-skill-config-v1.md](first-batch-10-heroes-skill-config-v1.md)。该文档正在补齐程序实现所需字段；旧 8 人 v0 表不再作为后续新增字段的入口。
 
 ## 战场站位映射
 
