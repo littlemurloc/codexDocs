@@ -39,5 +39,13 @@
 | --- | --- | --- |
 | 目标单位类型 | `target_unit_type` | leader / soldier / all / self / current_target。 |
 | 目标规则 | `target_rule` | 当前目标、生命最低队长、当前一路、当前目标区域等。 |
-| 是否进卡牌池 | `can_enter_card_pool` | 主动技能且所属英雄关闭自动释放后可进入。 |
+| 主动释放方式 | `active_cast_mode` | P0 固定为 `auto`；英雄主动技能不进入卡池。 |
 | 解锁星级 | `unlock_star_level` | 技能通过几星解锁。 |
+
+## 通用军令相关属性
+
+| 属性 | 字段 | 说明 |
+| --- | --- | --- |
+| 军令 ID | `tactical_command_id` | 固定三张通用军令卡的配置主键。 |
+| 军令目标规则 | `command_target_rule` | 友方队长及其小队、敌方队长或精英及其小队等。 |
+| 每波使用上限 | `command_use_limit_per_wave` | 普通/精英波为 1，Boss 波为 2。 |

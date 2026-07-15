@@ -7,9 +7,8 @@
 | 模块 | 状态 | 依据 |
 | --- | --- | --- |
 | 核心规则 | 当前依据 | `docs/design/general-rules.md` |
-| 第一批 8 英雄 | 当前依据 | `docs/design/first-batch-8-heroes-latest-skills.md` |
-| 技能落表审查 | 当前依据 | `docs/design/first-batch-8-heroes-skill-implementation-audit.md` |
-| 技能表草案 | 当前依据 | `docs/design/first-batch-8-heroes-y3-skill-table-v0.md` |
+| 首批 10 英雄 | 当前依据 | `docs/design/first-batch-10-heroes-skill-config-v1.md` |
+| 通用军令 V0 | 当前依据 | `docs/design/tactical-command-v0.md` |
 | 验收 | 当前依据 | `tests/acceptance-checklist.md` |
 | 装备 | 已废弃待重做 | 旧版装备文档仅历史参考 |
 | 战备 | 已废弃待重做 | 旧版战备 3 选 1 仅历史参考 |
@@ -24,14 +23,15 @@
 - 玩家队长死亡后小兵溃败，NPC 队长死亡后小兵继续战斗。
 - 每名英雄 6 技能，3 主动 + 3 被动，通过升星解锁。
 - 英雄进入战斗自动携带全部已解锁技能。
-- 自动释放开关按英雄关闭，关闭后该英雄所有已解锁主动技能进入公共 HUD 卡牌池。
+- 已解锁主动技能始终自动释放，不提供按英雄关闭自动释放的开关。
+- 战斗 HUD 固定显示 3 张通用军令；普通/精英波每波可用 1 张，Boss 波每波可用 2 张且不得重复。
 - 旧版 6 选 4、旧装备、旧战备、旧羁绊不得作为首轮原型通过条件。
 
 ## 首轮原型优先验证
 
 1. 阵容与 3x3 站位。
-2. 战斗 HUD 与技能卡牌。
+2. 战斗 HUD 与通用军令。
 3. 备战状态。
 4. 通关奖励。
 5. 失败结算。
-6. 8 英雄专属循环是否可读、可测、可落表。
+6. 首批 10 英雄专属循环与通用军令是否可读、可测、可落表。

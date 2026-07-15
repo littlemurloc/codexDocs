@@ -23,10 +23,11 @@
 
 ## 当前主策划重点文档
 
-- `docs/design/first-batch-8-heroes-latest-skills.md`：当前第一批 8 英雄技能主源。
+- `docs/design/first-batch-10-heroes-skill-config-v1.md`：当前首批 10 英雄技能落表主源。
+- `docs/design/tactical-command-v0.md`：当前通用军令 V0 主源。
 - `docs/design/hero-skill-template-guideline.md`：新增英雄、复盘英雄和审查技能稿的模板规范。
-- `docs/design/first-batch-8-heroes-skill-implementation-audit.md`：技能落表审查。
-- `docs/design/first-batch-8-heroes-y3-skill-table-v0.md`：Y3 技能落表草案。
+- `docs/design/first-batch-8-heroes-skill-implementation-audit.md`：首批 8 英雄的历史审查补充。
+- `docs/design/first-batch-8-heroes-y3-skill-table-v0.md`：已废弃的旧 Y3 技能落表草案，仅作历史参考。
 - `docs/design/general-rules.md`：当前核心规则。
 - `tests/acceptance-checklist.md`：当前验收口径。
 

@@ -4,13 +4,13 @@
 
 ## 当前阶段
 
-项目处于“新版第一版 8 英雄技能定型 + Y3 首轮原型准备”阶段，不是完整 Y3 实装阶段。
+项目处于“首批 10 英雄技能定型 + 通用军令 V0 + Y3 首轮原型准备”阶段，不是完整 Y3 实装阶段。
 
 当前优先事项：
 
-1. 保持 8 英雄技能主源正确。
-2. 补齐 Y3 技能落表字段。
-3. 验证 3x3 站位、小队规则、自动/手动技能卡牌池。
+1. 保持首批 10 英雄技能主源正确。
+2. 补齐 Y3 技能与通用军令落表字段。
+3. 验证 3x3 站位、小队规则、英雄自动技能和固定通用军令。
 4. 使用 P0 UI 组件拼接阵容、战斗 HUD、备战、通关奖励和失败结算流程。
 
 ## 当前核心玩法口径
@@ -23,15 +23,15 @@
 - 玩家队长死亡后小兵溃败，NPC 队长死亡后小兵继续战斗。
 - 每名英雄 6 技能，3 主动 + 3 被动，通过升星解锁。
 - 英雄进入战斗自动携带所有已解锁技能。
-- 自动释放开关按英雄关闭；关闭后该英雄所有已解锁主动技能进入公共技能卡牌池。
+- 已解锁主动技能始终自动释放，不提供按英雄关闭自动释放的开关。
+- 玩家主动参与使用固定三张通用军令；普通/精英波可用 1 张，Boss 波可用 2 张且不得重复。
 
 ## 文档入口
 
 - 核心规则：`docs/design/general-rules.md`
 - 英雄技能入口：`docs/design/hero-skill-design.md`
-- 8 英雄主源：`docs/design/first-batch-8-heroes-latest-skills.md`
-- 技能审查：`docs/design/first-batch-8-heroes-skill-implementation-audit.md`
-- 技能落表草案：`docs/design/first-batch-8-heroes-y3-skill-table-v0.md`
+- 10 英雄落表主源：`docs/design/first-batch-10-heroes-skill-config-v1.md`
+- 通用军令 V0：`docs/design/tactical-command-v0.md`
 - 表字段：`docs/design/y3-table-field-design.md`
 - 验收：`tests/acceptance-checklist.md`
 - UI 索引：`docs/design/ui-ux/ui-index.md`
@@ -41,5 +41,6 @@
 
 - 旧版装备、装备压力反查：历史参考，当前待重做。
 - 旧版战备抉择、战备能力池：历史参考，当前待重做。
+- 旧版“关闭英雄自动释放后进入随机技能卡池、每轮抽取 4 张”：已废弃。
 - 旧版羁绊：历史参考，当前暂不考虑。
 - 旧版 24 人英雄池、第二批/第三批、旧读性、旧数值基线：历史参考，不作为当前设计依据。

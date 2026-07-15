@@ -17,13 +17,13 @@
 - 司马懿
 - 甘宁
 
-已通过的 8 人定位、核心职责、专属循环、阶段技能、主动/被动划分，以 [first-batch-8-heroes-latest-skills.md](first-batch-8-heroes-latest-skills.md) 为准。司马懿、甘宁的正式配置入口为 [first-batch-10-heroes-skill-config-v1.md](first-batch-10-heroes-skill-config-v1.md)。
+首批 10 人的定位、核心职责、阶段技能、主动/被动划分与实现字段，以 [first-batch-10-heroes-skill-config-v1.md](first-batch-10-heroes-skill-config-v1.md) 为准。已通过的 8 人玩家阅读文本可回溯 [first-batch-8-heroes-latest-skills.md](first-batch-8-heroes-latest-skills.md)。
 
 后续新增英雄、复盘英雄或审查技能稿时，先参考 [hero-skill-template-guideline.md](hero-skill-template-guideline.md)。
 
-落表审查、目标对象、卡牌池价值和规则注释见 [first-batch-8-heroes-skill-implementation-audit.md](first-batch-8-heroes-skill-implementation-audit.md)。
+落表审查、目标对象和规则注释见 [first-batch-8-heroes-skill-implementation-audit.md](first-batch-8-heroes-skill-implementation-audit.md)。
 
-接近 Y3 表字段的 48 技能落表草案见 [first-batch-8-heroes-y3-skill-table-v0.md](first-batch-8-heroes-y3-skill-table-v0.md)。
+旧 48 技能落表草案见 [first-batch-8-heroes-y3-skill-table-v0.md](first-batch-8-heroes-y3-skill-table-v0.md)，仅作历史参考，不得用于当前落表。
 
 首批 10 人共 60 个技能的 v1 配置入口见 [first-batch-10-heroes-skill-config-v1.md](first-batch-10-heroes-skill-config-v1.md)。该文档正在补齐程序实现所需字段；旧 8 人 v0 表不再作为后续新增字段的入口。
 
@@ -62,13 +62,10 @@
 - 技能通过外围英雄升星依次解锁。
 - 英雄进入战斗时自动携带所有已经解锁的技能。
 - 旧版“每名武将 6 个技能，战前携带 4 个”的设定已废弃。
-- 被动技能解锁后随英雄生效，不进入技能卡牌池。
-- 已解锁主动技能默认可自动释放。
-- 自动释放开关按英雄关闭，不按单个技能关闭。
-- 关闭某名英雄自动释放后，该英雄所有已解锁主动技能进入公共 HUD 技能卡牌池。
-- 开启某名英雄自动释放后，该英雄所有已解锁主动技能不进入卡牌池。
-- 当前每轮最多抽取 4 张技能卡牌。
-- 冷却中、系统锁定或死亡英雄所属技能不会被抽取。
+- 被动技能解锁后随英雄自动生效。
+- 已解锁主动技能始终自动释放；V0 不提供按英雄关闭自动释放的开关。
+- 英雄技能不进入任何卡池，不参与随机抽取，也不以卡牌形式手动释放。
+- 战斗中的主动参与由 [tactical-command-v0.md](tactical-command-v0.md) 定义的固定三张通用军令卡承担。
 
 ## 英雄小队模型
 
@@ -97,4 +94,6 @@
 
 旧版首批/第二批/第三批武将池、旧版 24 人扩展稿、旧版武将读性稿和旧版首批数值基线不再作为当前设计依据。
 
-旧版装备、战备和羁绊已经废弃或暂缓，不应继续按旧流派反推当前英雄技能。新版装备、战备和羁绊应在第一版 8 英雄技能规则基本定型后重新讨论。
+旧版装备、战备和羁绊已经废弃或暂缓，不应继续按旧流派反推当前英雄技能。新版装备、战备和羁绊应在首批 10 英雄技能规则基本定型后重新讨论。
+
+旧版“关闭英雄自动释放后，全部主动技能进入公共随机卡池”和“每轮抽取 4 张技能卡”已废弃。
