@@ -1,6 +1,6 @@
 # 第一批 8 英雄 Y3 技能落表草案 v0
 
-> 已废弃：本文保留旧字段和历史讨论，包含已取消的英雄随机技能卡池规则，不得作为设计、实现或验收依据。当前请使用 `first-batch-10-heroes-skill-config-v1.md` 与 `tactical-command-v0.md`。
+> 已废弃：本文保留旧字段和历史讨论，包含已取消的英雄随机技能卡池规则，不得作为设计、实现或验收依据。当前请使用 `first-batch-10-heroes-skill-config-v1.md` 与 `tactical-command-card-system-v1.md`。
 
 本文把当前第一批 8 英雄技能整理成接近 `HeroSkillConfig` 的策划表口径。技能玩家文本以 [first-batch-8-heroes-latest-skills.md](first-batch-8-heroes-latest-skills.md) 为主，审查注释见 [first-batch-8-heroes-skill-implementation-audit.md](first-batch-8-heroes-skill-implementation-audit.md)。
 

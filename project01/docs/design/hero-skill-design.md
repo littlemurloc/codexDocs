@@ -1,6 +1,6 @@
 ﻿# Hero And Skill Design
 
-本文档是英雄与技能系统的索引和规则入口，不再承载旧版 24 人武将池。当前首批英雄唯一技能主源为 [first-batch-8-heroes-latest-skills.md](first-batch-8-heroes-latest-skills.md)。
+本文档是英雄与技能系统的索引和规则入口，不再承载旧版 24 人武将池。当前首批英雄技能配置主源为 [first-batch-10-heroes-skill-config-v1.md](first-batch-10-heroes-skill-config-v1.md)。
 
 ## 当前主源
 
@@ -63,9 +63,9 @@
 - 英雄进入战斗时自动携带所有已经解锁的技能。
 - 旧版“每名武将 6 个技能，战前携带 4 个”的设定已废弃。
 - 被动技能解锁后随英雄自动生效。
-- 已解锁主动技能始终自动释放；V0 不提供按英雄关闭自动释放的开关。
+- 已解锁主动技能始终自动释放；不提供按英雄关闭自动释放的开关。
 - 英雄技能不进入任何卡池，不参与随机抽取，也不以卡牌形式手动释放。
-- 战斗中的主动参与由 [tactical-command-v0.md](tactical-command-v0.md) 定义的固定三张通用军令卡承担。
+- 战斗中的主动参与由 [tactical-command-card-system-v1.md](tactical-command-card-system-v1.md) 定义的局内军令卡承担。
 
 ## 英雄小队模型
 

@@ -24,7 +24,8 @@
 ## 当前主策划重点文档
 
 - `docs/design/first-batch-10-heroes-skill-config-v1.md`：当前首批 10 英雄技能落表主源。
-- `docs/design/tactical-command-v0.md`：当前通用军令 V0 主源。
+- `docs/design/tactical-command-card-system-v1.md`：当前军令卡系统主源。
+- `docs/design/tactical-command-v0.md`：固定三卡历史验证方案，不作为当前依据。
 - `docs/design/hero-skill-template-guideline.md`：新增英雄、复盘英雄和审查技能稿的模板规范。
 - `docs/design/first-batch-8-heroes-skill-implementation-audit.md`：首批 8 英雄的历史审查补充。
 - `docs/design/first-batch-8-heroes-y3-skill-table-v0.md`：已废弃的旧 Y3 技能落表草案，仅作历史参考。
@@ -39,5 +40,6 @@
 - 旧版英雄读性和旧数值基线。
 - 旧版装备设计和装备压力反查。
 - 旧版战备 3 选 1 和战备能力池。
+- 固定三张通用军令及其每波使用次数规则。
 - 旧版羁绊设计。
 - 旧版设计自检和最终审查。

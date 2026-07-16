@@ -12,7 +12,7 @@
 - 判断站位、小队、小兵和核心机制是否清晰可读。
 - 为后续 Y3 落表和原型验证提供统一口径。
 
-当前英雄技能落表主源以 [first-batch-10-heroes-skill-config-v1.md](first-batch-10-heroes-skill-config-v1.md) 为准；玩家主动参与规则见 [tactical-command-v0.md](tactical-command-v0.md)。
+当前英雄技能落表主源以 [first-batch-10-heroes-skill-config-v1.md](first-batch-10-heroes-skill-config-v1.md) 为准；玩家主动参与规则见 [tactical-command-card-system-v1.md](tactical-command-card-system-v1.md)。
 
 ## 新英雄立项前检查
 
@@ -150,7 +150,7 @@
 
 - 已解锁主动技能始终自动释放；英雄技能不进入卡牌池，也不提供按英雄关闭自动释放的开关。
 - 主动技能的自动目标、释放阈值和优先级必须可落表，且不能因缺少玩家选点而失效。
-- 玩家主动参与由固定三张通用军令承担。军令不与英雄技能共用冷却，也不改变英雄技能的自动释放规则，详见 `tactical-command-v0.md`。
+- 玩家主动参与由局内军令卡承担。军令不与英雄技能共用冷却，也不改变英雄技能的自动释放规则，详见 `tactical-command-card-system-v1.md`。
 
 ## 被动技能规范
 
