@@ -19,6 +19,8 @@
 
 首批 10 人的定位、核心职责、阶段技能、主动/被动划分与实现字段，以 [first-batch-10-heroes-skill-config-v1.md](first-batch-10-heroes-skill-config-v1.md) 为准。已通过的 8 人玩家阅读文本可回溯 [first-batch-8-heroes-latest-skills.md](first-batch-8-heroes-latest-skills.md)。
 
+后续英雄从 [hero-reserve-roster.md](hero-reserve-roster.md) 的有效预备名单中选择。预备名单不等同于技能已确认名单，具体设计前仍需完成职业与基础战斗类型检查。
+
 后续新增英雄、复盘英雄或审查技能稿时，先参考 [hero-skill-template-guideline.md](hero-skill-template-guideline.md)。
 
 落表审查、目标对象和规则注释见 [first-batch-8-heroes-skill-implementation-audit.md](first-batch-8-heroes-skill-implementation-audit.md)。

@@ -25,6 +25,7 @@
 
 - `docs/design/first-batch-10-heroes-skill-config-v1.md`：当前首批 10 英雄技能落表主源。
 - `docs/design/tactical-command-card-system-v1.md`：当前军令卡系统主源。
+- `docs/design/tactical-command-card-catalog-v1.md`：首批军令、Set、融合结果与逐卡效果主源；程序顾问与数值/战斗验证在处理军令时必须读取。
 - `docs/design/tactical-command-v0.md`：固定三卡历史验证方案，不作为当前依据。
 - `docs/design/hero-skill-template-guideline.md`：新增英雄、复盘英雄和审查技能稿的模板规范。
 - `docs/design/first-batch-8-heroes-skill-implementation-audit.md`：首批 8 英雄的历史审查补充。

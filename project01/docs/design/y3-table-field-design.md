@@ -16,10 +16,11 @@
 | BossConfig | Boss 阶段、技能、弱点窗口 | 必做 |
 | HeroConfig | 英雄基础信息、升星、小队和站位 | 必做 |
 | HeroSkillConfig | 英雄技能、解锁、目标和自动释放规则 | 必做 |
-| CommandCardConfig | 主动军令、被动军略及其购买、展示、效果规则 | 规则已定，字段待补 |
-| CommandSetConfig | 被动吞噬、Set 条件与高阶卡解锁 | 规则已定，字段待补 |
-| BattlePreparationOfferConfig | 备战三报价、购买与刷新规则 | 规则已定，字段待补 |
-| CommandRunStateConfig | 局内军资、已购卡、解锁资格与军略图鉴状态 | 规则已定，字段待补 |
+| CommandCardConfig | 主动军令、被动军略、效果、展示与报价资格 | 必做 |
+| CommandSetConfig | Set 组件、自动融合、高阶结果与路线解锁 | 必做 |
+| BattlePreparationOfferConfig | 备战三报价、购买、刷新与路线/探索/自由位 | 必做 |
+| CommandRunStateConfig | 局内军资、已购卡、已备战主动、解锁资格、军略图鉴与军令点 | 必做 |
+| SquadRunStateConfig | 当前小兵数量、战前路归属、补员与跨波次损失 | 必做 |
 | KeywordConfig | 关键词说明和表现 | 必做 |
 | EnemyPreviewConfig | 下一波敌人预览信息 | 必做 |
 | RewardConfig | 难度通关奖励和局外资源 | 建议 |
@@ -70,14 +71,31 @@
 
 ## 军令卡系统 V1 落表边界
 
-具体字段和数值应在首批卡牌、Set 与经济规则定稿后补齐；当前先锁定以下表职责，避免继续沿用固定三卡的 V0 字段。
+首批卡牌、Set、融合与目标规则已定；基础经济、报价权重与战斗属性公式仍待数值核算。以下字段用于避免继续沿用固定三卡的 V0 字段。
 
 | 表名 | 当前应承载的信息 | 尚待确认的信息 |
 | --- | --- | --- |
-| CommandCardConfig | 卡牌 ID、名称、主动/被动类型、报价资格、购买成本、目标模式、效果规则、HUD/图鉴展示规则。 | 稀有度、数值、主动槽位、使用次数、冷却/充能。 |
-| CommandSetConfig | Set 条件、吞噬/合成关系、高阶卡解锁资格、完成状态的持久记录。 | 首批 Set 目录、卡牌归属、合成后的继承规则。 |
-| BattlePreparationOfferConfig | 每次备战展示 3 个报价、允许多张购买、消耗军资刷新。 | 刷新价格、补位、权重、保底与上限。 |
-| CommandRunStateConfig | 局内军资、已购卡、已解锁卡、Set 完成状态、军略图鉴状态；单局结束后清空。 | 初始军资、获得途径、结算与存档形式。 |
+| CommandCardConfig | `command_card_id`、名称、类型、Set ID、报价资格、购买成本、目标模式、军令点成本、每波次数、预警时间、效果载荷、HUD/图鉴展示规则。 | 基础卡价、稀有度与最终属性公式。 |
+| CommandSetConfig | `command_set_id`、3 个组件 ID、融合模式、自动结果 ID、继承效果、二阶 Set 解锁列表、完成状态。 | 后续扩展 Set 的稀有度与第三层规则。 |
+| BattlePreparationOfferConfig | 每次备战展示 3 个报价、路线/探索/自由位、允许多张购买、消耗军资刷新、根系完成后的两次新解锁保证报价。 | 刷新价格、补位、权重、保底与上限。 |
+| CommandRunStateConfig | 局内军资、已购卡、已解锁卡、Set 完成状态、军略图鉴状态、备战主动军令列表、本波军令点和已用次数；单局结束后清空。 | 初始军资、获得途径、结算与存档形式。 |
+| SquadRunStateConfig | 队长 ID、当前小兵数量、小兵上限、战前路归属、波次阵亡损失、备战补员次数与成本。 | NPC 小兵的跨波次重置策略。 |
+
+## 军令运行时字段建议
+
+| 字段 | 类型建议 | 说明 |
+| --- | --- | --- |
+| command_set_id | string | `break_i`、`fire_i`、`farm_i` 等 Set 主键；独立军略为空。 |
+| fusion_mode | string | `active_evolve` / `passive_consume`。 |
+| fusion_result_id | string | 完成 Set 时自动获得的结果。 |
+| initial_route_target | enum | `top` / `middle` / `bottom`；只读取战前路归属。 |
+| target_priority_rule | string | 例如后排优先、生命比例最低队长/精英。 |
+| refund_on_invalid_target | bool | 预警期目标失效时是否返还本次军令使用。 |
+| effect_timing | string | immediate / delayed / periodic / threshold / wave_start / prep_start 等。 |
+| effect_payload | json | 数值、持续时间、叠层上限、目标过滤、状态标签与表现事件。 |
+| command_point_cost | int | 当前第一版主动军令为 1。 |
+| uses_per_wave | int | 当前第一版主动军令为 1。 |
+| prepared_slot_limit | int | 当前第一版为 3。 |
 
 ## MVP 落表顺序
 
