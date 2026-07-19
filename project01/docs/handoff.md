@@ -82,5 +82,5 @@
 - 已确认表现要求：市场卡显示 Set 名称、进度、缺失组件、融合结果和“新解锁”来源；选路军令按战前上/中/下路归属显示，自动锁定目标须高亮预览。飞骑、伏兵使用临时战术表现，不调度英雄队伍移动。
 - 未完成事项：基础军资经济、刷新价格、报价权重、购买后补位、视觉稿和完整交互状态。
 - 接收角色优先读取：`docs/design/tactical-command-card-system-v1.md`、`docs/design/tactical-command-card-catalog-v1.md`、`docs/design/general-rules.md`。
-- 图标资源任务：先读取 `docs/design/ui-ux/command-card-v1-handoff.md` 的“军令图标资源包 V1”；按效果图审美确认、无文字清稿、工程切片顺序推进，不得直接批量生成最终切片。
+- 图标资源任务：12 张主动军令图标已完成。下一任务是按 `docs/design/ui-ux/command-card-v1-handoff.md` 补齐 30 张被动军略/自动融合图标；先提交完整效果总览审核，再进行无文字清稿、工程切片与 alpha 校验，不得覆盖现有主动军令资源。
 - 越界读取/修改需求：UI/UX 需要修改 UI 文档或资源时，先按本文档的越界申请模板获得项目负责人许可；不得修改核心规则、卡牌效果、军令点和数值。
