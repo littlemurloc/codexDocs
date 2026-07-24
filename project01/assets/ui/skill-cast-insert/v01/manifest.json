@@ -1,0 +1,31 @@
+{
+  "name": "skill-cast-insert-shared-layers",
+  "version": "v01",
+  "new_assets": [
+    { "file": "transparent/ink-brush-cyan.png", "role": "charge_and_arrow_theme", "size": [1672, 941] },
+    { "file": "transparent/ink-brush-cinnabar.png", "role": "burst_and_fire_theme", "size": [1536, 1024] },
+    { "file": "transparent/ink-brush-violet.png", "role": "formation_and_control_theme", "size": [1536, 1024] },
+    { "file": "transparent/ink-brush-jade.png", "role": "heal_and_buff_theme", "size": [1536, 1024] },
+    { "file": "transparent/ink-brush-earth.png", "role": "defense_and_terrain_theme", "size": [1536, 1024] },
+    { "file": "transparent/strategy-scroll-base.png", "role": "shared_strategy_emblem", "size": [1024, 1536] },
+    { "file": "transparent/gold-fragments.png", "role": "optional_shared_decoration", "size": [1536, 1024] }
+  ],
+  "reused_assets": {
+    "skill_icon_frame": "assets/ui/processed/p0_components/battle/ability-icon-slot.png",
+    "ability_name_slot": "assets/ui/processed/p0_components/battle/ability-name-slot.png",
+    "hero_portraits": "assets/characters/<hero>/.../<hero>-upperbody-512x1156.png",
+    "strategy_icons": "assets/ui/command-cards/v01/transparent/*.png"
+  },
+  "runtime_only": [
+    "battlefield_dim_mask",
+    "theme_energy_sweep",
+    "portrait_or_scroll_motion",
+    "ink_mask_reveal"
+  ],
+  "layout": {
+    "anchor": "left_middle",
+    "max_width_screen_fraction": 0.3,
+    "max_height_screen_fraction": 0.35,
+    "keep_clear": ["top_edge", "bottom_edge", "right_battlefield"]
+  }
+}
