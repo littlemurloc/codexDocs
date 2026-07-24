@@ -32,6 +32,8 @@
 
 ## 文档入口
 
+- 面向人类阅读、配置或交付的文档统一存放在 `deliverables/`；内部设计源文件继续存放在 `docs/`。
+
 - 核心规则：`docs/design/general-rules.md`
 - 英雄技能入口：`docs/design/hero-skill-design.md`
 - 10 英雄落表主源：`docs/design/first-batch-10-heroes-skill-config-v1.md`
@@ -40,6 +42,11 @@
 - 军令效果目录：`docs/design/tactical-command-card-catalog-v1.md`
 - 通用军令 V0（历史）：`docs/design/tactical-command-v0.md`
 - 表字段：`docs/design/y3-table-field-design.md`
+- P0 属性与局内成长基线：`docs/design/p0-attribute-progression-v0.1.md`
+- P0 首批 10 英雄基础面板：`docs/design/p0-hero-stat-baseline-v0.1.md`
+- P0 英雄小队、兵种与带兵上限：`docs/design/p0-hero-squad-design-v0.1.md`
+- P0 NPC 名册、敌方英雄队长与难度缩放：`docs/design/p0-npc-roster-and-scaling-v0.1.md`
+- P0 关卡 1 · 难度 1 首轮战斗样本：`docs/design/p0-stage1-difficulty1-combat-sample-v0.1.md`
 - 验收：`tests/acceptance-checklist.md`
 - UI 索引：`docs/design/ui-ux/ui-index.md`
 - UI 资源 manifest：`docs/design/ui-ux/asset-manifest.md`

@@ -12,7 +12,9 @@
 | DifficultyConfig | 每关 10 个难度、门槛、奖励组、推荐标签 | 必做 |
 | WaveConfig | 单个难度内的敌人波次 | 必做 |
 | EnemyGroupConfig | 每波敌方队伍组合 | 必做 |
-| EnemyUnitConfig | 敌方队长/小兵基础配置 | 必做 |
+| EnemyUnitConfig | 敌方队长/小兵基础配置与击杀经验 | 必做 |
+| EnemyHeroLeaderConfig | 敌方英雄队长的等级、星级与小兵配置 | 必做 |
+| DifficultyStatMultiplierConfig | 难度的血量、攻击、护甲、攻速与自然回血系数 | 必做 |
 | BossConfig | Boss 阶段、技能、弱点窗口 | 必做 |
 | HeroConfig | 英雄基础信息、升星、小队和站位 | 必做 |
 | HeroSkillConfig | 英雄技能、解锁、目标和自动释放规则 | 必做 |
@@ -47,6 +49,7 @@
 | battle_grid_slot | int/string | 我方战前摆放格位，按 `741 / 852 / 963` 编号。 |
 | recommended_grid_slots | string/list | 推荐站位格、行、列或侧翼标签。 |
 | active_cast_mode | string | P0 固定为 `auto`；英雄主动技能始终自动释放。 |
+| skill_rank | int | P0 固定为 `1`。本期不提供技能升级渠道；保留字段只为未来局外研习系统兼容，不得在 P0 使用。 |
 
 ## HeroSkillConfig 当前核心字段
 
@@ -57,6 +60,7 @@
 | skill_name | string | 技能名。 |
 | skill_type | string | active / passive。 |
 | unlock_star_level | int | 该技能通过英雄几星解锁。 |
+| skill_rank | int | P0 固定为 `1`，不随英雄等级或星级增长。 |
 | target_rule | string | 当前目标、当前一路、目标区域、生命最低队长等。 |
 | target_unit_type | string | leader / soldier / all / self / current_target。 |
 | cooldown | float | 冷却时间，待补。 |

@@ -1,5 +1,7 @@
 # Enemy Readability Design
 
+> **P0 范围更新（2026-07-25）**：本文的祭酒、渠帅、西凉及 Boss 表现为历史读性骨架，不得作为当前首轮原型依据。P0 仅可制作步卒、弓手、作为队长的力士，以及已有三国英雄的 NPC 队长变体；单位范围和数值以 [p0-npc-roster-and-scaling-v0.1.md](p0-npc-roster-and-scaling-v0.1.md) 为准。
+
 本文件承载敌人的外观读性、技能前摇、战斗表现和 Boss 阶段提示。敌人机制见 [enemy-boss-design.md](enemy-boss-design.md)，波次配置见 [stage-wave-table.md](stage-wave-table.md)。
 
 ## 设计目标
