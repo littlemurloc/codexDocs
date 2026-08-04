@@ -2,7 +2,7 @@
 
 本文定义后续在 Y3 中落表时建议使用的策划表字段。当前优先服务新版第一版 10 英雄、3x3 站位、英雄小队、技能升星解锁和军令卡系统 V1。旧版装备、旧版独立战备 3 选 1 和旧版羁绊字段不作为当前落表优先级。
 
-当前第一批 10 英雄技能配置入口见 [first-batch-10-heroes-skill-config-v1.md](first-batch-10-heroes-skill-config-v1.md)。旧 8 英雄落表草案见 [first-batch-8-heroes-y3-skill-table-v0.md](first-batch-8-heroes-y3-skill-table-v0.md)，仅作历史参考。
+当前第一批 10 英雄技能配置入口见 [first-batch-10-heroes-skill-config-v1.md](first-batch-10-heroes-skill-config-v1.md)。关卡、波次、敌方队伍和敌方英雄技能档位以 [stage-encounter-configuration-rules-v1.md](stage-encounter-configuration-rules-v1.md) 为准，Excel 字段填写见 [stage-monster-table-authoring-guide-v1.md](stage-monster-table-authoring-guide-v1.md)。旧 8 英雄落表草案见 [first-batch-8-heroes-y3-skill-table-v0.md](first-batch-8-heroes-y3-skill-table-v0.md)，仅作历史参考。
 
 ## 表格总览
 
@@ -13,7 +13,7 @@
 | WaveConfig | 单个难度内的敌人波次 | 必做 |
 | EnemyGroupConfig | 每波敌方队伍组合 | 必做 |
 | EnemyUnitConfig | 敌方队长/小兵基础配置与击杀经验 | 必做 |
-| EnemyHeroLeaderConfig | 敌方英雄队长的等级、星级与小兵配置 | 必做 |
+| EnemyHeroLeaderConfig | 敌方英雄队长的技能档位、小兵配置与战前格位 | 必做 |
 | DifficultyStatMultiplierConfig | 难度的血量、攻击、护甲、攻速与自然回血系数 | 必做 |
 | BossConfig | Boss 阶段、技能、弱点窗口 | 必做 |
 | HeroConfig | 英雄基础信息、升星、小队和站位 | 必做 |

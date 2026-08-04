@@ -31,6 +31,8 @@
 - `docs/design/first-batch-8-heroes-skill-implementation-audit.md`：首批 8 英雄的历史审查补充。
 - `docs/design/first-batch-8-heroes-y3-skill-table-v0.md`：已废弃的旧 Y3 技能落表草案，仅作历史参考。
 - `docs/design/general-rules.md`：当前核心规则。
+- `docs/design/stage-encounter-configuration-rules-v1.md`：关卡、波次、敌方队伍与敌方英雄技能档位主源。
+- `docs/design/stage-monster-table-authoring-guide-v1.md`：出怪表字段、填写流程和校验指南。
 - `tests/acceptance-checklist.md`：当前验收口径。
 
 ## 当前废弃/暂缓文件

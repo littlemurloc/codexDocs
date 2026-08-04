@@ -1,6 +1,6 @@
 # Enemy And Boss Design
 
-> **P0 范围更新（2026-07-25）**：本文中的祭酒、渠帅、西凉、赤壁、虎牢等敌人均为历史敌人骨架，不得作为当前首轮原型依据。当前 P0 仅使用步卒、弓手、作为队长的力士，以及已有英雄的 NPC 队长变体；以 [p0-npc-roster-and-scaling-v0.1.md](p0-npc-roster-and-scaling-v0.1.md) 为准。
+> **历史敌人与 Boss 文档**：本文中的敌人名册、波次压力规则和关卡波次建议均为历史骨架，不得作为当前 P0 首轮原型依据。当前 P0 的单位池、波次结构、队伍上限和敌方英雄技能档位以 [stage-encounter-configuration-rules-v1.md](stage-encounter-configuration-rules-v1.md) 为准；基础面板以 [p0-npc-roster-and-scaling-v0.1.md](p0-npc-roster-and-scaling-v0.1.md) 为准。
 
 本文件承载敌人单位、精英、Boss 与波次压力设计。关卡结构、难度解锁和波次定义见 [stage-design.md](stage-design.md)，敌人外观读性和技能前摇见 [enemy-readability-design.md](enemy-readability-design.md)。
 

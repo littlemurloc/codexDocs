@@ -1,6 +1,6 @@
 # P0 NPC 敌人名册与难度缩放 v0.1
 
-> 状态：当前首版敌人主源。仅定义三种原生 NPC 与“英雄 NPC 队长”规则；其余历史敌人、功能怪与 Boss 占位均不进入 P0。
+> 状态：P0 敌人单位名册与基础数值源。关卡层级、每波队伍上限和敌方英雄技能档位以 [stage-encounter-configuration-rules-v1.md](stage-encounter-configuration-rules-v1.md) 为准；本文不再使用 `npc_star_level`。
 
 ## 范围
 
@@ -33,21 +33,19 @@ P0 的原生 NPC 仅有以下三种：
 ```text
 EnemyHeroLeaderConfig
 = hero_id
-+ npc_variant_id
-+ npc_level
-+ npc_star_level
++ leader_skill_tier
++ initial_grid_slot
 + soldier_template_id
 + soldier_count
 ```
 
 - `hero_id` 复用现有英雄基础面板、属性成长、已设计技能与表现资产；不复制出一套独立英雄定义。
-- `npc_variant_id` 承载敌对阵营专属覆写，例如敌方初始站位、小兵模板和小兵数量；它不提供额外属性倍率，也不用于削减技能数量。
-- `npc_level` 为波次固定等级，取 1 至 6；不在战斗中获取经验。
-- `npc_star_level` 为波次固定星级，取 1 至 6；敌方英雄自动携带所有 `unlock_star_level <= npc_star_level` 的技能。技能数不设 3 个上限，6 星敌方英雄就是满技能敌方英雄。
-- 敌方星级与敌方等级独立配置：等级决定基础属性成长，星级决定技能解锁与小兵上限。敌方英雄的小兵上限与我方相同，为 `2 / 3 / 4 / 5 / 6 / 8`；波次可配置低于上限的实际数量，但不得超限。两者均不在战斗中变化。
+- `leader_skill_tier` 只取 `1 / 2 / 3`，分别启用英雄阶段 1 的 2 个技能、阶段 1 至 2 的 4 个技能、全部阶段 1 至 3 的 6 个技能。
+- 敌方英雄不读取玩家存档星级，不使用 `npc_star_level`，也不以技能等级或额外技能倍率制造难度。
+- `initial_grid_slot`、小兵模板和小兵数量由当前波次直接配置。每支队伍固定 1 名队长，最多 8 名小兵；小兵数量与 `leader_skill_tier` 独立。
 - 敌方英雄死亡后，其小兵继续作战；这与玩家英雄死亡后小兵溃败的规则不同。
 
-首轮敌方英雄投放建议：难度 1-2 使用 1 级、1-2 星；难度 3-4 使用 2 级、3-4 星；难度 5-6 使用 3 级、4-5 星；难度 7-8 使用 4 级、5 星；难度 9-10 可使用 5-6 级、6 星满技能英雄。满技能英雄每波最多 1 名，并在波次预览中展示星级与关键技能，保证难度可预判。
+关卡 1 的英雄投放顺序、`难度1 / 2 / 3` 标签与波次组合以 [stage-encounter-configuration-rules-v1.md](stage-encounter-configuration-rules-v1.md) 为准。高阶英雄队长与满编小队必须在波次预览中可识别，保证玩家能判断压力来源。
 
 ## 关卡难度属性系数
 
@@ -83,12 +81,12 @@ EnemyHeroLeaderConfig
 | 表 | 新增/关键字段 |
 | --- | --- |
 | `EnemyUnitConfig` | `enemy_unit_id`、`unit_kind`、难度 1 基础属性、攻击间隔、普攻距离、`xp_reward`、是否队长。 |
-| `EnemyHeroLeaderConfig` | `npc_variant_id`、`hero_id`、`npc_level`、`npc_star_level`、小兵模板/数量。 |
+| `EnemyHeroLeaderConfig` | `hero_id`、`leader_skill_tier`、战前格位、小兵模板/数量。 |
 | `DifficultyStatMultiplierConfig` | `stage_id`、`difficulty_id`、`hp_multiplier`、`physical_attack_multiplier`、`physical_defense_multiplier`、`attack_speed_multiplier`、`natural_regen_multiplier`；后两项 P0 固定为 `1.0`。 |
-| `WaveConfig` | 每路队长 ID、队长变体/等级、步卒/弓手数量、难度系数档位、`wave_clear_xp_bonus`（默认 0，仅特殊额外奖励）。 |
+| `WaveConfig` | 每波 1 至 9 支敌方队伍的队长 ID、战前格位、技能档位、小兵类型/数量、难度系数档位、`wave_clear_xp_bonus`（默认 0，仅特殊额外奖励）。 |
 
 ## 后续校验
 
 1. 用关卡 1 难度 1 的“力士队长 + 步卒 / 弓手”组合验证 2 人默认阵容的 15 至 25 秒波次目标。
 2. 以难度系数 5、10 分别验证 2 人与 4 人阵容，不通过额外提高攻速或控制时长制造难度。
-3. 敌方英雄首次投放时，逐个验证星级解锁出的完整技能循环；6 星满技能英雄必须在波次预览明确告知，且每波不超过 1 名。
+3. 敌方英雄首次投放时，逐个验证 `leader_skill_tier` 解锁出的 2 / 4 / 6 技能循环；高阶英雄和满编小队必须在波次预览明确告知。

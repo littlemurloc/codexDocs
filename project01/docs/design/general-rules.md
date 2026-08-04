@@ -62,7 +62,7 @@
 - 每个英雄带领一支小兵队伍进入战斗。
 - 玩家英雄小兵数量由外围升星等级影响，上限为 8 个小兵 + 1 名英雄；具体 1 至 6 星上限、小兵模板与英雄对应兵种见 [p0-hero-squad-design-v0.1.md](p0-hero-squad-design-v0.1.md)。
 - NPC 敌人小队也由队长和小兵组成，小兵数量直接由波次配表决定。
-- P0 原生 NPC 仅有步卒、弓手与作为队长的力士；已有三国英雄也可通过 NPC 变体成为敌方 9 宫格的队长。具体名册、英雄变体与难度缩放见 [p0-npc-roster-and-scaling-v0.1.md](p0-npc-roster-and-scaling-v0.1.md)。
+- P0 原生 NPC 仅有步卒、弓手与作为队长的力士；已有三国英雄也可成为敌方 9 宫格的队长。单位名册与基础面板见 [p0-npc-roster-and-scaling-v0.1.md](p0-npc-roster-and-scaling-v0.1.md)，关卡层级、队伍上限和英雄技能档位见 [stage-encounter-configuration-rules-v1.md](stage-encounter-configuration-rules-v1.md)。
 - 当前小兵兵种只有近战和远程。
 - 队长和小兵都是独立个体，都可以被技能选为目标。
 - 队长去哪儿，小兵跟随去哪儿；小兵复刻队长行动指令。
@@ -88,7 +88,7 @@
 ## 波次与结算
 
 - 一次单局通常对应一次关卡难度挑战。
-- 正常单局目标为约 10-12 波、约 15 分钟；初期教育关可使用更短波次结构。
+- 正常单局目标为约 10-13 波、约 15 分钟；初期教育关可使用更短波次结构。具体关卡波次曲线以 [stage-encounter-configuration-rules-v1.md](stage-encounter-configuration-rules-v1.md) 为准。
 - 完成当前难度全部波次才算该难度通关。
 - 普通波胜利后进入备战状态，可预览下一波和调整站位。
 - 最终波胜利后进入通关奖励。

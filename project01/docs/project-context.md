@@ -4,14 +4,15 @@
 
 ## 当前阶段
 
-项目处于“首批 10 英雄技能定型 + 军令卡系统 V1.1 首批内容定型 + Y3 首轮原型准备”阶段，不是完整 Y3 实装阶段。
+项目处于“首批 10 英雄技能与军令卡系统 V1.1 已进入实装验证 + 关卡 1 首轮可玩性验证”阶段，不是完整 Y3 实装阶段。
 
 当前优先事项：
 
 1. 保持首批 10 英雄技能主源正确。
 2. 补齐 Y3 技能与军令卡系统 V1.1 的落表字段与程序实现清单。
-3. 在 3x3 站位、小队规则和英雄自动技能基础上，核算军令经济、市场权重与战斗属性公式，并准备原型验证。
-4. 使用 P0 UI 组件拼接阵容、战斗 HUD、备战、通关奖励和失败结算流程。
+3. 在 3x3 站位、小队规则、英雄自动技能与军令实装基础上，验证关卡 1 的 10 难度怪物配置、波次节奏与跨波损耗。
+4. 核算军令经济、市场权重与战斗属性公式，并准备下一轮原型验证。
+5. 使用 P0 UI 组件拼接阵容、战斗 HUD、备战、通关奖励和失败结算流程。
 
 ## 当前核心玩法口径
 
@@ -46,6 +47,8 @@
 - P0 首批 10 英雄基础面板：`docs/design/p0-hero-stat-baseline-v0.1.md`
 - P0 英雄小队、兵种与带兵上限：`docs/design/p0-hero-squad-design-v0.1.md`
 - P0 NPC 名册、敌方英雄队长与难度缩放：`docs/design/p0-npc-roster-and-scaling-v0.1.md`
+- 关卡与怪物配置规则：`docs/design/stage-encounter-configuration-rules-v1.md`
+- 出怪表填表与校验指南：`docs/design/stage-monster-table-authoring-guide-v1.md`
 - P0 关卡 1 · 难度 1 首轮战斗样本：`docs/design/p0-stage1-difficulty1-combat-sample-v0.1.md`
 - 验收：`tests/acceptance-checklist.md`
 - UI 索引：`docs/design/ui-ux/ui-index.md`
