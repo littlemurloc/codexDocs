@@ -39,9 +39,9 @@ EnemyHeroLeaderConfig
 + soldier_count
 ```
 
-- `hero_id` 复用现有英雄基础面板、属性成长、已设计技能与表现资产；不复制出一套独立英雄定义。
+- `hero_id` 复用现有英雄的 1 级基础面板、已设计技能与表现资产；不复制出一套独立英雄定义。P0 敌方英雄固定 `npc_level = 1`，不读取或配置英雄属性成长。
 - `leader_skill_tier` 只取 `1 / 2 / 3`，分别启用英雄阶段 1 的 2 个技能、阶段 1 至 2 的 4 个技能、全部阶段 1 至 3 的 6 个技能。
-- 敌方英雄不读取玩家存档星级，不使用 `npc_star_level`，也不以技能等级或额外技能倍率制造难度。
+- 敌方英雄不读取玩家存档星级，不使用 `npc_star_level`，也不配置每波 `npc_level`；其数值难度只通过关卡难度属性系数调整，不以技能等级、额外技能倍率或隐藏等级制造难度。
 - `initial_grid_slot`、小兵模板和小兵数量由当前波次直接配置。每支队伍固定 1 名队长，最多 8 名小兵；小兵数量与 `leader_skill_tier` 独立。
 - 敌方英雄死亡后，其小兵继续作战；这与玩家英雄死亡后小兵溃败的规则不同。
 
@@ -52,12 +52,16 @@ EnemyHeroLeaderConfig
 敌方模板只保存难度 1 的基础属性。关卡难度的**可调属性池**固定为：最大生命、物理攻击、物理防御、攻击速度、自然回血；除这五项外，不得以难度名义直接提高其他属性，新增属性必须另行评审。实际生成时，由关卡难度对指定属性施加可配置乘法系数：
 
 ```text
-队长等级基础属性 = 基础属性 + (npc_level - 1) × 属性成长
-最终 NPC 属性 = round(队长等级基础属性 × 关卡难度属性系数)
+原生队长等级基础属性 = 基础属性 + (npc_level - 1) × 属性成长
+原生队长最终属性 = round(原生队长等级基础属性 × 关卡难度属性系数)
+
+敌方英雄 P0 基础属性 = HeroConfig 的 1 级基础属性
+敌方英雄最终属性 = round(敌方英雄 P0 基础属性 × 关卡难度属性系数)
 ```
 
 - 步卒、弓手没有等级成长，直接从基础属性进入难度系数。
 - 力士默认 `npc_level = 1`，可由波次覆写。
+- 敌方英雄在 P0 中固定 `npc_level = 1`，`EnemyHeroLeaderConfig` 与波次表均不得出现英雄等级覆写字段。
 - 未配置的属性系数固定为 `1.0`；首轮只启用最大生命、物理攻击、物理防御三项。
 - 攻击速度与自然回血属于已批准的后续调节池，但首轮系数固定为 `1.0`。若三项成长不足以解决高难度节奏问题，再以单独方案讨论启用范围、上限与关卡档位。
 - 攻击范围、命中、闪避、暴击、控制时长和技能 CD 不随难度自动缩放，保证敌人可读性。
@@ -81,7 +85,7 @@ EnemyHeroLeaderConfig
 | 表 | 新增/关键字段 |
 | --- | --- |
 | `EnemyUnitConfig` | `enemy_unit_id`、`unit_kind`、难度 1 基础属性、攻击间隔、普攻距离、`xp_reward`、是否队长。 |
-| `EnemyHeroLeaderConfig` | `hero_id`、`leader_skill_tier`、战前格位、小兵模板/数量。 |
+| `EnemyHeroLeaderConfig` | `hero_id`、`leader_skill_tier`、战前格位、小兵模板/数量；P0 敌方英雄固定等级 1，不配置 `npc_level`。 |
 | `DifficultyStatMultiplierConfig` | `stage_id`、`difficulty_id`、`hp_multiplier`、`physical_attack_multiplier`、`physical_defense_multiplier`、`attack_speed_multiplier`、`natural_regen_multiplier`；后两项 P0 固定为 `1.0`。 |
 | `WaveConfig` | 每波 1 至 9 支敌方队伍的队长 ID、战前格位、技能档位、小兵类型/数量、难度系数档位、`wave_clear_xp_bonus`（默认 0，仅特殊额外奖励）。 |
 

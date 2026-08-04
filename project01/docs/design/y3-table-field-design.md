@@ -63,6 +63,10 @@
 | skill_rank | int | P0 固定为 `1`，不随英雄等级或星级增长。 |
 | target_rule | string | 当前目标、当前一路、目标区域、生命最低队长等。 |
 | target_unit_type | string | leader / soldier / all / self / current_target。 |
+| target_scope | string | 目标搜索范围；例如 `cast_range`、`global_ally_leaders`。未填敌方技能默认 `cast_range`，未填友方全局辅助默认按技能规则扫描全场。 |
+| target_sort_rule | string | 主排序条件；例如 `lowest_hp_pct`、`highest_attack`、`current_target`。 |
+| target_tie_break_rule | string | P0 固定为：合法当前目标优先，其次距离更近，最后单位实体 ID 更早。 |
+| invalid_target_behavior | string | `reselect_once_or_cancel` / `cancel_no_cooldown` 等；预警或延迟技能默认锁定后取消，除非明确允许重新锁定。 |
 | cooldown | float | 冷却时间，待补。 |
 | cast_range | float | 释放距离，待补。 |
 | effect_type | string | 伤害、治疗、护盾、控制、增益、减益等。 |
@@ -70,7 +74,6 @@
 | duration | float | 持续时间，待补。 |
 | active_cast_mode | string | P0 固定为 `auto`，不支持英雄技能卡池。 |
 | position_passive_rule | string | 站位被动触发条件或规则 ID。 |
-| ai_priority | string/int | 自动释放优先级。 |
 | readability_note | string | 技能表现说明，待补。 |
 
 ## 军令卡系统 V1 落表边界
