@@ -2,7 +2,7 @@
 
 ## 资源
 
-- 预览图：`assets/ui/preview/battle-hud-v07.png`
+- 预览图：`assets/art/ui/preview/battle-hud-v07.png`
 - 状态：已确认
 - 界面：战斗 HUD
 - 设计方向：轻量局内 HUD，优先保证战斗观赏

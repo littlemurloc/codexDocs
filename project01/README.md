@@ -1,4 +1,4 @@
-﻿# 三国斗阵 Project01
+# 三国斗阵 Project01
 
 当前主项目是《三国斗阵》Y3 单人 PVE 自动战斗设计案。当前优先目标是新版第一版 8 英雄技能定型、3x3 站位、小队规则、技能卡牌池和首轮 Y3 原型准备。
 
@@ -35,6 +35,6 @@
 
 ## UI 资源当前状态
 
-- `assets/ui/processed/p0_components/`：首轮 Y3 原型拼接主资源。
-- `assets/ui/processed/p0/`：快速布局和比例参考。
-- `assets/ui/export/basic-ui-kits-sanguo-v01/extracted-controls-v12-imagegen-reference-redraw/`：基础控件候选资源，下一步只做审美、透明边缘和九宫格复核，不直接替换 P0 组件。
+- `assets/art/ui/processed/p0_components/`：首轮 Y3 原型拼接主资源。
+- `assets/art/ui/processed/p0/`：快速布局和比例参考。
+- `assets/art/ui/export/basic-ui-kits-sanguo-v01/extracted-controls-v12-imagegen-reference-redraw/`：基础控件候选资源，下一步只做审美、透明边缘和九宫格复核，不直接替换 P0 组件。

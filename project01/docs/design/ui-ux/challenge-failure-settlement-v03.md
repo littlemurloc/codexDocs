@@ -2,7 +2,7 @@
 
 ## 资源
 
-- 预览图：`assets/ui/preview/challenge-failure-settlement-v03.png`
+- 预览图：`assets/art/ui/preview/challenge-failure-settlement-v03.png`
 - 状态：已确认
 - 界面：挑战失败结算
 - 触发时机：我方全灭后

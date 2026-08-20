@@ -1,4 +1,4 @@
-﻿# Project Agent Rules
+# Project Agent Rules
 
 本文定义《三国斗阵》项目中不同角色 agent 的工作边界。它不替代 Codex 文件系统权限，只约束项目协作方式。
 
@@ -16,7 +16,7 @@
 | --- | --- | --- | --- |
 | 主策划 | `docs/project-context.md` | `README.md`、`docs/game-design.md`、`docs/design/`、`tests/acceptance-checklist.md`、必要索引文档 | UI 图片资源本体、工程代码、音频资源，除非任务明确要求 |
 | UI/UX | `docs/project-context.md`、`docs/design/ui-ux/ui-index.md` | `docs/design/ui-ux/`、`docs/design/ui-ux/asset-manifest.md`、任务指定 UI 资源说明 | 核心玩法、数值、关卡、英雄技能细案全文，除非获许可 |
-| UI 美术资源 | `docs/design/ui-ux/art-asset-generation-workflow.md`、`docs/design/ui-ux/character-portrait-production-rules.md`、`docs/design/ui-ux/asset-manifest.md` | `assets/ui/`、`assets/characters/` 指定目录、资源 README/manifest | 核心玩法、英雄技能、数值、关卡 |
+| UI 美术资源 | `docs/design/ui-ux/art-asset-generation-workflow.md`、`docs/design/ui-ux/character-portrait-production-rules.md`、`docs/design/ui-ux/asset-manifest.md` | `assets/art/ui/`、`assets/art/characters/` 指定目录、资源 README/manifest | 核心玩法、英雄技能、数值、关卡 |
 | 程序顾问 | `docs/project-context.md`、`docs/y3-implementation-alignment.md` | 技术咨询文档、表字段、原型或工具说明 | 擅自决定 Y3 工程架构、擅自改核心玩法 |
 | 数值/战斗验证 | `docs/project-context.md`、`tests/combat-sim-validation.md` | 战斗验证记录、模拟器规程、必要战斗细案 | UI 资源、非战斗文档全文 |
 | 测试验收 | `tests/acceptance-checklist.md` | `tests/`、任务相关设计文档 | 擅自修改玩法细案、UI 资源、工程代码 |
@@ -33,6 +33,7 @@
 - `docs/design/general-rules.md`：当前核心规则。
 - `docs/design/stage-encounter-configuration-rules-v1.md`：关卡、波次、敌方队伍与敌方英雄技能档位主源。
 - `docs/design/stage-monster-table-authoring-guide-v1.md`：出怪表字段、填写流程和校验指南。
+- `docs/design/p0-troop-archetype-counter-numerics-v0.1.md`：刀、弓、枪、盾、骑的标准小兵面板与伤害互克主源。
 - `tests/acceptance-checklist.md`：当前验收口径。
 
 ## 当前废弃/暂缓文件

@@ -8,7 +8,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw
 
 
-ROOT = Path(r"D:\codex\project01\assets\ui\command-cards\v01\route-selector-kit-v01")
+ROOT = Path(r"D:\codex\project01\assets\art\ui\command-cards\v01\route-selector-kit-v01")
 TMP = ROOT / "tmp"
 OUT = ROOT / "transparent"
 PREVIEW = ROOT / "preview"

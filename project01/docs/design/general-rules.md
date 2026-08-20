@@ -62,8 +62,8 @@
 - 每个英雄带领一支小兵队伍进入战斗。
 - 玩家英雄小兵数量由外围升星等级影响，上限为 8 个小兵 + 1 名英雄；具体 1 至 6 星上限、小兵模板与英雄对应兵种见 [p0-hero-squad-design-v0.1.md](p0-hero-squad-design-v0.1.md)。
 - NPC 敌人小队也由队长和小兵组成，小兵数量直接由波次配表决定。
-- P0 原生 NPC 仅有步卒、弓手与作为队长的力士；已有三国英雄也可成为敌方 9 宫格的队长。单位名册与基础面板见 [p0-npc-roster-and-scaling-v0.1.md](p0-npc-roster-and-scaling-v0.1.md)，关卡层级、队伍上限和英雄技能档位见 [stage-encounter-configuration-rules-v1.md](stage-encounter-configuration-rules-v1.md)。
-- 当前小兵兵种只有近战和远程。
+- P0 原生 NPC 包含刀、弓、枪、盾、骑五种标准小兵，以及对应的原生队长；已有三国英雄也可成为敌方 9 宫格的队长。单位名册与难度缩放见 [p0-npc-roster-and-scaling-v0.1.md](p0-npc-roster-and-scaling-v0.1.md)，五种标准小兵的基础面板和伤害互克见 [p0-troop-archetype-counter-numerics-v0.1.md](p0-troop-archetype-counter-numerics-v0.1.md)，关卡层级、队伍上限和英雄技能档位见 [stage-encounter-configuration-rules-v1.md](stage-encounter-configuration-rules-v1.md)。
+- 近战/远程是攻击距离类别：刀、枪、盾、骑为近战，弓为远程。小兵普攻按兵种关系获得伤害倍率；英雄和队长不自动继承该倍率。
 - 队长和小兵都是独立个体，都可以被技能选为目标。
 - 队长去哪儿，小兵跟随去哪儿；小兵复刻队长行动指令。
 - 玩家方队长死亡时，该小队小兵溃败逃离并离开战场。

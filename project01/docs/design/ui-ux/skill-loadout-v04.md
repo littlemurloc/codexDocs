@@ -2,7 +2,7 @@
 
 ## 资源
 
-- 预览图：`assets/ui/preview/skill-loadout-v04.png`
+- 预览图：`assets/art/ui/preview/skill-loadout-v04.png`
 - 状态：已废弃，已被 [hero-config-v01.md](hero-config-v01.md) 的武将配置页签方案替代。
 - 界面：技能装配
 - 入口：阵容编成页角色详情中的“调整技能”

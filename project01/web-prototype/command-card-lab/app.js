@@ -410,7 +410,7 @@ function render() {
           <div><span class="eyebrow">三国斗阵 / 规则体验</span><h1>军令构筑体验场</h1></div>
           <p>抽取、购买、Set 解锁与吞噬合成的迷你原型</p>
         </div>
-        <img class="commander-art" src="../../assets/characters/zhugeliang/v02-ink-wash-halfbody-avatar-256/zhugeliang-upperbody-512x1156.png" alt="诸葛亮立绘" />
+        <img class="commander-art" src="../../assets/art/characters/zhugeliang/v02-ink-wash-halfbody-avatar-256/zhugeliang-upperbody-512x1156.png" alt="诸葛亮立绘" />
         <button class="reset-button" onclick="actions.restart()">重开本局</button>
       </header>
 

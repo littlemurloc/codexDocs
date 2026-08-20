@@ -117,7 +117,7 @@ Use a temporary preview only for QA. Do not combine final deliverables into a co
 
 Store final files together at:
 
-`assets/characters/{character_id}/vNN-halfbody-avatar-256/`
+`assets/art/characters/{character_id}/vNN-halfbody-avatar-256/`
 
 Use these filenames:
 

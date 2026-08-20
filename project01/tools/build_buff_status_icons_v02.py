@@ -11,7 +11,7 @@ from PIL import Image, ImageDraw
 
 ROOT = Path(r"D:\codex\project01")
 GENERATED = Path(r"C:\Users\littl\.codex\generated_images\019f11ac-2fcc-7431-b8fe-6f6101936789")
-OUT = ROOT / "assets/ui/export/buff-status-icons-v02"
+OUT = ROOT / "assets/art/ui/export/buff-status-icons-v02"
 TRANSPARENT = OUT / "transparent"
 PREVIEW = OUT / "preview"
 REMOVER = Path(r"C:\Users\littl\.codex\skills\.system\imagegen\scripts\remove_chroma_key.py")

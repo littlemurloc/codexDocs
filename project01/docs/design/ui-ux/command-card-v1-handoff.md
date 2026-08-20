@@ -136,7 +136,7 @@ UI/UX 在开始概念图前，必须完整阅读以下主源，而不只依据�
 - 斩将令、破阵令、奇袭令、奔袭令。
 - 焚营令、火攻令、连环令、焚舟令。
 - 伏兵令、十面埋伏令、鼓舞令、固守令。
-- 已交付 `assets/ui/command-cards/v01/`：12 张 `512 x 512` 无文字透明主图、源图、48px 预览、alpha 预览和资源 manifest。
+- 已交付 `assets/art/ui/command-cards/v01/`：12 张 `512 x 512` 无文字透明主图、源图、48px 预览、alpha 预览和资源 manifest。
 - 12 个主动军令的 `command_card_id` 与透明主图已核对无缺失；不得重画、替换或覆盖该批资源，除非项目负责人另行提出返修。
 - 后续图标必须延续该批的清晰动作轮廓、克制历史策略感与小尺寸辨识度；同一进阶链保留可识别的核心意象，但高阶图标不能只靠换色区分。
 
@@ -148,7 +148,7 @@ UI/UX 在开始概念图前，必须完整阅读以下主源，而不只依据�
 - 独立被动：体魄、锐气、行军、保全。
 - 先输出覆盖全部 30 张的效果图总览，可使用临时标签帮助审核；重点验证被动、融合与高阶结果的意象区分。
 - 效果图审核后，再输出无文字透明主图、尺寸统一切片、48px 预览、alpha 预览，并扩展现有 `manifest.json` 与 `README.md`。
-- 最终资源放入既有 `assets/ui/command-cards/v01/` 的 `source/`、`transparent/`、`preview/` 目录；不得修改已完成的 12 张主动军令文件。
+- 最终资源放入既有 `assets/art/ui/command-cards/v01/` 的 `source/`、`transparent/`、`preview/` 目录；不得修改已完成的 12 张主动军令文件。
 
 ### 视觉与信息边界
 
@@ -162,7 +162,7 @@ UI/UX 在开始概念图前，必须完整阅读以下主源，而不只依据�
 
 - 每个图标先提供 `512 x 512` 的无文字透明主图，主体四周保留约 `12%` 透明安全边。
 - 以 `command_card_id` 命名，具体 ID 见 [军令效果设计清单 V1](../tactical-command-card-catalog-v1.md) 的“配置 ID”表。
-- 建议新建独立版本目录：`assets/ui/command-cards/v01/`，包含 `source/`、`transparent/`、`preview/`、`manifest.json` 和 `README.md`；不得覆盖已确认的 P0 组件目录。
+- 建议新建独立版本目录：`assets/art/ui/command-cards/v01/`，包含 `source/`、`transparent/`、`preview/`、`manifest.json` 和 `README.md`；不得覆盖已确认的 P0 组件目录。
 - 至少提供 `48 x 48` HUD 观察尺度的可读性预览，以及棋盘格 alpha 预览；非矩形图标边缘必须干净。
 - 图标风格确认与最终切片必须遵循 [美术资源出图与切片流程](art-asset-generation-workflow.md) 的“效果图确认 -> 无文字清稿 -> 工程切片”顺序。
 

@@ -4,8 +4,8 @@
 
 ## 资源
 
-- 技能页签预览图：`assets/ui/preview/hero-config-skill-tab-v01.png`
-- 装备页签预览图：`assets/ui/preview/hero-config-equipment-tab-v01.png`
+- 技能页签预览图：`assets/art/ui/preview/hero-config-skill-tab-v01.png`
+- 装备页签预览图：`assets/art/ui/preview/hero-config-equipment-tab-v01.png`
 - 状态：已确认
 - 界面：武将配置
 - 入口：阵容编成页角色详情中的“调整技能 / 调整装备”

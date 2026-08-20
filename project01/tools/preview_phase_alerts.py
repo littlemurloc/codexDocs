@@ -6,8 +6,8 @@ from PIL import Image, ImageDraw, ImageFont
 
 
 ROOT = Path(r"D:\codex\project01")
-PREP = ROOT / "assets/ui/export/phase-alert-preparation-v01/transparent"
-RESULTS = ROOT / "assets/ui/export/phase-alert-results-v01/transparent"
+PREP = ROOT / "assets/art/ui/export/phase-alert-preparation-v01/transparent"
+RESULTS = ROOT / "assets/art/ui/export/phase-alert-results-v01/transparent"
 OUT = ROOT / "tmp/phase-alert-combined-preview.png"
 
 

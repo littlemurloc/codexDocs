@@ -2,7 +2,7 @@
 
 ## 资源
 
-- 预览图：`assets/ui/preview/home-map-stage-select-v02.png`
+- 预览图：`assets/art/ui/preview/home-map-stage-select-v02.png`
 - 状态：已确认
 - 界面：主界面 / 地图选关入口
 - 设计方向：现代历史策略 UI，参考《三国志14》的清爽战略地图感

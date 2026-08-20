@@ -1,8 +1,8 @@
-﻿# 难度通关奖励 3 选 1 v01
+# 难度通关奖励 3 选 1 v01
 
 ## 资源
 
-- 预览图：`assets/ui/preview/difficulty-clear-reward-v01.png`
+- 预览图：`assets/art/ui/preview/difficulty-clear-reward-v01.png`
 - 状态：已确认
 - 界面：难度通关奖励 3 选 1
 - 触发时机：当前关卡难度的全部波次完成后

@@ -2,7 +2,7 @@
 
 ## 资源
 
-- 预览图：`assets/ui/preview/lineup-synergy-v01.png`
+- 预览图：`assets/art/ui/preview/lineup-synergy-v01.png`
 - 状态：已确认
 - 界面：阵容编成 / 羁绊页签
 - 入口：阵容编成页顶部页签中的“羁绊”，或底部“羁绊效果预览”摘要

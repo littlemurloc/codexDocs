@@ -2,7 +2,7 @@
 
 ## 资源
 
-- 预览图：`assets/ui/preview/meta-upgrade-v02.png`
+- 预览图：`assets/art/ui/preview/meta-upgrade-v02.png`
 - 状态：已确认
 - 界面：兵书成长
 - 入口：局外主界面 / 地图选关页的“兵书成长”

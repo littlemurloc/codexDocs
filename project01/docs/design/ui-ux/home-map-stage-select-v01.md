@@ -3,7 +3,7 @@
 ## 状态
 
 - 状态：已废弃
-- 原预览图：`assets/ui/preview/home-map-stage-select-v01.png`
+- 原预览图：`assets/art/ui/preview/home-map-stage-select-v01.png`
 - 当前情况：原预览图已删除，不再作为设计依据。
 - 替代版本：[home-map-stage-select-v02.md](home-map-stage-select-v02.md)
 

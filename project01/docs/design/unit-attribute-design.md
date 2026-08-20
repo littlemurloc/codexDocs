@@ -2,7 +2,7 @@
 
 本文定义当前 MVP 中单位、技能和状态会使用的基础属性口径。旧版装备、战备、羁绊相关属性不作为当前优先项。
 
-当前 P0 技能数值的相对系数、冷却档位和防护档位见 [p0-skill-numeric-baseline-v0.1.md](p0-skill-numeric-baseline-v0.1.md)；局内等级、属性成长、项目级恢复 Tick 与复合属性的使用边界见 [p0-attribute-progression-v0.1.md](p0-attribute-progression-v0.1.md)。
+当前 P0 技能数值的相对系数、冷却档位和防护档位见 [p0-skill-numeric-baseline-v0.1.md](p0-skill-numeric-baseline-v0.1.md)；局内等级、属性成长、项目级恢复 Tick 与复合属性的使用边界见 [p0-attribute-progression-v0.1.md](p0-attribute-progression-v0.1.md)。五种标准小兵的基础面板与伤害互克见 [p0-troop-archetype-counter-numerics-v0.1.md](p0-troop-archetype-counter-numerics-v0.1.md)。
 
 ## P0 战斗基础属性
 
@@ -17,6 +17,8 @@
 | 闪避 | `dodge_pct` | 成功闪避时不受本次伤害，可触发赵云游龙等效果。 |
 | 暴击 | `crit_pct` | 普攻暴击率；暴击倍率与和其他修正的结算顺序待定。 |
 | 伤害标签 | `damage_tag` | `physical` / `spell` / `true`；P0 暂不拆物理与法术抗性。 |
+| 兵种类型 | `troop_class` | `blade` / `archer` / `spear` / `shield` / `cavalry`。仅标准小兵与明确声明的兵种效果读取。 |
+| 攻击距离类别 | `combat_range_kind` | `melee` / `ranged`。它只定义攻击距离，不可替代 `troop_class`。 |
 
 ### 普攻攻击距离基准
 
@@ -39,6 +41,7 @@
 - 本项目将编辑器默认常数 `10000` 改为 `100`，使攻击与护甲处于相近的面板数量级；防御 `100` 时承受 50% 伤害，防御 `50` 时承受约 66.7% 伤害，防御 `200` 时承受约 33.3% 伤害。
 - “所有伤害加成”和“伤害减免”位于同一加减区间；P0 的总伤害减免上限暂定为 60%。
 - 法术伤害是否共用该防御结算路径、真实伤害是否仍受增伤/减伤影响，须在编辑器中补做独立实测后锁定；不得自行假定。
+- 标准小兵普攻命中有效兵种关系时，按 [p0-troop-archetype-counter-numerics-v0.1.md](p0-troop-archetype-counter-numerics-v0.1.md) 在本乘区之后乘以兵种伤害倍率；英雄、队长、军令和未明确标注的技能不自动读取该倍率。
 
 #### Y3 项目设置填写值
 
@@ -94,7 +97,8 @@
 | 所属队长 | `leader_unit_id` | 小兵所属队长。 |
 | 小兵上限 | `soldier_limit` | 玩家由当前升星决定，NPC 由配表决定。 |
 | 当前小兵数量 | `current_soldier_count` | 单局运行时数量。小兵阵亡后跨波次保留损失；仅补员效果可增加，且不得超过 `soldier_limit`。 |
-| 小兵兵种 | `soldier_type` | 当前只确认 melee / ranged。 |
+| 小兵兵种 | `troop_class` | `blade` / `archer` / `spear` / `shield` / `cavalry`；每支队伍只带一种。 |
+| 小兵攻击类别 | `combat_range_kind` | 刀、枪、盾、骑为 `melee`，弓为 `ranged`。 |
 | 队长死亡规则 | `leader_death_rule` | 玩家小兵溃败，NPC 小兵继续战斗。 |
 
 ## 技能相关属性

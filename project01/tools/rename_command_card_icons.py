@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 
-ROOT = Path(r"D:\codex\project01\assets\ui\command-cards\v01")
+ROOT = Path(r"D:\codex\project01\assets\art\ui\command-cards\v01")
 
 NAMES = {
     "cmd_break_execute": "\u65a9\u5c06\u4ee4",

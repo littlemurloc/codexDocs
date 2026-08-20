@@ -46,5 +46,5 @@ Create 128 x 128 or 32 x 32 variants only when explicitly requested.
 
 - Use a #00ff00 chroma-key background during generation, then remove that exact key color.
 - Verify RGBA alpha, dimensions, unclipped facial identifiers, transparent circular corners, and absence of green edge spill.
-- Store final deliverables at `assets/characters/{character_id}/vNN-halfbody-avatar-256/`.
+- Store final deliverables at `assets/art/characters/{character_id}/vNN-halfbody-avatar-256/`.
 - Include a `manifest.json` recording the model source, approved half-body source, output dimensions, approval state, and character direction brief.

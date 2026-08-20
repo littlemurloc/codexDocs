@@ -8,7 +8,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw
 
 
-ROOT = Path(r"D:\codex\project01\assets\ui\command-cards\v01")
+ROOT = Path(r"D:\codex\project01\assets\art\ui\command-cards\v01")
 CONCEPTS = ROOT / "passive-concepts-v02"
 SOURCE_DIR = ROOT / "source"
 TRANSPARENT_DIR = ROOT / "transparent"
