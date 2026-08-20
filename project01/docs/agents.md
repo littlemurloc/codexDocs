@@ -33,6 +33,7 @@
 - `docs/design/general-rules.md`：当前核心规则。
 - `docs/design/stage-encounter-configuration-rules-v1.md`：关卡、波次、敌方队伍与敌方英雄技能档位主源。
 - `docs/design/stage-monster-table-authoring-guide-v1.md`：出怪表字段、填写流程和校验指南。
+- `docs/design/skill-description-table-authoring-guide-v1.md`：单位技能表到技能作用描述表的 ID 映射、文案填写流程和交付校验指南。
 - `docs/design/p0-troop-archetype-counter-numerics-v0.1.md`：刀、弓、枪、盾、骑的标准小兵面板与伤害互克主源。
 - `tests/acceptance-checklist.md`：当前验收口径。
 
