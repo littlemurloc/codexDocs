@@ -1,0 +1,131 @@
+{
+  "package": "hero-choice-popup-cinnabar-v01",
+  "source_images": {
+    "popup": "assets/art/packages/hero-choice-popup-cinnabar-v01/source/hero_choice_popup_raw.png",
+    "buttons": "assets/art/packages/hero-choice-popup-cinnabar-v01/source/hero_choice_buttons_raw.png"
+  },
+  "target_screen": {
+    "width": 1920,
+    "height": 1080
+  },
+  "recommended_usage": {
+    "popup_width_on_1920x1080": 1500,
+    "popup_anchor_centered": {
+      "x": 210,
+      "y": 172
+    },
+    "title_runtime_text": "选择你的伙伴",
+    "side_plaque_text": "招贤"
+  },
+  "assets": [
+    {
+      "id": "hero_choice_popup_frame_blank_zhaoxian",
+      "path": "assets/art/packages/hero-choice-popup-cinnabar-v01/transparent/hero_choice_popup_frame_blank_zhaoxian.png",
+      "type": "modal_popup_frame",
+      "size_px": {
+        "width": 1500,
+        "height": 736
+      },
+      "reference_anchor_px_on_1920x1080": {
+        "x": 210,
+        "y": 172
+      },
+      "notes": "Hero cards and dynamic content are removed. Side plaques use 招贤. Title plaque is blank for runtime title art."
+    },
+    {
+      "id": "hero_choice_popup_frame_1920x1080_reference",
+      "path": "assets/art/packages/hero-choice-popup-cinnabar-v01/reference/hero_choice_popup_frame_1920x1080.png",
+      "type": "layout_reference_transparent_canvas",
+      "size_px": {
+        "width": 1920,
+        "height": 1080
+      }
+    },
+    {
+      "id": "button_confirm_red_blank",
+      "path": "assets/art/packages/hero-choice-popup-cinnabar-v01/controls/button_confirm_red_blank.png",
+      "type": "button_control",
+      "size_px": {
+        "width": 952,
+        "height": 158
+      }
+    },
+    {
+      "id": "button_cancel_green_blank",
+      "path": "assets/art/packages/hero-choice-popup-cinnabar-v01/controls/button_cancel_green_blank.png",
+      "type": "button_control",
+      "size_px": {
+        "width": 952,
+        "height": 152
+      }
+    },
+    {
+      "id": "button_neutral_parchment_blank",
+      "path": "assets/art/packages/hero-choice-popup-cinnabar-v01/controls/button_neutral_parchment_blank.png",
+      "type": "button_control",
+      "size_px": {
+        "width": 952,
+        "height": 157
+      }
+    },
+    {
+      "id": "button_long_disabled_gray_blank",
+      "path": "assets/art/packages/hero-choice-popup-cinnabar-v01/controls/button_long_disabled_gray_blank.png",
+      "type": "button_control",
+      "size_px": {
+        "width": 952,
+        "height": 154
+      }
+    },
+    {
+      "id": "button_refresh_round_normal",
+      "path": "assets/art/packages/hero-choice-popup-cinnabar-v01/controls/button_refresh_round_normal.png",
+      "type": "button_control",
+      "size_px": {
+        "width": 202,
+        "height": 204
+      }
+    },
+    {
+      "id": "button_refresh_round_disabled",
+      "path": "assets/art/packages/hero-choice-popup-cinnabar-v01/controls/button_refresh_round_disabled.png",
+      "type": "button_control",
+      "size_px": {
+        "width": 202,
+        "height": 199
+      }
+    },
+    {
+      "id": "text_confirm",
+      "path": "assets/art/packages/hero-choice-popup-cinnabar-v01/text/text_confirm.png",
+      "type": "button_text_art",
+      "size_px": {
+        "width": 253,
+        "height": 124
+      }
+    },
+    {
+      "id": "text_cancel",
+      "path": "assets/art/packages/hero-choice-popup-cinnabar-v01/text/text_cancel.png",
+      "type": "button_text_art",
+      "size_px": {
+        "width": 232,
+        "height": 122
+      }
+    },
+    {
+      "id": "text_refresh",
+      "path": "assets/art/packages/hero-choice-popup-cinnabar-v01/text/text_refresh.png",
+      "type": "button_text_art",
+      "size_px": {
+        "width": 253,
+        "height": 131
+      }
+    }
+  ],
+  "implementation_notes": {
+    "layering": "Use popup frame as base, place hero cards and action buttons as separate runtime layers.",
+    "nine_slice": "If stretching is required, only stretch the parchment interior and straight rails; keep plaques, tassels, corner brackets, and title plaque as overlays.",
+    "button_text": "Button blanks and Chinese text art are separated so states/localization can be swapped."
+  }
+}
