@@ -1,0 +1,291 @@
+{
+  "package": "battle-bottom-hud-light-components-v01",
+  "status": "implementation_ready_component_pack",
+  "source_concept": "assets/art/packages/battle-bottom-hud-light-components-v01/source/battle_bottom_hud_clean_blank_source.png",
+  "target_screen": {
+    "width": 1920,
+    "height": 1080
+  },
+  "layout_reference": {
+    "hud_group_size_px": {
+      "width": 960,
+      "height": 252
+    },
+    "hud_group_anchor_px_on_1920x1080": {
+      "x": 480,
+      "y": 828
+    },
+    "team_to_detail_ratio": "approximately 1:2",
+    "notes": "HUD is centered and bottom-attached. Character busts and avatar portraits are intentionally excluded."
+  },
+  "visual_reference": {
+    "id": "battle_bottom_hud_full_visual_reference",
+    "path": "assets/art/packages/battle-bottom-hud-light-components-v01/reference/battle_bottom_hud_full_visual_reference.png",
+    "type": "full_visual_reference_only",
+    "size_px": {
+      "width": 1672,
+      "height": 941
+    },
+    "notes": "Contains demo character bust, avatar portraits, skill icons, equipment icons, text, and battlefield background. Use only as implementation-composition reference; do not slice controls from this image."
+  },
+  "assets": [
+    {
+      "id": "hud_group_base_9slice",
+      "path": "assets/art/packages/battle-bottom-hud-light-components-v01/transparent/base/hud_group_base_9slice.png",
+      "type": "base",
+      "size_px": {
+        "width": 960,
+        "height": 252
+      },
+      "scale_mode": "nine_slice",
+      "contains_character_art": false,
+      "contains_avatar_art": false,
+      "nine_slice": {
+        "left": 24,
+        "top": 24,
+        "right": 24,
+        "bottom": 24
+      }
+    },
+    {
+      "id": "team_selector_base_9slice",
+      "path": "assets/art/packages/battle-bottom-hud-light-components-v01/transparent/base/team_selector_base_9slice.png",
+      "type": "base",
+      "size_px": {
+        "width": 300,
+        "height": 220
+      },
+      "scale_mode": "nine_slice",
+      "contains_character_art": false,
+      "contains_avatar_art": false,
+      "nine_slice": {
+        "left": 24,
+        "top": 24,
+        "right": 24,
+        "bottom": 24
+      }
+    },
+    {
+      "id": "hero_detail_base_9slice",
+      "path": "assets/art/packages/battle-bottom-hud-light-components-v01/transparent/base/hero_detail_base_9slice.png",
+      "type": "base",
+      "size_px": {
+        "width": 640,
+        "height": 220
+      },
+      "scale_mode": "nine_slice",
+      "contains_character_art": false,
+      "contains_avatar_art": false,
+      "nine_slice": {
+        "left": 24,
+        "top": 24,
+        "right": 24,
+        "bottom": 24
+      }
+    },
+    {
+      "id": "portrait_ink_backing_empty",
+      "path": "assets/art/packages/battle-bottom-hud-light-components-v01/transparent/base/portrait_ink_backing_empty.png",
+      "type": "base",
+      "size_px": {
+        "width": 248,
+        "height": 230
+      },
+      "scale_mode": "fixed",
+      "contains_character_art": false,
+      "contains_avatar_art": false
+    },
+    {
+      "id": "hero_name_plaque_blank_9slice",
+      "path": "assets/art/packages/battle-bottom-hud-light-components-v01/transparent/overlays/hero_name_plaque_blank_9slice.png",
+      "type": "overlays",
+      "size_px": {
+        "width": 224,
+        "height": 52
+      },
+      "scale_mode": "nine_slice",
+      "contains_character_art": false,
+      "contains_avatar_art": false,
+      "nine_slice": {
+        "left": 44,
+        "top": 16,
+        "right": 44,
+        "bottom": 16
+      }
+    },
+    {
+      "id": "section_header_blank_9slice",
+      "path": "assets/art/packages/battle-bottom-hud-light-components-v01/transparent/overlays/section_header_blank_9slice.png",
+      "type": "overlays",
+      "size_px": {
+        "width": 230,
+        "height": 34
+      },
+      "scale_mode": "nine_slice",
+      "contains_character_art": false,
+      "contains_avatar_art": false,
+      "nine_slice": {
+        "left": 56,
+        "top": 12,
+        "right": 56,
+        "bottom": 12
+      }
+    },
+    {
+      "id": "section_header_small_blank_9slice",
+      "path": "assets/art/packages/battle-bottom-hud-light-components-v01/transparent/overlays/section_header_small_blank_9slice.png",
+      "type": "overlays",
+      "size_px": {
+        "width": 168,
+        "height": 34
+      },
+      "scale_mode": "nine_slice",
+      "contains_character_art": false,
+      "contains_avatar_art": false,
+      "nine_slice": {
+        "left": 56,
+        "top": 12,
+        "right": 56,
+        "bottom": 12
+      }
+    },
+    {
+      "id": "skill_icon_slot_square_empty",
+      "path": "assets/art/packages/battle-bottom-hud-light-components-v01/transparent/controls/skill_icon_slot_square_empty.png",
+      "type": "controls",
+      "size_px": {
+        "width": 68,
+        "height": 68
+      },
+      "scale_mode": "fixed",
+      "contains_character_art": false,
+      "contains_avatar_art": false
+    },
+    {
+      "id": "equipment_icon_slot_square_empty",
+      "path": "assets/art/packages/battle-bottom-hud-light-components-v01/transparent/controls/equipment_icon_slot_square_empty.png",
+      "type": "controls",
+      "size_px": {
+        "width": 68,
+        "height": 68
+      },
+      "scale_mode": "fixed",
+      "contains_character_art": false,
+      "contains_avatar_art": false
+    },
+    {
+      "id": "team_avatar_frame_normal",
+      "path": "assets/art/packages/battle-bottom-hud-light-components-v01/transparent/controls/team_avatar_frame_normal.png",
+      "type": "controls",
+      "size_px": {
+        "width": 62,
+        "height": 62
+      },
+      "scale_mode": "fixed",
+      "contains_character_art": false,
+      "contains_avatar_art": false
+    },
+    {
+      "id": "team_avatar_frame_selected",
+      "path": "assets/art/packages/battle-bottom-hud-light-components-v01/transparent/controls/team_avatar_frame_selected.png",
+      "type": "controls",
+      "size_px": {
+        "width": 62,
+        "height": 62
+      },
+      "scale_mode": "fixed",
+      "contains_character_art": false,
+      "contains_avatar_art": false
+    },
+    {
+      "id": "team_avatar_frame_disabled",
+      "path": "assets/art/packages/battle-bottom-hud-light-components-v01/transparent/controls/team_avatar_frame_disabled.png",
+      "type": "controls",
+      "size_px": {
+        "width": 62,
+        "height": 62
+      },
+      "scale_mode": "fixed",
+      "contains_character_art": false,
+      "contains_avatar_art": false
+    },
+    {
+      "id": "stat_plate_attack_blank_9slice",
+      "path": "assets/art/packages/battle-bottom-hud-light-components-v01/transparent/controls/stat_plate_attack_blank_9slice.png",
+      "type": "controls",
+      "size_px": {
+        "width": 154,
+        "height": 44
+      },
+      "scale_mode": "nine_slice",
+      "contains_character_art": false,
+      "contains_avatar_art": false,
+      "nine_slice": {
+        "left": 54,
+        "top": 14,
+        "right": 20,
+        "bottom": 14
+      }
+    },
+    {
+      "id": "stat_plate_defense_blank_9slice",
+      "path": "assets/art/packages/battle-bottom-hud-light-components-v01/transparent/controls/stat_plate_defense_blank_9slice.png",
+      "type": "controls",
+      "size_px": {
+        "width": 154,
+        "height": 44
+      },
+      "scale_mode": "nine_slice",
+      "contains_character_art": false,
+      "contains_avatar_art": false,
+      "nine_slice": {
+        "left": 54,
+        "top": 14,
+        "right": 20,
+        "bottom": 14
+      }
+    },
+    {
+      "id": "hp_bar_frame_9slice",
+      "path": "assets/art/packages/battle-bottom-hud-light-components-v01/transparent/controls/hp_bar_frame_9slice.png",
+      "type": "controls",
+      "size_px": {
+        "width": 214,
+        "height": 34
+      },
+      "scale_mode": "nine_slice",
+      "contains_character_art": false,
+      "contains_avatar_art": false,
+      "nine_slice": {
+        "left": 18,
+        "top": 10,
+        "right": 18,
+        "bottom": 10
+      }
+    },
+    {
+      "id": "hp_bar_fill_red_9slice",
+      "path": "assets/art/packages/battle-bottom-hud-light-components-v01/transparent/controls/hp_bar_fill_red_9slice.png",
+      "type": "controls",
+      "size_px": {
+        "width": 188,
+        "height": 12
+      },
+      "scale_mode": "nine_slice",
+      "contains_character_art": false,
+      "contains_avatar_art": false,
+      "nine_slice": {
+        "left": 18,
+        "top": 10,
+        "right": 18,
+        "bottom": 10
+      }
+    }
+  ],
+  "qa": {
+    "alpha": "All exported controls are RGBA PNGs on transparent canvases; preview_alpha_check.png is provided for edge inspection.",
+    "character_art": "No human bust or hero avatar pixels are included in exported controls.",
+    "icon_compatibility": "Skill and equipment containers are square to match existing square game icons.",
+    "nine_slice": "Stretchable base/plates are marked with nine_slice values; decorative rings and icon frames are fixed scale."
+  }
+}
