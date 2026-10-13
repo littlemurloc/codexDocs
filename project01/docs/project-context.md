@@ -40,6 +40,7 @@
 - 10 英雄落表主源：`docs/design/first-batch-10-heroes-skill-config-v1.md`
 - 第一批新增 8 英雄技能归档：`deliverables/三国斗阵_第一批新增预选英雄技能设计归档_v1.0.docx`
 - 预备英雄名单：`docs/design/hero-reserve-roster.md`
+- 当前第二批技能设计：`deliverables/第二批英雄技能设计候选稿-v0.2.md`；2026-10-13 追加已审核关羽，本批为八名英雄。人类阅读稿为 `deliverables/三国斗阵_第二批英雄技能设计阅读稿_v0.3.docx`。本条指当前新稿，不是下方废弃的旧版第二批设计；关羽设计通过不等于工程实装完成。
 - 军令卡系统 V1：`docs/design/tactical-command-card-system-v1.md`
 - 军令效果目录：`docs/design/tactical-command-card-catalog-v1.md`
 - 通用军令 V0（历史）：`docs/design/tactical-command-v0.md`

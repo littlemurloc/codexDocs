@@ -14,7 +14,7 @@
 | 英雄 | 资源目录 | 当前技能状态 |
 | --- | --- | --- |
 | 貂蝉 | `assets/art/characters/diaochan/` | 未开始 |
-| 关羽 | `assets/art/characters/guanyu/` | 未开始 |
+| 关羽 | `assets/art/characters/guanyu/` | 2026-10-13 六技能设计审核通过，追加至第二批，尚未实装 |
 | 郭嘉 | `assets/art/characters/guojia/` | 未开始 |
 | 陆逊 | `assets/art/characters/luxun/` | 未开始 |
 | 周泰 | `assets/art/characters/zhoutai/` | 未开始 |
@@ -48,6 +48,9 @@
 | 贼/射手 | 张郃 | 未开始 |
 | 贼/射手 | 祝融 | 未开始 |
 | 贼/射手 | 韩当 | 未开始 |
+| 战士/坦克 | 关羽 | 2026-10-13 六技能设计审核通过，尚未实装 |
+
+关羽当前设计见 [第二批英雄技能设计候选稿 v0.2](../../deliverables/第二批英雄技能设计候选稿-v0.2.md)。本批由七人扩为八人；Boss 低于 10% 生命可被关羽斩杀、纯单 Boss 波次无法攒满武威均已获批。其余七人的本表状态未在此次追加任务中重新核定。
 
 徐晃不在当前预备英雄名单内。
 
