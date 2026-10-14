@@ -1,0 +1,14 @@
+ON /action/0 SET_VARIABLE BOOLEAN:符合购买条件:local, False
+ON /action/1 TRAVERSE_TABLE_NEW TABLE:军令卡牌base-表, 返回【玩家】在playerDetail的数组索引值(PLAYER:指定玩家:local), {actions} OPTIONAL True
+ON /action/1/args_list/1/args_list/0 IF_THEN_ELSE ABILITY_COMPARE(ABILITY_NAME:指定军略卡牌:local, "==", GET_ABILITY_NAME_TABLE_VAR_ND(TABLE:军令卡牌base-表, 返回【玩家】在playerDetail的数组索引值(PLAYER:指定玩家:local), ITER_TABLE_KEY_INT(), "技能类型")), {actions}, {actions}
+ON /action/1/args_list/1/args_list/0/args_list/0/args_list/0 CONDITION ABILITY_COMPARE(ABILITY_NAME:指定军略卡牌:local, "==", GET_ABILITY_NAME_TABLE_VAR_ND(TABLE:军令卡牌base-表, 返回【玩家】在playerDetail的数组索引值(PLAYER:指定玩家:local), ITER_TABLE_KEY_INT(), "技能类型"))
+ON /action/1/args_list/1/args_list/0/args_list/1/args_list/0 SET_VARIABLE INTEGER:result:local, GET_INTEGER_TABLE_VAR_ND(TABLE:军令卡牌base-表, 返回【玩家】在playerDetail的数组索引值(PLAYER:指定玩家:local), ITER_TABLE_KEY_INT(), "价格")
+ON /action/1/args_list/1/args_list/0/args_list/1/args_list/1 BREAK_LOOP 
+ON /action/2 IF_THEN_ELSE FLOAT_COMPARE(6(INTEGER:result:local), "<=", GET_ROLE_RES(PLAYER:指定玩家:local, "OGgJIytDEfC5bJeSrLCpxb")), {actions}, {actions}
+ON /action/2/args_list/0/args_list/0 CONDITION FLOAT_COMPARE(6(INTEGER:result:local), "<=", GET_ROLE_RES(PLAYER:指定玩家:local, "OGgJIytDEfC5bJeSrLCpxb"))
+ON /action/2/args_list/1/args_list/0 SET_VARIABLE BOOLEAN:符合购买条件:local, True
+ON /action/2/args_list/1/args_list/1 IF_THEN_ELSE BOOL_COMPARE(BOOLEAN:是否直接扣款:local, "==", True), {actions}, {actions}
+ON /action/2/args_list/1/args_list/1/args_list/0/args_list/0 CONDITION BOOL_COMPARE(BOOLEAN:是否直接扣款:local, "==", True)
+ON /action/2/args_list/1/args_list/1/args_list/1/args_list/0 CALL_TRIGGER_FUNC 局内执行-货币(PLAYER:指定玩家:local, "OGgJIytDEfC5bJeSrLCpxb", ARITHMETIC_OPERATION(6(INTEGER:result:local), "*", -1.0))
+ON /action/2/args_list/2/args_list/0 DISPLAY_INFO_TO_PLAYER PLAYER:指定玩家:local, "价格不够", False
+ON /action/3 400342 BOOLEAN:符合购买条件:local

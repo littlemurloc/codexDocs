@@ -1,0 +1,11 @@
+ON /trigger_dict/1930846210/action/0 CLEAR_MODIFIER_OWNER_ATTR CUR_MODIFIER()
+ON /trigger_dict/1930846210/event/0 LOSS_MODIFIER 
+ON /trigger_dict/1980923905/action/0 IF_THEN_ELSE FLOAT_COMPARE(GET_ROLE_RES(OWNER_PLAYER(MODIFIER_RELEASER()), "OGgJIytDEfC5bJeSrLCpxb"), ">=", 5.0), FLOAT_COMPARE(GET_ROLE_RES(OWNER_PLAYER(MODIFIER_RELEASER()), "OGgJIytDEfC5bJeSrLCpxb"), "<", 8.0), {actions}, {actions}
+ON /trigger_dict/1980923905/action/0/args_list/0/args_list/0 CONDITION FLOAT_COMPARE(GET_ROLE_RES(OWNER_PLAYER(MODIFIER_RELEASER()), "OGgJIytDEfC5bJeSrLCpxb"), ">=", 5.0)
+ON /trigger_dict/1980923905/action/0/args_list/0/args_list/1 CONDITION FLOAT_COMPARE(GET_ROLE_RES(OWNER_PLAYER(MODIFIER_RELEASER()), "OGgJIytDEfC5bJeSrLCpxb"), "<", 8.0)
+ON /trigger_dict/1980923905/action/0/args_list/1/args_list/0 ADD_MODIFIER_OWNER_ATTR CUR_MODIFIER(), "hp_max", "ATTR_ALL_RATIO", 8.0
+ON /trigger_dict/1980923905/action/1 IF_THEN_ELSE FLOAT_COMPARE(GET_ROLE_RES(OWNER_PLAYER(MODIFIER_RELEASER()), "OGgJIytDEfC5bJeSrLCpxb"), ">=", 8.0), {actions}, {actions}
+ON /trigger_dict/1980923905/action/1/args_list/0/args_list/0 CONDITION FLOAT_COMPARE(GET_ROLE_RES(OWNER_PLAYER(MODIFIER_RELEASER()), "OGgJIytDEfC5bJeSrLCpxb"), ">=", 8.0)
+ON /trigger_dict/1980923905/action/1/args_list/1/args_list/0 ADD_MODIFIER_OWNER_ATTR CUR_MODIFIER(), "hp_max", "ATTR_ALL_RATIO", 12.0
+ON /trigger_dict/1980923905/action/1/args_list/1/args_list/1 ADD_MODIFIER_OWNER_ATTR CUR_MODIFIER(), "attack_phy", "ATTR_ALL_RATIO", 8.0
+ON /trigger_dict/1980923905/event/0 OBTAIN_MODIFIER 

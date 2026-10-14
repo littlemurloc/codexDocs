@@ -1,0 +1,28 @@
+ON /trigger_dict/26066946/action/0 SWITCH GET_ABILITY_INT_ATTR(CUR_ABILITY(), "ability_level"), {actions}
+ON /trigger_dict/26066946/action/0/args_list/1/args_list/0 CASE 1, {actions}
+ON /trigger_dict/26066946/action/0/args_list/1/args_list/0/args_list/1/args_list/0 SET_ENTITY_KV CUR_ABILITY(), "伤害减免%", 0.2
+ON /trigger_dict/26066946/action/0/args_list/1/args_list/0/args_list/1/args_list/1 BREAK_LOOP 
+ON /trigger_dict/26066946/action/0/args_list/1/args_list/1 CASE 2, {actions}
+ON /trigger_dict/26066946/action/0/args_list/1/args_list/1/args_list/1/args_list/0 SET_ENTITY_KV CUR_ABILITY(), "伤害减免%", 0.2
+ON /trigger_dict/26066946/action/0/args_list/1/args_list/1/args_list/1/args_list/1 BREAK_LOOP 
+ON /trigger_dict/26066946/action/0/args_list/1/args_list/2 CASE 3, {actions}
+ON /trigger_dict/26066946/action/0/args_list/1/args_list/2/args_list/1/args_list/0 SET_ENTITY_KV CUR_ABILITY(), "伤害减免%", 0.2
+ON /trigger_dict/26066946/action/0/args_list/1/args_list/2/args_list/1/args_list/1 BREAK_LOOP 
+ON /trigger_dict/26066946/action/0/args_list/1/args_list/3 CASE 4, {actions}
+ON /trigger_dict/26066946/action/0/args_list/1/args_list/3/args_list/1/args_list/0 SET_ENTITY_KV CUR_ABILITY(), "伤害减免%", 0.2
+ON /trigger_dict/26066946/action/0/args_list/1/args_list/3/args_list/1/args_list/1 BREAK_LOOP 
+ON /trigger_dict/26066946/action/0/args_list/1/args_list/4 CASE 5, {actions}
+ON /trigger_dict/26066946/action/0/args_list/1/args_list/4/args_list/1/args_list/0 SET_ENTITY_KV CUR_ABILITY(), "伤害减免%", 0.2
+ON /trigger_dict/26066946/action/0/args_list/1/args_list/4/args_list/1/args_list/1 BREAK_LOOP 
+ON /trigger_dict/26066946/event/0 ABILITY_LEVEL_CHANGED 
+ON /trigger_dict/225054724/action/0 PRINT_MESSAGE_ACTION_TO_DIALOG 3, STR_JOIN(GET_ABILITY_STR_ATTR(CUR_ABILITY(), "name"), "触发了 失去 事件")
+ON /trigger_dict/225054724/event/0 ABILITY_LOSE 
+ON /trigger_dict/893440004/action/0 CREATE_SFX_ON_UNIT_3 106021, GET_ABILITY_TARGET_UNIT_FROM_EVENT(), "root", 2 OPTIONAL 3.0,1.0,True,5.0,5.0,5.0
+ON /trigger_dict/893440004/action/1 CREATE_SFX_ON_UNIT_3 102358, GET_ABILITY_TARGET_UNIT_FROM_EVENT(), "root", 2 OPTIONAL 3.0,1.0,True,5.0,5.0,5.0
+ON /trigger_dict/893440004/action/2 ADD_MODIFIER TARGET_UNIT_IN_ABILITY(CUR_ABILITY()), 134279904 OPTIONAL ABILITY_OWNER(),CUR_ABILITY(),5.0
+ON /trigger_dict/893440004/action/3 PICK_UNIT_DO_ACTION GET_UNIT_GROUP_KV(TARGET_UNIT_IN_ABILITY(CUR_ABILITY()), "带领小队"), {actions}
+ON /trigger_dict/893440004/action/3/args_list/1/args_list/0 IF_THEN_ELSE IS_UNIT_ALIVE(FOR_EACH_SELECTED_UNIT()), {actions}, {actions}
+ON /trigger_dict/893440004/action/3/args_list/1/args_list/0/args_list/0/args_list/0 CONDITION IS_UNIT_ALIVE(FOR_EACH_SELECTED_UNIT())
+ON /trigger_dict/893440004/action/3/args_list/1/args_list/0/args_list/1/args_list/0 ADD_MODIFIER FOR_EACH_SELECTED_UNIT(), 134279904 OPTIONAL ABILITY_OWNER(),CUR_ABILITY(),5.0
+ON /trigger_dict/893440004/event/0 ABILITY_SP_END 
+ON /trigger_dict/1959489540/event/0 ABILITY_OBTAIN 

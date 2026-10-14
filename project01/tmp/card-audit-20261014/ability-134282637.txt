@@ -1,0 +1,59 @@
+ON /trigger_dict/26066946/action/0 SWITCH GET_ABILITY_INT_ATTR(CUR_ABILITY(), "ability_level"), {actions}
+ON /trigger_dict/26066946/action/0/args_list/1/args_list/0 CASE 1, {actions}
+ON /trigger_dict/26066946/action/0/args_list/1/args_list/0/args_list/1/args_list/0 SET_ENTITY_KV CUR_ABILITY(), "伤害系数", 0.4
+ON /trigger_dict/26066946/action/0/args_list/1/args_list/0/args_list/1/args_list/1 SET_ENTITY_KV CUR_ABILITY(), "降攻系数", 15.0
+ON /trigger_dict/26066946/action/0/args_list/1/args_list/0/args_list/1/args_list/2 BREAK_LOOP 
+ON /trigger_dict/26066946/action/0/args_list/1/args_list/1 CASE 2, {actions}
+ON /trigger_dict/26066946/action/0/args_list/1/args_list/1/args_list/1/args_list/0 SET_ENTITY_KV CUR_ABILITY(), "伤害系数", 0.04
+ON /trigger_dict/26066946/action/0/args_list/1/args_list/1/args_list/1/args_list/1 SET_ENTITY_KV CUR_ABILITY(), "降攻系数", 15.0
+ON /trigger_dict/26066946/action/0/args_list/1/args_list/1/args_list/1/args_list/2 BREAK_LOOP 
+ON /trigger_dict/26066946/action/0/args_list/1/args_list/2 CASE 3, {actions}
+ON /trigger_dict/26066946/action/0/args_list/1/args_list/2/args_list/1/args_list/0 SET_ENTITY_KV CUR_ABILITY(), "伤害系数", 0.04
+ON /trigger_dict/26066946/action/0/args_list/1/args_list/2/args_list/1/args_list/1 SET_ENTITY_KV CUR_ABILITY(), "降攻系数", 15.0
+ON /trigger_dict/26066946/action/0/args_list/1/args_list/2/args_list/1/args_list/2 BREAK_LOOP 
+ON /trigger_dict/26066946/action/0/args_list/1/args_list/3 CASE 4, {actions}
+ON /trigger_dict/26066946/action/0/args_list/1/args_list/3/args_list/1/args_list/0 SET_ENTITY_KV CUR_ABILITY(), "伤害系数", 0.04
+ON /trigger_dict/26066946/action/0/args_list/1/args_list/3/args_list/1/args_list/1 SET_ENTITY_KV CUR_ABILITY(), "降攻系数", 15.0
+ON /trigger_dict/26066946/action/0/args_list/1/args_list/3/args_list/1/args_list/2 BREAK_LOOP 
+ON /trigger_dict/26066946/action/0/args_list/1/args_list/4 CASE 5, {actions}
+ON /trigger_dict/26066946/action/0/args_list/1/args_list/4/args_list/1/args_list/0 SET_ENTITY_KV CUR_ABILITY(), "伤害系数", 0.04
+ON /trigger_dict/26066946/action/0/args_list/1/args_list/4/args_list/1/args_list/1 SET_ENTITY_KV CUR_ABILITY(), "降攻系数", 15.0
+ON /trigger_dict/26066946/action/0/args_list/1/args_list/4/args_list/1/args_list/2 BREAK_LOOP 
+ON /trigger_dict/26066946/action/1 SET_VARIABLE FLOAT:影响区域-长:actor, 200.0
+ON /trigger_dict/26066946/action/2 SET_VARIABLE FLOAT:影响区域-宽:actor, 2000.0
+ON /trigger_dict/26066946/event/0 ABILITY_LEVEL_CHANGED 
+ON /trigger_dict/225054724/action/0 PRINT_MESSAGE_ACTION_TO_DIALOG 3, STR_JOIN(GET_ABILITY_STR_ATTR(CUR_ABILITY(), "name"), "触发了 失去 事件")
+ON /trigger_dict/225054724/event/0 ABILITY_LOSE 
+ON /trigger_dict/347213831/action/0 CLEAR_LIST_VAR STRING:合法目标编号-字符组:actor
+ON /trigger_dict/347213831/action/1 CLEAR_LIST_VAR UNIT_ENTITY:合法单位-数组:actor
+ON /trigger_dict/347213831/action/2 SET_VARIABLE_STR_LIST STRING:合法目标编号-字符组:actor, GET_STRING_KV(CUR_ABILITY(), "合法目标-字符"), "-"
+ON /trigger_dict/347213831/action/3 IF_THEN_ELSE BOOL_COMPARE(GET_BOOLEAN_KV(CUR_ABILITY(), "合法目标是否对敌"), "==", True), {actions}, {actions}
+ON /trigger_dict/347213831/action/3/args_list/0/args_list/0 CONDITION BOOL_COMPARE(GET_BOOLEAN_KV(CUR_ABILITY(), "合法目标是否对敌"), "==", True)
+ON /trigger_dict/347213831/action/3/args_list/1/args_list/0 SET_VARIABLE UNIT_GROUP:搜索单位组:local, UNIT_GROUP:敌人队伍
+ON /trigger_dict/347213831/action/3/args_list/2/args_list/0 SET_VARIABLE UNIT_GROUP:搜索单位组:local, UNIT_GROUP:玩家队伍, 返回【玩家】在playerDetail的数组索引值(OWNER_PLAYER(ABILITY_OWNER()))
+ON /trigger_dict/347213831/action/4 LIST_LOOP STRING:合法目标编号-字符组:actor, {actions}
+ON /trigger_dict/347213831/action/4/args_list/1/args_list/0 PICK_UNIT_DO_ACTION UNIT_GROUP:搜索单位组:local, {actions}
+ON /trigger_dict/347213831/action/4/args_list/1/args_list/0/args_list/1/args_list/0 IF_THEN_ELSE FLOAT_COMPARE(STR_TO_INT(2(STRING:合法目标编号-字符组:actor, GET_LOOP_LIST_INDEX())), "==", GET_INTEGER_KV(FOR_EACH_SELECTED_UNIT(), "归属阵型编号")), {actions}, {actions}
+ON /trigger_dict/347213831/action/4/args_list/1/args_list/0/args_list/1/args_list/0/args_list/0/args_list/0 CONDITION FLOAT_COMPARE(STR_TO_INT(2(STRING:合法目标编号-字符组:actor, GET_LOOP_LIST_INDEX())), "==", GET_INTEGER_KV(FOR_EACH_SELECTED_UNIT(), "归属阵型编号"))
+ON /trigger_dict/347213831/action/4/args_list/1/args_list/0/args_list/1/args_list/0/args_list/1/args_list/0 SET_VARIABLE UNIT_ENTITY:合法单位-数组:actor, INT_PLUS_ONE(LEN_OF_VAR(UNIT_ENTITY:合法单位-数组:actor)), FOR_EACH_SELECTED_UNIT()
+ON /trigger_dict/347213831/action/4/args_list/1/args_list/0/args_list/1/args_list/0/args_list/1/args_list/1 BREAK_LOOP 
+ON /trigger_dict/347213831/action/5 NEW_CAMERA_LINEAR_MOVE_TIME OWNER_PLAYER(ABILITY_OWNER()), UNIT_ENTITY_POINT(UNIT_ENTITY:合法单位-数组:actor, 1), 0.0, 0
+ON /trigger_dict/347213831/event/0 ABILITY_PS_START 
+OFF /trigger_dict/893440004/action/0 SET_VARIABLE PROJECTILE_ENTITY:projectile:local, CREATE_PROJECTILE_NEW(134218623, POINT_OFFSET_VECTOR_POINT(ABILITY_RELEASE_POSITION(CUR_ABILITY()), TERNARY_OPERATOR_ANGLE(PLAYER_COMPARE(OWNER_PLAYER(ABILITY_OWNER()), "==", 1), -90.0, 90.0), ARITHMETIC_OPERATION(2(FLOAT:影响区域-宽:actor), "/", 2.0)), ABILITY_OWNER()) optional=TERNARY_OPERATOR_ANGLE(PLAYER_COMPARE(OWNER_PLAYER(ABILITY_OWNER()), "==", 1), 90.0, -90.0),CUR_ABILITY(),True
+OFF /trigger_dict/893440004/action/1 CREATE_STRAIGHT_MOVER PROJECTILE_ENTITY:projectile:local, TERNARY_OPERATOR_ANGLE(PLAYER_COMPARE(OWNER_PLAYER(ABILITY_OWNER()), "==", 1), 90.0, -90.0), ARITHMETIC_OPERATION(2(FLOAT:影响区域-宽:actor), "*", 2.0), 1000.0, 2000.0, {actions}, {actions}, {actions}, {actions}, {actions} OPTIONAL 0,2(FLOAT:影响区域-长:actor),True,ABILITY_OWNER(),CUR_ABILITY()
+OFF /trigger_dict/893440004/action/1/args_list/5/args_list/0 PROJECTILE_DELETE PROJECTILE_ENTITY:projectile:local OPTIONAL True
+OFF /trigger_dict/893440004/action/1/args_list/9/args_list/0 ADD_MODIFIER MOVER_COLLIDE_UNIT(), 134256265 OPTIONAL ABILITY_OWNER(),CUR_ABILITY(),4.0
+OFF /trigger_dict/893440004/action/1/args_list/9/args_list/1 IF_THEN_ELSE OR(UNIT_HAS_TAG(MOVER_COLLIDE_UNIT(), "仆从伙伴"), UNIT_HAS_TAG(MOVER_COLLIDE_UNIT(), "阵型队长")), {actions}, {actions}
+OFF /trigger_dict/893440004/action/1/args_list/9/args_list/1/args_list/0/args_list/0 CONDITION OR(UNIT_HAS_TAG(MOVER_COLLIDE_UNIT(), "仆从伙伴"), UNIT_HAS_TAG(MOVER_COLLIDE_UNIT(), "阵型队长"))
+OFF /trigger_dict/893440004/action/1/args_list/9/args_list/1/args_list/0/args_list/0/args_list/0/args_list/0 CONDITION UNIT_HAS_TAG(MOVER_COLLIDE_UNIT(), "仆从伙伴")
+OFF /trigger_dict/893440004/action/1/args_list/9/args_list/1/args_list/0/args_list/0/args_list/0/args_list/1 CONDITION UNIT_HAS_TAG(MOVER_COLLIDE_UNIT(), "阵型队长")
+OFF /trigger_dict/893440004/action/1/args_list/9/args_list/1/args_list/1/args_list/0 APPLY_DAMAGE ABILITY_OWNER(), CUR_ABILITY(), MOVER_COLLIDE_UNIT(), 2, ARITHMETIC_OPERATION(GET_UNIT_ATTR(TARGET_UNIT_IN_ABILITY(CUR_ABILITY()), "ATTR_RESULT", "hp_max"), "*", ARITHMETIC_OPERATION(GET_FLOAT_KV(CUR_ABILITY(), "伤害系数"), "+", 0.02)), True OPTIONAL True,105594,"root",934269508
+OFF /trigger_dict/893440004/action/1/args_list/9/args_list/1/args_list/2/args_list/0 APPLY_DAMAGE ABILITY_OWNER(), CUR_ABILITY(), MOVER_COLLIDE_UNIT(), 2, ARITHMETIC_OPERATION(GET_UNIT_ATTR(TARGET_UNIT_IN_ABILITY(CUR_ABILITY()), "ATTR_RESULT", "hp_max"), "*", GET_FLOAT_KV(CUR_ABILITY(), "伤害系数")), True OPTIONAL True,105594,"root",934269508
+ON /trigger_dict/893440004/action/2 LIST_LOOP UNIT_ENTITY:合法单位-数组:actor, {actions}
+ON /trigger_dict/893440004/action/2/args_list/1/args_list/0 STORAGE_BOX , {actions}, {actions}, "战旗提示"
+ON /trigger_dict/893440004/action/2/args_list/1/args_list/0/args_list/1/args_list/0 CREATE_SFX_ON_UNIT_3 106037, UNIT_ENTITY:合法单位-数组:actor, GET_LOOP_LIST_INDEX(), "root", 2 OPTIONAL 3.0,1.0,True,5.0,5.0,5.0
+ON /trigger_dict/893440004/action/2/args_list/1/args_list/0/args_list/1/args_list/1 CREATE_SFX_ON_UNIT_3 102358, UNIT_ENTITY:合法单位-数组:actor, GET_LOOP_LIST_INDEX(), "root", 2 OPTIONAL 3.0,1.0,True,5.0,5.0,5.0
+ON /trigger_dict/893440004/action/2/args_list/1/args_list/1 ADD_MODIFIER UNIT_ENTITY:合法单位-数组:actor, GET_LOOP_LIST_INDEX(), 134256265 OPTIONAL ABILITY_OWNER(),CUR_ABILITY(),4.0
+ON /trigger_dict/893440004/action/2/args_list/1/args_list/2 APPLY_DAMAGE ABILITY_OWNER(), CUR_ABILITY(), UNIT_ENTITY:合法单位-数组:actor, GET_LOOP_LIST_INDEX(), 2, ARITHMETIC_OPERATION(GET_UNIT_ATTR(UNIT_ENTITY:合法单位-数组:actor, GET_LOOP_LIST_INDEX(), "ATTR_RESULT", "hp_max"), "*", ARITHMETIC_OPERATION(GET_FLOAT_KV(CUR_ABILITY(), "伤害系数"), "+", 0.02)), True OPTIONAL True,105594,"root",934269508
+ON /trigger_dict/893440004/event/0 ABILITY_SP_END 
+ON /trigger_dict/1959489540/event/0 ABILITY_OBTAIN 

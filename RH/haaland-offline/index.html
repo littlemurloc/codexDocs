@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#080f18">
+  <title>离线演示 · 哈兰德的锋线征程</title>
+  <meta name="description" content="哈兰德主题赛季活动的横屏手机UI/UX交互原型。">
+  <link rel="stylesheet" href="style.css">
+  <script defer src="assets/lucide.min.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body class="phone-preview">
+  <div class="ambient"></div>
+  <main class="preview-main">
+    <div class="device-stage"><div class="phone" id="phone"><div class="camera"></div><div class="game" id="game">
+      <header class="game-header" data-dialog-background><button class="back icon-btn" aria-label="返回赛季首页" data-tab="overview"><i data-lucide="chevron-left"></i></button><div class="event-name">锋线征程 <span>HAALAND / 09</span></div><div class="season-time"><i data-lucide="clock-3"></i> 赛季剩余 <b>32天</b></div><div class="wallet"><span title="累计训练点"><i data-lucide="zap"></i><b id="points">2,450</b></span><span class="gold" title="搭档徽记"><i data-lucide="hexagon"></i><b id="tokens">6</b></span><button class="icon-btn" id="rulesBtn" aria-label="查看活动规则"><i data-lucide="circle-help"></i></button></div></header>
+      <nav class="chapter-nav" aria-label="活动章节" data-dialog-background><button data-tab="overview" class="active"><i data-lucide="flag"></i>赛季大厅</button><button data-tab="training"><i data-lucide="crosshair"></i>射手训练场<span class="nav-dot" id="trainingDot"></span></button><button data-tab="partners"><i data-lucide="users"></i>最佳搭档</button><button data-tab="journey"><i data-lucide="footprints"></i>金靴征程</button><button data-tab="final"><i data-lucide="trophy"></i>冠军之夜<span class="tiny">第5周</span></button></nav>
+      <section id="content" aria-live="polite" data-dialog-background></section>
+      <footer class="game-footer" data-dialog-background><span><span class="live-dot"></span><span id="footerText">完成训练，向你的金靴迈进一步</span></span><button id="taskBtn"><i data-lucide="clipboard-list"></i> 赛季任务 <span id="taskCount">0/3</span><i data-lucide="chevron-right"></i></button></footer>
+      <div class="home-indicator"></div><div class="toast" id="toast" role="status"></div>
+      <div class="modal-layer" id="modalLayer" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><button class="close icon-btn" id="closeModal" aria-label="关闭弹窗"><i data-lucide="x"></i></button><div id="modalContent"></div></div></div>
+    </div></div></div>
+    <div class="preview-toolbar" data-dialog-background><span class="preview-label">横屏手机预览 <span>OFFLINE DEMO</span></span><div class="prototype-tools"><button id="guideBtn" class="plain"><i data-lucide="mouse-pointer-2"></i> 操作说明</button><button id="soundBtn" class="plain"><i data-lucide="volume-x"></i> 音效关闭</button><button id="resetBtn" class="plain"><i data-lucide="rotate-ccw"></i> 重置体验</button></div></div>
+    <p class="orientation-note">横屏查看效果更好</p>
+  </main>
+</body>
+</html>
+

@@ -1,0 +1,27 @@
+ON /trigger_dict/225054724/action/0 UNREG_TRIGGER DYNAMIC_TRIGGER_INSTANCE:temp触发器:actor
+ON /trigger_dict/225054724/action/1 PRINT_MESSAGE_ACTION_TO_DIALOG 3, STR_JOIN(GET_ABILITY_STR_ATTR(CUR_ABILITY(), "name"), "触发了 失去 事件")
+ON /trigger_dict/225054724/event/0 ABILITY_LOSE 
+ON /trigger_dict/315969539/action/0 PICK_UNIT_DO_ACTION UNIT_GROUP:搜索组:local, {actions}
+ON /trigger_dict/315969539/action/0/args_list/1/args_list/0 IF_THEN_ELSE FLOAT_COMPARE(GET_COUNT(GET_UNIT_GROUP_KV(FOR_EACH_SELECTED_UNIT(), "带领小队")), ">=", 返回【小兵数量】通过英雄升星数(FOR_EACH_SELECTED_UNIT())), BOOL_NOT(UNIT_HAS_MODIFIER(FOR_EACH_SELECTED_UNIT(), 134280771)), {actions}, {actions}
+ON /trigger_dict/315969539/action/0/args_list/1/args_list/0/args_list/0/args_list/0 CONDITION FLOAT_COMPARE(GET_COUNT(GET_UNIT_GROUP_KV(FOR_EACH_SELECTED_UNIT(), "带领小队")), ">=", 返回【小兵数量】通过英雄升星数(FOR_EACH_SELECTED_UNIT()))
+ON /trigger_dict/315969539/action/0/args_list/1/args_list/0/args_list/0/args_list/1 CONDITION BOOL_NOT(UNIT_HAS_MODIFIER(FOR_EACH_SELECTED_UNIT(), 134280771))
+ON /trigger_dict/315969539/action/0/args_list/1/args_list/0/args_list/1/args_list/0 ADD_MODIFIER FOR_EACH_SELECTED_UNIT(), 134280771 OPTIONAL ABILITY_OWNER(),CUR_ABILITY()
+ON /trigger_dict/315969539/action/0/args_list/1/args_list/0/args_list/1/args_list/1 PICK_UNIT_DO_ACTION GET_UNIT_GROUP_KV(FOR_EACH_SELECTED_UNIT(), "带领小队"), {actions}
+ON /trigger_dict/315969539/action/0/args_list/1/args_list/0/args_list/1/args_list/1/args_list/1/args_list/0 IF_THEN_ELSE BOOL_NOT(UNIT_HAS_MODIFIER(FOR_EACH_SELECTED_UNIT(), 134280771)), {actions}, {actions}
+ON /trigger_dict/315969539/action/0/args_list/1/args_list/0/args_list/1/args_list/1/args_list/1/args_list/0/args_list/0/args_list/0 CONDITION BOOL_NOT(UNIT_HAS_MODIFIER(FOR_EACH_SELECTED_UNIT(), 134280771))
+ON /trigger_dict/315969539/action/0/args_list/1/args_list/0/args_list/1/args_list/1/args_list/1/args_list/0/args_list/1/args_list/0 ADD_MODIFIER FOR_EACH_SELECTED_UNIT(), 134280771 OPTIONAL ABILITY_OWNER(),CUR_ABILITY()
+ON /trigger_dict/315969539/action/0/args_list/1/args_list/0/args_list/2/args_list/0 IF_THEN_ELSE UNIT_HAS_MODIFIER(FOR_EACH_SELECTED_UNIT(), 134280771), {actions}, {actions}
+ON /trigger_dict/315969539/action/0/args_list/1/args_list/0/args_list/2/args_list/0/args_list/0/args_list/0 CONDITION UNIT_HAS_MODIFIER(FOR_EACH_SELECTED_UNIT(), 134280771)
+ON /trigger_dict/315969539/action/0/args_list/1/args_list/0/args_list/2/args_list/0/args_list/1/args_list/0 REMOVE_BUFF_INS GET_LAST_MODIFIER_INSTANCE(FOR_EACH_SELECTED_UNIT(), 134280771)
+ON /trigger_dict/315969539/action/0/args_list/1/args_list/0/args_list/2/args_list/0/args_list/1/args_list/1 PICK_UNIT_DO_ACTION GET_UNIT_GROUP_KV(FOR_EACH_SELECTED_UNIT(), "带领小队"), {actions}
+ON /trigger_dict/315969539/action/0/args_list/1/args_list/0/args_list/2/args_list/0/args_list/1/args_list/1/args_list/1/args_list/0 IF_THEN_ELSE UNIT_HAS_MODIFIER(FOR_EACH_SELECTED_UNIT(), 134280771), {actions}, {actions}
+ON /trigger_dict/315969539/action/0/args_list/1/args_list/0/args_list/2/args_list/0/args_list/1/args_list/1/args_list/1/args_list/0/args_list/0/args_list/0 CONDITION UNIT_HAS_MODIFIER(FOR_EACH_SELECTED_UNIT(), 134280771)
+ON /trigger_dict/315969539/action/0/args_list/1/args_list/0/args_list/2/args_list/0/args_list/1/args_list/1/args_list/1/args_list/0/args_list/1/args_list/0 REMOVE_BUFF_INS GET_LAST_MODIFIER_INSTANCE(FOR_EACH_SELECTED_UNIT(), 134280771)
+ON /trigger_dict/315969539/condition/0 CONDITION FLOAT_COMPARE(GET_CUS_EVENT_PARAM("阶段编号"), "==", 2)
+ON /trigger_dict/315969539/event/0 RECEIVE_CUSTOM_EVENT 1646669129
+ON /trigger_dict/315969539/sub_trigger_owner_set_var_action SET_VARIABLE DYNAMIC_TRIGGER_INSTANCE:temp触发器:actor, REG_ABILITY_TRIGGER(315969539)
+ON /trigger_dict/1959489540/action/0 IF_THEN_ELSE DICT_HAS_VALUE(PLAYER:playersDetail, OWNER_PLAYER(ABILITY_OWNER())), {actions}, {actions}
+ON /trigger_dict/1959489540/action/0/args_list/0/args_list/0 CONDITION DICT_HAS_VALUE(PLAYER:playersDetail, OWNER_PLAYER(ABILITY_OWNER()))
+ON /trigger_dict/1959489540/action/0/args_list/1/args_list/0 SET_VARIABLE UNIT_GROUP:搜索组:local, UNIT_GROUP:玩家队伍, 返回【玩家】在playerDetail的数组索引值(OWNER_PLAYER(ABILITY_OWNER()))
+ON /trigger_dict/1959489540/action/0/args_list/2/args_list/0 SET_VARIABLE UNIT_GROUP:搜索组:local, UNIT_GROUP:敌人队伍
+ON /trigger_dict/1959489540/event/0 ABILITY_OBTAIN 

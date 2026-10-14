@@ -1,0 +1,18 @@
+ON /trigger_dict/225054724/action/0 DELETE_TIMER NEW_TIMER:temp计时器:actor
+ON /trigger_dict/225054724/action/1 REMOVE_BUFF_INS GET_LAST_MODIFIER_INSTANCE(ABILITY_OWNER(), 134230724)
+ON /trigger_dict/225054724/action/2 PRINT_MESSAGE_ACTION_TO_DIALOG 3, STR_JOIN(GET_ABILITY_STR_ATTR(CUR_ABILITY(), "name"), "触发了 失去 事件")
+ON /trigger_dict/225054724/event/0 ABILITY_LOSE 
+ON /trigger_dict/1959489540/action/0 IF_THEN_ELSE DICT_HAS_VALUE(PLAYER:playersDetail, OWNER_PLAYER(ABILITY_OWNER())), {actions}, {actions}
+ON /trigger_dict/1959489540/action/0/args_list/0/args_list/0 CONDITION DICT_HAS_VALUE(PLAYER:playersDetail, OWNER_PLAYER(ABILITY_OWNER()))
+ON /trigger_dict/1959489540/action/0/args_list/1/args_list/0 SET_VARIABLE UNIT_GROUP:搜索组:local, UNIT_GROUP:玩家队伍, 返回【玩家】在playerDetail的数组索引值(OWNER_PLAYER(ABILITY_OWNER()))
+ON /trigger_dict/1959489540/action/0/args_list/2/args_list/0 SET_VARIABLE UNIT_GROUP:搜索组:local, UNIT_GROUP:敌人队伍
+ON /trigger_dict/1959489540/action/1 RUN_LOOP_TIMER NEW_TIMER:temp计时器:actor, 1.0, True, {actions}
+ON /trigger_dict/1959489540/action/1/args_list/3/args_list/0 PICK_UNIT_DO_ACTION UNIT_GROUP:搜索组:local, {actions}
+ON /trigger_dict/1959489540/action/1/args_list/3/args_list/0/args_list/1/args_list/0 IF_THEN_ELSE BOOL_NOT(UNIT_HAS_MODIFIER(FOR_EACH_SELECTED_UNIT(), 134230724)), {actions}, {actions}
+ON /trigger_dict/1959489540/action/1/args_list/3/args_list/0/args_list/1/args_list/0/args_list/0/args_list/0 CONDITION BOOL_NOT(UNIT_HAS_MODIFIER(FOR_EACH_SELECTED_UNIT(), 134230724))
+ON /trigger_dict/1959489540/action/1/args_list/3/args_list/0/args_list/1/args_list/0/args_list/1/args_list/0 ADD_MODIFIER FOR_EACH_SELECTED_UNIT(), 134230724 OPTIONAL ABILITY_OWNER(),CUR_ABILITY()
+ON /trigger_dict/1959489540/action/1/args_list/3/args_list/0/args_list/1/args_list/1 PICK_UNIT_DO_ACTION GET_UNIT_GROUP_KV(FOR_EACH_SELECTED_UNIT(), "带领小队"), {actions}
+ON /trigger_dict/1959489540/action/1/args_list/3/args_list/0/args_list/1/args_list/1/args_list/1/args_list/0 IF_THEN_ELSE BOOL_NOT(UNIT_HAS_MODIFIER(FOR_EACH_SELECTED_UNIT(), 134230724)), {actions}, {actions}
+ON /trigger_dict/1959489540/action/1/args_list/3/args_list/0/args_list/1/args_list/1/args_list/1/args_list/0/args_list/0/args_list/0 CONDITION BOOL_NOT(UNIT_HAS_MODIFIER(FOR_EACH_SELECTED_UNIT(), 134230724))
+ON /trigger_dict/1959489540/action/1/args_list/3/args_list/0/args_list/1/args_list/1/args_list/1/args_list/0/args_list/1/args_list/0 ADD_MODIFIER FOR_EACH_SELECTED_UNIT(), 134230724 OPTIONAL ABILITY_OWNER(),CUR_ABILITY()
+ON /trigger_dict/1959489540/event/0 ABILITY_OBTAIN 

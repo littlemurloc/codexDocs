@@ -1,0 +1,3626 @@
+{
+  "map": "D:\\littl\\testTempFile\\ProjectMonster02\\maps\\map3",
+  "cards": [
+    {
+      "id": 134255046,
+      "name": "锋矢军略",
+      "set": "破军1",
+      "result": "false",
+      "in_formal_pool": true,
+      "cast": 3,
+      "desc": "<html><body><p>全部友方队长攻击提高 8%；其小兵攻击提高 4%</p></body></html>",
+      "kv": {},
+      "triggers": [
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 3
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        }
+      ],
+      "actions": {
+        "DELETE_TIMER": 1,
+        "REMOVE_BUFF_INS": 1,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "IF_THEN_ELSE": 3,
+        "SET_VARIABLE": 2,
+        "RUN_LOOP_TIMER": 1,
+        "PICK_UNIT_DO_ACTION": 2,
+        "ADD_MODIFIER": 2
+      },
+      "events": {
+        "ABILITY_LOSE": 1,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "modifiers": [
+        134230724
+      ],
+      "bytes": 41158
+    },
+    {
+      "id": 134253372,
+      "name": "战鼓军略",
+      "set": "破军1",
+      "result": "false",
+      "in_formal_pool": true,
+      "cast": 3,
+      "desc": "<html><body><p>每当敌方队长或精英死亡时，全部存活友方队长及小兵攻击速度提高 4%，最多叠加 3 层。本波内生效。普通小兵死亡不触发。</p></body></html>",
+      "kv": {},
+      "triggers": [
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 3
+        },
+        {
+          "id": "1422565379",
+          "name": "子触发器",
+          "valid": true,
+          "enabled": false,
+          "actions": 1
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        }
+      ],
+      "actions": {
+        "REMOVE_BUFF_INS": 1,
+        "UNREG_TRIGGER": 1,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "PICK_UNIT_DO_ACTION": 2,
+        "ADD_MODIFIER": 2,
+        "SET_VARIABLE": 3,
+        "IF_THEN_ELSE": 1
+      },
+      "events": {
+        "ABILITY_LOSE": 1,
+        "GENERIC_UNIT_EVENT": 1,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "modifiers": [
+        134280457
+      ],
+      "bytes": 33397
+    },
+    {
+      "id": 134230045,
+      "name": "斩将令",
+      "set": "破军1",
+      "result": "false",
+      "in_formal_pool": true,
+      "cast": 2,
+      "desc": "<html><body><p>选择 1 名敌方队长或精英。0.6 秒预警后，连续造成 3 次伤害，每次为目标最大生命值 2% 的真实伤害，共 6%。目标在预警期死亡或离场则返还本次使用；目标在三次伤害中死亡，剩余伤害取消且不改选目标。</p></body></html>",
+      "kv": {
+        "伤害系数": 0.0
+      },
+      "triggers": [
+        {
+          "id": "26066946",
+          "name": "新建触发器_2",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "893440004",
+          "name": "新建触发器",
+          "valid": true,
+          "enabled": true,
+          "actions": 3
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 0
+        }
+      ],
+      "actions": {
+        "SWITCH": 1,
+        "CASE": 5,
+        "SET_ENTITY_KV": 5,
+        "BREAK_LOOP": 5,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "STORAGE_BOX": 1,
+        "CREATE_SFX_ON_UNIT_3": 3,
+        "RUN_COUNT_TIMER_NO_SAVE": 1,
+        "IF_THEN_ELSE": 1,
+        "APPLY_DAMAGE": 1
+      },
+      "events": {
+        "ABILITY_LEVEL_CHANGED": 1,
+        "ABILITY_LOSE": 1,
+        "ABILITY_SP_END": 1,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [],
+      "modifiers": [],
+      "bytes": 65059
+    },
+    {
+      "id": 134282637,
+      "name": "破阵令",
+      "set": "破军1",
+      "result": "true",
+      "in_formal_pool": true,
+      "cast": 2,
+      "desc": "<html><body><p>选择敌方战前上、中、下任一路。0.8 秒预警后，该路全部存活敌方单位各受到自身最大生命值 4% 的真实伤害；该路队长与精英额外受到自身最大生命值 2% 的真实伤害。全部命中单位防御降低 15%，持续 4 秒。</p></body></html>",
+      "kv": {
+        "伤害系数": 0.0,
+        "合法目标-字符": "000",
+        "合法目标是否对敌": true,
+        "降攻系数": 0.0,
+        "额外条件": "无"
+      },
+      "triggers": [
+        {
+          "id": "26066946",
+          "name": "新建触发器_2",
+          "valid": true,
+          "enabled": true,
+          "actions": 3
+        },
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "347213831",
+          "name": "新建触发器_5",
+          "valid": true,
+          "enabled": true,
+          "actions": 6
+        },
+        {
+          "id": "893440004",
+          "name": "新建触发器",
+          "valid": true,
+          "enabled": true,
+          "actions": 3
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 0
+        }
+      ],
+      "actions": {
+        "SWITCH": 1,
+        "CASE": 5,
+        "SET_ENTITY_KV": 10,
+        "BREAK_LOOP": 6,
+        "SET_VARIABLE": 5,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "CLEAR_LIST_VAR": 2,
+        "SET_VARIABLE_STR_LIST": 1,
+        "IF_THEN_ELSE": 2,
+        "LIST_LOOP": 2,
+        "PICK_UNIT_DO_ACTION": 1,
+        "NEW_CAMERA_LINEAR_MOVE_TIME": 1,
+        "STORAGE_BOX": 1,
+        "CREATE_SFX_ON_UNIT_3": 2,
+        "ADD_MODIFIER": 1,
+        "APPLY_DAMAGE": 1
+      },
+      "events": {
+        "ABILITY_LEVEL_CHANGED": 1,
+        "ABILITY_LOSE": 1,
+        "ABILITY_PS_START": 1,
+        "ABILITY_SP_END": 1,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "modifiers": [
+        134256265
+      ],
+      "bytes": 174426
+    },
+    {
+      "id": 134257911,
+      "name": "铁甲军略",
+      "set": "虎贲2",
+      "result": "false",
+      "in_formal_pool": true,
+      "cast": 3,
+      "desc": "<html><body><p>战前位于前排 123 的友方队长及其小兵防御提高 12%</p></body></html>",
+      "kv": {},
+      "triggers": [
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        },
+        {
+          "id": "2104102915",
+          "name": "子触发器",
+          "valid": true,
+          "enabled": false,
+          "actions": 1
+        }
+      ],
+      "actions": {
+        "UNREG_TRIGGER": 1,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "IF_THEN_ELSE": 5,
+        "SET_VARIABLE": 3,
+        "PICK_UNIT_DO_ACTION": 3,
+        "ADD_MODIFIER": 2,
+        "REMOVE_BUFF_INS": 2
+      },
+      "events": {
+        "ABILITY_LOSE": 1,
+        "ABILITY_OBTAIN": 1,
+        "RECEIVE_CUSTOM_EVENT": 1
+      },
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "modifiers": [
+        134276955
+      ],
+      "bytes": 68644
+    },
+    {
+      "id": 134273392,
+      "name": "盾列军略",
+      "set": "虎贲2",
+      "result": "false",
+      "in_formal_pool": true,
+      "cast": 3,
+      "desc": "<html><body><p>战前位于前排 123 的友方队长及其小兵最大生命值提高 10%。</p></body></html>",
+      "kv": {},
+      "triggers": [
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        },
+        {
+          "id": "1772048387",
+          "name": "子触发器",
+          "valid": true,
+          "enabled": false,
+          "actions": 1
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        }
+      ],
+      "actions": {
+        "UNREG_TRIGGER": 1,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "PICK_UNIT_DO_ACTION": 3,
+        "IF_THEN_ELSE": 5,
+        "ADD_MODIFIER": 2,
+        "REMOVE_BUFF_INS": 2,
+        "SET_VARIABLE": 3
+      },
+      "events": {
+        "ABILITY_LOSE": 1,
+        "RECEIVE_CUSTOM_EVENT": 1,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "modifiers": [
+        134270540
+      ],
+      "bytes": 68652
+    },
+    {
+      "id": 134254464,
+      "name": "死守军略",
+      "set": "虎贲2",
+      "result": "false",
+      "in_formal_pool": true,
+      "cast": 3,
+      "desc": "<html><body><p>每个前排友方队伍每波首次由其队长生命值降至 40% 或以下时，该队长及其存活小兵受到伤害降低 20%，持续 6 秒。</p></body></html>",
+      "kv": {
+        "内置CD": false
+      },
+      "triggers": [
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        },
+        {
+          "id": "850006019",
+          "name": "子触发器",
+          "valid": true,
+          "enabled": false,
+          "actions": 4
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        }
+      ],
+      "actions": {
+        "UNREG_TRIGGER": 1,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "SET_ENTITY_KV": 2,
+        "ADD_MODIFIER": 2,
+        "PICK_UNIT_DO_ACTION": 1,
+        "IF_THEN_ELSE": 2,
+        "RUN_ONCE_TIMER_NO_SAVE": 1,
+        "DELETE_TIMER": 1,
+        "SET_VARIABLE": 3
+      },
+      "events": {
+        "ABILITY_LOSE": 1,
+        "GENERIC_UNIT_EVENT": 1,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "modifiers": [
+        134259078
+      ],
+      "bytes": 49286
+    },
+    {
+      "id": 134247645,
+      "name": "固阵军略",
+      "set": "虎贲2",
+      "result": "true",
+      "in_formal_pool": true,
+      "cast": 3,
+      "desc": "<html><body><p>只要至少 1 名战前位于前排的友方队长仍存活，所有战前位于中排或后排的友方单位受到伤害降低 5%。最后一名前排队长死亡后，该效果结束<br /></p></body></html>",
+      "kv": {},
+      "triggers": [
+        {
+          "id": "219856900",
+          "name": "子触发器_2",
+          "valid": true,
+          "enabled": false,
+          "actions": 1
+        },
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 3
+        },
+        {
+          "id": "686985219",
+          "name": "子触发器",
+          "valid": true,
+          "enabled": false,
+          "actions": 2
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 3
+        }
+      ],
+      "actions": {
+        "IF_THEN_ELSE": 10,
+        "REMOVE_UNIT_ENTITY_IN_GROUP": 1,
+        "PICK_UNIT_DO_ACTION": 6,
+        "REMOVE_BUFF_INS": 4,
+        "SET_VARIABLE": 4,
+        "UNREG_TRIGGER": 2,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "CLEAR_GROUP": 1,
+        "GROUP_ADD_UNIT": 1,
+        "ADD_MODIFIER": 2
+      },
+      "events": {
+        "GENERIC_UNIT_EVENT": 1,
+        "ABILITY_LOSE": 1,
+        "RECEIVE_CUSTOM_EVENT": 1,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "modifiers": [
+        134246119
+      ],
+      "bytes": 149662
+    },
+    {
+      "id": 134267093,
+      "name": "良马军略",
+      "set": "飞骑2",
+      "result": "false",
+      "in_formal_pool": true,
+      "cast": 3,
+      "desc": "<html><body><p>战前位于侧翼 147 或 369 的友方队长及其小兵移动速度提高 12%，闪避提高 8%。</p></body></html>",
+      "kv": {},
+      "triggers": [
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        },
+        {
+          "id": "1190330371",
+          "name": "子触发器",
+          "valid": true,
+          "enabled": false,
+          "actions": 1
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        }
+      ],
+      "actions": {
+        "UNREG_TRIGGER": 1,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "PICK_UNIT_DO_ACTION": 3,
+        "IF_THEN_ELSE": 5,
+        "ADD_MODIFIER": 2,
+        "REMOVE_BUFF_INS": 2,
+        "SET_VARIABLE": 3
+      },
+      "events": {
+        "ABILITY_LOSE": 1,
+        "RECEIVE_CUSTOM_EVENT": 1,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "modifiers": [
+        134263406
+      ],
+      "bytes": 79138
+    },
+    {
+      "id": 134268589,
+      "name": "侧击军略",
+      "set": "飞骑2",
+      "result": "false",
+      "in_formal_pool": true,
+      "cast": 3,
+      "desc": "<html><body><p>战前位于侧翼的友方队伍，攻击战前位于中排或后排的敌方队长及其小兵时，造成伤害提高 10%。不改变选敌。</p></body></html>",
+      "kv": {},
+      "triggers": [
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        },
+        {
+          "id": "751505411",
+          "name": "子触发器",
+          "valid": true,
+          "enabled": false,
+          "actions": 1
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        }
+      ],
+      "actions": {
+        "UNREG_TRIGGER": 1,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "PICK_UNIT_DO_ACTION": 3,
+        "IF_THEN_ELSE": 5,
+        "ADD_MODIFIER": 2,
+        "REMOVE_BUFF_INS": 2,
+        "SET_VARIABLE": 3
+      },
+      "events": {
+        "ABILITY_LOSE": 1,
+        "RECEIVE_CUSTOM_EVENT": 1,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "modifiers": [
+        134230566
+      ],
+      "bytes": 79108
+    },
+    {
+      "id": 134269480,
+      "name": "奇袭令",
+      "set": "飞骑2",
+      "result": "false",
+      "in_formal_pool": true,
+      "cast": 2,
+      "desc": "<html><body><p>选择敌方战前上、中、下任一路。0.6 秒预警后，锁定该路战前列最靠后的存活敌方队伍，优先级为后排、中排、前排。目标队伍中的队长及所有存活小兵，各受到自身最大生命值 5% 的真实伤害。目标路在结算前清空则返还本次使用。</p></body></html>",
+      "kv": {
+        "伤害系数": 0.0,
+        "合法目标-字符": "000",
+        "合法目标是否对敌": true,
+        "额外条件": "后排"
+      },
+      "triggers": [
+        {
+          "id": "26066946",
+          "name": "新建触发器_2",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "347213831",
+          "name": "新建触发器_5",
+          "valid": true,
+          "enabled": true,
+          "actions": 6
+        },
+        {
+          "id": "893440004",
+          "name": "新建触发器",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 0
+        }
+      ],
+      "actions": {
+        "SWITCH": 1,
+        "CASE": 5,
+        "SET_ENTITY_KV": 5,
+        "BREAK_LOOP": 6,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "CLEAR_LIST_VAR": 2,
+        "SET_VARIABLE_STR_LIST": 1,
+        "IF_THEN_ELSE": 3,
+        "SET_VARIABLE": 4,
+        "LIST_LOOP": 2,
+        "PICK_UNIT_DO_ACTION": 2,
+        "NEW_CAMERA_LINEAR_MOVE_TIME": 1,
+        "STORAGE_BOX": 1,
+        "CREATE_SFX_ON_UNIT_3": 3,
+        "FOR_INT_DO_ACTION_NEW": 1,
+        "CREATE_STRAIGHT_MOVER": 1,
+        "PROJECTILE_DELETE": 1,
+        "APPLY_DAMAGE": 2
+      },
+      "events": {
+        "ABILITY_LEVEL_CHANGED": 1,
+        "ABILITY_LOSE": 1,
+        "ABILITY_PS_START": 1,
+        "ABILITY_SP_END": 1,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "modifiers": [],
+      "bytes": 178339
+    },
+    {
+      "id": 134251160,
+      "name": "奔袭令",
+      "set": "飞骑2",
+      "result": "true",
+      "in_formal_pool": true,
+      "cast": 2,
+      "desc": "<html><body><p>继承：奇袭令自动替换，保留两张被动效果。</p><p>效果：选择敌方战前上、中、下任一路。0.8 秒预警后，按后排、中排、前排优先级锁定该路最靠后的存活敌方队伍。该队伍中全部存活单位各受到自身最大生命值 8% 的真实伤害，攻击速度降低 35%、移动速度降低 30%，持续 5 秒。</p><p>表现：军令召来的飞骑突击，不移动已有英雄队伍。</p></body></html>",
+      "kv": {
+        "伤害系数": 0.0,
+        "合法目标-字符": "000",
+        "合法目标是否对敌": true,
+        "攻速降低": 0.0,
+        "移速降低": 0.0,
+        "额外条件": "后排"
+      },
+      "triggers": [
+        {
+          "id": "26066946",
+          "name": "新建触发器_2",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "347213831",
+          "name": "新建触发器_5",
+          "valid": true,
+          "enabled": true,
+          "actions": 6
+        },
+        {
+          "id": "893440004",
+          "name": "新建触发器",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 0
+        }
+      ],
+      "actions": {
+        "SWITCH": 1,
+        "CASE": 5,
+        "SET_ENTITY_KV": 15,
+        "BREAK_LOOP": 6,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "CLEAR_LIST_VAR": 2,
+        "SET_VARIABLE_STR_LIST": 1,
+        "IF_THEN_ELSE": 3,
+        "SET_VARIABLE": 4,
+        "LIST_LOOP": 2,
+        "PICK_UNIT_DO_ACTION": 2,
+        "NEW_CAMERA_LINEAR_MOVE_TIME": 1,
+        "STORAGE_BOX": 1,
+        "CREATE_SFX_ON_UNIT_3": 3,
+        "FOR_INT_DO_ACTION_NEW": 1,
+        "CREATE_STRAIGHT_MOVER": 1,
+        "PROJECTILE_DELETE": 1,
+        "APPLY_DAMAGE": 2,
+        "ADD_MODIFIER": 4
+      },
+      "events": {
+        "ABILITY_LEVEL_CHANGED": 1,
+        "ABILITY_LOSE": 1,
+        "ABILITY_PS_START": 1,
+        "ABILITY_SP_END": 1,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "modifiers": [
+        134218873,
+        134239130
+      ],
+      "bytes": 222265
+    },
+    {
+      "id": 134257166,
+      "name": "火油军略",
+      "set": "火计1",
+      "result": "false",
+      "in_formal_pool": true,
+      "cast": 3,
+      "desc": "<html><body><p>每波开始时，敌方战前位于前排 123 的队长及其小兵获得灼烧，持续 4 秒，每秒造成自身最大生命值 0.6% 的真实伤害，共 4 次。</p></body></html>",
+      "kv": {
+        "每次伤害系数": 0.06
+      },
+      "triggers": [
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        },
+        {
+          "id": "1137029123",
+          "name": "子触发器",
+          "valid": true,
+          "enabled": false,
+          "actions": 1
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        }
+      ],
+      "actions": {
+        "UNREG_TRIGGER": 1,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "PICK_UNIT_DO_ACTION": 3,
+        "IF_THEN_ELSE": 5,
+        "ADD_MODIFIER": 2,
+        "REMOVE_BUFF_INS": 2,
+        "SET_VARIABLE": 3
+      },
+      "events": {
+        "ABILITY_LOSE": 1,
+        "RECEIVE_CUSTOM_EVENT": 1,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "modifiers": [
+        134253664
+      ],
+      "bytes": 69691
+    },
+    {
+      "id": 134220355,
+      "name": "风助军略",
+      "set": "火计1",
+      "result": "false",
+      "in_formal_pool": true,
+      "cast": 3,
+      "desc": "<html><body><p>带有灼烧的任意敌方单位死亡时，对其所在敌方路的其余存活单位各造成自身最大生命值 2% 的真实伤害。每条敌方路每波最多触发 1 次。该伤害不附加灼烧。</p></body></html>",
+      "kv": {
+        "伤害减免%": 0.0
+      },
+      "triggers": [
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 3
+        },
+        {
+          "id": "838389764",
+          "name": "子触发器_2",
+          "valid": true,
+          "enabled": false,
+          "actions": 3
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        },
+        {
+          "id": "2112155651",
+          "name": "子触发器",
+          "valid": true,
+          "enabled": false,
+          "actions": 2
+        }
+      ],
+      "actions": {
+        "UNREG_TRIGGER": 2,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "CREATE_SFX_ON_POINT_NEW": 1,
+        "IF_THEN_ELSE": 4,
+        "PICK_UNIT_DO_ACTION": 2,
+        "APPLY_DAMAGE": 3,
+        "REMOVE_UNIT_ENTITY_IN_GROUP": 2,
+        "SET_VARIABLE": 4,
+        "CLEAR_GROUP": 1
+      },
+      "events": {
+        "ABILITY_LOSE": 1,
+        "GENERIC_UNIT_EVENT": 1,
+        "ABILITY_OBTAIN": 1,
+        "RECEIVE_CUSTOM_EVENT": 1
+      },
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "modifiers": [],
+      "bytes": 84470
+    },
+    {
+      "id": 134271333,
+      "name": "焚营令",
+      "set": "火计1",
+      "result": "false",
+      "in_formal_pool": true,
+      "cast": 2,
+      "desc": "<html><body><p>选择敌方战前上、中、下任一路。0.6 秒预警后，该路全部存活敌方单位获得灼烧，持续 5 秒，每秒造成自身最大生命值 1% 的真实伤害，共 5 次。目标路在结算前清空则返还本次使用。</p></body></html>",
+      "kv": {
+        "合法目标-字符": "000",
+        "合法目标是否对敌": true,
+        "每次伤害系数": 0.0,
+        "额外条件": ""
+      },
+      "triggers": [
+        {
+          "id": "26066946",
+          "name": "新建触发器_2",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "347213831",
+          "name": "新建触发器_5",
+          "valid": true,
+          "enabled": true,
+          "actions": 6
+        },
+        {
+          "id": "893440004",
+          "name": "新建触发器",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 0
+        }
+      ],
+      "actions": {
+        "SWITCH": 1,
+        "CASE": 5,
+        "SET_ENTITY_KV": 5,
+        "BREAK_LOOP": 6,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "CLEAR_LIST_VAR": 2,
+        "SET_VARIABLE_STR_LIST": 1,
+        "IF_THEN_ELSE": 2,
+        "SET_VARIABLE": 3,
+        "LIST_LOOP": 2,
+        "PICK_UNIT_DO_ACTION": 2,
+        "NEW_CAMERA_LINEAR_MOVE_TIME": 1,
+        "STORAGE_BOX": 1,
+        "CREATE_SFX_ON_UNIT_3": 5,
+        "ADD_MODIFIER": 2
+      },
+      "events": {
+        "ABILITY_LEVEL_CHANGED": 1,
+        "ABILITY_LOSE": 1,
+        "ABILITY_PS_START": 1,
+        "ABILITY_SP_END": 1,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "modifiers": [
+        134253664
+      ],
+      "bytes": 117229
+    },
+    {
+      "id": 134265871,
+      "name": "火攻令",
+      "set": "火计1",
+      "result": "true",
+      "in_formal_pool": true,
+      "cast": 2,
+      "desc": "<html><body><p>继承：焚营令自动替换，保留两张被动效果。</p><p>效果：选择敌方战前上、中、下任一路。0.8 秒预警后，该路全部存活敌方单位获得灼烧，持续 5 秒，每秒造成自身最大生命值 1.5% 的真实伤害，共 5 次。灼烧期间，该路单位造成的伤害降低 15%。</p><p>解锁：连环 II、伏兵 II。</p></body></html>",
+      "kv": {
+        "合法目标-字符": "000",
+        "合法目标是否对敌": true,
+        "每次伤害系数": 0.0,
+        "降攻系数": 0.0,
+        "额外条件": ""
+      },
+      "triggers": [
+        {
+          "id": "26066946",
+          "name": "新建触发器_2",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "347213831",
+          "name": "新建触发器_5",
+          "valid": true,
+          "enabled": true,
+          "actions": 6
+        },
+        {
+          "id": "893440004",
+          "name": "新建触发器",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 0
+        }
+      ],
+      "actions": {
+        "SWITCH": 1,
+        "CASE": 5,
+        "SET_ENTITY_KV": 10,
+        "BREAK_LOOP": 6,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "CLEAR_LIST_VAR": 2,
+        "SET_VARIABLE_STR_LIST": 1,
+        "IF_THEN_ELSE": 2,
+        "SET_VARIABLE": 3,
+        "LIST_LOOP": 2,
+        "PICK_UNIT_DO_ACTION": 2,
+        "NEW_CAMERA_LINEAR_MOVE_TIME": 1,
+        "STORAGE_BOX": 1,
+        "CREATE_SFX_ON_UNIT_3": 5,
+        "ADD_MODIFIER": 4
+      },
+      "events": {
+        "ABILITY_LEVEL_CHANGED": 1,
+        "ABILITY_LOSE": 1,
+        "ABILITY_PS_START": 1,
+        "ABILITY_SP_END": 1,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "modifiers": [
+        134253664,
+        134256265
+      ],
+      "bytes": 133715
+    },
+    {
+      "id": 134256155,
+      "name": "缚舟军略",
+      "set": "连环2",
+      "result": "false",
+      "in_formal_pool": true,
+      "cast": 3,
+      "desc": "<html><body><p>处于灼烧状态且生命值低于 40% 的敌方队长或精英，受到的所有伤害提高 12%。</p></body></html>",
+      "kv": {},
+      "triggers": [
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 3
+        },
+        {
+          "id": "280584195",
+          "name": "子触发器",
+          "valid": true,
+          "enabled": false,
+          "actions": 1
+        },
+        {
+          "id": "870424580",
+          "name": "子触发器_2",
+          "valid": true,
+          "enabled": false,
+          "actions": 1
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        }
+      ],
+      "actions": {
+        "UNREG_TRIGGER": 2,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "ADD_MODIFIER": 1,
+        "SET_VARIABLE": 2,
+        "REMOVE_BUFF_INS": 1
+      },
+      "events": {
+        "ABILITY_LOSE": 1,
+        "GENERIC_UNIT_EVENT": 2,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [],
+      "modifiers": [
+        134264526
+      ],
+      "bytes": 28628
+    },
+    {
+      "id": 134232476,
+      "name": "断索军略",
+      "set": "连环2",
+      "result": "false",
+      "in_formal_pool": true,
+      "cast": 3,
+      "desc": "<html><body><p>带有灼烧的敌方队长或精英死亡时，其所在敌方路的其余存活单位防御降低 12%，持续 5 秒。每条敌方路每波最多触发 1 次。</p></body></html>",
+      "kv": {
+        "减甲": 0.0
+      },
+      "triggers": [
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 3
+        },
+        {
+          "id": "891039747",
+          "name": "子触发器",
+          "valid": true,
+          "enabled": false,
+          "actions": 2
+        },
+        {
+          "id": "1243467780",
+          "name": "子触发器_2",
+          "valid": true,
+          "enabled": false,
+          "actions": 3
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        }
+      ],
+      "actions": {
+        "UNREG_TRIGGER": 2,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "CLEAR_GROUP": 1,
+        "IF_THEN_ELSE": 2,
+        "SET_VARIABLE": 4,
+        "CREATE_SFX_ON_POINT_NEW": 1,
+        "PICK_UNIT_DO_ACTION": 1,
+        "ADD_MODIFIER": 1,
+        "REMOVE_UNIT_ENTITY_IN_GROUP": 1
+      },
+      "events": {
+        "ABILITY_LOSE": 1,
+        "RECEIVE_CUSTOM_EVENT": 1,
+        "GENERIC_UNIT_EVENT": 1,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "modifiers": [
+        134277217
+      ],
+      "bytes": 40597
+    },
+    {
+      "id": 134240053,
+      "name": "连环令",
+      "set": "连环2",
+      "result": "false",
+      "in_formal_pool": true,
+      "cast": 2,
+      "desc": "<html><body><p>选择敌方战前上、中、下任一路；该路没有存活队长或精英时不可选择。0.6 秒预警后，锁定该路生命比例最低的敌方队长或精英，并在选择阶段高亮预览。对其造成最大生命值 4% 的真实伤害，施加持续 5 秒、每秒最大生命值 1% 真实伤害的灼烧，并施加持续 5 秒的火媒。火媒期间目标死亡时，相邻敌路全部存活单位各受到最大生命值 2.5% 的真实伤害。连锁伤害不附加灼烧。</p></body></html>",
+      "kv": {
+        "伤害系数": 0.0,
+        "合法目标-字符": "000",
+        "合法目标是否对敌": true,
+        "每次伤害系数": 0.0,
+        "火媒系数": 0.0,
+        "额外条件": "最低血"
+      },
+      "triggers": [
+        {
+          "id": "26066946",
+          "name": "新建触发器_2",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "347213831",
+          "name": "新建触发器_5",
+          "valid": true,
+          "enabled": true,
+          "actions": 6
+        },
+        {
+          "id": "893440004",
+          "name": "新建触发器",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 0
+        }
+      ],
+      "actions": {
+        "SWITCH": 1,
+        "CASE": 5,
+        "SET_ENTITY_KV": 15,
+        "BREAK_LOOP": 6,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "CLEAR_LIST_VAR": 2,
+        "SET_VARIABLE_STR_LIST": 1,
+        "IF_THEN_ELSE": 2,
+        "SET_VARIABLE": 3,
+        "LIST_LOOP": 2,
+        "PICK_UNIT_DO_ACTION": 1,
+        "NEW_CAMERA_LINEAR_MOVE_TIME": 1,
+        "STORAGE_BOX": 1,
+        "CREATE_SFX_ON_UNIT_3": 4,
+        "APPLY_DAMAGE": 1,
+        "ADD_MODIFIER": 2
+      },
+      "events": {
+        "ABILITY_LEVEL_CHANGED": 1,
+        "ABILITY_LOSE": 1,
+        "ABILITY_PS_START": 1,
+        "ABILITY_SP_END": 1,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "modifiers": [
+        134253664,
+        134263847
+      ],
+      "bytes": 136139
+    },
+    {
+      "id": 134243883,
+      "name": "焚舟令",
+      "set": "连环2",
+      "result": "true",
+      "in_formal_pool": true,
+      "cast": 2,
+      "desc": "<html><body><p>继承：连环令自动替换，保留两张被动效果。</p><p>效果：选择敌方战前上、中、下任一路；按相同规则锁定该路生命比例最低的存活敌方队长或精英。0.8 秒预警后，对其造成最大生命值 6% 的真实伤害，施加持续 5 秒、每秒最大生命值 1.5% 真实伤害的灼烧，并施加持续 8 秒的火媒。</p><p>火媒死亡：相邻敌路全部存活单位各受到最大生命值 4% 的真实伤害，且防御降低 12%，持续 4 秒。连锁伤害不附加灼烧。</p><p>失效：目标在预警阶段死亡或离场则返还本次使用。</p></body></html>",
+      "kv": {
+        "伤害系数": 0.0,
+        "减甲": 12.0,
+        "合法目标-字符": "000",
+        "合法目标是否对敌": true,
+        "每次伤害系数": 0.0,
+        "火媒系数": 0.0,
+        "额外条件": "最低血"
+      },
+      "triggers": [
+        {
+          "id": "26066946",
+          "name": "新建触发器_2",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "347213831",
+          "name": "新建触发器_5",
+          "valid": true,
+          "enabled": true,
+          "actions": 6
+        },
+        {
+          "id": "893440004",
+          "name": "新建触发器",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 0
+        }
+      ],
+      "actions": {
+        "SWITCH": 1,
+        "CASE": 5,
+        "SET_ENTITY_KV": 15,
+        "BREAK_LOOP": 6,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "CLEAR_LIST_VAR": 2,
+        "SET_VARIABLE_STR_LIST": 1,
+        "IF_THEN_ELSE": 2,
+        "SET_VARIABLE": 3,
+        "LIST_LOOP": 2,
+        "PICK_UNIT_DO_ACTION": 1,
+        "NEW_CAMERA_LINEAR_MOVE_TIME": 1,
+        "STORAGE_BOX": 1,
+        "CREATE_SFX_ON_UNIT_3": 4,
+        "APPLY_DAMAGE": 1,
+        "ADD_MODIFIER": 2
+      },
+      "events": {
+        "ABILITY_LEVEL_CHANGED": 1,
+        "ABILITY_LOSE": 1,
+        "ABILITY_PS_START": 1,
+        "ABILITY_SP_END": 1,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "modifiers": [
+        134253664,
+        134263847
+      ],
+      "bytes": 136139
+    },
+    {
+      "id": 134274904,
+      "name": "耳目军略",
+      "set": "伏兵2",
+      "result": "false",
+      "in_formal_pool": true,
+      "cast": 3,
+      "desc": "<html><body><p>每波开始后的 6 秒内，全部敌方队长与精英攻击速度降低 10%。小兵不受影响</p></body></html>",
+      "kv": {
+        "伤害减免%": 0.0
+      },
+      "triggers": [
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        },
+        {
+          "id": "1030307843",
+          "name": "子触发器",
+          "valid": true,
+          "enabled": false,
+          "actions": 1
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        }
+      ],
+      "actions": {
+        "UNREG_TRIGGER": 1,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "PICK_UNIT_DO_ACTION": 1,
+        "IF_THEN_ELSE": 2,
+        "ADD_MODIFIER": 1,
+        "SET_VARIABLE": 3
+      },
+      "events": {
+        "ABILITY_LOSE": 1,
+        "RECEIVE_CUSTOM_EVENT": 1,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "modifiers": [
+        134243477
+      ],
+      "bytes": 29136
+    },
+    {
+      "id": 134280267,
+      "name": "断粮军略",
+      "set": "伏兵2",
+      "result": "false",
+      "in_formal_pool": true,
+      "cast": 3,
+      "desc": "<html><body><p>每名敌方队长或精英每波首次生命值降至 50% 或以下时，其造成的伤害降低 12%，持续至本波结束</p></body></html>",
+      "kv": {
+        "伤害减免%": 0.0
+      },
+      "triggers": [
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        },
+        {
+          "id": "411136003",
+          "name": "子触发器",
+          "valid": true,
+          "enabled": false,
+          "actions": 1
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        }
+      ],
+      "actions": {
+        "UNREG_TRIGGER": 1,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "ADD_MODIFIER": 1,
+        "SET_VARIABLE": 3,
+        "IF_THEN_ELSE": 1
+      },
+      "events": {
+        "ABILITY_LOSE": 1,
+        "GENERIC_UNIT_EVENT": 1,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "modifiers": [
+        134231404
+      ],
+      "bytes": 27866
+    },
+    {
+      "id": 134279582,
+      "name": "伏兵令",
+      "set": "伏兵2",
+      "result": "false",
+      "in_formal_pool": true,
+      "cast": 2,
+      "desc": "<html><body><p>选择敌方战前上、中、下任一路。0.6 秒预警后在该路布置伏兵，2 秒后发动突袭。该路全部存活敌方单位各受到最大生命值 2% 的真实伤害，攻击速度和移动速度降低 30%，持续 4 秒；该路队长与精英造成的伤害额外降低 15%，持续 4 秒。突袭发动前目标路清空则返还本次使用。</p></body></html>",
+      "kv": {
+        "伤害系数": 0.0,
+        "合法目标-字符": "000",
+        "合法目标是否对敌": true,
+        "攻速降低": 0.0,
+        "移速降低": 0.0,
+        "降攻系数": 0.0,
+        "额外条件": ""
+      },
+      "triggers": [
+        {
+          "id": "26066946",
+          "name": "新建触发器_2",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "347213831",
+          "name": "新建触发器_5",
+          "valid": true,
+          "enabled": true,
+          "actions": 6
+        },
+        {
+          "id": "893440004",
+          "name": "新建触发器",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 0
+        }
+      ],
+      "actions": {
+        "SWITCH": 1,
+        "CASE": 5,
+        "SET_ENTITY_KV": 20,
+        "BREAK_LOOP": 6,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "CLEAR_LIST_VAR": 2,
+        "SET_VARIABLE_STR_LIST": 1,
+        "IF_THEN_ELSE": 3,
+        "SET_VARIABLE": 4,
+        "LIST_LOOP": 2,
+        "PICK_UNIT_DO_ACTION": 2,
+        "NEW_CAMERA_LINEAR_MOVE_TIME": 1,
+        "STORAGE_BOX": 1,
+        "CREATE_SFX_ON_UNIT_3": 3,
+        "FOR_INT_DO_ACTION_NEW": 1,
+        "CREATE_STRAIGHT_MOVER": 1,
+        "PROJECTILE_DELETE": 1,
+        "APPLY_DAMAGE": 2,
+        "ADD_MODIFIER": 5
+      },
+      "events": {
+        "ABILITY_LEVEL_CHANGED": 1,
+        "ABILITY_LOSE": 1,
+        "ABILITY_PS_START": 1,
+        "ABILITY_SP_END": 1,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "modifiers": [
+        134218873,
+        134239130,
+        134256265
+      ],
+      "bytes": 238373
+    },
+    {
+      "id": 134266669,
+      "name": "十面埋伏令",
+      "set": "伏兵2",
+      "result": "true",
+      "in_formal_pool": true,
+      "cast": 2,
+      "desc": "<html><body><p>继承：伏兵令自动替换，保留两张被动效果。</p><p>效果：选择敌方战前上、中、下任一路。0.6 秒预警后布置伏兵，1.5 秒后发动突袭。该路全部存活敌方单位各受到最大生命值 4% 的真实伤害，攻击速度和移动速度降低 40%，持续 5 秒；该路队长与精英造成的伤害降低 20%，持续 5 秒。</p><p>表现：军令召来的伏兵或箭阵，不移动已有英雄队伍。</p></body></html>",
+      "kv": {
+        "伤害系数": 0.0,
+        "合法目标-字符": "000",
+        "合法目标是否对敌": true,
+        "攻速降低": 0.0,
+        "移速降低": 0.0,
+        "降攻系数": 0.0,
+        "额外条件": ""
+      },
+      "triggers": [
+        {
+          "id": "26066946",
+          "name": "新建触发器_2",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "347213831",
+          "name": "新建触发器_5",
+          "valid": true,
+          "enabled": true,
+          "actions": 6
+        },
+        {
+          "id": "893440004",
+          "name": "新建触发器",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 0
+        }
+      ],
+      "actions": {
+        "SWITCH": 1,
+        "CASE": 5,
+        "SET_ENTITY_KV": 20,
+        "BREAK_LOOP": 6,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "CLEAR_LIST_VAR": 2,
+        "SET_VARIABLE_STR_LIST": 1,
+        "IF_THEN_ELSE": 3,
+        "SET_VARIABLE": 4,
+        "LIST_LOOP": 2,
+        "PICK_UNIT_DO_ACTION": 2,
+        "NEW_CAMERA_LINEAR_MOVE_TIME": 1,
+        "STORAGE_BOX": 1,
+        "CREATE_SFX_ON_UNIT_3": 3,
+        "FOR_INT_DO_ACTION_NEW": 1,
+        "CREATE_STRAIGHT_MOVER": 1,
+        "PROJECTILE_DELETE": 1,
+        "APPLY_DAMAGE": 2,
+        "ADD_MODIFIER": 5
+      },
+      "events": {
+        "ABILITY_LEVEL_CHANGED": 1,
+        "ABILITY_LOSE": 1,
+        "ABILITY_PS_START": 1,
+        "ABILITY_SP_END": 1,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "modifiers": [
+        134218873,
+        134239130,
+        134256265
+      ],
+      "bytes": 238373
+    },
+    {
+      "id": 134276885,
+      "name": "屯垦军略",
+      "set": "屯田1",
+      "result": "false",
+      "in_formal_pool": true,
+      "cast": 3,
+      "desc": "<html><body><p>每次进入备战阶段时获得 1 点军资；获得时机在报价出现前。</p></body></html>",
+      "kv": {},
+      "triggers": [
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        },
+        {
+          "id": "1723875331",
+          "name": "子触发器",
+          "valid": true,
+          "enabled": false,
+          "actions": 1
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        }
+      ],
+      "actions": {
+        "UNREG_TRIGGER": 1,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "CALL_TRIGGER_FUNC": 1,
+        "SET_VARIABLE": 1
+      },
+      "events": {
+        "ABILITY_LOSE": 1,
+        "RECEIVE_CUSTOM_EVENT": 1,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [
+        "局内执行-货币"
+      ],
+      "modifiers": [],
+      "bytes": 14734
+    },
+    {
+      "id": 134277078,
+      "name": "节用军略",
+      "set": "屯田1",
+      "result": "false",
+      "in_formal_pool": true,
+      "cast": 3,
+      "desc": "<html><body><p>每个备战阶段的第一次刷新报价免费；后续刷新遵循正常价格规则。</p></body></html>",
+      "kv": {},
+      "triggers": [
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        },
+        {
+          "id": "792481795",
+          "name": "子触发器",
+          "valid": true,
+          "enabled": false,
+          "actions": 1
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        }
+      ],
+      "actions": {
+        "UNREG_TRIGGER": 1,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "SET_VARIABLE": 2
+      },
+      "events": {
+        "ABILITY_LOSE": 1,
+        "RECEIVE_CUSTOM_EVENT": 1,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "modifiers": [],
+      "bytes": 14947
+    },
+    {
+      "id": 134242070,
+      "name": "缴获军略",
+      "set": "屯田1",
+      "result": "false",
+      "in_formal_pool": true,
+      "cast": 3,
+      "desc": "<html><body><p>每波中首次击败敌方精英或 Boss 时，获得 1 点军资。普通敌方队长不触发。</p></body></html>",
+      "kv": {
+        "内置CD": false
+      },
+      "triggers": [
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 3
+        },
+        {
+          "id": "709906435",
+          "name": "子触发器_2",
+          "valid": true,
+          "enabled": false,
+          "actions": 3
+        },
+        {
+          "id": "1163530244",
+          "name": "子触发器",
+          "valid": true,
+          "enabled": false,
+          "actions": 3
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        }
+      ],
+      "actions": {
+        "UNREG_TRIGGER": 2,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "SET_ENTITY_KV": 2,
+        "CREATE_SFX_ON_POINT_NEW": 1,
+        "CALL_TRIGGER_FUNC": 1,
+        "SET_VARIABLE": 4,
+        "CLEAR_GROUP": 1,
+        "IF_THEN_ELSE": 1
+      },
+      "events": {
+        "ABILITY_LOSE": 1,
+        "GENERIC_UNIT_EVENT": 1,
+        "RECEIVE_CUSTOM_EVENT": 1,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [
+        "局内执行-货币",
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "modifiers": [],
+      "bytes": 36425
+    },
+    {
+      "id": 134245050,
+      "name": "富国军略",
+      "set": "屯田1",
+      "result": "true",
+      "in_formal_pool": true,
+      "cast": 3,
+      "desc": "<html><body><p>继承：保留三张组件效果。</p><p>新增：每波进入战斗前，按备战结束时持有的军资获得本波储备收益，军资不被消耗。持有 5 点或以上军资时，全部友方队长及小兵最大生命值提高 8%；持有 8 点或以上军资时，改为最大生命值提高 12%，并额外攻击提高 8%。</p><p>解锁：募兵 II、军械 II。<br /></p></body></html>",
+      "kv": {},
+      "triggers": [
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        },
+        {
+          "id": "1217355779",
+          "name": "子触发器",
+          "valid": true,
+          "enabled": false,
+          "actions": 1
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        }
+      ],
+      "actions": {
+        "UNREG_TRIGGER": 1,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "PICK_UNIT_DO_ACTION": 2,
+        "IF_THEN_ELSE": 3,
+        "ADD_MODIFIER": 2,
+        "SET_VARIABLE": 3
+      },
+      "events": {
+        "ABILITY_LOSE": 1,
+        "RECEIVE_CUSTOM_EVENT": 1,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "modifiers": [
+        134257828
+      ],
+      "bytes": 42328
+    },
+    {
+      "id": 134220091,
+      "name": "募卒军略",
+      "set": "募兵2",
+      "result": "false",
+      "in_formal_pool": true,
+      "cast": 3,
+      "desc": "<html><body><p>每个备战阶段，为每名仍存活的友方队长补充 1 名小兵。不得超过该队长当前升星对应的小兵上限；每个备战阶段最多补充 1 名。</p></body></html>",
+      "kv": {},
+      "triggers": [
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        },
+        {
+          "id": "942878723",
+          "name": "子触发器",
+          "valid": true,
+          "enabled": false,
+          "actions": 1
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        }
+      ],
+      "actions": {
+        "UNREG_TRIGGER": 1,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "PICK_UNIT_DO_ACTION": 1,
+        "IF_THEN_ELSE": 2,
+        "STORAGE_BOX": 1,
+        "CALL_TRIGGER_FUNC": 2,
+        "SET_ENTITY_KV": 1,
+        "GROUP_ADD_UNIT": 1,
+        "SET_ATTR": 1,
+        "CHANGE_UNIT_FACE_ANGLE": 1,
+        "CREATE_SFX_ON_UNIT_3": 1,
+        "SET_VARIABLE": 3
+      },
+      "events": {
+        "ABILITY_LOSE": 1,
+        "RECEIVE_CUSTOM_EVENT": 1,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [
+        "创建单位（含对象池维护）",
+        "根据升星属性给队伍小兵赋值",
+        "返回【小兵数量】通过英雄升星数",
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "modifiers": [],
+      "bytes": 73652
+    },
+    {
+      "id": 134275709,
+      "name": "练卒军略",
+      "set": "募兵2",
+      "result": "false",
+      "in_formal_pool": true,
+      "cast": 3,
+      "desc": "<html><body><p>所有友方小兵最大生命值提高 12%，攻击提高 8%。对战斗开始时已有小兵及后续补充的小兵都生效。</p></body></html>",
+      "kv": {},
+      "triggers": [
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        },
+        {
+          "id": "1941250051",
+          "name": "子触发器",
+          "valid": true,
+          "enabled": false,
+          "actions": 1
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        }
+      ],
+      "actions": {
+        "UNREG_TRIGGER": 1,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "PICK_UNIT_DO_ACTION": 2,
+        "IF_THEN_ELSE": 2,
+        "ADD_MODIFIER": 1,
+        "SET_VARIABLE": 3
+      },
+      "events": {
+        "ABILITY_LOSE": 1,
+        "RECEIVE_CUSTOM_EVENT": 1,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "modifiers": [
+        134249342
+      ],
+      "bytes": 32209
+    },
+    {
+      "id": 134234637,
+      "name": "成阵军略",
+      "set": "募兵2",
+      "result": "false",
+      "in_formal_pool": true,
+      "cast": 3,
+      "desc": "<html><body><p>每波开始时，若一名友方队长的小兵数量达到其个人上限，该队长及其小兵攻击速度提高 10%、受到伤害降低 6%，持续本波。战斗中小兵阵亡不会移除本波已获得的效果。</p></body></html>",
+      "kv": {},
+      "triggers": [
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        },
+        {
+          "id": "315969539",
+          "name": "子触发器",
+          "valid": true,
+          "enabled": false,
+          "actions": 1
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        }
+      ],
+      "actions": {
+        "UNREG_TRIGGER": 1,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "PICK_UNIT_DO_ACTION": 3,
+        "IF_THEN_ELSE": 5,
+        "ADD_MODIFIER": 2,
+        "REMOVE_BUFF_INS": 2,
+        "SET_VARIABLE": 3
+      },
+      "events": {
+        "ABILITY_LOSE": 1,
+        "RECEIVE_CUSTOM_EVENT": 1,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [
+        "返回【小兵数量】通过英雄升星数",
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "modifiers": [
+        134280771
+      ],
+      "bytes": 61325
+    },
+    {
+      "id": 134258455,
+      "name": "精兵强军",
+      "set": "募兵2",
+      "result": "true",
+      "in_formal_pool": true,
+      "cast": 3,
+      "desc": "<html><body><p>每个备战阶段最多可补充 2 名小兵；满编队伍的本波效果改为攻击速度提高 15%、受到伤害降低 10%，并额外攻击提高 8%。</p><p>队长死亡后，小兵仍按既定规则溃败离场；本军略不改变队长与小兵的绑定关系。<br /></p></body></html>",
+      "kv": {},
+      "triggers": [
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 3
+        },
+        {
+          "id": "1543413763",
+          "name": "子触发器",
+          "valid": true,
+          "enabled": false,
+          "actions": 1
+        },
+        {
+          "id": "1830707204",
+          "name": "子触发器_2",
+          "valid": true,
+          "enabled": false,
+          "actions": 1
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 3
+        }
+      ],
+      "actions": {
+        "UNREG_TRIGGER": 2,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "PICK_UNIT_DO_ACTION": 4,
+        "IF_THEN_ELSE": 8,
+        "STORAGE_BOX": 1,
+        "FOR_INT_DO_ACTION_NEW": 1,
+        "CALL_TRIGGER_FUNC": 2,
+        "SET_ENTITY_KV": 1,
+        "GROUP_ADD_UNIT": 1,
+        "SET_ATTR": 1,
+        "CHANGE_UNIT_FACE_ANGLE": 1,
+        "CREATE_SFX_ON_UNIT_3": 1,
+        "SET_VARIABLE": 4,
+        "REMOVE_BUFF_INS": 4,
+        "ADD_MODIFIER": 2
+      },
+      "events": {
+        "ABILITY_LOSE": 1,
+        "RECEIVE_CUSTOM_EVENT": 2,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [
+        "创建单位（含对象池维护）",
+        "根据升星属性给队伍小兵赋值",
+        "返回【小兵数量】通过英雄升星数",
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "modifiers": [
+        134228333
+      ],
+      "bytes": 153410
+    },
+    {
+      "id": 134217979,
+      "name": "精锻军略",
+      "set": "军械2",
+      "result": "false",
+      "in_formal_pool": true,
+      "cast": 3,
+      "desc": "<html><body><p>所有友方队长及小兵攻击提高 8%。</p></body></html>",
+      "kv": {},
+      "triggers": [
+        {
+          "id": "187396099",
+          "name": "子触发器",
+          "valid": true,
+          "enabled": false,
+          "actions": 1
+        },
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        }
+      ],
+      "actions": {
+        "PICK_UNIT_DO_ACTION": 2,
+        "IF_THEN_ELSE": 3,
+        "ADD_MODIFIER": 2,
+        "SET_VARIABLE": 3,
+        "UNREG_TRIGGER": 1,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1
+      },
+      "events": {
+        "RECEIVE_CUSTOM_EVENT": 1,
+        "ABILITY_LOSE": 1,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "modifiers": [
+        134252125
+      ],
+      "bytes": 40387
+    },
+    {
+      "id": 134221801,
+      "name": "甲胄军略",
+      "set": "军械2",
+      "result": "false",
+      "in_formal_pool": true,
+      "cast": 3,
+      "desc": "<html><body><p>所有友方队长及小兵防御提高 10%。</p></body></html>",
+      "kv": {},
+      "triggers": [
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        },
+        {
+          "id": "2050625539",
+          "name": "子触发器",
+          "valid": true,
+          "enabled": false,
+          "actions": 1
+        }
+      ],
+      "actions": {
+        "UNREG_TRIGGER": 1,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "IF_THEN_ELSE": 3,
+        "SET_VARIABLE": 3,
+        "PICK_UNIT_DO_ACTION": 2,
+        "ADD_MODIFIER": 2
+      },
+      "events": {
+        "ABILITY_LOSE": 1,
+        "ABILITY_OBTAIN": 1,
+        "RECEIVE_CUSTOM_EVENT": 1
+      },
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "modifiers": [
+        134235147
+      ],
+      "bytes": 40403
+    },
+    {
+      "id": 134257572,
+      "name": "校准军略",
+      "set": "军械2",
+      "result": "false",
+      "in_formal_pool": true,
+      "cast": 3,
+      "desc": "<html><body><p>所有友方队长及小兵攻击速度提高 10%，普攻暴击率提高 5%。</p></body></html>",
+      "kv": {},
+      "triggers": [
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        },
+        {
+          "id": "306634755",
+          "name": "子触发器",
+          "valid": true,
+          "enabled": false,
+          "actions": 1
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        }
+      ],
+      "actions": {
+        "UNREG_TRIGGER": 1,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "PICK_UNIT_DO_ACTION": 2,
+        "IF_THEN_ELSE": 3,
+        "ADD_MODIFIER": 2,
+        "SET_VARIABLE": 3
+      },
+      "events": {
+        "ABILITY_LOSE": 1,
+        "RECEIVE_CUSTOM_EVENT": 1,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "modifiers": [
+        134238612
+      ],
+      "bytes": 40387
+    },
+    {
+      "id": 134278739,
+      "name": "百工军略",
+      "set": "军械2",
+      "result": "true",
+      "in_formal_pool": true,
+      "cast": 3,
+      "desc": "<html><body><p>继承：保留三张组件效果。</p><p>新增：每名友方单位独立计算普通攻击次数。每波中第 4、8、12 等第 4 次倍数的普通攻击无视目标 30% 防御。攻击次数在每波开始时重置；技能伤害、军令伤害和持续伤害不参与计数。</p></body></html>",
+      "kv": {},
+      "triggers": [
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        },
+        {
+          "id": "1483550723",
+          "name": "子触发器",
+          "valid": true,
+          "enabled": false,
+          "actions": 1
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 2
+        }
+      ],
+      "actions": {
+        "UNREG_TRIGGER": 1,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "PICK_UNIT_DO_ACTION": 2,
+        "IF_THEN_ELSE": 3,
+        "ADD_MODIFIER": 2,
+        "SET_VARIABLE": 3
+      },
+      "events": {
+        "ABILITY_LOSE": 1,
+        "RECEIVE_CUSTOM_EVENT": 1,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "modifiers": [
+        134235502
+      ],
+      "bytes": 40403
+    },
+    {
+      "id": 134257459,
+      "name": "鼓舞令",
+      "set": "独立",
+      "result": "false",
+      "in_formal_pool": false,
+      "cast": 2,
+      "desc": "<html><body><p>选择我方战前上、中、下任一路。0.3 秒后，该路所属队长及小兵攻击提高 15%、攻击速度提高 20%，持续 6 秒。</p></body></html>",
+      "kv": {
+        "伤害减免%": 0.0
+      },
+      "triggers": [
+        {
+          "id": "26066946",
+          "name": "新建触发器_2",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "893440004",
+          "name": "新建触发器",
+          "valid": true,
+          "enabled": true,
+          "actions": 4
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 0
+        }
+      ],
+      "actions": {
+        "SWITCH": 1,
+        "CASE": 5,
+        "SET_ENTITY_KV": 5,
+        "BREAK_LOOP": 5,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "CREATE_SFX_ON_UNIT_3": 2,
+        "ADD_MODIFIER": 2,
+        "PICK_UNIT_DO_ACTION": 1,
+        "IF_THEN_ELSE": 1
+      },
+      "events": {
+        "ABILITY_LEVEL_CHANGED": 1,
+        "ABILITY_LOSE": 1,
+        "ABILITY_SP_END": 1,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [],
+      "modifiers": [
+        134279904
+      ],
+      "bytes": 49350
+    },
+    {
+      "id": 134257119,
+      "name": "固守令",
+      "set": "独立",
+      "result": "false",
+      "in_formal_pool": false,
+      "cast": 2,
+      "desc": "<html><body><p>选择我方战前上、中、下任一路。0.3 秒后，该路所属队长及小兵获得相当于各自最大生命值 10% 的护盾，护盾最多持续 6 秒。</p></body></html>",
+      "kv": {
+        "伤害减免%": 0.0
+      },
+      "triggers": [
+        {
+          "id": "26066946",
+          "name": "新建触发器_2",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "893440004",
+          "name": "新建触发器",
+          "valid": true,
+          "enabled": true,
+          "actions": 4
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 0
+        }
+      ],
+      "actions": {
+        "SWITCH": 1,
+        "CASE": 5,
+        "SET_ENTITY_KV": 5,
+        "BREAK_LOOP": 5,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "CREATE_SFX_ON_UNIT_3": 2,
+        "ADD_MODIFIER": 2,
+        "PICK_UNIT_DO_ACTION": 1,
+        "IF_THEN_ELSE": 1
+      },
+      "events": {
+        "ABILITY_LEVEL_CHANGED": 1,
+        "ABILITY_LOSE": 1,
+        "ABILITY_SP_END": 1,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [],
+      "modifiers": [
+        134279904
+      ],
+      "bytes": 49350
+    },
+    {
+      "id": 134254774,
+      "name": "体魄军略",
+      "set": "独立",
+      "result": "false",
+      "in_formal_pool": false,
+      "cast": 3,
+      "desc": "<html><body><p>所有友方队长及小兵最大生命值提高 6%</p></body></html>",
+      "kv": {
+        "伤害减免%": 0.0
+      },
+      "triggers": [
+        {
+          "id": "26066946",
+          "name": "新建触发器_2",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "893440004",
+          "name": "新建触发器",
+          "valid": true,
+          "enabled": true,
+          "actions": 4
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 0
+        }
+      ],
+      "actions": {
+        "SWITCH": 1,
+        "CASE": 5,
+        "SET_ENTITY_KV": 5,
+        "BREAK_LOOP": 5,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "CREATE_SFX_ON_UNIT_3": 2,
+        "ADD_MODIFIER": 2,
+        "PICK_UNIT_DO_ACTION": 1,
+        "IF_THEN_ELSE": 1
+      },
+      "events": {
+        "ABILITY_LEVEL_CHANGED": 1,
+        "ABILITY_LOSE": 1,
+        "ABILITY_SP_END": 1,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [],
+      "modifiers": [
+        134279904
+      ],
+      "bytes": 49350
+    },
+    {
+      "id": 134246929,
+      "name": "锐气军略",
+      "set": "独立",
+      "result": "false",
+      "in_formal_pool": false,
+      "cast": 3,
+      "desc": "<html><body><p>每波战斗开始后的 8 秒内，所有友方队长及小兵攻击提高 10%</p></body></html>",
+      "kv": {
+        "伤害减免%": 0.0
+      },
+      "triggers": [
+        {
+          "id": "26066946",
+          "name": "新建触发器_2",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "893440004",
+          "name": "新建触发器",
+          "valid": true,
+          "enabled": true,
+          "actions": 4
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 0
+        }
+      ],
+      "actions": {
+        "SWITCH": 1,
+        "CASE": 5,
+        "SET_ENTITY_KV": 5,
+        "BREAK_LOOP": 5,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "CREATE_SFX_ON_UNIT_3": 2,
+        "ADD_MODIFIER": 2,
+        "PICK_UNIT_DO_ACTION": 1,
+        "IF_THEN_ELSE": 1
+      },
+      "events": {
+        "ABILITY_LEVEL_CHANGED": 1,
+        "ABILITY_LOSE": 1,
+        "ABILITY_SP_END": 1,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [],
+      "modifiers": [
+        134279904
+      ],
+      "bytes": 49350
+    },
+    {
+      "id": 134279853,
+      "name": "行军军略",
+      "set": "独立",
+      "result": "false",
+      "in_formal_pool": false,
+      "cast": 3,
+      "desc": "<html><body><p>所有友方队长及小兵移动速度提高 10%、闪避提高 4%</p></body></html>",
+      "kv": {
+        "伤害减免%": 0.0
+      },
+      "triggers": [
+        {
+          "id": "26066946",
+          "name": "新建触发器_2",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "893440004",
+          "name": "新建触发器",
+          "valid": true,
+          "enabled": true,
+          "actions": 4
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 0
+        }
+      ],
+      "actions": {
+        "SWITCH": 1,
+        "CASE": 5,
+        "SET_ENTITY_KV": 5,
+        "BREAK_LOOP": 5,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "CREATE_SFX_ON_UNIT_3": 2,
+        "ADD_MODIFIER": 2,
+        "PICK_UNIT_DO_ACTION": 1,
+        "IF_THEN_ELSE": 1
+      },
+      "events": {
+        "ABILITY_LEVEL_CHANGED": 1,
+        "ABILITY_LOSE": 1,
+        "ABILITY_SP_END": 1,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [],
+      "modifiers": [
+        134279904
+      ],
+      "bytes": 49350
+    },
+    {
+      "id": 134235884,
+      "name": "保全军略",
+      "set": "独立",
+      "result": "false",
+      "in_formal_pool": false,
+      "cast": 3,
+      "desc": "<html><body><p>每波胜利结算时，若本波没有友方队长死亡，获得 1 点军资；每波最多触发 1 次，小兵阵亡不影响判定。</p></body></html>",
+      "kv": {
+        "伤害减免%": 0.0
+      },
+      "triggers": [
+        {
+          "id": "26066946",
+          "name": "新建触发器_2",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "225054724",
+          "name": "新建触发器_3",
+          "valid": true,
+          "enabled": true,
+          "actions": 1
+        },
+        {
+          "id": "893440004",
+          "name": "新建触发器",
+          "valid": true,
+          "enabled": true,
+          "actions": 4
+        },
+        {
+          "id": "1959489540",
+          "name": "新建触发器_4",
+          "valid": true,
+          "enabled": true,
+          "actions": 0
+        }
+      ],
+      "actions": {
+        "SWITCH": 1,
+        "CASE": 5,
+        "SET_ENTITY_KV": 5,
+        "BREAK_LOOP": 5,
+        "PRINT_MESSAGE_ACTION_TO_DIALOG": 1,
+        "CREATE_SFX_ON_UNIT_3": 2,
+        "ADD_MODIFIER": 2,
+        "PICK_UNIT_DO_ACTION": 1,
+        "IF_THEN_ELSE": 1
+      },
+      "events": {
+        "ABILITY_LEVEL_CHANGED": 1,
+        "ABILITY_LOSE": 1,
+        "ABILITY_SP_END": 1,
+        "ABILITY_OBTAIN": 1
+      },
+      "calls": [],
+      "modifiers": [
+        134279904
+      ],
+      "bytes": 49350
+    }
+  ],
+  "buffs": [
+    {
+      "id": 134218873,
+      "name": "减攻速",
+      "desc": "<html><body><p>减攻速</p></body></html>",
+      "kv": {},
+      "keys": {
+        "cycle_time": 0,
+        "time_change_of_cover": 1
+      },
+      "actions": {
+        "CREATE_SFX_ON_UNIT_3": 1,
+        "ADD_MODIFIER_OWNER_ATTR": 1,
+        "CLEAR_MODIFIER_OWNER_ATTR": 1
+      },
+      "invalid": []
+    },
+    {
+      "id": 134228333,
+      "name": "精兵强军",
+      "desc": "<html><body><p>每个备战阶段最多可补充 2 名小兵；满编队伍的本波效果改为攻击速度提高 15%、受到伤害降低 10%，并额外攻击提高 8%。</p><p>队长死亡后，小兵仍按既定规则溃败离场；本军略不改变队长与小兵的绑定关系。</p><p><br /></p></body></html>",
+      "kv": {},
+      "keys": {
+        "cycle_time": 0,
+        "time_change_of_cover": 1
+      },
+      "actions": {
+        "SET_CUR_DAMAGE": 1,
+        "SET_VARIABLE": 1,
+        "CLEAR_MODIFIER_OWNER_ATTR": 1,
+        "UNREG_TRIGGER": 1,
+        "ADD_MODIFIER_OWNER_ATTR": 2
+      },
+      "invalid": []
+    },
+    {
+      "id": 134230566,
+      "name": "侧击军略",
+      "desc": "<html><body><p>战前位于侧翼的友方队伍，攻击战前位于中排或后排的敌方队长及其小兵时，造成伤害提高 10%。不改变选敌。</p></body></html>",
+      "kv": {},
+      "keys": {
+        "cycle_time": 0,
+        "time_change_of_cover": 1
+      },
+      "actions": {
+        "SET_CUR_DAMAGE": 1,
+        "SET_VARIABLE": 1,
+        "UNREG_TRIGGER": 1
+      },
+      "invalid": []
+    },
+    {
+      "id": 134230724,
+      "name": "锋矢军略",
+      "desc": "<html><body><p>全部友方队长攻击提高 8%；其小兵攻击提高 4%</p></body></html>",
+      "kv": {},
+      "keys": {
+        "cycle_time": 0,
+        "time_change_of_cover": 1
+      },
+      "actions": {
+        "CLEAR_MODIFIER_OWNER_ATTR": 1,
+        "IF_THEN_ELSE": 2,
+        "ADD_MODIFIER_OWNER_ATTR": 2
+      },
+      "invalid": []
+    },
+    {
+      "id": 134231404,
+      "name": "断粮军略",
+      "desc": "<html><body><p>每名敌方队长或精英每波首次生命值降至 50% 或以下时，其造成的伤害降低 12%，持续至本波结束</p></body></html>",
+      "kv": {},
+      "keys": {
+        "cycle_time": 0,
+        "time_change_of_cover": 1
+      },
+      "actions": {
+        "SET_CUR_DAMAGE": 1,
+        "SET_VARIABLE": 1,
+        "UNREG_TRIGGER": 1
+      },
+      "invalid": []
+    },
+    {
+      "id": 134235147,
+      "name": "甲胄军略",
+      "desc": "<html><body><p>所有友方队长及小兵防御提高 10%。</p></body></html>",
+      "kv": {},
+      "keys": {
+        "cycle_time": 0,
+        "time_change_of_cover": 1
+      },
+      "actions": {
+        "CLEAR_MODIFIER_OWNER_ATTR": 1,
+        "ADD_MODIFIER_OWNER_ATTR": 1
+      },
+      "invalid": []
+    },
+    {
+      "id": 134235502,
+      "name": "百工军略",
+      "desc": "<html><body><p>每名友方单位独立计算普通攻击次数。每波中第 4、8、12 等第 4 次倍数的普通攻击无视目标 30% 防御。攻击次数在每波开始时重置；技能伤害、军令伤害和持续伤害不参与计数。</p></body></html>",
+      "kv": {},
+      "keys": {
+        "cycle_time": 0,
+        "time_change_of_cover": 1
+      },
+      "actions": {
+        "SET_VARIABLE": 4,
+        "IF_THEN_ELSE": 1,
+        "SET_CUR_DAMAGE": 1,
+        "CREATE_SFX_ON_UNIT_3": 1,
+        "UNREG_TRIGGER": 1
+      },
+      "invalid": []
+    },
+    {
+      "id": 134238612,
+      "name": "校准军略",
+      "desc": "<html><body><p>所有友方队长及小兵攻击速度提高 10%，普攻暴击率提高 5%。</p></body></html>",
+      "kv": {},
+      "keys": {
+        "cycle_time": 0,
+        "time_change_of_cover": 1
+      },
+      "actions": {
+        "CLEAR_MODIFIER_OWNER_ATTR": 1,
+        "ADD_MODIFIER_OWNER_ATTR": 2
+      },
+      "invalid": []
+    },
+    {
+      "id": 134239130,
+      "name": "减移速",
+      "desc": "<html><body><p>减移速</p></body></html>",
+      "kv": {},
+      "keys": {
+        "cycle_time": 0,
+        "time_change_of_cover": 1
+      },
+      "actions": {
+        "CREATE_SFX_ON_UNIT_3": 1,
+        "ADD_MODIFIER_OWNER_ATTR": 1,
+        "CLEAR_MODIFIER_OWNER_ATTR": 1
+      },
+      "invalid": []
+    },
+    {
+      "id": 134243477,
+      "name": "耳目军略",
+      "desc": "<html><body><p>每波开始后的 6 秒内，全部敌方队长与精英攻击速度降低 10%。小兵不受影响</p></body></html>",
+      "kv": {},
+      "keys": {
+        "cycle_time": 0,
+        "time_change_of_cover": 1
+      },
+      "actions": {
+        "CLEAR_MODIFIER_OWNER_ATTR": 1,
+        "IF_THEN_ELSE": 2,
+        "ADD_MODIFIER_OWNER_ATTR": 2
+      },
+      "invalid": []
+    },
+    {
+      "id": 134246119,
+      "name": "固阵军略",
+      "desc": "<html><body><p>只要至少 1 名战前位于前排的友方队长仍存活，所有战前位于中排或后排的友方单位受到伤害降低 5%。最后一名前排队长死亡后，该效果结束</p></body></html>",
+      "kv": {},
+      "keys": {
+        "cycle_time": 0,
+        "time_change_of_cover": 1
+      },
+      "actions": {
+        "SET_CUR_DAMAGE": 1,
+        "SET_VARIABLE": 1,
+        "UNREG_TRIGGER": 1
+      },
+      "invalid": []
+    },
+    {
+      "id": 134249342,
+      "name": "练卒军略",
+      "desc": "<html><body><p>所有友方小兵最大生命值提高 12%，攻击提高 8%。对战斗开始时已有小兵及后续补充的小兵都生效。</p></body></html>",
+      "kv": {},
+      "keys": {
+        "cycle_time": 0,
+        "time_change_of_cover": 1
+      },
+      "actions": {
+        "CLEAR_MODIFIER_OWNER_ATTR": 1,
+        "ADD_MODIFIER_OWNER_ATTR": 2
+      },
+      "invalid": []
+    },
+    {
+      "id": 134252125,
+      "name": "精锻军略",
+      "desc": "<html><body><p>所有友方队长及小兵攻击提高 8%。</p></body></html>",
+      "kv": {},
+      "keys": {
+        "cycle_time": 0,
+        "time_change_of_cover": 1
+      },
+      "actions": {
+        "CLEAR_MODIFIER_OWNER_ATTR": 1,
+        "ADD_MODIFIER_OWNER_ATTR": 1
+      },
+      "invalid": []
+    },
+    {
+      "id": 134253664,
+      "name": "灼烧",
+      "desc": "<html><body><p>这个单位在灼烧状态，持续扣血</p></body></html>",
+      "kv": {
+        "每次伤害": 10.0
+      },
+      "keys": {
+        "cycle_time": 0,
+        "time_change_of_cover": 1
+      },
+      "actions": {
+        "RUN_LOOP_TIMER": 1,
+        "APPLY_DAMAGE": 1,
+        "DELETE_TIMER": 1
+      },
+      "invalid": []
+    },
+    {
+      "id": 134256265,
+      "name": "降攻",
+      "desc": "<html><body><p>降攻</p></body></html>",
+      "kv": {},
+      "keys": {
+        "cycle_time": 0,
+        "time_change_of_cover": 2
+      },
+      "actions": {
+        "CREATE_SFX_ON_UNIT_3": 1,
+        "ADD_MODIFIER_OWNER_ATTR": 1,
+        "CLEAR_MODIFIER_OWNER_ATTR": 1
+      },
+      "invalid": []
+    },
+    {
+      "id": 134257828,
+      "name": "富国军略",
+      "desc": "<html><body><p>每波进入战斗前，按备战结束时持有的军资获得本波储备收益，军资不被消耗。持有 5 点或以上军资时，全部友方队长及小兵最大生命值提高 8%；持有 8 点或以上军资时，改为最大生命值提高 12%，并额外攻击提高 8%。</p></body></html>",
+      "kv": {},
+      "keys": {
+        "cycle_time": 0,
+        "time_change_of_cover": 1
+      },
+      "actions": {
+        "CLEAR_MODIFIER_OWNER_ATTR": 1,
+        "IF_THEN_ELSE": 2,
+        "ADD_MODIFIER_OWNER_ATTR": 3
+      },
+      "invalid": []
+    },
+    {
+      "id": 134259078,
+      "name": "死守军略",
+      "desc": "<html><body><p>每个前排友方队伍每波首次由其队长生命值降至 40% 或以下时，该队长及其存活小兵受到伤害降低 20%，持续 6 秒。</p></body></html>",
+      "kv": {},
+      "keys": {
+        "cycle_time": 0,
+        "time_change_of_cover": 1
+      },
+      "actions": {
+        "SET_CUR_DAMAGE": 1,
+        "SET_VARIABLE": 1,
+        "UNREG_TRIGGER": 1
+      },
+      "invalid": []
+    },
+    {
+      "id": 134263406,
+      "name": "良马军略",
+      "desc": "<html><body><p>战前位于侧翼 147 或 369 的友方队长及其小兵移动速度提高 12%，闪避提高 8%。</p></body></html>",
+      "kv": {},
+      "keys": {
+        "cycle_time": 0,
+        "time_change_of_cover": 1
+      },
+      "actions": {
+        "CLEAR_MODIFIER_OWNER_ATTR": 1,
+        "IF_THEN_ELSE": 2,
+        "ADD_MODIFIER_OWNER_ATTR": 4
+      },
+      "invalid": []
+    },
+    {
+      "id": 134263847,
+      "name": "火媒",
+      "desc": "<html><body><p>被击杀触发额外效果</p></body></html>",
+      "kv": {
+        "每次伤害": 10.0
+      },
+      "keys": {
+        "cycle_time": 0,
+        "time_change_of_cover": 1
+      },
+      "actions": {
+        "UNREG_TRIGGER": 1,
+        "CREATE_SFX_ON_POINT_NEW": 1,
+        "PICK_UNIT_DO_ACTION": 1,
+        "APPLY_DAMAGE": 1,
+        "IF_THEN_ELSE": 1,
+        "ADD_MODIFIER": 1,
+        "SET_VARIABLE": 1
+      },
+      "invalid": []
+    },
+    {
+      "id": 134264526,
+      "name": "缚舟军略",
+      "desc": "<html><body><p>处于灼烧状态且生命值低于 40% 的敌方队长或精英，受到的所有伤害提高 12%。</p></body></html>",
+      "kv": {},
+      "keys": {
+        "cycle_time": 0,
+        "time_change_of_cover": 1
+      },
+      "actions": {
+        "SET_CUR_DAMAGE": 1,
+        "SET_VARIABLE": 1,
+        "UNREG_TRIGGER": 1
+      },
+      "invalid": []
+    },
+    {
+      "id": 134270540,
+      "name": "盾列军略",
+      "desc": "<html><body><p>战前位于前排 123 的友方队长及其小兵最大生命值提高 10%。</p></body></html>",
+      "kv": {},
+      "keys": {
+        "cycle_time": 0,
+        "time_change_of_cover": 1
+      },
+      "actions": {
+        "CLEAR_MODIFIER_OWNER_ATTR": 1,
+        "IF_THEN_ELSE": 2,
+        "ADD_MODIFIER_OWNER_ATTR": 2
+      },
+      "invalid": []
+    },
+    {
+      "id": 134276955,
+      "name": "铁甲军略",
+      "desc": "<html><body><p>战前位于前排 123 的友方队长及其小兵防御提高 12%</p></body></html>",
+      "kv": {},
+      "keys": {
+        "cycle_time": 0,
+        "time_change_of_cover": 1
+      },
+      "actions": {
+        "CLEAR_MODIFIER_OWNER_ATTR": 1,
+        "IF_THEN_ELSE": 2,
+        "ADD_MODIFIER_OWNER_ATTR": 2
+      },
+      "invalid": []
+    },
+    {
+      "id": 134277217,
+      "name": "断索军略",
+      "desc": "<html><body><p>带有灼烧的敌方队长或精英死亡时，其所在敌方路的其余存活单位防御降低 12%，持续 5 秒。每条敌方路每波最多触发 1 次。</p></body></html>",
+      "kv": {},
+      "keys": {
+        "cycle_time": 0,
+        "time_change_of_cover": 1
+      },
+      "actions": {
+        "CLEAR_MODIFIER_OWNER_ATTR": 1,
+        "IF_THEN_ELSE": 2,
+        "ADD_MODIFIER_OWNER_ATTR": 2
+      },
+      "invalid": []
+    },
+    {
+      "id": 134279904,
+      "name": "受伤减免",
+      "desc": "<html><body><p>受伤减免</p></body></html>",
+      "kv": {},
+      "keys": {
+        "cycle_time": 0,
+        "time_change_of_cover": 1
+      },
+      "actions": {
+        "SET_CUR_DAMAGE": 1,
+        "SET_VARIABLE": 1,
+        "CREATE_SFX_ON_UNIT_3": 1,
+        "IF_THEN_ELSE": 1,
+        "CREATE_HARM_TEXT_NEW": 2,
+        "UNREG_TRIGGER": 1
+      },
+      "invalid": []
+    },
+    {
+      "id": 134280457,
+      "name": "战鼓军略",
+      "desc": "<html><body><p>每当敌方队长或精英死亡时，全部存活友方队长及小兵攻击速度提高 4%，最多叠加 3 层。本波内生效。普通小兵死亡不触发。</p></body></html>",
+      "kv": {},
+      "keys": {
+        "cycle_time": 0,
+        "time_change_of_cover": 2
+      },
+      "actions": {
+        "CLEAR_MODIFIER_OWNER_ATTR": 1,
+        "IF_THEN_ELSE": 2,
+        "ADD_MODIFIER_OWNER_ATTR": 2
+      },
+      "invalid": []
+    },
+    {
+      "id": 134280771,
+      "name": "成阵军略",
+      "desc": "<html><body><p>每波开始时，若一名友方队长的小兵数量达到其个人上限，该队长及其小兵攻击速度提高 10%、受到伤害降低 6%，持续本波。战斗中小兵阵亡不会移除本波已获得的效果。</p></body></html>",
+      "kv": {},
+      "keys": {
+        "cycle_time": 0,
+        "time_change_of_cover": 1
+      },
+      "actions": {
+        "SET_CUR_DAMAGE": 1,
+        "SET_VARIABLE": 1,
+        "CLEAR_MODIFIER_OWNER_ATTR": 1,
+        "UNREG_TRIGGER": 1,
+        "ADD_MODIFIER_OWNER_ATTR": 1
+      },
+      "invalid": []
+    }
+  ],
+  "functions": [
+    {
+      "path": "global_trigger/function/new/UI/军略卡牌合成画面表现处理.json",
+      "name": "军略卡牌合成画面表现处理",
+      "func_id": "674938acb11211f1a782517072b020be",
+      "enabled": true,
+      "valid": true,
+      "events": [],
+      "calls": [
+        "UI动画展示",
+        "创建自定义界面序列帧动画",
+        "返回【set数量】根据已获得的军略卡牌",
+        "返回【升级机制】通过军略卡牌类型",
+        "返回【所属set名称】根据军略卡牌类型",
+        "返回【描述】根据技能类型&等级"
+      ],
+      "sha256": "4d9ac710b55eac5e651b7417936e5d1d39c211dd8b0a6d75542f12506c43b734"
+    },
+    {
+      "path": "global_trigger/function/new/UI/刷新军略卡牌替换界面UI展示.json",
+      "name": "刷新军略卡牌替换界面UI展示",
+      "func_id": "1fcbaec7b5c811f190fb3343501ca841",
+      "enabled": true,
+      "valid": true,
+      "events": [],
+      "calls": [
+        "返回【index】指定技能类型在表中的索引",
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "sha256": "1b37037bae62963a081955010a9056f993983ce60664927ac8f369a9d8452b9f"
+    },
+    {
+      "path": "global_trigger/function/new/UI/刷新军略卡牌背包格子界面UI展示.json",
+      "name": "刷新军略卡牌背包格子界面UI展示",
+      "func_id": "56b19c02b4b811f1b65385df42a38b0b",
+      "enabled": true,
+      "valid": true,
+      "events": [],
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "sha256": "34de2d121f06f2becaa8dc6e672b7633fa3c57ce5b4ec5a77f6070c6116f1702"
+    },
+    {
+      "path": "global_trigger/function/new/功能执行/3选1军略卡牌处理.json",
+      "name": "3选1军略卡牌处理",
+      "func_id": "967f711e840a11f19023819965134a73",
+      "enabled": true,
+      "valid": true,
+      "events": [],
+      "calls": [
+        "军略3选1-处理合成的新卡牌",
+        "军略3选1-屏蔽上一级主动卡牌",
+        "军略3选1-解锁后续set卡组（base专用）",
+        "军略3选1-解锁后续set牌组",
+        "军略卡牌合成画面表现处理",
+        "判断 抽取的3选1军略卡牌是为本set最后一张",
+        "判断【8虎骑数量】是否满足指定数量",
+        "判断【set】是否属于群雄base解锁卡牌",
+        "判断【武器锻造材料】是否满足合成数量",
+        "判断群雄帝国之心触发升级",
+        "判断蜀国匡扶汉室触发升级",
+        "返回【set数量】根据已获得的军略卡牌",
+        "返回【子归类数量】根据已获得的军略卡牌",
+        "返回【所属set名称】根据军略卡牌类型",
+        "返回【玩家】在playerDetail的数组索引值",
+        "返回已拥有的合法【武器锻造-图纸类技能】根据现有的材料&图纸"
+      ],
+      "sha256": "6e899dcd1ba9110c7dd743327d512c49dff683806f08d90c223b769875d43c0c"
+    },
+    {
+      "path": "global_trigger/function/new/功能执行/军略3选1-处理合成的新卡牌.json",
+      "name": "军略3选1-处理合成的新卡牌",
+      "func_id": "e4a62a69b3db11f191048b7bdf2d7282",
+      "enabled": true,
+      "valid": true,
+      "events": [],
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "sha256": "12efd73cc2deba420df011fb032d9abb352a2b5f5653da44c7819e8abef755fb"
+    },
+    {
+      "path": "global_trigger/function/new/功能执行/军略3选1-屏蔽上一级主动卡牌.json",
+      "name": "军略3选1-屏蔽上一级主动卡牌",
+      "func_id": "5ec39849b3e211f197f88b7bdf2d7282",
+      "enabled": true,
+      "valid": true,
+      "events": [],
+      "calls": [
+        "军略3选1-屏蔽已吞噬的卡牌",
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "sha256": "84c2b9abfbc8db7b52e9b35b94187e390a7406b4ab1c433dc42110126af42cd0"
+    },
+    {
+      "path": "global_trigger/function/new/功能执行/军略3选1-屏蔽已吞噬的卡牌.json",
+      "name": "军略3选1-屏蔽已吞噬的卡牌",
+      "func_id": "b1c9eb62b4ba11f18b7a85df42a38b0b",
+      "enabled": true,
+      "valid": true,
+      "events": [],
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "sha256": "7ead99a32f4684dd937aeb92defb4e41e384fc5ba6cc5ff179971caff45490d0"
+    },
+    {
+      "path": "global_trigger/function/new/功能执行/军略3选1-解锁后续set卡组（base专用）.json",
+      "name": "军略3选1-解锁后续set卡组（base专用）",
+      "func_id": "72664894b3e511f190888b7bdf2d7282",
+      "enabled": true,
+      "valid": true,
+      "events": [],
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "sha256": "7fbdd73ed8945a29606947797df04702b7d0648143f561a0d848ca72633879ce"
+    },
+    {
+      "path": "global_trigger/function/new/功能执行/军略3选1-解锁后续set牌组.json",
+      "name": "军略3选1-解锁后续set牌组",
+      "func_id": "af90a265b3d611f184b08b7bdf2d7282",
+      "enabled": true,
+      "valid": true,
+      "events": [],
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "sha256": "6e0c757200296962c55b3f35455fba8462c10910d98897266ceb91e0ffbb7878"
+    },
+    {
+      "path": "global_trigger/function/new/参数返回/返回【N个军略技能类型】随机卡牌技能池表.json",
+      "name": "返回【N个军略技能类型】随机卡牌技能池表",
+      "func_id": "d12a81b7840611f192ff819965134a73",
+      "enabled": true,
+      "valid": true,
+      "events": [],
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "sha256": "b81efb0505893f3ca59dcafb4602563c5024fbbe322ee9686a403fb3558d1df6"
+    },
+    {
+      "path": "global_trigger/function/new/参数返回/返回【N个技能】随机卡牌技能池表.json",
+      "name": "返回【N个技能】随机卡牌技能池表",
+      "func_id": "7d88751678b511f19d4137a6bfb50fb6",
+      "enabled": true,
+      "valid": true,
+      "events": [],
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "sha256": "195dc8026bdd6f7cdc8a4df63b6fe86d7d27b465e6b95fbc17c2d7cb5e5c689f"
+    },
+    {
+      "path": "global_trigger/function/new/参数返回/返回【set数量】根据已获得的军略卡牌.json",
+      "name": "返回【set数量】根据已获得的军略卡牌",
+      "func_id": "6f6c399284e011f182d50f76820168d8",
+      "enabled": true,
+      "valid": true,
+      "events": [],
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "sha256": "e765f4d4657dc706d32f70f7e34bb105b8045d5b71caf552ba58033a0523073a"
+    },
+    {
+      "path": "global_trigger/function/new/参数返回/返回【上中下路UI队伍编号orUI队伍编号路名】根据队长单位阵型编号.json",
+      "name": "返回【上中下路UI队伍编号orUI队伍编号路名】根据队长单位阵型编号",
+      "func_id": "fff302ed8c0e11f1945675bfd8846e7a",
+      "enabled": true,
+      "valid": true,
+      "events": [],
+      "calls": [],
+      "sha256": "33696d53802aee662775d9b574820a398cf9b73160eda6ce62a2fbe3532280e6"
+    },
+    {
+      "path": "global_trigger/function/new/参数返回/返回【升级机制】通过军略卡牌类型.json",
+      "name": "返回【升级机制】通过军略卡牌类型",
+      "func_id": "ff52b673a9ba11f19f2af50ace8048fc",
+      "enabled": true,
+      "valid": true,
+      "events": [],
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "sha256": "1656d30d5721d7edb7ab4e33c8bc9f2ed05e0f19791401978b5c8303124ad8cd"
+    },
+    {
+      "path": "global_trigger/function/new/参数返回/返回【合法目标所在方阵编号】上中下路.json",
+      "name": "返回【合法目标所在方阵编号】上中下路",
+      "func_id": "d52271ab865c11f19b2c0ff349a805bc",
+      "enabled": true,
+      "valid": true,
+      "events": [],
+      "calls": [
+        "返回【队长单位】根据阵型编号"
+      ],
+      "sha256": "ee0b778b13b9bbd588c157e2c4cd43a789bec183a51ef1f12235388d22941668"
+    },
+    {
+      "path": "global_trigger/function/new/参数返回/返回【子归类数量】根据已获得的军略卡牌.json",
+      "name": "返回【子归类数量】根据已获得的军略卡牌",
+      "func_id": "7d7648a1aad311f1aa93e97ca6b822ad",
+      "enabled": true,
+      "valid": true,
+      "events": [],
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "sha256": "ec1929e3155998312472067a90b8de90e71522284dfb06000c3d9503f3399c28"
+    },
+    {
+      "path": "global_trigger/function/new/参数返回/返回【所属set名称】根据军略卡牌类型.json",
+      "name": "返回【所属set名称】根据军略卡牌类型",
+      "func_id": "82d9f2bb84d611f199590f76820168d8",
+      "enabled": true,
+      "valid": true,
+      "events": [],
+      "calls": [],
+      "sha256": "4c382741bd1b8a075df6dd7e0fa6b5c4f8fd3f0d0d4057a84918c63dc1be0992"
+    },
+    {
+      "path": "global_trigger/function/new/参数返回/返回【所属set的合成牌index】根据军略卡牌类型.json",
+      "name": "返回【所属set的合成牌index】根据军略卡牌类型",
+      "func_id": "e0cd0d24ae7e11f1b09ff54a8cce95be",
+      "enabled": true,
+      "valid": true,
+      "events": [],
+      "calls": [],
+      "sha256": "5d58fabf87bc4a0c55e88af108e38f67c48cd69fbdc714992bdb0c25acfe572b"
+    },
+    {
+      "path": "global_trigger/function/new/参数返回/返回已拥有的合法【武器锻造-图纸类技能】根据现有的材料&图纸.json",
+      "name": "返回已拥有的合法【武器锻造-图纸类技能】根据现有的材料&图纸",
+      "func_id": "c1ab2f9eab9f11f1a172b9e0bd8e6779",
+      "enabled": true,
+      "valid": true,
+      "events": [],
+      "calls": [
+        "返回【所属set的合成牌index】根据军略卡牌类型",
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "sha256": "79760afc28e68224e247236cb533de0a1677fec997cb2984f09bfe9bb8660836"
+    },
+    {
+      "path": "global_trigger/function/new/条件判断/判断 军略卡牌是否已达到背包上限.json",
+      "name": "判断 军略卡牌是否已达到背包上限",
+      "func_id": "0b75d179b5c711f1a7d63343501ca841",
+      "enabled": true,
+      "valid": true,
+      "events": [],
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "sha256": "c897816240cb8811d1a6cabf5e6c0ec46eaefd06749ffeeee834b9e1dc459ea3"
+    },
+    {
+      "path": "global_trigger/function/new/条件判断/判断 抽取的3选1军略卡牌是为本set最后一张.json",
+      "name": "判断 抽取的3选1军略卡牌是为本set最后一张",
+      "func_id": "f99eca3eb3e811f19f108b7bdf2d7282",
+      "enabled": true,
+      "valid": true,
+      "events": [],
+      "calls": [
+        "返回【set数量】根据已获得的军略卡牌",
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "sha256": "9df7d0700412e79381d56ebdfacacbc26567dd5d4fc325096a2f18e639b6610d"
+    },
+    {
+      "path": "global_trigger/function/new/条件判断/判断【set】是否属于群雄base解锁卡牌.json",
+      "name": "判断【set】是否属于群雄base解锁卡牌",
+      "func_id": "c5811594a92411f1a23ffd531842fe13",
+      "enabled": true,
+      "valid": true,
+      "events": [],
+      "calls": [
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "sha256": "2c9761f3134ecd97b3305381edcc4bbfd3491c57f9c15d8fbb91caa5c386e476"
+    },
+    {
+      "path": "global_trigger/function/new/条件判断/判断当前卡牌是否已经全消耗完.json",
+      "name": "判断当前卡牌是否已经全消耗完",
+      "func_id": "7d0da8b378c811f181ab37a6bfb50fb6",
+      "enabled": true,
+      "valid": true,
+      "events": [],
+      "calls": [],
+      "sha256": "293c8e680f45fb1be3cd21b40a3d2a9db4eb6ec78484927715749c4e77c03870"
+    },
+    {
+      "path": "global_trigger/function/new/条件判断/判断技能是否属于当前拥有的卡牌技能.json",
+      "name": "判断技能是否属于当前拥有的卡牌技能",
+      "func_id": "870d4212767411f1b7ff9f5cb536f239",
+      "enabled": true,
+      "valid": true,
+      "events": [],
+      "calls": [],
+      "sha256": "dea9eb91316ed65fad2458590d2b427ccbb65fe35d4957c41606706d91860262"
+    },
+    {
+      "path": "global_trigger/function/new/条件判断/判断是否符合购买军略卡牌条件.json",
+      "name": "判断是否符合购买军略卡牌条件",
+      "func_id": "fb6ad57484e711f1a03d0f76820168d8",
+      "enabled": true,
+      "valid": true,
+      "events": [],
+      "calls": [
+        "局内执行-货币",
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "sha256": "71da23b20b384e274def832b4942f6a71e487ee8f2b6644bd8199f05bb1eda56"
+    },
+    {
+      "path": "global_trigger/trigger/关卡初始化内容/AI行为_2.json",
+      "name": "AI行为_2",
+      "func_id": null,
+      "enabled": true,
+      "valid": true,
+      "events": [
+        "RECEIVE_CUSTOM_EVENT",
+        "GLOBAL_ABILITY_EVENT",
+        "GENERIC_UNIT_EVENT"
+      ],
+      "calls": [
+        "单位说话",
+        "获取角色指定动作名",
+        "返回【台词文本】根据角色",
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "sha256": "f609ca43f986d95ca352f23126214a5620bea2ec8f294372f314fb1e5fcfe552"
+    },
+    {
+      "path": "global_trigger/trigger/关卡初始化内容/universe01.json",
+      "name": "universe01",
+      "func_id": null,
+      "enabled": true,
+      "valid": true,
+      "events": [
+        "RECEIVE_CUSTOM_EVENT",
+        "MOUSE_KEY_DOWN_EVENT",
+        "TRIGGER_COMPONENT_EVENT",
+        "TRIGGER_COMPONENT_EVENT",
+        "TRIGGER_COMPONENT_EVENT",
+        "SELECT_UNIT_EVENT",
+        "GAME_ELAPSE_REPEAT",
+        "TRIGGER_COMPONENT_EVENT",
+        "CANCEL_SELECT_UNIT",
+        "MOUSE_KEY_DOWN_EVENT",
+        "TRIGGER_COMPONENT_EVENT",
+        "RECEIVE_CUSTOM_EVENT",
+        "GENERIC_UNIT_EVENT",
+        "TRIGGER_COMPONENT_EVENT",
+        "GAME_ELAPSE_REPEAT",
+        "TRIGGER_COMPONENT_EVENT",
+        "TRIGGER_COMPONENT_EVENT",
+        "TRIGGER_COMPONENT_EVENT"
+      ],
+      "calls": [
+        "ID转矩形区域",
+        "Refresh Tooltip",
+        "创建单位（含对象池维护）",
+        "创建敌人队伍单位",
+        "创建英雄队伍单位",
+        "判断坐标点是否在阵型区域内",
+        "判断当前波次怪物是否被清空",
+        "判断数组对应索引的队长单位是否存在",
+        "刷新备战阶段刷新对阵9宫格单位信息",
+        "备战阶段阵型区域处理",
+        "展示战斗阶段UI界面",
+        "展示队伍行进路线特效提示",
+        "强制重置队伍备战阵型占位",
+        "执行备战阶段UI界面队长阵型位置切换",
+        "执行战斗血条扣血",
+        "是否锁定队伍行动状态",
+        "更新队形走位",
+        "根据升星属性给英雄队长赋值",
+        "根据拥有技能赋予能力循环机制",
+        "根据随机池表给怪物赋随机技能",
+        "返回【index】指定单位在表中的索引",
+        "返回【兵种类型】根据存档编号",
+        "返回【单位】指定index在表中的单位",
+        "返回【敌对目标-坐标点】根据阵型排列",
+        "返回【最终波次数】",
+        "返回【玩家】在playerDetail的数组索引值",
+        "返回【表】怪物随机技能",
+        "返回【队长单位】根据阵型编号",
+        "返回【阵型编号】or【阵型区域】基于编号&区域"
+      ],
+      "sha256": "9370668a252a4b982bf999c8f34314783e75e5edd05ee788859400109f313d96"
+    },
+    {
+      "path": "global_trigger/trigger/关卡初始化内容/universe02.json",
+      "name": "universe02",
+      "func_id": null,
+      "enabled": true,
+      "valid": true,
+      "events": [
+        "RECEIVE_CUSTOM_EVENT",
+        "TRIGGER_COMPONENT_EVENT",
+        "TRIGGER_COMPONENT_EVENT",
+        "STOP_SKILL_POINTER",
+        "RECEIVE_CUSTOM_EVENT",
+        "START_SKILL_POINTER",
+        "TRIGGER_COMPONENT_EVENT",
+        "TRIGGER_COMPONENT_EVENT",
+        "GENERIC_UNIT_EVENT",
+        "GENERIC_UNIT_EVENT",
+        "CANCEL_SELECT_UNIT",
+        "LOST_SELECT_UNIT",
+        "GLOBAL_ABILITY_EVENT",
+        "RECEIVE_CUSTOM_EVENT",
+        "SELECT_UNIT_EVENT",
+        "RECEIVE_CUSTOM_EVENT",
+        "TRIGGER_COMPONENT_EVENT",
+        "TRIGGER_COMPONENT_EVENT",
+        "TRIGGER_COMPONENT_EVENT",
+        "GENERIC_UNIT_EVENT",
+        "TRIGGER_COMPONENT_EVENT"
+      ],
+      "calls": [
+        "Refresh Tooltip",
+        "创建自定义界面序列帧动画",
+        "判断当前卡牌是否已经全消耗完",
+        "判断技能是否属于当前拥有的卡牌技能",
+        "开启自定义单位描边效果",
+        "返回【N个技能】随机卡牌技能池表",
+        "返回【描述】根据技能类型&等级",
+        "返回【玩家】在playerDetail的数组索引值"
+      ],
+      "sha256": "e383ad42b4d15713d0a163fa9843d0c52a75792ac980863fc90ece8b1eae3804"
+    },
+    {
+      "path": "global_trigger/trigger/关卡初始化内容/universe03.json",
+      "name": "universe03",
+      "func_id": null,
+      "enabled": true,
+      "valid": true,
+      "events": [
+        "RECEIVE_CUSTOM_EVENT",
+        "TRIGGER_COMPONENT_EVENT",
+        "RECEIVE_CUSTOM_EVENT",
+        "TRIGGER_COMPONENT_EVENT",
+        "TRIGGER_COMPONENT_EVENT",
+        "TRIGGER_COMPONENT_EVENT",
+        "TRIGGER_COMPONENT_EVENT",
+        "RECEIVE_CUSTOM_EVENT",
+        "GENERIC_UNIT_EVENT",
+        "RECEIVE_CUSTOM_EVENT"
+      ],
+      "calls": [
+        "3选1军略卡牌处理",
+        "判断 军略卡牌是否已达到背包上限",
+        "判断是否符合购买军略卡牌条件",
+        "刷新军略卡牌替换界面UI展示",
+        "刷新军略卡牌背包格子界面UI展示",
+        "局内执行-货币",
+        "播放插画特写",
+        "返回【N个军略技能类型】随机卡牌技能池表",
+        "返回【index】指定技能类型在表中的索引",
+        "返回【set数量】根据已获得的军略卡牌",
+        "返回【上中下路UI队伍编号orUI队伍编号路名】根据队长单位阵型编号",
+        "返回【升级机制】通过军略卡牌类型",
+        "返回【合法目标所在方阵编号】上中下路",
+        "返回【所属set名称】根据军略卡牌类型",
+        "返回【描述】根据技能类型&等级",
+        "返回【玩家】在playerDetail的数组索引值",
+        "返回【队长单位】根据阵型编号"
+      ],
+      "sha256": "4d71ae18f8f3763fe33675c5d00ed8694d07e5a2bfd5e51d6b9a2170c9e2873c"
+    }
+  ],
+  "variables": {
+    "BOOLEAN": {
+      "3选1界面展示开关": false,
+      "军令卡牌免费刷新开关": true
+    },
+    "INTEGER": {
+      "局内-额外触发3选1所需累计经验": 0,
+      "玩家卡牌背包格子上限": 0,
+      "玩家归属怪物刷新累计": 0,
+      "玩家累计3选1技能次数": 0,
+      "获取卡牌数量上限": 0
+    },
+    "STRING": {
+      "群雄类-军略卡牌锁定子归类名称": ""
+    },
+    "TABLE": {
+      "军令卡牌base-表": null,
+      "卡牌技能池-表": null,
+      "玩家专属的3选1技能-表": null
+    },
+    "UNIT_NAME": {
+      "局内-3选1仆从召唤选择": 0
+    }
+  }
+}

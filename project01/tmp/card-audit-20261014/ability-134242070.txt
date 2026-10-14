@@ -1,0 +1,21 @@
+ON /trigger_dict/225054724/action/0 UNREG_TRIGGER DYNAMIC_TRIGGER_INSTANCE:temp触发器:actor
+ON /trigger_dict/225054724/action/1 UNREG_TRIGGER DYNAMIC_TRIGGER_INSTANCE:temp2触发器:actor
+ON /trigger_dict/225054724/action/2 PRINT_MESSAGE_ACTION_TO_DIALOG 3, STR_JOIN(GET_ABILITY_STR_ATTR(CUR_ABILITY(), "name"), "触发了 失去 事件")
+ON /trigger_dict/225054724/event/0 ABILITY_LOSE 
+ON /trigger_dict/709906435/action/0 SET_ENTITY_KV CUR_ABILITY(), "内置CD", True
+ON /trigger_dict/709906435/action/1 CREATE_SFX_ON_POINT_NEW 104117, UNIT_ENTITY_POINT(KILLED_UNIT()) OPTIONAL 2.0,True,2.0,2.0,2.0
+ON /trigger_dict/709906435/action/2 CALL_TRIGGER_FUNC 局内执行-货币(OWNER_PLAYER(ABILITY_OWNER()), "OGgJIytDEfC5bJeSrLCpxb", 500.0)
+ON /trigger_dict/709906435/condition/0 CONDITION BOOL_COMPARE(GET_BOOLEAN_KV(CUR_ABILITY(), "内置CD"), "==", False)
+ON /trigger_dict/709906435/condition/1 CONDITION UNIT_IN_GROUP(KILLED_UNIT(), UNIT_GROUP:搜索组:actor)
+ON /trigger_dict/709906435/event/0 GENERIC_UNIT_EVENT GENERIC_UNIT_EVENT("ET_BEFORE_UNIT_DIE")
+ON /trigger_dict/709906435/sub_trigger_owner_set_var_action SET_VARIABLE DYNAMIC_TRIGGER_INSTANCE:temp2触发器:actor, REG_ABILITY_TRIGGER(709906435)
+ON /trigger_dict/1163530244/action/0 CLEAR_GROUP UNIT_GROUP:搜索组:actor
+ON /trigger_dict/1163530244/action/1 IF_THEN_ELSE DICT_HAS_VALUE(PLAYER:playersDetail, OWNER_PLAYER(ABILITY_OWNER())), {actions}, {actions}
+ON /trigger_dict/1163530244/action/1/args_list/0/args_list/0 CONDITION DICT_HAS_VALUE(PLAYER:playersDetail, OWNER_PLAYER(ABILITY_OWNER()))
+ON /trigger_dict/1163530244/action/1/args_list/1/args_list/0 SET_VARIABLE UNIT_GROUP:搜索组:actor, UNIT_GROUP:敌人队伍
+ON /trigger_dict/1163530244/action/1/args_list/2/args_list/0 SET_VARIABLE UNIT_GROUP:搜索组:actor, UNIT_GROUP:玩家队伍, 返回【玩家】在playerDetail的数组索引值(OWNER_PLAYER(ABILITY_OWNER()))
+ON /trigger_dict/1163530244/action/2 SET_ENTITY_KV CUR_ABILITY(), "内置CD", False
+ON /trigger_dict/1163530244/condition/0 CONDITION FLOAT_COMPARE(GET_CUS_EVENT_PARAM("阶段编号"), "==", 2)
+ON /trigger_dict/1163530244/event/0 RECEIVE_CUSTOM_EVENT 1646669129
+ON /trigger_dict/1163530244/sub_trigger_owner_set_var_action SET_VARIABLE DYNAMIC_TRIGGER_INSTANCE:temp触发器:actor, REG_ABILITY_TRIGGER(1163530244)
+ON /trigger_dict/1959489540/event/0 ABILITY_OBTAIN 

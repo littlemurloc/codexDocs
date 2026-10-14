@@ -1,0 +1,7 @@
+ON /action/0 SET_VARIABLE BOOLEAN:判断结果:local, False
+ON /action/1 ITER_UI_COMP_DO PLAYER:执行的玩家:local, "ed9e9488-d381-4d8a-a6df-2c78bc079153", {actions}
+ON /action/1/args_list/2/args_list/0 IF_THEN_ELSE ABILITY_ENTITY_COMPARE(2(ABILITY:执行的技能:local), "==", GET_ABILITY_KV(GET_UI_COMP_PREFAB(PLAYER:执行的玩家:local, FOR_EACH_UI_COMP()), "skill")), {actions}, {actions}
+ON /action/1/args_list/2/args_list/0/args_list/0/args_list/0 CONDITION ABILITY_ENTITY_COMPARE(2(ABILITY:执行的技能:local), "==", GET_ABILITY_KV(GET_UI_COMP_PREFAB(PLAYER:执行的玩家:local, FOR_EACH_UI_COMP()), "skill"))
+ON /action/1/args_list/2/args_list/0/args_list/1/args_list/0 SET_VARIABLE BOOLEAN:判断结果:local, True
+ON /action/1/args_list/2/args_list/0/args_list/1/args_list/1 BREAK_LOOP 
+ON /action/2 400342 BOOLEAN:判断结果:local

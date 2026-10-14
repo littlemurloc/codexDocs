@@ -1,0 +1,17 @@
+ON /action/0 TRAVERSE_TABLE_NEW TABLE:军令卡牌base-表, 返回【玩家】在playerDetail的数组索引值(PLAYER:指定玩家:local), {actions} OPTIONAL True
+ON /action/0/args_list/1/args_list/0 IF_THEN_ELSE ABILITY_COMPARE(ABILITY_NAME:指定军略卡牌:local, "==", GET_ABILITY_NAME_TABLE_VAR_ND(TABLE:军令卡牌base-表, 返回【玩家】在playerDetail的数组索引值(PLAYER:指定玩家:local), ITER_TABLE_KEY_INT(), "技能类型")), {actions}, {actions}
+ON /action/0/args_list/1/args_list/0/args_list/0/args_list/0 CONDITION ABILITY_COMPARE(ABILITY_NAME:指定军略卡牌:local, "==", GET_ABILITY_NAME_TABLE_VAR_ND(TABLE:军令卡牌base-表, 返回【玩家】在playerDetail的数组索引值(PLAYER:指定玩家:local), ITER_TABLE_KEY_INT(), "技能类型"))
+ON /action/0/args_list/1/args_list/0/args_list/1/args_list/0 SET_VARIABLE ["STRING", "子归类名称", "local"], GET_STRING_TABLE_VAR_ND(TABLE:军令卡牌base-表, 返回【玩家】在playerDetail的数组索引值(PLAYER:指定玩家:local), ITER_TABLE_KEY_INT(), "子归类")
+ON /action/0/args_list/1/args_list/0/args_list/1/args_list/1 BREAK_LOOP 
+ON /action/1 SET_VARIABLE ["INTEGER", "拥有count", "local"], 0
+ON /action/2 SET_VARIABLE INTEGER:上限count:local, 0
+ON /action/3 TRAVERSE_TABLE_NEW TABLE:军令卡牌base-表, 返回【玩家】在playerDetail的数组索引值(PLAYER:指定玩家:local), {actions} OPTIONAL True
+ON /action/3/args_list/1/args_list/0 IF_THEN_ELSE STRING_COMPARE(GET_STRING_TABLE_VAR_ND(TABLE:军令卡牌base-表, 返回【玩家】在playerDetail的数组索引值(PLAYER:指定玩家:local), ITER_TABLE_KEY_INT(), "子归类"), "==", 2(["STRING", "子归类名称", "local"])), BOOL_COMPARE(GET_BOOLEAN_TABLE_VAR_ND(TABLE:军令卡牌base-表, 返回【玩家】在playerDetail的数组索引值(PLAYER:指定玩家:local), ITER_TABLE_KEY_INT(), "是否合成"), "==", True), {actions}, {actions}
+ON /action/3/args_list/1/args_list/0/args_list/0/args_list/0 CONDITION STRING_COMPARE(GET_STRING_TABLE_VAR_ND(TABLE:军令卡牌base-表, 返回【玩家】在playerDetail的数组索引值(PLAYER:指定玩家:local), ITER_TABLE_KEY_INT(), "子归类"), "==", 2(["STRING", "子归类名称", "local"]))
+ON /action/3/args_list/1/args_list/0/args_list/0/args_list/1 CONDITION BOOL_COMPARE(GET_BOOLEAN_TABLE_VAR_ND(TABLE:军令卡牌base-表, 返回【玩家】在playerDetail的数组索引值(PLAYER:指定玩家:local), ITER_TABLE_KEY_INT(), "是否合成"), "==", True)
+ON /action/3/args_list/1/args_list/0/args_list/1/args_list/0 SET_VARIABLE INTEGER:上限count:local, INT_PLUS_ONE(6(INTEGER:上限count:local))
+ON /action/3/args_list/1/args_list/0/args_list/1/args_list/1 IF_THEN_ELSE BOOL_COMPARE(GET_BOOLEAN_TABLE_VAR_ND(TABLE:军令卡牌base-表, 返回【玩家】在playerDetail的数组索引值(PLAYER:指定玩家:local), ITER_TABLE_KEY_INT(), "是否已抽取"), "==", True), BOOL_COMPARE(GET_BOOLEAN_TABLE_VAR_ND(TABLE:军令卡牌base-表, 返回【玩家】在playerDetail的数组索引值(PLAYER:指定玩家:local), ITER_TABLE_KEY_INT(), "是否解锁"), "==", True), {actions}, {actions}
+ON /action/3/args_list/1/args_list/0/args_list/1/args_list/1/args_list/0/args_list/0 CONDITION BOOL_COMPARE(GET_BOOLEAN_TABLE_VAR_ND(TABLE:军令卡牌base-表, 返回【玩家】在playerDetail的数组索引值(PLAYER:指定玩家:local), ITER_TABLE_KEY_INT(), "是否已抽取"), "==", True)
+ON /action/3/args_list/1/args_list/0/args_list/1/args_list/1/args_list/0/args_list/1 CONDITION BOOL_COMPARE(GET_BOOLEAN_TABLE_VAR_ND(TABLE:军令卡牌base-表, 返回【玩家】在playerDetail的数组索引值(PLAYER:指定玩家:local), ITER_TABLE_KEY_INT(), "是否解锁"), "==", True)
+ON /action/3/args_list/1/args_list/0/args_list/1/args_list/1/args_list/1/args_list/0 SET_VARIABLE ["INTEGER", "拥有count", "local"], INT_PLUS_ONE(6(["INTEGER", "拥有count", "local"]))
+ON /action/4 400342 6(["INTEGER", "拥有count", "local"]), 6(INTEGER:上限count:local)
