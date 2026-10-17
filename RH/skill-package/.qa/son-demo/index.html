@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <!--OFFLINE_CSP-->
+  <meta name="theme-color" content="#08111b">
+  <title>赛季活动演示</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="toolbar"><span id="demo-label">赛季活动 · 手机预览</span><div><button data-action="rules">规则与说明</button><button data-action="reset">重置体验</button></div></div>
+  <div class="phone-wrap" id="phone-wrap">
+    <section class="phone" id="phone" aria-label="横屏手机游戏活动">
+      <div class="screen">
+        <header class="topbar"><div><span class="brand-mark">FC</span><div><b id="season-title"></b><small id="season-subtitle"></small></div></div><div class="topstats" id="topstats"></div></header>
+        <nav id="navigation" aria-label="活动章节"></nav>
+        <main id="content"></main>
+        <footer><span>原创概念 · 本地模拟</span><span id="status-line">进度在浏览器允许时保存在本机</span></footer>
+      </div>
+    </section>
+  </div>
+  <dialog id="dialog" aria-labelledby="dialog-title"><button class="dialog-close" data-action="close" aria-label="关闭">×</button><div id="dialog-body"></div></dialog>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script id="season-config" type="application/json">__SEASON_CONFIG__</script>
+  <script defer src="app.js"></script>
+</body>
+</html>

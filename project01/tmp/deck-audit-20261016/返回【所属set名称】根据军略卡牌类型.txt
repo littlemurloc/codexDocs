@@ -1,0 +1,7 @@
+ON /action/0 SET_VARIABLE STRING:result:local, ""
+ON /action/1 TRAVERSE_TABLE_NEW 军令卡牌技能表, {actions} OPTIONAL True
+ON /action/1/args_list/1/args_list/0 IF_THEN_ELSE ABILITY_COMPARE(ABILITY_NAME:查询技能类型:local, "==", GET_ABILITY_NAME_TABLE_VAR_ND(军令卡牌技能表, ITER_TABLE_KEY_INT(), "技能类型")), {actions}, {actions}
+ON /action/1/args_list/1/args_list/0/args_list/0/args_list/0 CONDITION ABILITY_COMPARE(ABILITY_NAME:查询技能类型:local, "==", GET_ABILITY_NAME_TABLE_VAR_ND(军令卡牌技能表, ITER_TABLE_KEY_INT(), "技能类型"))
+ON /action/1/args_list/1/args_list/0/args_list/1/args_list/0 SET_VARIABLE STRING:result:local, GET_STRING_TABLE_VAR_ND(军令卡牌技能表, ITER_TABLE_KEY_INT(), "所属set")
+ON /action/1/args_list/1/args_list/0/args_list/1/args_list/1 BREAK_LOOP 
+ON /action/2 400342 2(STRING:result:local)

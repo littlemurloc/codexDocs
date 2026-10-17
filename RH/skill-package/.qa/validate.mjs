@@ -1,0 +1,67 @@
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import vm from 'node:vm';
+import assert from 'node:assert/strict';
+import {createRequire} from 'node:module';
+import {spawnSync} from 'node:child_process';
+const require=createRequire(import.meta.url);
+const {parseHTML}=require('D:/codex/RH/haaland-qa/node_modules/linkedom');
+const root='D:/codex/RH/skill-package',skill=root+'/fc-season-web-demo',project=root+'/.qa/son-demo';
+await fs.writeFile(skill+'/agents/openai.yaml','interface:\n  display_name: "FC赛季活动网页工坊"\n  short_description: "根据赛季主题与六模块框架制作可体验的手机活动网页，交付离线单文件演示"\n  default_prompt: "使用 $fc-season-web-demo，围绕我提供的主题设计赛季活动并生成可体验的离线手机网页。"\n','utf8');
+const c=JSON.parse(await fs.readFile(skill+'/assets/frontend-template/theme.json','utf8'));c.stage='concept';c.id='qa-son';c.theme='孙兴慜';
+c.title='双足锋芒 · 孙兴慜';c.heroCopy='在不同射门时机与进攻路线中完成锋线挑战。';
+c.drills[0].name='双足终结';c.drills[0].targetStart=25;c.drills[0].targetEnd=72;
+c.drills[1].name='内切破门';c.drills[1].targetStart=63;c.drills[1].targetEnd=80;
+await fs.writeFile(project+'/theme.json',JSON.stringify(c,null,2));
+await fs.writeFile(project+'/season-plan.md','# 验证样例\n\n只验证模板与脚本，不代表完成了独立主题的正式设计。\n');
+const html=await fs.readFile(project+'/index.html','utf8'),app=await fs.readFile(project+'/app.js','utf8');
+function setup(saved,blocked=false){
+ const {document,window}=parseHTML(html.replace('__SEASON_CONFIG__',JSON.stringify(c)));
+ const backing=new Map(saved===undefined?[]:[['fc-season-demo:'+c.id,typeof saved==='string'?saved:JSON.stringify(saved)]]);
+ let next=1,now=0;const jobs=new Map(),frames=new Map();
+ const localStorage={getItem:k=>{if(blocked)throw Error('blocked');return backing.get(k)??null;},setItem:(k,v)=>{if(blocked)throw Error('blocked');backing.set(k,v);},removeItem:k=>{if(blocked)throw Error('blocked');backing.delete(k);}};
+ window.innerWidth=1280;window.innerHeight=780;
+ const setTimeout=(fn,delay)=>{const id=next++;jobs.set(id,{fn,delay});return id;};
+ const clearTimeout=id=>jobs.delete(id),requestAnimationFrame=fn=>{const id=next++;frames.set(id,fn);return id;},cancelAnimationFrame=id=>frames.delete(id);
+ class MockDate extends Date{static now(){return now;}}
+ const context=vm.createContext({document,window,localStorage,Date:MockDate,setTimeout,clearTimeout,requestAnimationFrame,cancelAnimationFrame,console});
+ vm.runInContext(app,context,{filename:'app.js'});
+ const click=(selector)=>{const b=document.querySelector(selector);assert.ok(b,'Missing control '+selector);if(b.disabled)return;b.dispatchEvent(new window.Event('click',{bubbles:true}));};
+ const flush=delay=>{for(const [id,j] of [...jobs])if(j.delay===delay){jobs.delete(id);j.fn();}};
+ const api=window.SeasonDemo;
+ return {document,window,click,flush,jobs,frames,backing,state:()=>api.snapshot(),time:v=>{now=v;},dispose:()=>api.dispose()};
+}
+const checks=[];const check=(name,fn)=>{fn();checks.push(name);};
+const t=setup();
+check('daily reward and repeat guard',()=>{t.click('[data-action="daily"]');const p=t.state().points;t.click('[data-action="daily"]');assert.equal(p,c.initialPoints+c.dailyReward);assert.equal(t.state().points,p);});
+t.click('[data-tab="training"]');
+check('training cancellation stops delayed reward',()=>{t.click('[data-action="drill"]');t.click('[data-action="shoot"]');t.click('[data-action="close"]');t.flush(180);assert.equal(t.state().trained.length,0);assert.equal(t.state().points,c.initialPoints+c.dailyReward);assert.equal(t.frames.size,0);});
+function complete(id){t.click(`[data-action="drill"][data-id="${id}"]`);for(let i=0;i<3;i++){t.time(i*320+800);t.click('[data-action="shoot"]');t.click('[data-action="shoot"]');t.flush(180);}t.click('[data-action="close"]');}
+check('three-shot completion and first-time-only reward',()=>{complete(c.drills[0].id);assert.equal(t.state().trained.length,1);const p=t.state().points;complete(c.drills[0].id);assert.equal(t.state().points,p);complete(c.drills[1].id);assert.equal(t.state().trained.length,2);});
+check('route choice changes actual match task',()=>{t.click('[data-tab="partners"]');t.click(`[data-action="route"][data-id="${c.routes[1].id}"]`);t.click('[data-tab="final"]');t.click('[data-action="match"]');assert.ok(t.document.getElementById('dialog-body').textContent.includes(c.routes[1].task));t.click('[data-action="close"]');assert.equal(t.state().matches,0);});
+check('match settlement and repeated-click guard',()=>{for(let i=0;i<c.matchesRequired;i++){t.click('[data-action="match"]');const detached=t.document.querySelector('[data-action="finish-match"]');t.click('[data-action="finish-match"]');const points=t.state().points;detached.dispatchEvent(new t.window.Event('click',{bubbles:true}));assert.equal(t.state().points,points);t.click('[data-action="close"]');}assert.equal(t.state().matches,c.matchesRequired);});
+check('core reward is reachable, claimed once and costs no cumulative points',()=>{assert.ok(t.state().points>=c.coreThreshold);t.click('[data-tab="journey"]');const before=t.state().points;t.click('[data-action="node"][data-index="4"]');t.click('[data-action="close"]');assert.ok(t.state().claimed.includes(4));t.click('[data-action="node"][data-index="4"]');assert.equal(t.state().points,before);assert.equal(t.state().claimed.filter(i=>i===4).length,1);});
+check('partner exchange consumes only tokens and cannot repeat',()=>{t.click('[data-tab="partners"]');const before=t.state();t.click('[data-action="partner"]');t.click('[data-action="exchange"]');assert.equal(t.state().tokens,before.tokens-c.partnerCost);assert.equal(t.state().points,before.points);assert.ok(t.state().partner);t.click('[data-action="partner"]');assert.equal(t.state().tokens,before.tokens-c.partnerCost);});
+check('reload restores progress',()=>{const restored=setup([...t.backing.values()][0]);assert.equal(JSON.stringify(restored.state()),JSON.stringify(t.state()));restored.dispose();});
+check('reset clears state and closes pending work',()=>{t.click('[data-action="reset"]');t.click('[data-action="reset-confirm"]');assert.equal(t.state().points,c.initialPoints);assert.equal(t.state().trained.length,0);assert.equal(t.state().matches,0);assert.equal(t.state().partner,false);});
+check('blocked storage remains playable',()=>{const b=setup(undefined,true);b.click('[data-action="daily"]');assert.equal(b.state().points,c.initialPoints+c.dailyReward);assert.match(b.document.getElementById('status-line').textContent,/存储不可用/);b.dispose();});
+check('corrupt and contradictory saves recover',()=>{for(const bad of ['{bad',[],{points:-1,tokens:NaN,matches:999,trained:['unknown'],claimed:[4,4,99],route:'bad'}]){const b=setup(bad);assert.ok(b.state().points>=0);assert.ok(!b.state().claimed.includes(4));assert.equal(b.state().trained.length,0);b.dispose();}});
+check('viewport math stays within available canvas',()=>{for(const [w,h]of [[1440,900],[1024,768],[800,600],[390,844],[844,390]]){const s=Math.min((w-24)/1200,(h-62)/660,1);assert.ok(1200*s<=w-24+.001);assert.ok(660*s<=h-62+.001);}});
+t.dispose();
+// Exercise packaging with a real large image and malicious-looking text as data.
+c.heroImage='assets/large-background.png';c.visualNote='验证用现有AI背景';c.theme='孙兴慜 </script><script>throw Error("injected")</script>';
+await fs.mkdir(project+'/assets',{recursive:true});await fs.copyFile('D:/codex/RH/haaland-offline/assets/haaland-stadium.png',project+'/assets/large-background.png');
+await fs.writeFile(project+'/theme.json',JSON.stringify(c,null,2));
+const run=(file,args,ok=true)=>{const r=spawnSync(process.execPath,[skill+'/scripts/'+file,...args],{encoding:'utf8'});if(r.error)throw r.error;if(ok)assert.equal(r.status,0,r.stderr);else assert.notEqual(r.status,0);return r;};
+run('build-offline.mjs',['--project',project,'--out',project+'/ready.html','--ready','--force']);
+run('check-offline.mjs',[project+'/ready.html','--ready']);
+const built=await fs.readFile(project+'/ready.html','utf8');
+assert.ok(built.includes('URL.createObjectURL'));assert.ok(!/--hero-image\s*:\s*url\(['"]?data:/.test(built));assert.ok(!built.includes('<script>throw Error("injected")</script>'));
+checks.push('large image embedded through Blob, JSON closing-script text escaped, ready build passes');
+run('build-offline.mjs',['--project',project,'--out',project+'/ready.html','--ready'],false);checks.push('existing output refuses overwrite without force');
+const original=c.coreThreshold;c.coreThreshold=999999;c.milestones[4].at=999999;await fs.writeFile(project+'/theme.json',JSON.stringify(c));
+run('build-offline.mjs',['--project',project,'--out',project+'/unreachable.html','--ready'],false);checks.push('unreachable reward budget rejected');
+c.coreThreshold=original;c.milestones[4].at=original;c.heroImage='../outside.png';await fs.writeFile(project+'/theme.json',JSON.stringify(c));await fs.copyFile(project+'/assets/large-background.png',root+'/.qa/outside.png');
+run('build-offline.mjs',['--project',project,'--out',project+'/escape.html','--ready'],false);checks.push('asset path escape rejected');
+await fs.writeFile(root+'/.qa/results.json',JSON.stringify({checks,limitation:'DOM/state and package checks. No browser layout rendering or live offline network test.'},null,2));
+console.log(JSON.stringify({passed:checks.length,checks}));

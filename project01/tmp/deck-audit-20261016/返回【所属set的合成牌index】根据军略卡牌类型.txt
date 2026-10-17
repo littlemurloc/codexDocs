@@ -1,0 +1,15 @@
+ON /action/0 SET_VARIABLE ["STRING", "set名称", "local"], ""
+OFF /action/1 SET_VARIABLE INTEGER:result:local, 0
+ON /action/2 TRAVERSE_TABLE_NEW 军令卡牌技能表, {actions} OPTIONAL True
+ON /action/2/args_list/1/args_list/0 IF_THEN_ELSE ABILITY_COMPARE(ABILITY_NAME:查询技能类型:local, "==", GET_ABILITY_NAME_TABLE_VAR_ND(军令卡牌技能表, ITER_TABLE_KEY_INT(), "技能类型")), {actions}, {actions}
+ON /action/2/args_list/1/args_list/0/args_list/0/args_list/0 CONDITION ABILITY_COMPARE(ABILITY_NAME:查询技能类型:local, "==", GET_ABILITY_NAME_TABLE_VAR_ND(军令卡牌技能表, ITER_TABLE_KEY_INT(), "技能类型"))
+ON /action/2/args_list/1/args_list/0/args_list/1/args_list/0 SET_VARIABLE ["STRING", "set名称", "local"], GET_STRING_TABLE_VAR_ND(军令卡牌技能表, ITER_TABLE_KEY_INT(), "所属set")
+ON /action/2/args_list/1/args_list/0/args_list/1/args_list/1 BREAK_LOOP 
+ON /action/3 TRAVERSE_TABLE_NEW 军令卡牌技能表, {actions} OPTIONAL True
+ON /action/3/args_list/1/args_list/0 IF_THEN_ELSE STRING_COMPARE(GET_STRING_TABLE_VAR_ND(军令卡牌技能表, ITER_TABLE_KEY_INT(), "升级机制"), "==", "武器锻造"), STRING_COMPARE(GET_STRING_TABLE_VAR_ND(军令卡牌技能表, ITER_TABLE_KEY_INT(), "所属set"), "==", 2(STRING:set名称:local)), BOOL_COMPARE(GET_BOOLEAN_TABLE_VAR_ND(军令卡牌技能表, ITER_TABLE_KEY_INT(), "是否合成"), "==", True), {actions}, {actions}
+ON /action/3/args_list/1/args_list/0/args_list/0/args_list/0 CONDITION STRING_COMPARE(GET_STRING_TABLE_VAR_ND(军令卡牌技能表, ITER_TABLE_KEY_INT(), "升级机制"), "==", "武器锻造")
+ON /action/3/args_list/1/args_list/0/args_list/0/args_list/1 CONDITION STRING_COMPARE(GET_STRING_TABLE_VAR_ND(军令卡牌技能表, ITER_TABLE_KEY_INT(), "所属set"), "==", 2(STRING:set名称:local))
+ON /action/3/args_list/1/args_list/0/args_list/0/args_list/2 CONDITION BOOL_COMPARE(GET_BOOLEAN_TABLE_VAR_ND(军令卡牌技能表, ITER_TABLE_KEY_INT(), "是否合成"), "==", True)
+ON /action/3/args_list/1/args_list/0/args_list/1/args_list/0 SET_VARIABLE INTEGER:result:local, ITER_TABLE_KEY_INT()
+ON /action/3/args_list/1/args_list/0/args_list/1/args_list/1 BREAK_LOOP 
+ON /action/4 400342 6(INTEGER:result:local)

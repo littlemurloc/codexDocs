@@ -23,6 +23,7 @@
 
 ## 当前主策划重点文档
 
+- 涉及 Y3 ECA 实装、生成、重构或排错时，先读 [Y3 编辑器 ECA 实装规范](y3-eca-implementation-standards.md)，并按任务范围使用 [交付验收清单](../tests/y3-eca-delivery-checklist.md)；本条不改变项目负责人授权范围，不把新增文档视为历史验收已通过。
 - `docs/design/first-batch-10-heroes-skill-config-v1.md`：当前首批 10 英雄技能落表主源。
 - `docs/design/tactical-command-card-system-v1.md`：当前军令卡系统主源。
 - `docs/design/tactical-command-card-catalog-v1.md`：首批军令、Set、融合结果与逐卡效果主源；程序顾问与数值/战斗验证在处理军令时必须读取。

@@ -1,0 +1,59 @@
+ON /action/0 SET_VARIABLE BOOLEAN:result:local, False
+ON /action/1 IF_THEN_ELSE CHECK_HAS_ABILITY_TYPE(UNIT_ENTITY:playerHeroList, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), 134275195<铜>), {actions}, {actions}
+ON /action/1/args_list/0/args_list/0 CONDITION CHECK_HAS_ABILITY_TYPE(UNIT_ENTITY:playerHeroList, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), 134275195<铜>)
+ON /action/1/args_list/1/args_list/0 SET_VARIABLE INTEGER:铜:local, GET_INTEGER_KV(GET_ABILITY_BY_AID(UNIT_ENTITY:playerHeroList, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), 2, 134275195<铜>), "累计总数")
+ON /action/2 IF_THEN_ELSE CHECK_HAS_ABILITY_TYPE(UNIT_ENTITY:playerHeroList, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), 134260011<铁>), {actions}, {actions}
+ON /action/2/args_list/0/args_list/0 CONDITION CHECK_HAS_ABILITY_TYPE(UNIT_ENTITY:playerHeroList, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), 134260011<铁>)
+ON /action/2/args_list/1/args_list/0 SET_VARIABLE INTEGER:铁:local, GET_INTEGER_KV(GET_ABILITY_BY_AID(UNIT_ENTITY:playerHeroList, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), 2, 134260011<铁>), "累计总数")
+ON /action/3 IF_THEN_ELSE CHECK_HAS_ABILITY_TYPE(UNIT_ENTITY:playerHeroList, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), 134222206<精钢>), {actions}, {actions}
+ON /action/3/args_list/0/args_list/0 CONDITION CHECK_HAS_ABILITY_TYPE(UNIT_ENTITY:playerHeroList, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), 134222206<精钢>)
+ON /action/3/args_list/1/args_list/0 SET_VARIABLE INTEGER:精钢:local, GET_INTEGER_KV(GET_ABILITY_BY_AID(UNIT_ENTITY:playerHeroList, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), 2, 134222206<精钢>), "累计总数")
+ON /action/4 IF_THEN_ELSE CHECK_HAS_ABILITY_TYPE(UNIT_ENTITY:playerHeroList, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), 134276867<镔铁>), {actions}, {actions}
+ON /action/4/args_list/0/args_list/0 CONDITION CHECK_HAS_ABILITY_TYPE(UNIT_ENTITY:playerHeroList, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), 134276867<镔铁>)
+ON /action/4/args_list/1/args_list/0 SET_VARIABLE INTEGER:镔铁:local, GET_INTEGER_KV(GET_ABILITY_BY_AID(UNIT_ENTITY:playerHeroList, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), 2, 134276867<镔铁>), "累计总数")
+ON /action/5 IF_THEN_ELSE CHECK_HAS_ABILITY_TYPE(UNIT_ENTITY:playerHeroList, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), 134274353<陨铁>), {actions}, {actions}
+ON /action/5/args_list/0/args_list/0 CONDITION CHECK_HAS_ABILITY_TYPE(UNIT_ENTITY:playerHeroList, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), 134274353<陨铁>)
+ON /action/5/args_list/1/args_list/0 SET_VARIABLE INTEGER:陨铁:local, GET_INTEGER_KV(GET_ABILITY_BY_AID(UNIT_ENTITY:playerHeroList, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), 2, 134274353<陨铁>), "累计总数")
+ON /action/6 STORAGE_BOX , {actions}, {actions}, "倚天剑"
+ON /action/6/args_list/1/args_list/0 IF_THEN_ELSE ABILITY_COMPARE(ABILITY_NAME:套装技能类型:local, "==", 134242388<套装-倚天剑>), FLOAT_COMPARE(6(INTEGER:陨铁:local), ">=", 2), FLOAT_COMPARE(6(INTEGER:镔铁:local), ">=", 2), FLOAT_COMPARE(6(INTEGER:精钢:local), ">=", 3), {actions}, {actions}
+ON /action/6/args_list/1/args_list/0/args_list/0/args_list/0 CONDITION ABILITY_COMPARE(ABILITY_NAME:套装技能类型:local, "==", 134242388<套装-倚天剑>)
+ON /action/6/args_list/1/args_list/0/args_list/0/args_list/1 CONDITION FLOAT_COMPARE(6(INTEGER:陨铁:local), ">=", 2)
+ON /action/6/args_list/1/args_list/0/args_list/0/args_list/2 CONDITION FLOAT_COMPARE(6(INTEGER:镔铁:local), ">=", 2)
+ON /action/6/args_list/1/args_list/0/args_list/0/args_list/3 CONDITION FLOAT_COMPARE(6(INTEGER:精钢:local), ">=", 3)
+ON /action/6/args_list/1/args_list/0/args_list/1/args_list/0 SET_VARIABLE BOOLEAN:result:local, True
+ON /action/6/args_list/1/args_list/0/args_list/1/args_list/1 SET_ENTITY_KV GET_ABILITY_BY_AID(UNIT_ENTITY:playerHeroList, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), 2, 134274353<陨铁>), "累计总数", MATH_OPERATION(GET_INTEGER_KV(GET_ABILITY_BY_AID(UNIT_ENTITY:playerHeroList, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), 2, 134274353<陨铁>), "累计总数"), "-", 2)
+ON /action/6/args_list/1/args_list/0/args_list/1/args_list/2 SET_ENTITY_KV GET_ABILITY_BY_AID(UNIT_ENTITY:playerHeroList, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), 2, 134276867<镔铁>), "累计总数", MATH_OPERATION(GET_INTEGER_KV(GET_ABILITY_BY_AID(UNIT_ENTITY:playerHeroList, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), 2, 134276867<镔铁>), "累计总数"), "-", 2)
+ON /action/6/args_list/1/args_list/0/args_list/1/args_list/3 SET_ENTITY_KV GET_ABILITY_BY_AID(UNIT_ENTITY:playerHeroList, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), 2, 134222206<精钢>), "累计总数", MATH_OPERATION(GET_INTEGER_KV(GET_ABILITY_BY_AID(UNIT_ENTITY:playerHeroList, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), 2, 134222206<精钢>), "累计总数"), "-", 3)
+ON /action/7 STORAGE_BOX , {actions}, {actions}, "青龙偃月刀"
+ON /action/7/args_list/1/args_list/0 IF_THEN_ELSE ABILITY_COMPARE(ABILITY_NAME:套装技能类型:local, "==", 134255392<套装-青龙偃月刀>), FLOAT_COMPARE(6(INTEGER:铁:local), ">=", 2), FLOAT_COMPARE(6(INTEGER:镔铁:local), ">=", 2), FLOAT_COMPARE(6(INTEGER:精钢:local), ">=", 2), {actions}, {actions}
+ON /action/7/args_list/1/args_list/0/args_list/0/args_list/0 CONDITION ABILITY_COMPARE(ABILITY_NAME:套装技能类型:local, "==", 134255392<套装-青龙偃月刀>)
+ON /action/7/args_list/1/args_list/0/args_list/0/args_list/1 CONDITION FLOAT_COMPARE(6(INTEGER:铁:local), ">=", 2)
+ON /action/7/args_list/1/args_list/0/args_list/0/args_list/2 CONDITION FLOAT_COMPARE(6(INTEGER:镔铁:local), ">=", 2)
+ON /action/7/args_list/1/args_list/0/args_list/0/args_list/3 CONDITION FLOAT_COMPARE(6(INTEGER:精钢:local), ">=", 2)
+ON /action/7/args_list/1/args_list/0/args_list/1/args_list/0 SET_VARIABLE BOOLEAN:result:local, True
+ON /action/7/args_list/1/args_list/0/args_list/1/args_list/1 SET_ENTITY_KV GET_ABILITY_BY_AID(UNIT_ENTITY:playerHeroList, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), 2, 134260011<铁>), "累计总数", MATH_OPERATION(GET_INTEGER_KV(GET_ABILITY_BY_AID(UNIT_ENTITY:playerHeroList, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), 2, 134260011<铁>), "累计总数"), "-", 2)
+ON /action/7/args_list/1/args_list/0/args_list/1/args_list/2 SET_ENTITY_KV GET_ABILITY_BY_AID(UNIT_ENTITY:playerHeroList, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), 2, 134276867<镔铁>), "累计总数", MATH_OPERATION(GET_INTEGER_KV(GET_ABILITY_BY_AID(UNIT_ENTITY:playerHeroList, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), 2, 134276867<镔铁>), "累计总数"), "-", 2)
+ON /action/7/args_list/1/args_list/0/args_list/1/args_list/3 SET_ENTITY_KV GET_ABILITY_BY_AID(UNIT_ENTITY:playerHeroList, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), 2, 134222206<精钢>), "累计总数", MATH_OPERATION(GET_INTEGER_KV(GET_ABILITY_BY_AID(UNIT_ENTITY:playerHeroList, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), 2, 134222206<精钢>), "累计总数"), "-", 2)
+ON /action/8 STORAGE_BOX , {actions}, {actions}, "七星刀"
+ON /action/8/args_list/1/args_list/0 IF_THEN_ELSE ABILITY_COMPARE(ABILITY_NAME:套装技能类型:local, "==", 134264094<套装-七星刀>), FLOAT_COMPARE(6(INTEGER:铁:local), ">=", 3), FLOAT_COMPARE(6(INTEGER:精钢:local), ">=", 3), {actions}, {actions}
+ON /action/8/args_list/1/args_list/0/args_list/0/args_list/0 CONDITION ABILITY_COMPARE(ABILITY_NAME:套装技能类型:local, "==", 134264094<套装-七星刀>)
+ON /action/8/args_list/1/args_list/0/args_list/0/args_list/1 CONDITION FLOAT_COMPARE(6(INTEGER:铁:local), ">=", 3)
+ON /action/8/args_list/1/args_list/0/args_list/0/args_list/2 CONDITION FLOAT_COMPARE(6(INTEGER:精钢:local), ">=", 3)
+ON /action/8/args_list/1/args_list/0/args_list/1/args_list/0 SET_VARIABLE BOOLEAN:result:local, True
+ON /action/8/args_list/1/args_list/0/args_list/1/args_list/1 SET_ENTITY_KV GET_ABILITY_BY_AID(UNIT_ENTITY:playerHeroList, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), 2, 134260011<铁>), "累计总数", MATH_OPERATION(GET_INTEGER_KV(GET_ABILITY_BY_AID(UNIT_ENTITY:playerHeroList, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), 2, 134260011<铁>), "累计总数"), "-", 3)
+ON /action/8/args_list/1/args_list/0/args_list/1/args_list/2 SET_ENTITY_KV GET_ABILITY_BY_AID(UNIT_ENTITY:playerHeroList, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), 2, 134222206<精钢>), "累计总数", MATH_OPERATION(GET_INTEGER_KV(GET_ABILITY_BY_AID(UNIT_ENTITY:playerHeroList, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), 2, 134222206<精钢>), "累计总数"), "-", 3)
+ON /action/9 STORAGE_BOX , {actions}, {actions}, "丈八蛇矛"
+ON /action/9/args_list/1/args_list/0 IF_THEN_ELSE ABILITY_COMPARE(ABILITY_NAME:套装技能类型:local, "==", 134256398<套装-丈八蛇矛>), FLOAT_COMPARE(6(INTEGER:铜:local), ">=", 2), FLOAT_COMPARE(6(INTEGER:铁:local), ">=", 2), {actions}, {actions}
+ON /action/9/args_list/1/args_list/0/args_list/0/args_list/0 CONDITION ABILITY_COMPARE(ABILITY_NAME:套装技能类型:local, "==", 134256398<套装-丈八蛇矛>)
+ON /action/9/args_list/1/args_list/0/args_list/0/args_list/1 CONDITION FLOAT_COMPARE(6(INTEGER:铜:local), ">=", 2)
+ON /action/9/args_list/1/args_list/0/args_list/0/args_list/2 CONDITION FLOAT_COMPARE(6(INTEGER:铁:local), ">=", 2)
+ON /action/9/args_list/1/args_list/0/args_list/1/args_list/0 SET_VARIABLE BOOLEAN:result:local, True
+ON /action/9/args_list/1/args_list/0/args_list/1/args_list/1 SET_ENTITY_KV GET_ABILITY_BY_AID(UNIT_ENTITY:playerHeroList, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), 2, 134260011<铁>), "累计总数", MATH_OPERATION(GET_INTEGER_KV(GET_ABILITY_BY_AID(UNIT_ENTITY:playerHeroList, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), 2, 134260011<铁>), "累计总数"), "-", 2)
+ON /action/9/args_list/1/args_list/0/args_list/1/args_list/2 SET_ENTITY_KV GET_ABILITY_BY_AID(UNIT_ENTITY:playerHeroList, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), 2, 134275195<铜>), "累计总数", MATH_OPERATION(GET_INTEGER_KV(GET_ABILITY_BY_AID(UNIT_ENTITY:playerHeroList, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), 2, 134275195<铜>), "累计总数"), "-", 2)
+ON /action/10 STORAGE_BOX , {actions}, {actions}, "百炼环首刀"
+ON /action/10/args_list/1/args_list/0 IF_THEN_ELSE ABILITY_COMPARE(ABILITY_NAME:套装技能类型:local, "==", 134229761<套装-百炼环首刀>), FLOAT_COMPARE(6(INTEGER:铜:local), ">=", 3), {actions}, {actions}
+ON /action/10/args_list/1/args_list/0/args_list/0/args_list/0 CONDITION ABILITY_COMPARE(ABILITY_NAME:套装技能类型:local, "==", 134229761<套装-百炼环首刀>)
+ON /action/10/args_list/1/args_list/0/args_list/0/args_list/1 CONDITION FLOAT_COMPARE(6(INTEGER:铜:local), ">=", 3)
+ON /action/10/args_list/1/args_list/0/args_list/1/args_list/0 SET_VARIABLE BOOLEAN:result:local, True
+ON /action/10/args_list/1/args_list/0/args_list/1/args_list/1 SET_ENTITY_KV GET_ABILITY_BY_AID(UNIT_ENTITY:playerHeroList, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), 2, 134275195<铜>), "累计总数", MATH_OPERATION(GET_INTEGER_KV(GET_ABILITY_BY_AID(UNIT_ENTITY:playerHeroList, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), 2, 134275195<铜>), "累计总数"), "-", 3)
+ON /action/11 400342 BOOLEAN:result:local

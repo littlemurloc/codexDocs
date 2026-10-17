@@ -2,6 +2,8 @@
 
 本文档用于把当前设计案转成 Y3 实装前的主策划对齐口径。它不规定工程结构、ECA 写法或代码方案。
 
+编辑器实装的方法与交付要求见 [Y3 编辑器 ECA 实装规范](y3-eca-implementation-standards.md)，实际检查使用 [ECA 交付验收清单](../tests/y3-eca-delivery-checklist.md)。这些技术规范与本文设计口径分别维护；设计冲突仍按项目负责人最新口径及 `project-context.md` 处理。
+
 ## 当前依据
 
 | 模块 | 状态 | 依据 |

@@ -1,0 +1,22 @@
+ON /action/0 SET_VARIABLE BOOLEAN:result:local, False
+ON /action/1 IF_THEN_ELSE FLOAT_COMPARE(GET_INTEGER_KV(2(ABILITY:执行的匡扶汉室技能:local), "声望累计"), ">=", 30), FLOAT_COMPARE(GET_ABILITY_INT_ATTR(2(ABILITY:执行的匡扶汉室技能:local), "ability_level"), "<", 2), {actions}, {actions}
+ON /action/1/args_list/0/args_list/0 CONDITION FLOAT_COMPARE(GET_INTEGER_KV(2(ABILITY:执行的匡扶汉室技能:local), "声望累计"), ">=", 30)
+ON /action/1/args_list/0/args_list/1 CONDITION FLOAT_COMPARE(GET_ABILITY_INT_ATTR(2(ABILITY:执行的匡扶汉室技能:local), "ability_level"), "<", 2)
+ON /action/1/args_list/1/args_list/0 SET_ABILITY_LEVEL 2(ABILITY:执行的匡扶汉室技能:local), 2
+ON /action/1/args_list/1/args_list/1 SET_VARIABLE BOOLEAN:result:local, True
+ON /action/2 IF_THEN_ELSE FLOAT_COMPARE(GET_INTEGER_KV(2(ABILITY:执行的匡扶汉室技能:local), "声望累计"), ">=", 60), FLOAT_COMPARE(GET_ABILITY_INT_ATTR(2(ABILITY:执行的匡扶汉室技能:local), "ability_level"), "<", 3), {actions}, {actions}
+ON /action/2/args_list/0/args_list/0 CONDITION FLOAT_COMPARE(GET_INTEGER_KV(2(ABILITY:执行的匡扶汉室技能:local), "声望累计"), ">=", 60)
+ON /action/2/args_list/0/args_list/1 CONDITION FLOAT_COMPARE(GET_ABILITY_INT_ATTR(2(ABILITY:执行的匡扶汉室技能:local), "ability_level"), "<", 3)
+ON /action/2/args_list/1/args_list/0 SET_ABILITY_LEVEL 2(ABILITY:执行的匡扶汉室技能:local), 3
+ON /action/2/args_list/1/args_list/1 SET_VARIABLE BOOLEAN:result:local, True
+ON /action/3 IF_THEN_ELSE FLOAT_COMPARE(GET_INTEGER_KV(2(ABILITY:执行的匡扶汉室技能:local), "声望累计"), ">=", 90), FLOAT_COMPARE(GET_ABILITY_INT_ATTR(2(ABILITY:执行的匡扶汉室技能:local), "ability_level"), "<", 4), {actions}, {actions}
+ON /action/3/args_list/0/args_list/0 CONDITION FLOAT_COMPARE(GET_INTEGER_KV(2(ABILITY:执行的匡扶汉室技能:local), "声望累计"), ">=", 90)
+ON /action/3/args_list/0/args_list/1 CONDITION FLOAT_COMPARE(GET_ABILITY_INT_ATTR(2(ABILITY:执行的匡扶汉室技能:local), "ability_level"), "<", 4)
+ON /action/3/args_list/1/args_list/0 SET_ABILITY_LEVEL 2(ABILITY:执行的匡扶汉室技能:local), 4
+ON /action/3/args_list/1/args_list/1 SET_VARIABLE BOOLEAN:result:local, True
+ON /action/4 IF_THEN_ELSE FLOAT_COMPARE(GET_INTEGER_KV(2(ABILITY:执行的匡扶汉室技能:local), "声望累计"), ">=", 120), FLOAT_COMPARE(GET_ABILITY_INT_ATTR(2(ABILITY:执行的匡扶汉室技能:local), "ability_level"), "<", 5), {actions}, {actions}
+ON /action/4/args_list/0/args_list/0 CONDITION FLOAT_COMPARE(GET_INTEGER_KV(2(ABILITY:执行的匡扶汉室技能:local), "声望累计"), ">=", 120)
+ON /action/4/args_list/0/args_list/1 CONDITION FLOAT_COMPARE(GET_ABILITY_INT_ATTR(2(ABILITY:执行的匡扶汉室技能:local), "ability_level"), "<", 5)
+ON /action/4/args_list/1/args_list/0 SET_ABILITY_LEVEL 2(ABILITY:执行的匡扶汉室技能:local), 5
+ON /action/4/args_list/1/args_list/1 SET_VARIABLE BOOLEAN:result:local, True
+ON /action/5 400342 BOOLEAN:result:local
