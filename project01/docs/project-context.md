@@ -55,7 +55,7 @@
 
 - 面向人类阅读、配置或交付的文档统一存放在 `deliverables/`；内部设计源文件继续存放在 `docs/`。
 
-- Y3 编辑器 ECA 实装规范：[规范主文](y3-eca-implementation-standards.md)，2026-10-18 从吴国实装经验整理，覆盖数据来源、原生事件参数、可读性、时序、生命周期、收益、发布与分层验证。
+- Y3 编辑器 ECA 实装规范：[规范主文](y3-eca-implementation-standards.md)，2026-10-18 汇总吴国、蜀国及自动施法返工经验，覆盖数据来源、原生参数、表表达式、返回值控制流、效果状态范围、波次去重、合成重入保护，以及共用函数先最小实战再批量发布和正向行为验收；新规范不代表历史实装已通过验收。
 - Y3 ECA 技术验收：[交付检查模板](../tests/y3-eca-delivery-checklist.md)，与下方玩法验收分别记录；模板建立不代表历史功能已全量验收。
 - 核心规则：`docs/design/general-rules.md`
 - 英雄技能入口：`docs/design/hero-skill-design.md`

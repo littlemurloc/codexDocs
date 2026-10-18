@@ -84,6 +84,8 @@ class VM:
         if not isinstance(v,dict):return v
         if '__tuple__' in v:return v['items']
         t=v.get('sub_type');a=v.get('args_list',[])
+        if v.get('arg_type')==100011 and t==1 and any(isinstance(x,dict) for x in a):
+            raise AssertionError('Runtime table expression wrapped as a table constant')
         if t in (1,11,2,'VARIABLE'):
             if a and isinstance(a[0],dict) and '__tuple__' in a[0]:return self.vars.get(self.variable(v),0.)
             return self.ev(a[0]) if len(a)==1 else [self.ev(x) for x in a]

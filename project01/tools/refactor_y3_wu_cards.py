@@ -31,7 +31,13 @@ TYPES={'UNIT_ENTITY':(100006,11,0),'MODIFIER_ENTITY':(100076,11,0),
 def tp(items):return {'__tuple__':True,'items':items}
 def i(v):return b.lit(100002,v)
 def flag(v):return b.lit(100001,v)
-def table(tid):return b.lit(100011,tid)
+def table(tid):
+    # A runtime table is already an expression. Wrapping it in a literal makes
+    # Y3 interpret the expression object as a static table-resource identifier.
+    if isinstance(tid,dict):
+        if tid.get('arg_type')!=100011:raise TypeError('Expected a TABLE expression')
+        return tid
+    return b.lit(100011,tid)
 def get(tid,row,key,kind='STRING'):
     kinds={'STRING':(100003,'GET_STRING_TABLE_VAR_ND'),'ABILITY_NAME':(100039,'GET_ABILITY_NAME_TABLE_VAR_ND'),
            'BOOLEAN':(100001,'GET_BOOLEAN_TABLE_VAR_ND'),'ATTRIBUTE':(100042,'GET_UNIT_WRITE_ATTRIBUTE_TABLE_VAR_ND'),
