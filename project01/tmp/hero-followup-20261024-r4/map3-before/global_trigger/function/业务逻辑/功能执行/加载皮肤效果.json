@@ -1,0 +1,272 @@
+{
+    "action": [
+        {
+            "action_type": "REPLACE_UNIT_MODEL", 
+            "args_list": [
+                {
+                    "arg_type": 100006, 
+                    "args_list": [
+                        {
+                            "__tuple__": true, 
+                            "items": [
+                                "UNIT_ENTITY", 
+                                "执行单位", 
+                                "local"
+                            ]
+                        }
+                    ], 
+                    "sub_type": 11
+                }, 
+                {
+                    "arg_type": 100122, 
+                    "args_list": [
+                        {
+                            "__tuple__": true, 
+                            "items": [
+                                "MODEL", 
+                                "更换皮肤模型", 
+                                "local"
+                            ]
+                        }
+                    ], 
+                    "sub_type": 4
+                }
+            ], 
+            "bp": false, 
+            "element_id": 785977658000013, 
+            "enable": true
+        }, 
+        {
+            "action_type": "CHANGE_MODEL_TEXTURE", 
+            "args_list": [
+                {
+                    "arg_type": 100006, 
+                    "args_list": [
+                        {
+                            "__tuple__": true, 
+                            "items": [
+                                "UNIT_ENTITY", 
+                                "执行单位", 
+                                "local"
+                            ]
+                        }
+                    ], 
+                    "sub_type": 11
+                }, 
+                {
+                    "arg_type": 100122, 
+                    "args_list": [
+                        {
+                            "__tuple__": true, 
+                            "items": [
+                                "MODEL", 
+                                "更换皮肤模型", 
+                                "local"
+                            ]
+                        }
+                    ], 
+                    "sub_type": 4
+                }, 
+                {
+                    "arg_type": 100002, 
+                    "args_list": [
+                        1
+                    ], 
+                    "sub_type": 1
+                }, 
+                {
+                    "arg_type": 100002, 
+                    "args_list": [
+                        1
+                    ], 
+                    "sub_type": 1
+                }, 
+                {
+                    "arg_type": 100115, 
+                    "args_list": [
+                        120767
+                    ], 
+                    "sub_type": 1
+                }
+            ], 
+            "bp": false, 
+            "element_id": 785977658000081, 
+            "enable": false
+        }, 
+        {
+            "action_type": "IF_THEN_ELSE", 
+            "args_list": [
+                {
+                    "arg_type": 100021, 
+                    "args_list": [
+                        {
+                            "args_list": [
+                                {
+                                    "arg_type": 100046, 
+                                    "args_list": [
+                                        {
+                                            "__tuple__": true, 
+                                            "items": [
+                                                "MODIFIER", 
+                                                "魔法效果", 
+                                                "local"
+                                            ]
+                                        }
+                                    ], 
+                                    "sub_type": 2
+                                }, 
+                                {
+                                    "arg_type": 100035, 
+                                    "args_list": [
+                                        "!="
+                                    ], 
+                                    "sub_type": 1
+                                }, 
+                                {
+                                    "arg_type": 100046, 
+                                    "args_list": [], 
+                                    "sub_type": "NONE_MODIFIER_KEY"
+                                }
+                            ], 
+                            "condition_type": "MODIFIER_CLASS_COMPARE", 
+                            "element_id": 785977658000039, 
+                            "enable": true
+                        }
+                    ], 
+                    "sub_type": 1
+                }, 
+                {
+                    "arg_type": 100022, 
+                    "args_list": [
+                        {
+                            "action_type": "ADD_MODIFIER", 
+                            "args_list": [
+                                {
+                                    "arg_type": 100006, 
+                                    "args_list": [
+                                        {
+                                            "__tuple__": true, 
+                                            "items": [
+                                                "UNIT_ENTITY", 
+                                                "执行单位", 
+                                                "local"
+                                            ]
+                                        }
+                                    ], 
+                                    "sub_type": 11
+                                }, 
+                                {
+                                    "arg_type": 100046, 
+                                    "args_list": [
+                                        {
+                                            "__tuple__": true, 
+                                            "items": [
+                                                "MODIFIER", 
+                                                "魔法效果", 
+                                                "local"
+                                            ]
+                                        }
+                                    ], 
+                                    "sub_type": 2
+                                }
+                            ], 
+                            "bp": false, 
+                            "element_id": 785977658000021, 
+                            "enable": true, 
+                            "op_arg": [
+                                null, 
+                                null, 
+                                null, 
+                                null, 
+                                null, 
+                                null
+                            ], 
+                            "op_arg_enable": [
+                                false, 
+                                false, 
+                                false, 
+                                false, 
+                                false, 
+                                false
+                            ]
+                        }
+                    ], 
+                    "sub_type": 1
+                }, 
+                {
+                    "arg_type": 100022, 
+                    "args_list": [], 
+                    "sub_type": 1
+                }
+            ], 
+            "bp": false, 
+            "element_id": 785977658000030, 
+            "enable": true, 
+            "fake_op": []
+        }
+    ], 
+    "call_enabled": true, 
+    "condition": [], 
+    "enabled": true, 
+    "event": [], 
+    "func_category": "t_function", 
+    "func_comment": "", 
+    "func_des": "函数描述{执行单位}{更换皮肤模型}", 
+    "func_id": "500ec87213d711f09be06d03f73866b3", 
+    "func_name": "加载皮肤效果", 
+    "func_param_list": [
+        {
+            "__tuple__": true, 
+            "items": [
+                "执行单位", 
+                true
+            ]
+        }, 
+        {
+            "__tuple__": true, 
+            "items": [
+                "更换皮肤模型", 
+                true
+            ]
+        }, 
+        {
+            "__tuple__": true, 
+            "items": [
+                "魔法效果", 
+                false
+            ]
+        }
+    ], 
+    "group_id": "DcxfSxPXEfCsbm0D9zhms2", 
+    "is_func": true, 
+    "is_official_func": false, 
+    "p_trigger_id": null, 
+    "trigger_id": 785977658, 
+    "trigger_name": "加载皮肤效果", 
+    "valid": true, 
+    "var_data": [
+        {
+            "MODEL": {
+                "更换皮肤模型": 0
+            }, 
+            "MODIFIER": {
+                "魔法效果": 0
+            }, 
+            "NEW_TIMER": {}, 
+            "PLAYER": {}, 
+            "UNIT_ENTITY": {
+                "执行单位": 0
+            }
+        }, 
+        {
+            "执行单位": 0, 
+            "更换皮肤模型": 0, 
+            "魔法效果": 0
+        }, 
+        [
+            "更换皮肤模型", 
+            "魔法效果", 
+            "执行单位"
+        ]
+    ]
+}

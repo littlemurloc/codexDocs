@@ -1,0 +1,282 @@
+{
+    "action": [
+        {
+            "action_type": "SET_VARIABLE", 
+            "args_list": [
+                {
+                    "arg_type": 100030, 
+                    "args_list": [
+                        [
+                            "TABLE", 
+                            "表", 
+                            "local"
+                        ]
+                    ], 
+                    "sub_type": 1
+                }, 
+                {
+                    "arg_type": 100011, 
+                    "args_list": [
+                        [
+                            "TABLE", 
+                            "参数计时器窗口表", 
+                            "local"
+                        ]
+                    ], 
+                    "sub_type": "VARIABLE"
+                }
+            ], 
+            "bp": false, 
+            "element_id": 88715328000001, 
+            "enable": true
+        }, 
+        {
+            "action_type": "STORAGE_BOX", 
+            "args_list": [
+                {
+                    "arg_type": 100021, 
+                    "args_list": [], 
+                    "sub_type": 1
+                }, 
+                {
+                    "arg_type": 100022, 
+                    "args_list": [
+                        {
+                            "action_type": "PICK_PLAYER_DO_ACTION", 
+                            "args_list": [
+                                {
+                                    "arg_type": 100027, 
+                                    "args_list": [], 
+                                    "sub_type": "ALL_PLAYER"
+                                }, 
+                                {
+                                    "arg_type": 100022, 
+                                    "args_list": [
+                                        {
+                                            "action_type": "SET_VARIABLE", 
+                                            "args_list": [
+                                                {
+                                                    "arg_type": 100030, 
+                                                    "args_list": [
+                                                        [
+                                                            "UI_PREFAB_INSTANCE", 
+                                                            "计时器窗口模块", 
+                                                            "local"
+                                                        ]
+                                                    ], 
+                                                    "sub_type": 1
+                                                }, 
+                                                {
+                                                    "arg_type": 1001558, 
+                                                    "args_list": [
+                                                        {
+                                                            "arg_type": 100011, 
+                                                            "args_list": [
+                                                                [
+                                                                    "TABLE", 
+                                                                    "表", 
+                                                                    "local"
+                                                                ]
+                                                            ], 
+                                                            "sub_type": "VARIABLE"
+                                                        }, 
+                                                        {
+                                                            "arg_type": 100002, 
+                                                            "args_list": [
+                                                                {
+                                                                    "arg_type": 100025, 
+                                                                    "args_list": [], 
+                                                                    "sub_type": "PICKED_PLAYER"
+                                                                }
+                                                            ], 
+                                                            "sub_type": "PLAYER_ID_NUMBER"
+                                                        }
+                                                    ], 
+                                                    "sub_type": "GET_UI_PREFAB_INSTANCE_TABLE_VAR_1D"
+                                                }
+                                            ], 
+                                            "bp": false, 
+                                            "element_id": 88715328000002, 
+                                            "enable": true
+                                        }, 
+                                        {
+                                            "action_type": "DEL_UI_PREFAB_INS", 
+                                            "args_list": [
+                                                {
+                                                    "arg_type": 1001558, 
+                                                    "args_list": [
+                                                        [
+                                                            "UI_PREFAB_INSTANCE", 
+                                                            "计时器窗口模块", 
+                                                            "local"
+                                                        ]
+                                                    ], 
+                                                    "sub_type": "VARIABLE"
+                                                }
+                                            ], 
+                                            "bp": false, 
+                                            "element_id": 88715328000003, 
+                                            "enable": true
+                                        }
+                                    ], 
+                                    "sub_type": 1
+                                }
+                            ], 
+                            "bp": false, 
+                            "element_id": 88715328000004, 
+                            "enable": true
+                        }, 
+                        {
+                            "action_type": "SET_VARIABLE", 
+                            "args_list": [
+                                {
+                                    "arg_type": 100030, 
+                                    "args_list": [
+                                        [
+                                            "NEW_TIMER", 
+                                            "监听计时器", 
+                                            "local"
+                                        ]
+                                    ], 
+                                    "sub_type": 1
+                                }, 
+                                {
+                                    "arg_type": 100181, 
+                                    "args_list": [
+                                        {
+                                            "arg_type": 100011, 
+                                            "args_list": [
+                                                [
+                                                    "TABLE", 
+                                                    "表", 
+                                                    "local"
+                                                ]
+                                            ], 
+                                            "sub_type": "VARIABLE"
+                                        }, 
+                                        {
+                                            "arg_type": 100003, 
+                                            "args_list": [
+                                                "监听计时器"
+                                            ], 
+                                            "sub_type": 1
+                                        }
+                                    ], 
+                                    "sub_type": "GET_NEW_TIMER_TABLE_VAR_1D"
+                                }
+                            ], 
+                            "bp": false, 
+                            "element_id": 88715328000005, 
+                            "enable": true
+                        }, 
+                        {
+                            "action_type": "DELETE_TIMER", 
+                            "args_list": [
+                                {
+                                    "arg_type": 100181, 
+                                    "args_list": [
+                                        [
+                                            "NEW_TIMER", 
+                                            "监听计时器", 
+                                            "local"
+                                        ]
+                                    ], 
+                                    "sub_type": "VARIABLE"
+                                }
+                            ], 
+                            "bp": false, 
+                            "element_id": 88715328000006, 
+                            "enable": true
+                        }, 
+                        {
+                            "action_type": "CLEAR_TABLE", 
+                            "args_list": [
+                                {
+                                    "arg_type": 100011, 
+                                    "args_list": [
+                                        [
+                                            "TABLE", 
+                                            "表", 
+                                            "local"
+                                        ]
+                                    ], 
+                                    "sub_type": "VARIABLE"
+                                }
+                            ], 
+                            "bp": false, 
+                            "element_id": 88715328000007, 
+                            "enable": true
+                        }
+                    ], 
+                    "sub_type": 1
+                }, 
+                {
+                    "arg_type": 100022, 
+                    "args_list": [], 
+                    "sub_type": 1
+                }, 
+                {
+                    "arg_type": 100003, 
+                    "args_list": [
+                        "删除计时器窗口"
+                    ], 
+                    "sub_type": 1
+                }
+            ], 
+            "bp": false, 
+            "element_id": 88715328000008, 
+            "enable": true
+        }
+    ], 
+    "call_enabled": true, 
+    "condition": [], 
+    "enabled": true, 
+    "event": [], 
+    "func_category": "t_function", 
+    "func_comment": "", 
+    "func_des": "删除计时器窗口{参数计时器窗口表}", 
+    "func_id": "8e4f581e152211ee8561309c23206d62", 
+    "func_name": "计时器窗口删除", 
+    "func_param_list": [
+        {
+            "__tuple__": true, 
+            "items": [
+                "参数计时器窗口表", 
+                true
+            ]
+        }
+    ], 
+    "group_id": "fhyUYUJvEe+Tj+jIKcBWmQ", 
+    "is_func": true, 
+    "is_official_func": false, 
+    "p_trigger_id": null, 
+    "trigger_id": 88715328, 
+    "trigger_name": "计时器窗口删除", 
+    "valid": true, 
+    "var_data": [
+        {
+            "NEW_TIMER": {
+                "监听计时器": -1
+            }, 
+            "TABLE": {
+                "参数计时器窗口表": null, 
+                "表": null
+            }, 
+            "UI_PREFAB_INSTANCE": {
+                "计时器窗口模块": ""
+            }
+        }, 
+        {
+            "参数计时器窗口表": 0, 
+            "监听计时器": 0, 
+            "表": 0, 
+            "计时器窗口模块": 0
+        }, 
+        [
+            "参数计时器窗口表", 
+            "监听计时器", 
+            "表", 
+            "计时器窗口模块"
+        ]
+    ]
+}

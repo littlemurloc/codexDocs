@@ -1,0 +1,484 @@
+{
+    "local_variable": {
+        "1418035204": {
+            "variable_dict": {},
+            "variable_length_dict": {}
+        },
+        "1625518081": {
+            "variable_dict": {
+                "BOOLEAN": {
+                    "已冷却": false
+                }
+            },
+            "variable_length_dict": {
+                "已冷却": 0
+            }
+        },
+        "1726324738": {
+            "variable_dict": {},
+            "variable_length_dict": {}
+        }
+    },
+    "trigger_dict": {
+        "1418035204": {
+            "action": [
+                {
+                    "action_type": "IF_THEN_ELSE",
+                    "args_list": [
+                        {
+                            "arg_type": 100021,
+                            "args_list": [
+                                {
+                                    "args_list": [
+                                        {
+                                            "arg_type": 100000,
+                                            "args_list": [
+                                                {
+                                                    "arg_type": 100076,
+                                                    "args_list": [],
+                                                    "sub_type": "CUR_MODIFIER"
+                                                },
+                                                {
+                                                    "arg_type": 100003,
+                                                    "args_list": [
+                                                        "xuchu_speed_hits"
+                                                    ],
+                                                    "sub_type": 1
+                                                }
+                                            ],
+                                            "sub_type": "GET_FLOAT_KV"
+                                        },
+                                        {
+                                            "arg_type": 100015,
+                                            "args_list": [
+                                                "<="
+                                            ],
+                                            "sub_type": 1
+                                        },
+                                        {
+                                            "arg_type": 100000,
+                                            "args_list": [
+                                                1.0
+                                            ],
+                                            "sub_type": 1
+                                        }
+                                    ],
+                                    "condition_type": "FLOAT_COMPARE",
+                                    "element_id": 1418035204900090,
+                                    "enable": true
+                                }
+                            ],
+                            "sub_type": 1
+                        },
+                        {
+                            "arg_type": 100022,
+                            "args_list": [
+                                {
+                                    "action_type": "REMOVE_BUFF_INS",
+                                    "args_list": [
+                                        {
+                                            "arg_type": 100076,
+                                            "args_list": [],
+                                            "sub_type": "CUR_MODIFIER"
+                                        }
+                                    ],
+                                    "bp": false,
+                                    "element_id": 1418035204900091,
+                                    "enable": true
+                                }
+                            ],
+                            "sub_type": 1
+                        },
+                        {
+                            "arg_type": 100022,
+                            "args_list": [
+                                {
+                                    "action_type": "SET_ENTITY_KV",
+                                    "args_list": [
+                                        {
+                                            "arg_type": 100076,
+                                            "args_list": [],
+                                            "sub_type": "CUR_MODIFIER"
+                                        },
+                                        {
+                                            "arg_type": 100003,
+                                            "args_list": [
+                                                "xuchu_speed_hits"
+                                            ],
+                                            "sub_type": 1
+                                        },
+                                        {
+                                            "arg_type": 100000,
+                                            "args_list": [
+                                                {
+                                                    "arg_type": 100000,
+                                                    "args_list": [
+                                                        {
+                                                            "arg_type": 100076,
+                                                            "args_list": [],
+                                                            "sub_type": "CUR_MODIFIER"
+                                                        },
+                                                        {
+                                                            "arg_type": 100003,
+                                                            "args_list": [
+                                                                "xuchu_speed_hits"
+                                                            ],
+                                                            "sub_type": 1
+                                                        }
+                                                    ],
+                                                    "sub_type": "GET_FLOAT_KV"
+                                                },
+                                                {
+                                                    "arg_type": 100017,
+                                                    "args_list": [
+                                                        "-"
+                                                    ],
+                                                    "sub_type": 1
+                                                },
+                                                {
+                                                    "arg_type": 100000,
+                                                    "args_list": [
+                                                        1.0
+                                                    ],
+                                                    "sub_type": 1
+                                                }
+                                            ],
+                                            "sub_type": "ARITHMETIC_OPERATION"
+                                        }
+                                    ],
+                                    "bp": false,
+                                    "element_id": 1418035204900092,
+                                    "enable": true
+                                }
+                            ],
+                            "sub_type": 1
+                        }
+                    ],
+                    "bp": false,
+                    "element_id": 1418035204900093,
+                    "enable": true,
+                    "fake_op": [
+                        2
+                    ]
+                }
+            ],
+            "call_enabled": true,
+            "condition": [
+                {
+                    "args_list": [],
+                    "condition_type": "GET_IS_NORMAL_HIT_FROM_EVENT",
+                    "element_id": 1418035204900001,
+                    "enable": true
+                }
+            ],
+            "enabled": false,
+            "event": [
+                {
+                    "args_list": [
+                        {
+                            "arg_type": 100006,
+                            "args_list": [],
+                            "sub_type": "MODIFIER_OWNER"
+                        },
+                        {
+                            "arg_type": 100007,
+                            "args_list": [
+                                "ET_UNIT_HURT_OTHER"
+                            ],
+                            "sub_type": 1
+                        }
+                    ],
+                    "element_id": 1418035204000005,
+                    "enable": true,
+                    "event_type": "SPECIAL_UNIT_EVENT"
+                }
+            ],
+            "group_id": 134283923,
+            "is_conf": true,
+            "p_trigger_id": 1625518081,
+            "sub_trigger_owner_set_var_action": {
+                "action_type": "SET_VARIABLE",
+                "args_list": [
+                    {
+                        "arg_type": 100178,
+                        "args_list": [
+                            {
+                                "__tuple__": true,
+                                "items": [
+                                    "DYNAMIC_TRIGGER_INSTANCE",
+                                    "temp触发器",
+                                    "actor"
+                                ]
+                            }
+                        ],
+                        "sub_type": "VARIABLE"
+                    },
+                    {
+                        "arg_type": 100178,
+                        "args_list": [
+                            {
+                                "arg_type": 100069,
+                                "args_list": [
+                                    1418035204
+                                ],
+                                "sub_type": 1
+                            }
+                        ],
+                        "sub_type": "REG_MODIFIER_TRIGGER"
+                    }
+                ],
+                "bp": false,
+                "element_id": 1418035204000001,
+                "enable": true
+            },
+            "trigger_id": 1418035204,
+            "trigger_name": "子触发器",
+            "valid": true,
+            "var_data": [
+                {},
+                {},
+                []
+            ]
+        },
+        "1625518081": {
+            "action": [
+                {
+                    "action_type": "SET_ENTITY_KV",
+                    "args_list": [
+                        {
+                            "arg_type": 100076,
+                            "args_list": [],
+                            "sub_type": "CUR_MODIFIER"
+                        },
+                        {
+                            "arg_type": 100003,
+                            "args_list": [
+                                "xuchu_speed_hits"
+                            ],
+                            "sub_type": 1
+                        },
+                        {
+                            "arg_type": 100000,
+                            "args_list": [
+                                2.0
+                            ],
+                            "sub_type": 1
+                        }
+                    ],
+                    "bp": false,
+                    "element_id": 1625518081810080,
+                    "enable": true
+                },
+                {
+                    "action_type": "ADD_MODIFIER_OWNER_ATTR",
+                    "args_list": [
+                        {
+                            "arg_type": 100076,
+                            "args_list": [],
+                            "sub_type": "CUR_MODIFIER"
+                        },
+                        {
+                            "arg_type": 100042,
+                            "args_list": [
+                                "attack_speed"
+                            ],
+                            "sub_type": 1
+                        },
+                        {
+                            "arg_type": 100300,
+                            "sub_type": 1,
+                            "args_list": [
+                                "ATTR_ALL_RATIO"
+                            ]
+                        },
+                        {
+                            "arg_type": 100000,
+                            "sub_type": 1,
+                            "args_list": [
+                                30.0
+                            ]
+                        }
+                    ],
+                    "bp": false,
+                    "element_id": 1625518081810006,
+                    "enable": true
+                },
+                1418035204
+            ],
+            "call_enabled": true,
+            "condition": [],
+            "enabled": true,
+            "event": [
+                {
+                    "args_list": [],
+                    "element_id": 16255180810001,
+                    "enable": true,
+                    "event_type": "OBTAIN_MODIFIER"
+                }
+            ],
+            "group_id": 134283923,
+            "is_conf": true,
+            "p_trigger_id": false,
+            "trigger_id": 1625518081,
+            "trigger_name": "GainBuff",
+            "valid": true,
+            "var_data": [
+                {
+                    "BOOLEAN": {
+                        "已冷却": false
+                    }
+                },
+                {
+                    "已冷却": 0
+                },
+                [
+                    "已冷却"
+                ]
+            ]
+        },
+        "1726324738": {
+            "action": [
+                {
+                    "action_type": "CLEAR_MODIFIER_OWNER_ATTR",
+                    "args_list": [
+                        {
+                            "arg_type": 100076,
+                            "args_list": [],
+                            "sub_type": "CUR_MODIFIER"
+                        }
+                    ],
+                    "bp": false,
+                    "element_id": 1726324738810047,
+                    "enable": true
+                },
+                {
+                    "action_type": "UNREG_TRIGGER",
+                    "args_list": [
+                        {
+                            "arg_type": 100178,
+                            "args_list": [
+                                {
+                                    "__tuple__": true,
+                                    "items": [
+                                        "DYNAMIC_TRIGGER_INSTANCE",
+                                        "temp触发器",
+                                        "actor"
+                                    ]
+                                }
+                            ],
+                            "sub_type": "VARIABLE"
+                        }
+                    ],
+                    "bp": false,
+                    "element_id": 1726324738810090,
+                    "enable": true
+                }
+            ],
+            "call_enabled": true,
+            "condition": [],
+            "enabled": true,
+            "event": [
+                {
+                    "args_list": [],
+                    "element_id": 17263247380001,
+                    "enable": true,
+                    "event_type": "LOSS_MODIFIER"
+                }
+            ],
+            "group_id": 134283923,
+            "is_conf": true,
+            "p_trigger_id": false,
+            "trigger_id": 1726324738,
+            "trigger_name": "LoseBuff",
+            "valid": true,
+            "var_data": [
+                {},
+                {},
+                []
+            ]
+        }
+    },
+    "trigger_group_info": [
+        {
+            "_trigger_group_": true,
+            "group": [
+                {
+                    "__tuple__": true,
+                    "items": [
+                        1625518081,
+                        "GainBuff"
+                    ]
+                },
+                {
+                    "__tuple__": true,
+                    "items": [
+                        1726324738,
+                        "LoseBuff"
+                    ]
+                }
+            ],
+            "key": 134283923,
+            "name": "134283923"
+        },
+        {
+            "__tuple__": true,
+            "items": [
+                1418035204,
+                "子触发器"
+            ]
+        }
+    ],
+    "trigger_version": "1.2",
+    "variable_dict": {
+        "DYNAMIC_TRIGGER_INSTANCE": {
+            "temp触发器": 0
+        },
+        "FLOAT": {},
+        "INTEGER": {
+            "层数": 0
+        },
+        "NEW_TIMER": {
+            "持续伤害计时器": -1
+        },
+        "SFX_ENTITY": {},
+        "STRING": {
+            "actionName": ""
+        }
+    },
+    "variable_group_info": [
+        {
+            "__tuple__": true,
+            "items": [
+                "持续伤害计时器",
+                "持续伤害计时器"
+            ]
+        },
+        {
+            "__tuple__": true,
+            "items": [
+                "层数",
+                "层数"
+            ]
+        },
+        {
+            "__tuple__": true,
+            "items": [
+                "temp触发器",
+                "temp触发器"
+            ]
+        },
+        {
+            "__tuple__": true,
+            "items": [
+                "actionName",
+                "actionName"
+            ]
+        }
+    ],
+    "variable_length_dict": {
+        "actionName": 0,
+        "temp触发器": 0,
+        "层数": 0,
+        "持续伤害计时器": 0
+    }
+}

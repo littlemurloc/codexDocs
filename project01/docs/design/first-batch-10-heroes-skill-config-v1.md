@@ -75,14 +75,14 @@
 
 ## 张飞
 
-核心资源：守势，受到近战伤害获得；每秒最多 1 层，最多 3 层；每层近战减伤 6%，持续 5 秒并可刷新；被消耗时失去对应减伤。
+核心资源：守势，受到近战伤害获得；每秒最多 1 层，最多 3 层；每层近战普攻减伤 6%，持续 5 秒并可刷新；被消耗时失去对应减伤。按 2026-10-21 确认，减伤不包含技能伤害，资源获取条件不因本条调整。
 
 | 星级 | skill_id | 类型 | target_rule / active_cast_mode | auto_rule | effect_payload / 数值状态 |
 | --- | --- | --- | --- | --- | --- |
 | 1 | `zhangfei_dangyang_nuhou` | 主动 | `current_target` / `auto` | 自动优先队长或精英| 单体伤害并嘲讽 3 秒；有守势时嘲讽额外 +1 秒。伤害、CD 待配置。 |
-| 2 | `zhangfei_shoumen_mengjiang` | 被动 | `self` / `passive` | - | 战前锁定前排：近战减伤 +10%；守势循环。 |
+| 2 | `zhangfei_shoumen_mengjiang` | 被动 | `self` / `passive` | - | 战前锁定前排：近战普攻减伤 +10%；守势循环。不减免技能伤害。 |
 | 3 | `zhangfei_shemao_henglan` | 主动 | `current_lane_front_max_3` / `auto` | 自动当前路前方目标较多时释放| 当前一路前方最多 3 个敌人：伤害、击退；消耗 1 层守势时降低攻击 3 秒。伤害、攻击降低值、CD 待配置。 |
-| 4 | `zhangfei_qiangdun_chengqiang` | 被动 | `own_soldiers` / `passive` | - | 小队小兵近战减伤 +10%；持有守势时额外 +8%。 |
+| 4 | `zhangfei_qiangdun_chengqiang` | 被动 | `own_soldiers` / `passive` | - | 小队小兵近战普攻减伤 +10%；持有守势时额外 +8%。不减免技能伤害。 |
 | 5 | `zhangfei_juqiao_sishou` | 主动 | `self_and_current_target` / `auto` | 自动承压时释放| 自身护盾并嘲讽当前目标 3 秒；消耗全部守势，每层提高护盾。护盾值、每层增幅、持续、CD 待配置。 |
 | 6 | `zhangfei_wanfu_mokai` | 被动 | `self` / `passive` | - | 生命低于 40%：立即获得 3 层守势；12 秒 ICD。 |
 
@@ -95,7 +95,7 @@
 | 1 | `xiahoudun_dumu_yingji` | 主动 | `current_target_and_self` / `auto` | 自动攻击当前目标| 单体伤害并获得护盾；持有刚烈时提高护盾。伤害、护盾、强化、持续、CD 待配置。 |
 | 2 | `xiahoudun_ganglie` | 被动 | `self_area` / `passive` | - | 刚烈循环与满层反斩。反斩伤害、区域范围待配置。 |
 | 3 | `xiahoudun_bashi_nuzhan` | 主动 | `current_target` / `auto` | 自动攻击当前目标| 立即获得 2 层刚烈并斩击；本次满层时立刻触发反斩。伤害、CD 待配置。 |
-| 4 | `xiahoudun_dumu_butui` | 被动 | `self` / `passive` | - | 战前锁定前排：击退效果降低 50%；持有刚烈时近战减伤 +8%。 |
+| 4 | `xiahoudun_dumu_butui` | 被动 | `self` / `passive` | - | 战前锁定前排：击退效果降低 50%；持有刚烈时近战普攻减伤 +8%，不减免技能伤害。 |
 | 5 | `xiahoudun_liezhen_fanpu` | 主动 | `current_lane_front_max_3` / `auto` | 自动当前路目标较多时释放| 当前一路前方最多 3 个敌人：伤害、击退；每层刚烈提高伤害；释放后消耗全部刚烈。数值、CD 待配置。 |
 | 6 | `xiahoudun_yishang_huanshi` | 被动 | `self` / `passive` | - | 触发反斩后，下一次主动技能伤害 +20%。 |
 
@@ -106,7 +106,7 @@
 | 星级 | skill_id | 类型 | target_rule / active_cast_mode | auto_rule | effect_payload / 数值状态 |
 | --- | --- | --- | --- | --- | --- |
 | 1 | `lvbu_fangtian_yazhen` | 主动 | `current_lane_front_max_3` / `auto` | 自动当前路前方目标较多时释放| 当前一路前方最多 3 个敌人伤害；每层威势提高伤害。基础、每层、CD 待配置。 |
-| 2 | `lvbu_jixia_wutui` | 被动 | `self` / `passive` | - | 战前锁定前排：近战减伤 +10%；普攻队长或精英时伤害 +10%。 |
+| 2 | `lvbu_jixia_wutui` | 被动 | `self` / `passive` | - | 战前锁定前排：近战普攻减伤 +10%，不减免技能伤害；普攻队长或精英时伤害 +10%。 |
 | 3 | `lvbu_zhenqian_jiaozhan` | 主动 | `current_target` / `auto` | 自动优先队长或精英| 单体伤害；目标为队长或精英时嘲讽 3 秒并降低攻击 3 秒。伤害、攻击降低值、CD 待配置。 |
 | 4 | `lvbu_renzhong_lvbu` | 被动 | `self` / `passive` | - | 威势循环。 |
 | 5 | `lvbu_yuanmen_zhanjiang` | 主动 | `lowest_hp_enemy_leader_or_elite` / `auto` | 自动选择最低生命比例队长或精英| 突击高伤；消耗全部威势，每层提高伤害。基础、每层、CD 待配置。 |

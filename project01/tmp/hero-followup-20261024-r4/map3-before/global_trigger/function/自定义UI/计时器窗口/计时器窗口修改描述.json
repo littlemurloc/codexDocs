@@ -1,0 +1,241 @@
+{
+    "action": [
+        {
+            "action_type": "SET_VARIABLE", 
+            "args_list": [
+                {
+                    "arg_type": 100030, 
+                    "args_list": [
+                        [
+                            "TABLE", 
+                            "表", 
+                            "local"
+                        ]
+                    ], 
+                    "sub_type": 1
+                }, 
+                {
+                    "arg_type": 100011, 
+                    "args_list": [
+                        [
+                            "TABLE", 
+                            "参数计时器窗口表", 
+                            "local"
+                        ]
+                    ], 
+                    "sub_type": "VARIABLE"
+                }
+            ], 
+            "bp": false, 
+            "element_id": 625586243000001, 
+            "enable": true
+        }, 
+        {
+            "action_type": "PICK_PLAYER_DO_ACTION", 
+            "args_list": [
+                {
+                    "arg_type": 100027, 
+                    "args_list": [], 
+                    "sub_type": "ALL_PLAYER"
+                }, 
+                {
+                    "arg_type": 100022, 
+                    "args_list": [
+                        {
+                            "action_type": "SET_VARIABLE", 
+                            "args_list": [
+                                {
+                                    "arg_type": 100030, 
+                                    "args_list": [
+                                        [
+                                            "UI_PREFAB_INSTANCE", 
+                                            "计时器窗口模块", 
+                                            "local"
+                                        ]
+                                    ], 
+                                    "sub_type": 1
+                                }, 
+                                {
+                                    "arg_type": 1001558, 
+                                    "args_list": [
+                                        {
+                                            "arg_type": 100011, 
+                                            "args_list": [
+                                                [
+                                                    "TABLE", 
+                                                    "表", 
+                                                    "local"
+                                                ]
+                                            ], 
+                                            "sub_type": "VARIABLE"
+                                        }, 
+                                        {
+                                            "arg_type": 100002, 
+                                            "args_list": [
+                                                {
+                                                    "arg_type": 100025, 
+                                                    "args_list": [], 
+                                                    "sub_type": "PICKED_PLAYER"
+                                                }
+                                            ], 
+                                            "sub_type": "PLAYER_ID_NUMBER"
+                                        }
+                                    ], 
+                                    "sub_type": "GET_UI_PREFAB_INSTANCE_TABLE_VAR_1D"
+                                }
+                            ], 
+                            "bp": false, 
+                            "element_id": 625586243000002, 
+                            "enable": true
+                        }, 
+                        {
+                            "action_type": "SET_VARIABLE", 
+                            "args_list": [
+                                {
+                                    "arg_type": 100030, 
+                                    "args_list": [
+                                        [
+                                            "UI_COMP", 
+                                            "计时器窗口名字控件", 
+                                            "local"
+                                        ]
+                                    ], 
+                                    "sub_type": 1
+                                }, 
+                                {
+                                    "arg_type": 100070, 
+                                    "args_list": [
+                                        {
+                                            "arg_type": 1001558, 
+                                            "args_list": [
+                                                [
+                                                    "UI_PREFAB_INSTANCE", 
+                                                    "计时器窗口模块", 
+                                                    "local"
+                                                ]
+                                            ], 
+                                            "sub_type": "VARIABLE"
+                                        }, 
+                                        {
+                                            "arg_type": 100003, 
+                                            "args_list": [
+                                                "名字"
+                                            ], 
+                                            "sub_type": 1
+                                        }
+                                    ], 
+                                    "sub_type": "GET_UI_PREFAB_CHILD_BY_PATH"
+                                }
+                            ], 
+                            "bp": false, 
+                            "element_id": 625586243000003, 
+                            "enable": true
+                        }, 
+                        {
+                            "action_type": "SET_UI_COMP_TEXT", 
+                            "args_list": [
+                                {
+                                    "arg_type": 100025, 
+                                    "args_list": [], 
+                                    "sub_type": "PICKED_PLAYER"
+                                }, 
+                                {
+                                    "arg_type": 100070, 
+                                    "args_list": [
+                                        [
+                                            "UI_COMP", 
+                                            "计时器窗口名字控件", 
+                                            "local"
+                                        ]
+                                    ], 
+                                    "sub_type": "VARIABLE"
+                                }, 
+                                {
+                                    "arg_type": 100003, 
+                                    "args_list": [
+                                        [
+                                            "STRING", 
+                                            "参数计时器窗口描述", 
+                                            "local"
+                                        ]
+                                    ], 
+                                    "sub_type": 2
+                                }
+                            ], 
+                            "bp": false, 
+                            "element_id": 625586243000004, 
+                            "enable": true
+                        }
+                    ], 
+                    "sub_type": 1
+                }
+            ], 
+            "bp": false, 
+            "element_id": 625586243000005, 
+            "enable": true
+        }
+    ], 
+    "call_enabled": true, 
+    "condition": [], 
+    "enabled": true, 
+    "event": [], 
+    "func_category": "t_function", 
+    "func_comment": "", 
+    "func_des": "修改计时器窗口描述{参数计时器窗口表}{参数计时器窗口描述}", 
+    "func_id": "8fa65ecf153111eebd53309c23206d62", 
+    "func_name": "计时器窗口修改描述", 
+    "func_param_list": [
+        {
+            "__tuple__": true, 
+            "items": [
+                "参数计时器窗口表", 
+                true
+            ]
+        }, 
+        {
+            "__tuple__": true, 
+            "items": [
+                "参数计时器窗口描述", 
+                true
+            ]
+        }
+    ], 
+    "group_id": "fhyUYUJvEe+Tj+jIKcBWmQ", 
+    "is_func": true, 
+    "is_official_func": false, 
+    "p_trigger_id": null, 
+    "trigger_id": 625586243, 
+    "trigger_name": "计时器窗口修改描述", 
+    "valid": true, 
+    "var_data": [
+        {
+            "STRING": {
+                "参数计时器窗口描述": ""
+            }, 
+            "TABLE": {
+                "参数计时器窗口表": null, 
+                "表": null
+            }, 
+            "UI_COMP": {
+                "计时器窗口名字控件": ""
+            }, 
+            "UI_PREFAB_INSTANCE": {
+                "计时器窗口模块": ""
+            }
+        }, 
+        {
+            "参数计时器窗口描述": 0, 
+            "参数计时器窗口表": 0, 
+            "表": 0, 
+            "计时器窗口名字控件": 0, 
+            "计时器窗口模块": 0
+        }, 
+        [
+            "参数计时器窗口描述", 
+            "参数计时器窗口表", 
+            "表", 
+            "计时器窗口名字控件", 
+            "计时器窗口模块"
+        ]
+    ]
+}

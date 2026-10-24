@@ -1,0 +1,322 @@
+{
+    "action": [
+        {
+            "action_type": "LIST_LOOP", 
+            "args_list": [
+                {
+                    "arg_type": 100081, 
+                    "args_list": [
+                        {
+                            "__tuple__": true, 
+                            "items": [
+                                "RECTANGLE", 
+                                "怪物触发区域"
+                            ]
+                        }
+                    ], 
+                    "sub_type": 1
+                }, 
+                {
+                    "arg_type": 100022, 
+                    "args_list": [
+                        {
+                            "action_type": "IF_THEN_ELSE", 
+                            "args_list": [
+                                {
+                                    "arg_type": 100021, 
+                                    "args_list": [
+                                        {
+                                            "args_list": [
+                                                {
+                                                    "arg_type": 100001, 
+                                                    "args_list": [
+                                                        {
+                                                            "__tuple__": true, 
+                                                            "items": [
+                                                                "BOOLEAN", 
+                                                                "怪物区域触发开关"
+                                                            ]
+                                                        }, 
+                                                        {
+                                                            "arg_type": 100002, 
+                                                            "args_list": [], 
+                                                            "sub_type": "GET_LOOP_LIST_INDEX"
+                                                        }
+                                                    ], 
+                                                    "sub_type": "VARIABLE"
+                                                }, 
+                                                {
+                                                    "arg_type": 100035, 
+                                                    "args_list": [
+                                                        "=="
+                                                    ], 
+                                                    "sub_type": 1
+                                                }, 
+                                                {
+                                                    "arg_type": 100001, 
+                                                    "args_list": [
+                                                        true
+                                                    ], 
+                                                    "sub_type": 1
+                                                }
+                                            ], 
+                                            "condition_type": "BOOL_COMPARE", 
+                                            "element_id": 129605798241610, 
+                                            "enable": true
+                                        }, 
+                                        {
+                                            "args_list": [
+                                                {
+                                                    "arg_type": 100004, 
+                                                    "args_list": [
+                                                        {
+                                                            "arg_type": 100006, 
+                                                            "args_list": [], 
+                                                            "sub_type": "GET_UNIT_FROM_EVENT"
+                                                        }
+                                                    ], 
+                                                    "sub_type": "UNIT_ENTITY_POINT"
+                                                }, 
+                                                {
+                                                    "arg_type": 100009, 
+                                                    "args_list": [
+                                                        {
+                                                            "__tuple__": true, 
+                                                            "items": [
+                                                                "RECTANGLE", 
+                                                                "怪物触发区域"
+                                                            ]
+                                                        }, 
+                                                        {
+                                                            "arg_type": 100002, 
+                                                            "args_list": [], 
+                                                            "sub_type": "GET_LOOP_LIST_INDEX"
+                                                        }
+                                                    ], 
+                                                    "sub_type": 7
+                                                }
+                                            ], 
+                                            "condition_type": "WHETHER_POINT_IN_AREA", 
+                                            "element_id": 129605798241631, 
+                                            "enable": true
+                                        }
+                                    ], 
+                                    "sub_type": 1
+                                }, 
+                                {
+                                    "arg_type": 100022, 
+                                    "args_list": [
+                                        {
+                                            "action_type": "SET_VARIABLE", 
+                                            "args_list": [
+                                                {
+                                                    "arg_type": 100028, 
+                                                    "args_list": [
+                                                        {
+                                                            "__tuple__": true, 
+                                                            "items": [
+                                                                "BOOLEAN", 
+                                                                "怪物区域触发开关"
+                                                            ]
+                                                        }, 
+                                                        {
+                                                            "arg_type": 100002, 
+                                                            "args_list": [], 
+                                                            "sub_type": "GET_LOOP_LIST_INDEX"
+                                                        }
+                                                    ], 
+                                                    "sub_type": 1
+                                                }, 
+                                                {
+                                                    "arg_type": 100001, 
+                                                    "args_list": [
+                                                        false
+                                                    ], 
+                                                    "sub_type": 1
+                                                }
+                                            ], 
+                                            "bp": false, 
+                                            "element_id": 129605798241612, 
+                                            "enable": true
+                                        }, 
+                                        {
+                                            "action_type": "SEND_CUSTOM_EVENT", 
+                                            "args_list": [
+                                                {
+                                                    "arg_type": 100238, 
+                                                    "args_list": [
+                                                        1705058604
+                                                    ], 
+                                                    "sub_type": 1
+                                                }, 
+                                                {
+                                                    "arg_type": 100002, 
+                                                    "args_list": [], 
+                                                    "sub_type": "GET_LOOP_LIST_INDEX"
+                                                }
+                                            ], 
+                                            "bp": false, 
+                                            "element_id": 129605798241613, 
+                                            "enable": true
+                                        }
+                                    ], 
+                                    "sub_type": 1
+                                }, 
+                                {
+                                    "arg_type": 100022, 
+                                    "args_list": [], 
+                                    "sub_type": 1
+                                }
+                            ], 
+                            "bp": false, 
+                            "element_id": 129605798241614, 
+                            "enable": true, 
+                            "fake_op": []
+                        }
+                    ], 
+                    "sub_type": 1
+                }
+            ], 
+            "bp": false, 
+            "element_id": 129605798000017, 
+            "enable": true
+        }
+    ], 
+    "call_enabled": true, 
+    "condition": [
+        {
+            "args_list": [
+                {
+                    "arg_type": 100081, 
+                    "args_list": [
+                        {
+                            "__tuple__": true, 
+                            "items": [
+                                "UNIT_ENTITY", 
+                                "playerHeroList"
+                            ]
+                        }
+                    ], 
+                    "sub_type": 1
+                }, 
+                {
+                    "arg_type": 100006, 
+                    "args_list": [], 
+                    "sub_type": "GET_UNIT_FROM_EVENT"
+                }
+            ], 
+            "condition_type": "DICT_HAS_VALUE", 
+            "element_id": 129605798241608, 
+            "enable": true
+        }, 
+        {
+            "args_list": [
+                {
+                    "arg_type": 100021, 
+                    "args_list": [
+                        {
+                            "args_list": [
+                                {
+                                    "arg_type": 900002, 
+                                    "args_list": [], 
+                                    "sub_type": "GET_CURRENT_LEVEL"
+                                }, 
+                                {
+                                    "arg_type": 100035, 
+                                    "args_list": [
+                                        "=="
+                                    ], 
+                                    "sub_type": 1
+                                }, 
+                                {
+                                    "arg_type": 900002, 
+                                    "args_list": [
+                                        "f618ed0f-426a-11ef-9680-e8c829c05699"
+                                    ], 
+                                    "sub_type": 1
+                                }
+                            ], 
+                            "condition_type": "ANY_COMPARE", 
+                            "element_id": 129605798241639, 
+                            "enable": true
+                        }, 
+                        {
+                            "args_list": [
+                                {
+                                    "arg_type": 900002, 
+                                    "args_list": [], 
+                                    "sub_type": "GET_CURRENT_LEVEL"
+                                }, 
+                                {
+                                    "arg_type": 100035, 
+                                    "args_list": [
+                                        "=="
+                                    ], 
+                                    "sub_type": 1
+                                }, 
+                                {
+                                    "arg_type": 900002, 
+                                    "args_list": [
+                                        "bf346e42-c8ef-11ef-b391-d5184c6257bb"
+                                    ], 
+                                    "sub_type": 1
+                                }
+                            ], 
+                            "condition_type": "ANY_COMPARE", 
+                            "element_id": 129605798241648, 
+                            "enable": true
+                        }
+                    ], 
+                    "sub_type": 1
+                }
+            ], 
+            "condition_type": "OR", 
+            "element_id": 129605798241634, 
+            "enable": true
+        }
+    ], 
+    "enabled": false, 
+    "event": [
+        {
+            "args_list": [
+                {
+                    "arg_type": 100008, 
+                    "args_list": [
+                        "ET_UNIT_START_MOVE"
+                    ], 
+                    "sub_type": "GENERIC_UNIT_EVENT"
+                }
+            ], 
+            "element_id": 129605798000001, 
+            "enable": true, 
+            "event_type": "GENERIC_UNIT_EVENT"
+        }
+    ], 
+    "group_id": "-RmPzrpfEe+ZLtEWi0fpCM", 
+    "p_trigger_id": null, 
+    "trigger_id": 129605798, 
+    "trigger_name": "场景区域触发刷怪处理", 
+    "valid": true, 
+    "var_data": [
+        {
+            "BOOLEAN": {}, 
+            "FLOAT": {}, 
+            "INTEGER": {
+                "对应数组index": 0
+            }, 
+            "POLYGON": {
+                "触发区域": 0
+            }, 
+            "TABLE": {}, 
+            "UNIT_ENTITY": {}
+        }, 
+        {
+            "对应数组index": 0, 
+            "触发区域": 0
+        }, 
+        [
+            "触发区域", 
+            "对应数组index"
+        ]
+    ]
+}

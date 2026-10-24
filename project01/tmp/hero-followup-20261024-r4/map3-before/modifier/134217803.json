@@ -1,0 +1,467 @@
+{
+    "local_variable": {
+        "178204674": {
+            "variable_dict": {
+                "ABILITY": {}, 
+                "TABLE": {}
+            }, 
+            "variable_length_dict": {}
+        }, 
+        "295727108": {
+            "variable_dict": {}, 
+            "variable_length_dict": {}
+        }, 
+        "949927937": {
+            "variable_dict": {}, 
+            "variable_length_dict": {}
+        }, 
+        "1184874499": {
+            "variable_dict": {}, 
+            "variable_length_dict": {}
+        }
+    }, 
+    "trigger_dict": {
+        "178204674": {
+            "action": [
+                {
+                    "action_type": "SET_VARIABLE", 
+                    "args_list": [
+                        {
+                            "arg_type": 100030, 
+                            "args_list": [
+                                {
+                                    "__tuple__": true, 
+                                    "items": [
+                                        "ABILITY", 
+                                        "\u5173\u8054\u6280\u80fd", 
+                                        "actor"
+                                    ]
+                                }
+                            ], 
+                            "sub_type": 1
+                        }, 
+                        {
+                            "arg_type": 100014, 
+                            "args_list": [
+                                {
+                                    "arg_type": 100076, 
+                                    "args_list": [], 
+                                    "sub_type": "CUR_MODIFIER"
+                                }
+                            ], 
+                            "sub_type": "RELATED_ABILITY_MODIFIER"
+                        }
+                    ], 
+                    "bp": false, 
+                    "element_id": 178204674000002, 
+                    "enable": true
+                }, 
+                {
+                    "action_type": "SET_VARIABLE", 
+                    "args_list": [
+                        {
+                            "arg_type": 100030, 
+                            "args_list": [
+                                [
+                                    "FLOAT", 
+                                    "\u539f\u59cb\u7fa4\u4f53\u7cfb\u4f24\u5bb3%", 
+                                    "actor"
+                                ]
+                            ], 
+                            "sub_type": 1
+                        }, 
+                        {
+                            "arg_type": 100000, 
+                            "args_list": [
+                                {
+                                    "arg_type": 100006, 
+                                    "args_list": [], 
+                                    "sub_type": "MODIFIER_OWNER"
+                                }, 
+                                {
+                                    "arg_type": 100301, 
+                                    "args_list": [
+                                        "ATTR_ALL_RATIO"
+                                    ], 
+                                    "sub_type": 1
+                                }, 
+                                {
+                                    "arg_type": 100042, 
+                                    "args_list": [
+                                        "UAsrmGoFEfCIytFjOpmdre"
+                                    ], 
+                                    "sub_type": 1
+                                }
+                            ], 
+                            "sub_type": "GET_UNIT_ATTR"
+                        }
+                    ], 
+                    "bp": false, 
+                    "element_id": 178204674000003, 
+                    "enable": true
+                }
+            ], 
+            "call_enabled": true, 
+            "condition": [], 
+            "enabled": true, 
+            "event": [
+                {
+                    "args_list": [], 
+                    "element_id": 178204674000001, 
+                    "enable": true, 
+                    "event_type": "OBTAIN_MODIFIER"
+                }
+            ], 
+            "group_id": 134217803, 
+            "p_trigger_id": null, 
+            "trigger_id": 178204674, 
+            "trigger_name": "\u65b0\u5efa\u89e6\u53d1\u5668", 
+            "valid": false, 
+            "var_data": [
+                {
+                    "ABILITY": {}, 
+                    "TABLE": {}
+                }, 
+                {}, 
+                []
+            ]
+        }, 
+        "295727108": {
+            "action": [
+                {
+                    "action_type": "PREVENT_OBTAIN_MODIFIER", 
+                    "args_list": [], 
+                    "bp": false, 
+                    "element_id": 295727108000003, 
+                    "enable": true
+                }
+            ], 
+            "call_enabled": true, 
+            "condition": [
+                {
+                    "args_list": [
+                        {
+                            "arg_type": 100001, 
+                            "args_list": [
+                                {
+                                    "arg_type": 100006, 
+                                    "args_list": [], 
+                                    "sub_type": "GET_WILL_MODIFIER_UNIT"
+                                }, 
+                                {
+                                    "arg_type": 100003, 
+                                    "args_list": [
+                                        "\u7fa4\u4f53\u7cfb"
+                                    ], 
+                                    "sub_type": 1
+                                }
+                            ], 
+                            "sub_type": "UNIT_HAS_TAG"
+                        }
+                    ], 
+                    "condition_type": "BOOL_NOT", 
+                    "element_id": 295727108000002, 
+                    "enable": true
+                }
+            ], 
+            "enabled": true, 
+            "event": [
+                {
+                    "args_list": [], 
+                    "element_id": 295727108000001, 
+                    "enable": true, 
+                    "event_type": "MODIFIER_GET_BEFORE_CREATE"
+                }
+            ], 
+            "group_id": 134217803, 
+            "p_trigger_id": null, 
+            "trigger_id": 295727108, 
+            "trigger_name": "\u65b0\u5efa\u89e6\u53d1\u5668_3", 
+            "valid": true, 
+            "var_data": [
+                {}, 
+                {}, 
+                []
+            ]
+        }, 
+        "949927937": {
+            "action": [
+                {
+                    "action_type": "IF_THEN_ELSE", 
+                    "args_list": [
+                        {
+                            "arg_type": 100021, 
+                            "args_list": [
+                                {
+                                    "args_list": [
+                                        {
+                                            "arg_type": 100006, 
+                                            "args_list": [], 
+                                            "sub_type": "MODIFIER_OWNER"
+                                        }, 
+                                        {
+                                            "arg_type": 100003, 
+                                            "args_list": [
+                                                "\u7fa4\u4f53\u7cfb"
+                                            ], 
+                                            "sub_type": 1
+                                        }
+                                    ], 
+                                    "condition_type": "UNIT_HAS_TAG", 
+                                    "element_id": 949927937000002, 
+                                    "enable": true
+                                }
+                            ], 
+                            "sub_type": 1
+                        }, 
+                        {
+                            "arg_type": 100022, 
+                            "args_list": [
+                                {
+                                    "action_type": "SET_MODIFIER_OWNER_ATTR", 
+                                    "args_list": [
+                                        {
+                                            "arg_type": 100076, 
+                                            "args_list": [], 
+                                            "sub_type": "CUR_MODIFIER"
+                                        }, 
+                                        {
+                                            "arg_type": 100042, 
+                                            "args_list": [
+                                                "UAsrmGoFEfCIytFjOpmdre"
+                                            ], 
+                                            "sub_type": 1
+                                        }, 
+                                        {
+                                            "arg_type": 100300, 
+                                            "args_list": [
+                                                "ATTR_ALL_RATIO"
+                                            ], 
+                                            "sub_type": 1
+                                        }, 
+                                        {
+                                            "arg_type": 100000, 
+                                            "args_list": [
+                                                {
+                                                    "arg_type": 100000, 
+                                                    "args_list": [
+                                                        [
+                                                            "FLOAT", 
+                                                            "\u539f\u59cb\u7fa4\u4f53\u7cfb\u4f24\u5bb3%", 
+                                                            "actor"
+                                                        ]
+                                                    ], 
+                                                    "sub_type": 2
+                                                }, 
+                                                {
+                                                    "arg_type": 100017, 
+                                                    "args_list": [
+                                                        "+"
+                                                    ], 
+                                                    "sub_type": 1
+                                                }, 
+                                                {
+                                                    "arg_type": 100000, 
+                                                    "args_list": [
+                                                        {
+                                                            "arg_type": 100014, 
+                                                            "args_list": [
+                                                                {
+                                                                    "__tuple__": true, 
+                                                                    "items": [
+                                                                        "ABILITY", 
+                                                                        "\u5173\u8054\u6280\u80fd", 
+                                                                        "actor"
+                                                                    ]
+                                                                }
+                                                            ], 
+                                                            "sub_type": 2
+                                                        }, 
+                                                        {
+                                                            "arg_type": 100003, 
+                                                            "args_list": [
+                                                                "\u989d\u4f24%"
+                                                            ], 
+                                                            "sub_type": 1
+                                                        }
+                                                    ], 
+                                                    "sub_type": "GET_FLOAT_KV"
+                                                }
+                                            ], 
+                                            "sub_type": "ARITHMETIC_OPERATION"
+                                        }
+                                    ], 
+                                    "bp": false, 
+                                    "element_id": 949927937000003, 
+                                    "enable": true
+                                }
+                            ], 
+                            "sub_type": 1
+                        }, 
+                        {
+                            "arg_type": 100022, 
+                            "args_list": [
+                                {
+                                    "action_type": "CLEAR_MODIFIER_OWNER_ATTR", 
+                                    "args_list": [
+                                        {
+                                            "arg_type": 100076, 
+                                            "args_list": [], 
+                                            "sub_type": "CUR_MODIFIER"
+                                        }
+                                    ], 
+                                    "bp": false, 
+                                    "element_id": 949927937000004, 
+                                    "enable": true
+                                }
+                            ], 
+                            "sub_type": 1
+                        }
+                    ], 
+                    "bp": false, 
+                    "element_id": 949927937000005, 
+                    "enable": true, 
+                    "fake_op": [
+                        2
+                    ]
+                }
+            ], 
+            "call_enabled": true, 
+            "condition": [], 
+            "enabled": true, 
+            "event": [
+                {
+                    "args_list": [], 
+                    "element_id": 949927937000001, 
+                    "enable": true, 
+                    "event_type": "MODIFIER_CYCLE_TRIGGER"
+                }
+            ], 
+            "group_id": 134217803, 
+            "p_trigger_id": null, 
+            "trigger_id": 949927937, 
+            "trigger_name": "\u65b0\u5efa\u89e6\u53d1\u5668_4", 
+            "valid": false, 
+            "var_data": [
+                {}, 
+                {}, 
+                []
+            ]
+        }, 
+        "1184874499": {
+            "action": [
+                {
+                    "action_type": "CLEAR_MODIFIER_OWNER_ATTR", 
+                    "args_list": [
+                        {
+                            "arg_type": 100076, 
+                            "args_list": [], 
+                            "sub_type": "CUR_MODIFIER"
+                        }
+                    ], 
+                    "bp": false, 
+                    "element_id": 1184874499000002, 
+                    "enable": true
+                }
+            ], 
+            "call_enabled": true, 
+            "condition": [], 
+            "enabled": true, 
+            "event": [
+                {
+                    "args_list": [], 
+                    "element_id": 1184874499000001, 
+                    "enable": true, 
+                    "event_type": "LOSS_MODIFIER"
+                }
+            ], 
+            "group_id": 134217803, 
+            "p_trigger_id": null, 
+            "trigger_id": 1184874499, 
+            "trigger_name": "\u65b0\u5efa\u89e6\u53d1\u5668_2", 
+            "valid": true, 
+            "var_data": [
+                {}, 
+                {}, 
+                []
+            ]
+        }
+    }, 
+    "trigger_group_info": [
+        {
+            "_trigger_group_": true, 
+            "group": [
+                {
+                    "__tuple__": true, 
+                    "items": [
+                        295727108, 
+                        "\u65b0\u5efa\u89e6\u53d1\u5668_3"
+                    ]
+                }, 
+                {
+                    "__tuple__": true, 
+                    "items": [
+                        1184874499, 
+                        "\u65b0\u5efa\u89e6\u53d1\u5668_2"
+                    ]
+                }, 
+                {
+                    "__tuple__": true, 
+                    "items": [
+                        178204674, 
+                        "\u65b0\u5efa\u89e6\u53d1\u5668"
+                    ]
+                }, 
+                {
+                    "__tuple__": true, 
+                    "items": [
+                        949927937, 
+                        "\u65b0\u5efa\u89e6\u53d1\u5668_4"
+                    ]
+                }
+            ], 
+            "key": 134217803, 
+            "name": "134217803"
+        }
+    ], 
+    "trigger_version": "1.2", 
+    "variable_dict": {
+        "ABILITY": {
+            "\u5173\u8054\u6280\u80fd": null
+        }, 
+        "DYNAMIC_TRIGGER_INSTANCE": {
+            "temp\u89e6\u53d1\u5668": 0
+        }, 
+        "FLOAT": {
+            "\u539f\u59cb\u7fa4\u4f53\u7cfb\u4f24\u5bb3%": 0.0
+        }
+    }, 
+    "variable_group_info": [
+        {
+            "__tuple__": true, 
+            "items": [
+                "\u5173\u8054\u6280\u80fd", 
+                "\u5173\u8054\u6280\u80fd"
+            ]
+        }, 
+        {
+            "__tuple__": true, 
+            "items": [
+                "temp\u89e6\u53d1\u5668", 
+                "temp\u89e6\u53d1\u5668"
+            ]
+        }, 
+        {
+            "__tuple__": true, 
+            "items": [
+                "\u539f\u59cb\u7fa4\u4f53\u7cfb\u4f24\u5bb3%", 
+                "\u539f\u59cb\u7fa4\u4f53\u7cfb\u4f24\u5bb3%"
+            ]
+        }
+    ], 
+    "variable_length_dict": {
+        "temp\u89e6\u53d1\u5668": 0, 
+        "\u5173\u8054\u6280\u80fd": 0, 
+        "\u539f\u59cb\u7fa4\u4f53\u7cfb\u4f24\u5bb3%": 0
+    }
+}

@@ -1,0 +1,2227 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>羊名立万 · 春节活动</title></head><body>
+<style>
+:root{color-scheme:dark;font-family:"PingFang SC","Microsoft YaHei",sans-serif;color:#f7edcd;background:#120c10;line-height:1.5}
+*{box-sizing:border-box}
+body{margin:0;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}
+button{font:inherit;-webkit-tap-highlight-color:transparent}
+button:focus-visible{outline:3px solid #f9e6a9;outline-offset:5px}
+[hidden]{display:none!important}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.stage{width:min(100vw,200dvh,2160px);aspect-ratio:2;position:relative;overflow:hidden;background:#200c12;isolation:isolate;flex:none;--design-scale:1}
+.design-canvas{position:absolute;top:0;left:0;width:2160px;height:1080px;transform:scale(var(--design-scale));transform-origin:0 0;background:#200c12 var(--art-v3-background-fixed-webp) 0 0/2160px 1080px no-repeat}
+.reward-scroll{position:absolute;left:0;right:0;top:0;height:1080px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;touch-action:pan-x;overscroll-behavior-x:contain;outline-offset:-5px;background-color:#200c12;background-image:var(--art-v3-ram-moving-webp),var(--art-v3-background-fixed-webp);background-position:174px 199px,0 0;background-size:864px 573px,2160px 1080px;background-repeat:no-repeat;background-attachment:local,scroll;background-blend-mode:overlay,normal}
+.reward-scroll::-webkit-scrollbar{display:none}
+.reward-track{position:relative;height:1080px;padding-top:220px;display:flex;align-items:flex-start;width:max-content;min-width:2160px}
+.moving-ram{position:absolute;left:174px;top:199px;width:864px;height:573px;mix-blend-mode:overlay;pointer-events:none;user-select:none}
+/* Blend both background layers within the scrolling viewport for Safari.
+   Only the ram uses local attachment, so it moves over the fixed artwork. */
+.moving-ram,.greeting-brand-ram,.kings-brand-ram{visibility:hidden}
+.moving-rail{position:absolute;z-index:2;left:0;top:0;width:36px;height:1080px;pointer-events:none;user-select:none}
+.hero{position:relative;width:2017px;height:860px;flex:none}
+.hero>img{display:block;position:absolute;user-select:none;pointer-events:none}
+.event-brand{position:relative;height:860px;flex:none;color:#f4e3b7}
+.event-brand>img{position:absolute;display:block;pointer-events:none;user-select:none}
+.event-brand-title{left:127px;top:42px;width:804px;height:459px;object-fit:contain}
+.event-brand-year{left:531px;top:431px;width:197px;height:44px;object-fit:contain}
+.event-brand-fc{left:758px;top:428px;width:129px;height:50px;object-fit:contain}
+.event-brand-subtitle{position:absolute;left:164px;top:552px;margin:0;font-family:"PingFang SC","Microsoft YaHei",sans-serif;font-size:62px;font-weight:650;letter-spacing:1.5px;line-height:1.3;color:#e9d39b;text-shadow:0 3px 13px #15070e77}
+.event-brand-copy{position:absolute;left:164px;top:650px;width:600px;margin:0;font-size:27px;line-height:1.6;letter-spacing:1px;color:#d5c4b3}
+.event-brand-actions{position:absolute;left:805px;top:662px;display:flex;align-items:center}
+.common-action,.opening-action,.dialog-action{display:inline-flex;align-items:center;justify-content:center;border:1px solid #f1d595;border-radius:999px;background:linear-gradient(180deg,#f6e3b1,#d6b57b);color:#5a1c22;box-shadow:inset 0 1px 0 #fff3d466,0 3px 12px #10070b33;font-weight:650;line-height:1.3;letter-spacing:1.5px;cursor:pointer}
+.common-action{gap:16px;min-height:60px;padding:10px 32px;font-size:25px}
+.event-rules-button{min-width:220px;min-height:86px;padding:14px 24px;font-size:33px;letter-spacing:1px}
+.event-brand>.event-rules-button{position:absolute;left:805px;top:662px}
+.gm-tools{position:absolute;left:60px;top:38px;z-index:8}
+.gm-toggle{min-width:110px;min-height:64px;padding:10px 22px;font-size:26px}
+.gm-menu{position:absolute;left:0;top:84px;width:350px;padding:24px;border:1px solid #bc915e;background:#26131bf5;box-shadow:0 14px 40px #0d050a77}
+.gm-menu-date{margin:0 0 18px;color:#d6bb87;font-size:24px;text-align:center}
+.gm-menu>.common-action{display:flex;width:100%;min-height:66px;margin-top:14px;font-size:27px;letter-spacing:1px}
+.common-action:hover:not(:disabled):not([aria-disabled="true"]),.opening-action:hover:not(:disabled):not([aria-disabled="true"]),.dialog-action:hover:not(:disabled):not([aria-disabled="true"]){background:linear-gradient(180deg,#fff0c8,#e4c38b);border-color:#fff0c6}
+.common-action:disabled,.common-action[aria-disabled="true"],.opening-action:disabled,.opening-action[aria-disabled="true"],.dialog-action:disabled,.dialog-action[aria-disabled="true"],.dialog-action.secondary:disabled,.dialog-action.secondary[aria-disabled="true"]{background:#343237;color:#9f9b9a;border-color:#626066;box-shadow:none;cursor:default;filter:none}
+.common-gift{position:relative;display:block;width:234px;height:222px;flex:none;padding:0;border:0;border-radius:50%;background:transparent;color:#e9d8b5;cursor:pointer;touch-action:pan-x;appearance:none}
+.common-gift-art{position:absolute;inset:0;display:block;width:234px;height:222px;object-fit:contain;pointer-events:none;user-select:none}
+.claim-caption{position:absolute;left:50%;top:222px;transform:translateX(-50%);display:block;padding:1px 12px;color:#e8dab5;background:transparent;font-size:25px;line-height:1.4;font-weight:500;letter-spacing:1px;white-space:nowrap;border-radius:3px}
+.common-gift[data-state="available"]:hover .common-gift-art{filter:brightness(1.13)}
+.common-gift[data-state="claimed"]{cursor:default}
+.common-gift[data-state="claimed"] .claim-caption{color:#c8e5b6;background:transparent}
+.common-gift[data-state="locked"] .common-gift-art,.common-gift[data-state="expired"] .common-gift-art,.common-gift[data-state="invalid"] .common-gift-art,.common-gift[data-state="ended"] .common-gift-art{filter:brightness(.55)}
+.common-gift,.gift-target{--gift-left-mask:url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20234%20222'%3E%3Cdefs%3E%3CradialGradient%20id%3D'g'%3E%3Cstop%20offset%3D'.917'%20stop-color%3D'white'%2F%3E%3Cstop%20offset%3D'1'%20stop-color%3D'white'%20stop-opacity%3D'0'%2F%3E%3C%2FradialGradient%3E%3C%2Fdefs%3E%3Ccircle%20cx%3D'107'%20cy%3D'125'%20r%3D'97'%20fill%3D'url(%23g)'%2F%3E%3Ccircle%20cx%3D'171'%20cy%3D'58'%20r%3D'26'%20fill%3D'white'%2F%3E%3Ccircle%20cx%3D'195'%20cy%3D'123'%20r%3D'27'%20fill%3D'white'%2F%3E%3Ccircle%20cx%3D'106'%20cy%3D'30'%20r%3D'26'%20fill%3D'white'%2F%3E%3C%2Fsvg%3E");--gift-right-mask:url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20234%20222'%3E%3Cdefs%3E%3CradialGradient%20id%3D'g'%3E%3Cstop%20offset%3D'.917'%20stop-color%3D'white'%2F%3E%3Cstop%20offset%3D'1'%20stop-color%3D'white'%20stop-opacity%3D'0'%2F%3E%3C%2FradialGradient%3E%3C%2Fdefs%3E%3Ccircle%20cx%3D'107'%20cy%3D'125'%20r%3D'97'%20fill%3D'url(%23g)'%2F%3E%3Ccircle%20cx%3D'171'%20cy%3D'58'%20r%3D'26'%20fill%3D'white'%2F%3E%3Ccircle%20cx%3D'195'%20cy%3D'123'%20r%3D'27'%20fill%3D'white'%2F%3E%3C%2Fsvg%3E")}
+.common-gift[data-state="claimed"] .common-gift-art,.gift-target[data-state="available"]>img,.gift-target[data-state="claimed"]>img{-webkit-mask-image:var(--gift-left-mask);mask-image:var(--gift-left-mask)}
+.common-gift[data-state="locked"] .common-gift-art,.common-gift[data-state="expired"] .common-gift-art,.common-gift[data-state="invalid"] .common-gift-art,.common-gift[data-state="ended"] .common-gift-art,.gift-target[data-state="locked"]>img{-webkit-mask-image:var(--gift-right-mask);mask-image:var(--gift-right-mask)}
+.common-gift-art,.gift-target>img{-webkit-mask-size:100% 100%;mask-size:100% 100%;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}
+.login-daily-main{position:absolute;left:1130px;top:46px;width:767px;height:746px;border:2px solid #9b414a;background:linear-gradient(145deg,#190e17e8 0%,#251015d9 64%,#5b101da6 100%);box-shadow:inset 0 0 60px #10091033;text-align:center}
+.login-daily-main::before{content:"";position:absolute;top:0;left:0;width:29px;height:29px;background:linear-gradient(135deg,#c858624d 0 49%,transparent 50%);pointer-events:none}
+.login-daily-main h3{position:absolute;left:64px;right:64px;top:96px;margin:0;font-size:52px;line-height:1.3;font-weight:650;letter-spacing:2px;color:#f1dfad}
+.login-daily-main>p{position:absolute;left:64px;right:64px;top:205px;margin:0;font-size:28px;line-height:1.6;color:#cdbda8;letter-spacing:1px}
+.login-daily-main>.common-gift{position:absolute;left:calc(50% - 117px);top:385px}
+.reward-panels{height:860px;display:flex;gap:120px;padding-right:40px;align-items:flex-start;flex:none}
+.reward-panel{position:relative;margin-top:46px;width:767px;height:746px;flex:none}
+.art-button{position:absolute;padding:0;margin:0;display:block;border:0;background:transparent;color:transparent;cursor:pointer;appearance:none;touch-action:pan-x}
+.card-target{top:123px;width:297px;height:306px}
+.card-target>img{display:block;width:100%;height:100%;object-fit:contain;pointer-events:none;user-select:none}
+.card-target.left{left:69px}
+.card-target.right{left:399px}
+.card-target:hover{filter:drop-shadow(0 0 10px #ead7a355);background:#fff7d106}
+.gift-target{top:438px;width:234px;height:222px;border-radius:50%}
+.gift-target.left{left:109px}
+.gift-target.right{left:437px}
+.gift-target>img{position:absolute;inset:0;width:234px;height:222px;pointer-events:none;user-select:none}
+.gift-target[data-state="available"]:hover{filter:brightness(1.15)}
+.gift-target[data-state="locked"]{cursor:help}
+.gift-target[data-state="claimed"]{cursor:default}
+.claim-stamp{position:absolute;left:50%;top:220px;transform:translateX(-50%);font-size:24px;line-height:1.4;font-weight:500;color:#c8e5b6;white-space:nowrap;padding:0 12px;background:transparent;border-radius:3px}
+.top-chrome{position:absolute;z-index:4;left:0;top:0;width:2160px;height:220px}
+.top-chrome>img{position:absolute;inset:0;width:2160px;height:220px;clip-path:inset(0 0 84px 0);pointer-events:none;user-select:none}
+.back{left:198px;top:24px;width:84px;height:92px}
+.chapters{position:absolute;left:180px;top:140px;width:1174px;height:73px;display:flex;gap:26px}
+.chapter{position:relative;flex:0 0 274px;height:73px;border:2px solid transparent;background:#30312e;color:#9b9d92;font-size:27px;line-height:1.2;font-weight:500;text-shadow:0 1px 2px #0005}
+.chapter:hover{background:#3a3b34;color:#f0e5bf}
+.chapter[aria-current="page"],.chapter.is-active{border-color:#eee3bd;color:#e0d8ac;background:#30312e}
+.utility{top:20px;width:84px;height:86px}
+.utility-rules{left:1707px}
+.utility-records{left:1801px}
+.utility-home{left:1887px}
+.reward-scroll.is-dragging,.reward-scroll.is-dragging .art-button{cursor:grabbing}
+.opening-track{height:1080px;padding:220px 40px 0 0;display:flex;align-items:flex-start;width:max-content;min-width:2160px;position:relative}
+.opening-track button{touch-action:pan-x}
+.opening-track img{pointer-events:none;user-select:none}
+.opening-panel{position:relative;border:2px solid #9b414a;background:linear-gradient(145deg,#190e17d9 0%,#251015b3 64%,#5b101d80 100%);box-shadow:inset 0 0 60px #10091033;flex:none}
+.opening-panel::before{content:"";position:absolute;top:0;left:0;width:29px;height:29px;background:linear-gradient(135deg,#c8586229 0 49%,transparent 50%);pointer-events:none}
+.opening-intro{margin:0;width:1100px;height:860px;padding:0;flex:none}
+.opening-kicker{margin:0 0 3px;color:#c4a77a;font-size:20px;letter-spacing:4px}
+.opening-daily-panel{position:relative;width:1100px;height:746px;margin-top:46px;margin-left:120px;flex:none}
+.opening-daily-art{position:absolute;left:-65px;top:40px;display:block;width:650px;height:650px;object-fit:contain;filter:drop-shadow(0 16px 28px #08040866)}
+.opening-daily-copy{position:absolute;left:550px;top:170px;width:480px;text-align:center}
+.opening-daily-copy h2{margin:8px 0 0;font-size:51px;line-height:1.4;font-weight:500;letter-spacing:4px;color:#f2dfac}
+.opening-daily-copy>p:not(.opening-kicker){margin:20px 0 0;font-size:28px;line-height:1.8;color:#cbbbA8;letter-spacing:1px}
+.opening-daily-copy .opening-mode-statuses{margin-top:28px;gap:36px;font-size:20px}
+.opening-daily-copy .opening-mode-statuses b{font-size:22px}
+.opening-daily-gift{position:absolute;left:673px;top:390px}
+.opening-action{min-width:276px;min-height:64px;padding:12px 32px;font-size:29px}
+.opening-rules{position:absolute;left:522px;right:38px;top:218px;display:flex;flex-direction:column;gap:28px}
+.opening-rule{display:flex;align-items:center;gap:22px;color:#f2dfb7}
+.opening-rule>div{min-width:0}
+.opening-rule strong{display:block;font-size:26px;line-height:1.4;font-weight:500;white-space:nowrap}
+.opening-rule div>span{display:block;margin-top:3px;font-size:20px;line-height:1.5;color:#b5a79d;white-space:nowrap}
+.opening-rule-symbol{position:relative;display:block;width:47px;height:43px;flex:none;color:#d8bd84}
+.envelope-symbol{border:2px solid #d8bd84;height:35px}
+.envelope-symbol::after{content:"";position:absolute;top:-2px;left:5px;width:31px;height:22px;border-right:2px solid #d8bd84;border-bottom:2px solid #d8bd84;transform:rotate(45deg) skew(-11deg,-11deg);transform-origin:center}
+.pitch-symbol{border:2px solid #d8bd84;border-radius:2px;background:linear-gradient(90deg,transparent calc(50% - 1px),#d8bd84 calc(50% - 1px),#d8bd84 calc(50% + 1px),transparent calc(50% + 1px))}
+.pitch-symbol::after{content:"";position:absolute;top:11px;left:13px;width:17px;height:17px;border:2px solid #d8bd84;border-radius:50%}
+.repeat-symbol{height:47px;font-size:60px;line-height:39px;font-family:Arial,sans-serif;text-align:center}
+.upgrade-symbol::before,.upgrade-symbol::after{content:"";position:absolute;width:24px;height:24px;border-top:3px solid #d8bd84;border-right:3px solid #d8bd84;transform:rotate(-45deg);left:10px;top:3px}
+.upgrade-symbol::after{top:21px;opacity:.65}
+.opening-mode-statuses{display:flex;gap:16px;list-style:none;padding:0;margin:10px 0 0;color:#aea199;font-size:17px;line-height:1.4;white-space:nowrap}
+.opening-mode-statuses li{display:flex;flex-direction:column;gap:1px}
+.opening-mode-statuses b{font-size:18px;font-weight:400;color:#d5c6b5}
+.opening-mode-statuses [data-complete="true"]{color:#c6e4ad}
+.opening-rule-modes{align-items:flex-start}
+.opening-rule-modes .opening-rule-symbol{margin-top:7px}
+.opening-browse{position:absolute;bottom:22px;left:54px;display:flex;align-items:center;gap:26px;padding:0;border:0;background:none;color:#d6ba81;font-size:22px;letter-spacing:2px;cursor:pointer}
+.opening-browse>span:last-child{font-size:34px;line-height:1}
+.opening-browse:hover{color:#ffecaf}
+.opening-rewards{width:2480px;height:746px;margin-top:46px;margin-left:120px}
+.opening-section-heading{position:absolute;left:64px;top:30px;right:64px;display:flex;align-items:baseline;gap:52px}
+.opening-section-heading h2{margin:0;font-size:43px;line-height:1.4;letter-spacing:3px;font-weight:550;color:#f6e7bb}
+.opening-section-heading p{font-size:25px;line-height:1.5;margin:0;color:#b7a89e}
+.opening-section-heading strong{font-size:32px;color:#ead7a6;font-weight:500;letter-spacing:1px}
+.opening-section-heading p>span{font-size:22px;color:#a99a90}
+.opening-cards{position:absolute;left:64px;top:140px;display:flex;gap:36px;padding-left:236px;width:2380px;height:560px}
+.opening-card{position:relative;flex:0 0 400px;width:400px;height:560px;text-align:center}
+.opening-card-art{position:absolute;left:36px;top:0;width:328px;height:328px;padding:12px 28px;border:1px solid #8d464b;background:#24101980;cursor:pointer}
+.opening-card-art img{display:block;width:100%;height:100%;object-fit:contain}
+.opening-card-art:hover{border-color:#e1c48d;filter:brightness(1.07)}
+.opening-card-threshold{position:absolute;left:0;right:0;top:348px;margin:0;color:#d8c9b4;font-size:27px;line-height:1.4;white-space:nowrap}
+.opening-card-node{position:absolute;top:428px;left:calc(50% - 12px);width:24px;height:24px;display:block;transform:rotate(45deg);border:3px solid #9a7a59;background:#2b1b20;z-index:2}
+.opening-card[data-state="claimed"] .opening-card-node{background:#dac492;border-color:#f4dfad}
+.opening-card[data-state="available"] .opening-card-node{background:#f0d59b;border-color:#fff0ba;box-shadow:0 0 20px #e4b86488}
+.opening-card[data-state="available"] .opening-card-art{border-color:#d8b879;box-shadow:inset 0 0 38px #e8bd5b12,0 0 26px #ca904d12}
+.opening-card-claim{position:absolute;left:140px;top:460px;width:120px;height:114px;padding:0;border:0;border-radius:50%;background:transparent;cursor:pointer}
+.opening-card-claim .common-gift-art{width:120px;height:114px}
+.opening-card-claim .claim-caption{top:114px;font-size:22px;letter-spacing:1px}
+.opening-card[data-state="available"] .opening-card-claim:hover .common-gift-art{filter:brightness(1.12)}
+.opening-card[data-state="claimed"] .opening-card-claim{cursor:default}
+.opening-card[data-state="claimed"] .opening-card-claim .claim-caption{color:#c8e5b6;background:transparent}
+.opening-card[data-state="locked"] .opening-card-claim{cursor:help}
+.opening-card[data-state="locked"] .opening-card-claim .common-gift-art{filter:brightness(.5)}
+.opening-card[data-state="locked"] .opening-card-claim .claim-caption{color:#a29490}
+.opening-progress{position:absolute;top:580px;left:64px;width:2180px;height:4px;background:#6d4c43;z-index:1}
+.opening-progress-fill{height:100%;width:62.5%;max-width:100%;background:linear-gradient(90deg,#b28c50,#f0dca2);box-shadow:0 0 14px #e7b76744;transition:width .3s ease}
+.opening-progress-zero{position:absolute;top:-42px;left:-9px;min-width:18px;text-align:center;color:#baaa92;font-size:23px;line-height:1}
+.opening-progress-zero::after{content:"";position:absolute;top:37px;left:3px;width:12px;height:12px;transform:rotate(45deg);background:#c0a676;border:2px solid #e0c99c}
+.opening-level-combination{position:relative;display:flex;align-items:flex-start;width:1440px;height:746px;margin:46px 0 0 120px;flex:none}
+.opening-level-combination::after{content:"";position:absolute;left:720px;top:60px;bottom:60px;width:1px;background:#ba805638;pointer-events:none}
+.opening-level-status,.opening-level-reward{position:relative;margin:0;width:718px;height:742px;text-align:center;flex:none}
+.opening-level-status h2{position:absolute;left:0;right:0;top:170px;margin:0;color:#e8d5a7;font-size:40px;letter-spacing:3px;line-height:1.4;font-weight:600}
+.opening-level-total{position:absolute;left:0;right:0;top:265px;margin:0;line-height:1.3;color:#f5e0ad;white-space:nowrap}
+.opening-level-total strong{font-size:76px;font-weight:500;letter-spacing:2px}
+.opening-level-total>span{font-size:27px;margin-left:13px;color:#cab69b}
+.opening-level-labels{position:absolute;left:66px;right:66px;top:382px;display:flex;align-items:baseline;justify-content:space-between;gap:24px;font-size:26px;line-height:1.4;color:#d8c29c;letter-spacing:1px}
+.opening-level-progress{position:absolute;left:66px;right:66px;top:430px;height:12px;background:#130c11}
+.opening-level-progress>div{height:100%;max-width:100%;background:linear-gradient(90deg,#ac7d40,#ecd397);transition:width .3s ease}
+.opening-level-numbers{position:absolute;left:0;right:0;top:465px;margin:0;font-size:30px;line-height:1.4;color:#ead8af;letter-spacing:2px}
+.opening-level-reward-name{position:absolute;left:40px;right:40px;top:28px;margin:0;font-size:32px;line-height:1.4;color:#ead8af;letter-spacing:1px}
+.opening-level-image{position:absolute;left:calc(50% - 205px);top:88px;width:410px;height:380px;object-fit:contain;filter:drop-shadow(0 15px 26px #10050966)}
+.opening-level-reward>.opening-level-gift{position:absolute;left:calc(50% - 117px);top:480px}
+.opening-claim-note{position:absolute;left:32px;right:32px;bottom:25px;margin:0;font-size:21px;line-height:1.4;color:#a59283}
+.opening-scroll.is-dragging,.opening-scroll.is-dragging button{cursor:grabbing}
+.dialog-envelope{display:block;width:160px;height:190px;object-fit:contain;margin:8px auto 18px}
+dialog{border:1px solid #9d744e;border-radius:4px;padding:0;width:min(570px,calc(100vw - 32px));max-height:calc(100dvh - 32px);overflow:auto;color:#f9efd5;background:linear-gradient(135deg,#461a22,#1e1016 70%);box-shadow:0 20px 100px #0009}
+dialog::backdrop{background:#0a0309bf;backdrop-filter:blur(3px)}
+.dialog-shell{position:relative;padding:32px;text-align:center}
+.dialog-close{position:absolute;right:10px;top:8px;min-width:44px;min-height:44px;border:0;background:none;color:#d9c6ae;font-size:30px;line-height:1;cursor:pointer}
+.dialog-eyebrow{font-size:12px;letter-spacing:2px;color:#c5a877;margin:0 38px 8px}
+dialog h2{font-size:25px;line-height:1.4;font-weight:500;letter-spacing:2px;margin:0 20px 14px}
+.dialog-card{width:170px;height:auto;aspect-ratio:1211/1299;object-fit:contain;display:block;margin:8px auto 16px}
+.dialog-gift{width:110px;height:110px;object-fit:contain;display:block;margin:12px auto}
+.dialog-copy{font-size:14px;line-height:1.85;color:#dbccc0;margin:12px 0 20px}
+.dialog-action{min-width:150px;min-height:44px;padding:10px 24px;font-size:15px;letter-spacing:1px}
+.dialog-action.secondary{background:#57242c;color:#ead7ae;border-color:#a47d56}
+.dialog-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+.success-check{width:34px;height:34px;vertical-align:middle;margin-right:8px}
+.record-list{list-style:none;padding:0;margin:16px 0 24px;text-align:left}
+.record-list li{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid #b99a6a33;font-size:14px}
+.record-list img{width:48px;height:48px;object-fit:contain}
+.record-list span{flex:1}
+.record-list em{font-size:12px;color:#c8e5b6;font-style:normal}
+.toast{position:fixed;z-index:20;left:50%;bottom:max(20px,env(safe-area-inset-bottom));transform:translateX(-50%);max-width:calc(100vw - 32px);padding:10px 20px;background:#f0ddb5;color:#3b231d;border-radius:3px;box-shadow:0 4px 25px #0006;text-align:center;font-size:14px;line-height:1.6;pointer-events:none}
+.prototype-test-controls{position:fixed;z-index:12;left:50%;bottom:16px;transform:translateX(-50%);width:min(1080px,calc(100vw - 32px));max-height:calc(100dvh - 32px);overflow:auto}
+@media(max-width:600px){.dialog-shell{padding:26px 20px}.dialog-card{width:130px;height:auto}dialog h2{font-size:21px}.dialog-copy{font-size:13px}}
+@media(prefers-reduced-motion:reduce){dialog::backdrop{backdrop-filter:none}}
+
+/* Date rewards are rendered from the calendar, rather than baked into an image. */
+.date-panel{border:2px solid #9b414a;background:linear-gradient(145deg,#190e17e8,#251015d9 64%,#5b101da6);box-shadow:inset 0 0 60px #10091033}
+.date-panel::before{content:"";position:absolute;top:0;left:0;width:29px;height:29px;background:linear-gradient(135deg,#c858624d 0 49%,transparent 50%)}
+.date-panel-title{position:absolute;left:24px;right:24px;top:27px;margin:0;text-align:center;font-size:38px;line-height:1.4;font-weight:600;color:#efdcab}
+.date-reward-grid{position:absolute;left:54px;right:54px;top:108px;bottom:30px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px}
+.date-reward-item{position:relative;display:flex;flex-direction:column;align-items:center}
+.date-reward-card{position:relative;display:block;width:280px;height:330px;border:0;padding:0;background:none;cursor:pointer}
+.date-reward-card>img{display:block;width:100%;height:100%;object-fit:contain}
+.date-gift{position:relative;margin-top:25px;width:190px;height:180px}
+.date-gift .common-gift-art{width:190px;height:180px}
+.date-gift .claim-caption{top:180px;font-size:23px}
+.date-gift[data-state="locked"] .common-gift-art,.date-gift[data-state="expired"] .common-gift-art{filter:grayscale(1) brightness(.55)}
+.date-panel.is-eve{width:1180px}
+.is-eve .date-reward-grid{top:92px;bottom:28px;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:23px 30px}
+.is-eve .date-reward-card{width:190px;height:205px}
+.is-eve .date-gift{width:86px;height:82px;margin-top:2px}
+.is-eve .date-gift .common-gift-art{width:86px;height:82px}
+.is-eve .date-gift .claim-caption{top:82px;font-size:19px}
+.common-gift[data-state="expired"] .common-gift-art{filter:grayscale(1) brightness(.5)}
+
+.greeting-track{position:relative;display:flex;align-items:flex-start;width:max-content;min-width:2160px;height:1080px;padding-top:220px}
+.greeting-page{position:relative;flex:none;width:2160px;height:860px}
+.greeting-overview{width:3020px}
+.greeting-track img{user-select:none;pointer-events:none}
+.greeting-track button{touch-action:pan-x}
+.greeting-brand{position:absolute;left:0;top:0;width:1100px;height:860px}
+.greeting-brand-ram{position:absolute;left:174px;top:-21px;width:864px;height:573px;mix-blend-mode:overlay}
+.greeting-collection{position:absolute;left:1120px;top:0;width:1846px;height:860px}
+.greeting-figures{position:absolute;left:0;top:-21px;width:1250px;height:998.75px;-webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 86.2%,transparent 88.3%);mask-image:linear-gradient(to bottom,#000 0%,#000 86.2%,transparent 88.3%);-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-size:100% 100%;mask-size:100% 100%}
+.greeting-group-base,.greeting-person,.greeting-person img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.greeting-group-base{filter:brightness(0);opacity:1}
+.greeting-person{display:block;margin:0;padding:0;border:0;background:none;cursor:pointer}
+.greeting-person img{filter:brightness(0);opacity:1;transition:filter .25s,opacity .25s}
+.greeting-person[data-status="ready"] img{filter:brightness(0);opacity:1}
+.greeting-ready-particles{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.55;filter:drop-shadow(0 0 3px #ead29c80);animation:greeting-ready-breathe 2.8s ease-in-out infinite}
+.greeting-ready-particles polygon{fill:none;stroke:#ead29c;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:.01 14}
+@keyframes greeting-ready-breathe{0%,100%{opacity:.38}50%{opacity:.85}}
+.greeting-person[data-status="lit"] img{filter:none;opacity:1}
+.greeting-person:hover img{opacity:1}
+.greeting-figures[data-complete="true"] .greeting-group-base{filter:none;opacity:1}
+.greeting-figures[data-complete="true"] .greeting-person img{opacity:0}
+.greeting-reward-area{position:absolute;left:1286px;top:20px;width:560px;height:804px}
+.greeting-light-progress{position:absolute;left:0;right:0;top:0;height:80px;display:flex;align-items:center;justify-content:center;margin:0;font-size:32px;text-align:center;line-height:1.4;color:#dbc69b;letter-spacing:2px}
+.greeting-light-progress strong{font-size:46px;font-weight:600;margin-left:14px;color:#f4dfa8}
+.greeting-light-progress>span{font-size:30px;color:#b4a287}
+.greeting-milestones{position:absolute;left:0;top:104px;display:flex;flex-direction:column;gap:0}
+.greeting-milestone{position:relative;width:560px;height:350px;border:0;background:none}
+.greeting-milestone>img{position:absolute;left:0;top:16px;width:220px;height:300px;object-fit:contain}
+.greeting-milestone>div{position:absolute;left:232px;right:18px;top:38px;bottom:24px}
+.greeting-milestone h3{margin:0 0 12px;font-size:32px;font-weight:600;line-height:1.35;letter-spacing:1px;color:#e9d3a3}
+.greeting-milestone p{margin:0;font-size:27px;line-height:1.3;color:#c1b09a}
+.greeting-milestone-progress{position:absolute;right:0;bottom:106px;font-size:27px;color:#c9b58f}
+.greeting-milestone .common-action{position:absolute;left:0;right:0;bottom:0;width:100%;min-width:0;min-height:80px;margin:0;padding:15px 20px;font-size:26px;line-height:1.2;letter-spacing:1px}
+.greeting-milestone[data-state="locked"] .common-action,.greeting-milestone[data-state="claimed"] .common-action,.greeting-milestone[data-state="before"] .common-action,.greeting-milestone[data-state="ended"] .common-action{background:#36342f;color:#a6a294;border-color:#665d4a;box-shadow:none}
+.greeting-personal{width:1900px}
+.greeting-personal-panel{position:absolute;left:60px;top:20px;width:1780px;height:804px;border:2px solid #9b414a;background:linear-gradient(145deg,#190e17e8 0%,#251015d9 64%,#5b101da6 100%);box-shadow:inset 0 0 60px #10091033;pointer-events:none}
+.greeting-personal-panel::before{content:"";position:absolute;left:0;top:0;width:29px;height:29px;background:linear-gradient(135deg,#c858624d 0 49%,transparent 50%)}
+.greeting-personal-header{position:absolute;left:110px;top:50px;display:flex;align-items:center;gap:26px}
+.greeting-personal-header>p{font-size:31px;letter-spacing:2px;margin:0;color:#ecd8ab;font-weight:600}
+.greeting-zodiac{position:absolute;left:50%;top:0;transform:translateX(-50%);padding:4px 11px;border:1px solid #b99a64;color:#c8ac79;font-size:20px;line-height:1.4;letter-spacing:2px;white-space:nowrap}
+.greeting-visual{position:absolute;left:430px;top:110px;width:600px;height:684px;text-align:center}
+.greeting-shirt{position:absolute;left:0;top:0;width:600px;height:650px}
+.greeting-shirt>img{position:absolute;left:20px;top:var(--shirt-offset-y,0px);width:560px;height:650px;object-fit:contain}
+.greeting-shirt[data-open="false"]{filter:grayscale(1) brightness(.65)}
+.greeting-revealed-card{position:absolute;left:80px;top:120.35px;width:440px;height:550px}
+.greeting-revealed-card img{width:100%;height:500px;object-fit:contain;filter:drop-shadow(0 12px 25px #08040970)}
+.greeting-revealed-card>span{position:absolute;left:-30px;right:-30px;top:461.65px;display:block;font-size:28px;line-height:1.3;color:#f2e1b6;letter-spacing:2px;margin:0}
+.greeting-player-actions{position:absolute;left:110px;top:118px;width:270px;height:680px}
+.greeting-gift-wrap{position:absolute;left:0;width:270px;text-align:center}
+.greeting-claim-slot{top:0;height:265px}
+.greeting-upgrade-slot{top:302px;height:370px}
+.greeting-player-actions .common-gift{position:relative;width:190px;height:180px;margin:0 auto}
+.greeting-player-actions .common-gift-art{width:190px;height:180px}
+.greeting-player-actions .common-gift[data-state="locked"] .common-gift-art,.greeting-player-actions .common-gift[data-state="ended"] .common-gift-art{filter:grayscale(1) brightness(.55)}
+.greeting-player-actions .claim-caption{font-size:23px;top:175px;white-space:nowrap}
+.greeting-gift-hint{margin:29px 0 0;font-size:19px;color:#bbaa92;line-height:1.4}
+.greeting-upgrade-condition{position:absolute;left:0;right:0;top:0;min-height:54px;margin:0;display:flex;align-items:center;justify-content:center;font-size:19px;color:#c6b398;line-height:1.4}
+.greeting-exchange-action{position:absolute;left:35px;top:70px;width:200px;height:220px;margin:0;padding:0;border:0;background:none;color:#ead6aa;cursor:pointer}
+.greeting-exchange-art{position:absolute;left:0;top:0;width:200px;height:186px;object-fit:contain}
+.greeting-exchange-badge{position:absolute;right:2px;top:113px;width:57px;height:57px;object-fit:contain}
+.greeting-exchange-caption{position:absolute;left:-25px;right:-25px;top:185px;font-size:25px;line-height:1.4;color:#ead6aa;white-space:nowrap}
+.greeting-exchange-action[aria-disabled="true"]{cursor:help}
+.greeting-exchange-action[data-state="locked"] .greeting-exchange-art,.greeting-exchange-action[data-state="ended"] .greeting-exchange-art{filter:grayscale(1) brightness(.55)}
+.greeting-exchange-action[data-state="claimed"] .greeting-exchange-caption{color:#c8e0af}
+.greeting-open-countdown,.greeting-calendar-status{position:absolute;left:0;right:0;top:292px;margin:0;font-size:20px;color:#bbaa92;line-height:1.4}
+.greeting-story-area{position:absolute;left:1090px;top:135px;width:680px;height:640px}
+.greeting-story-eyebrow{margin:0 0 14px;color:#ba9b6c;font-size:20px;letter-spacing:2px}
+.greeting-story-area>h2{margin:0 0 22px;font-size:42px;font-weight:650;line-height:1.3;letter-spacing:2px;color:#ecd5a3}
+.greeting-birthday{margin:-6px 0 22px;color:#c4b195;font-size:21px;letter-spacing:1px}
+.greeting-story{margin:0 0 26px;font-size:32px;line-height:1.6;letter-spacing:1px;color:#dacbb6;max-width:680px}
+.greeting-story-hint{font-size:26px;line-height:1.8;letter-spacing:1px;color:#c7b79d;margin:40px 0 0}
+.greeting-story-area>.greeting-guess-action{position:absolute;left:0;bottom:95px;display:inline-flex;min-height:64px;min-width:350px;font-size:27px;padding:14px 34px;letter-spacing:1px}
+.greeting-story-area>.greeting-guess-action[aria-disabled="true"]{color:#a6a294!important;border-color:#665d4a!important;background-image:none!important;background-color:#343237!important;box-shadow:none!important;cursor:help}
+.greeting-story-area>.greeting-guess-action[data-state="answered"]{color:#b6baa4!important;border-color:#5e6553!important;background-color:#30352c!important}
+.greeting-answer-options{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0 10px}
+.greeting-answer-options .common-action{font-size:15px;min-height:54px;min-width:0;padding:10px;letter-spacing:0;justify-content:flex-start}
+.greeting-answer-options .common-action>span{color:#66502f;margin:0 12px 0 4px}
+.greeting-answer-feedback{min-height:24px;margin:14px 0 0;color:#e9b894;font-size:14px}
+.greeting-choices{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0 12px}
+.greeting-choice{border:1px solid #744f47;background:#1b1016;color:#e4d0a6;padding:8px 4px;min-width:0;cursor:pointer}
+.greeting-choice>img{width:62px;height:70px;object-fit:contain}
+.greeting-choice>strong{display:block;font-size:12px;line-height:1.6;font-weight:400;white-space:nowrap;letter-spacing:-.5px}
+.greeting-choice>small{display:block;font-size:10px;line-height:1.6;color:#a39482}
+.greeting-choice[aria-disabled="true"]{opacity:.55;cursor:help}
+.greeting-choice.is-selected{border-color:#f1d89b;box-shadow:inset 0 0 20px #cda55b22}
+.greeting-choice-hidden{display:flex;height:70px;align-items:center;justify-content:center;font-family:serif;font-size:42px;color:#755e46}
+.greeting-selection-note{min-height:36px;color:#bbab93;font-size:12px;line-height:1.8;margin:12px 0 16px}
+.greeting-choice-cancel{font-size:11px;color:#968575;margin:12px 0 0}
+dialog .common-action{font-size:15px;min-height:44px;min-width:150px;padding:10px 24px;letter-spacing:1px}
+.greeting-demo{margin:0 auto;color:#d3c4ae;font-size:13px;line-height:1.7;max-width:1080px;padding:12px 22px;background:#191216;border:1px solid #533a3c}
+.greeting-demo>summary{cursor:pointer;color:#ccb38b}
+.greeting-demo>p{margin:10px 0;color:#a99a8c;font-size:12px}
+.greeting-demo select{padding:5px 9px;background:#281b21;border:1px solid #7c6150;color:#e3cfaa;margin-left:10px;font-size:13px}
+.greeting-demo fieldset{display:flex;gap:15px;flex-wrap:wrap;margin:13px 0;border:1px solid #60433f;padding:12px}
+.greeting-demo legend{color:#b69f7e;padding:0 8px}
+.greeting-demo fieldset>label{white-space:nowrap}
+.greeting-demo .common-action{font-size:13px;min-height:36px;min-width:150px;padding:7px 18px;letter-spacing:1px}
+.greeting-demo-result{color:#d7c394!important}
+@media(prefers-reduced-motion:reduce){.greeting-track *{animation:none!important;transition:none!important}}
+
+.kings-track{position:relative;display:flex;align-items:flex-start;width:max-content;min-width:2160px;height:1080px;padding-top:220px}
+.kings-page{position:relative;flex:none;width:2160px;height:860px}
+.kings-claim-page{width:2640px}
+.kings-track img{user-select:none;pointer-events:none}
+.kings-track button{touch-action:pan-x}
+.kings-brand{position:absolute;left:0;top:0;width:1100px;height:860px}
+.kings-brand-ram{position:absolute;left:174px;top:-21px;width:864px;height:573px;mix-blend-mode:overlay}
+.kings-acquisitions{position:absolute;left:1180px;top:46px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;width:1400px;height:746px;padding:26px 20px;border:1px solid #a25b50;background:linear-gradient(145deg,#30101cde,#5c1b278f);box-shadow:inset 0 0 45px #1209103d}
+.kings-acquire-card{position:relative;min-width:0;height:692px;text-align:center}
+.kings-acquire-card h3{position:absolute;left:8px;right:8px;top:22px;margin:0;font-size:35px;font-weight:650;line-height:1.35;letter-spacing:1px;color:#f0dbab}
+.kings-acquire-intro{position:absolute;left:5px;right:5px;top:88px;margin:0;font-size:20px;line-height:1.5;color:#cbbb9f}
+.kings-mini-card{position:absolute;width:290px;height:342px}
+.kings-acquire-card .kings-mini-card{left:50%;top:140px;width:360px;height:420px;transform:translateX(-50%)}
+.kings-card-link{padding:0;border:0;background:transparent;box-shadow:none;cursor:pointer;appearance:none}
+.kings-card-link:hover .kings-card-frame{filter:brightness(1.1)}
+.kings-card-frame{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.kings-acquire-action{position:absolute;left:50%;top:590px;width:390px;min-height:78px;padding:14px 20px;transform:translateX(-50%);font-size:30px;letter-spacing:1px}
+.kings-battle::before{content:"";position:absolute;left:60px;right:60px;top:30px;bottom:45px;border:1px solid #a25b50;background:linear-gradient(145deg,#30101ce8,#5c1b278f);box-shadow:inset 0 0 55px #1209103d;pointer-events:none}
+.kings-battle-heading{position:absolute;left:140px;right:140px;top:59px}
+.kings-battle-heading h2{margin:0;font-size:40px;font-weight:650;line-height:1.35;letter-spacing:1px;color:#f0d9aa}
+.kings-photo-panel{position:absolute;left:140px;top:150px;width:500px;height:610px;margin:0}
+.kings-photo-panel>img{display:block;width:500px;height:450px;object-fit:contain}
+.kings-photo-panel figcaption{padding-top:22px;text-align:center;color:#c5af92}
+.kings-photo-panel strong{display:block;font-size:32px;font-weight:600;line-height:1.4;color:#edd8ae}
+.kings-photo-panel span{display:block;margin-top:9px;font-size:22px;line-height:1.5}
+.kings-photo-panel small{display:block;margin-top:10px;font-size:21px;line-height:1.5;color:#b7a58d}
+.kings-story{position:absolute;left:700px;top:150px;width:720px;height:610px}
+.kings-section-label{margin:0 0 22px;font-size:26px;line-height:1.4;font-weight:600;letter-spacing:2px;color:#dec18e}
+.kings-story-copy{min-height:230px;margin:0 0 26px;font-size:32px;line-height:1.6;letter-spacing:1px;color:#d5c6b1}
+.kings-story h3{margin:0 0 18px;font-size:30px;line-height:1.4;font-weight:600;letter-spacing:1px;color:#ecd6ad;text-align:center}
+.kings-icon-action{position:relative;display:block;flex:none;padding:0;border:0;border-radius:50%;background:transparent;box-shadow:none;appearance:none;color:#ead7ae;cursor:pointer}
+.kings-icon-action:disabled{cursor:default}
+.kings-action-art{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:contain}
+.kings-action-badge{position:absolute;right:4%;bottom:12%;z-index:1;width:35%;height:35%;object-fit:contain}
+.kings-icon-action[data-state="ready"]:hover .kings-action-art{filter:brightness(1.12)}
+.kings-icon-action[data-state="clock"] .kings-action-art{filter:brightness(.7)}
+.kings-icon-action[data-state="lock"] .kings-action-art{filter:brightness(.55)}
+.kings-challenge-action{width:218px;height:218px;margin:0 auto}
+.kings-upgrade-panel{position:absolute;left:1504px;top:124px;width:516px;height:675px;text-align:center}
+.kings-upgrade-panel .kings-mini-card{left:93px;top:0;width:330px;height:390px}
+.kings-rating-route{position:absolute;left:15px;right:15px;top:398px;margin:0;font-size:38px;font-weight:600;line-height:1.4;letter-spacing:1px;color:#f2dca7}
+.kings-rating-route span{padding:0 17px;color:#b89464}
+.kings-exchange-action{position:absolute;left:158px;top:460px;width:200px;height:215px}
+.kings-exchange-action .kings-action-art{height:184px}
+.kings-exchange-action .kings-action-badge{right:3px;bottom:48px;width:64px;height:64px}
+.kings-icon-caption{position:absolute;left:-20px;right:-20px;top:181px;font-size:27px;font-weight:600;line-height:1.3;letter-spacing:1px;text-align:center;color:#ead7ae;pointer-events:none}
+.kings-exchange-action[data-state="check"] .kings-icon-caption{color:#c8e0af}
+
+#yangnian-login-inline{position:relative;display:block;width:100%;background:transparent;overflow:visible}
+</style>
+<div id="yangnian-login-inline">
+<main id="login-preview" class="stage" aria-label="羊名立万，春节活动交互预览">
+    <h1 class="sr-only">羊名立万 · 春节活动</h1>
+    <div class="design-canvas" data-edit-id="shared/background" data-edit-kind="background" data-edit-locked="true">
+      <div id="reward-scroll" class="reward-scroll" tabindex="0" aria-label="登录奖励，支持左右滑动及方向键浏览">
+        <div class="reward-track">
+          <img class="moving-ram" data-asset="v3/ram-moving.webp" width="864" height="573" alt="" draggable="false" aria-hidden="true">
+          <img class="moving-rail" data-asset="v3/left-rail.webp" width="36" height="1080" alt="" draggable="false" aria-hidden="true">
+          <section class="hero event-brand" data-edit-id="c1/intro" data-edit-kind="group" aria-label="新春见面礼活动介绍">
+            <img class="event-brand-title" data-asset="v2/hero-title.png" width="804" height="459" alt="羊名立万" draggable="false">
+            <img class="event-brand-year" data-asset="v2/hero-year.png" width="197" height="44" alt="2027" draggable="false">
+            <img class="event-brand-fc" data-asset="v2/hero-fc.png" width="129" height="50" alt="EA SPORTS FC MOBILE" draggable="false">
+            <h2 class="event-brand-subtitle">新春见面礼</h2>
+            <p class="event-brand-copy">每日登录礼：腊月廿四至正月十四。<br>日期奖励至正月初八，当天领取，错过不补。</p>
+            <div class="event-brand-actions"><button class="cursor-interaction common-action event-rules-button" type="button" data-overview>活动规则</button></div>
+            <div class="login-daily-main" data-edit-id="c1/daily" data-edit-kind="group">
+              <h3>每日登录礼</h3>
+              <p>每天登录，领取一份新春好礼。</p>
+              <button class="cursor-interaction common-gift" type="button" data-login-daily data-edit-id="c1/daily/claim" data-edit-kind="component" data-state="available" aria-label="领取每日登录礼"><img class="common-gift-art" data-asset="v3/hero-gift-alpha.webp" width="234" height="222" alt="" draggable="false"><span class="claim-caption">领取奖励</span></button>
+            </div>
+          </section>
+          <div id="reward-panels" class="reward-panels"></div>
+        </div>
+      </div>
+      <div id="opening-scroll" class="reward-scroll opening-scroll" tabindex="0" aria-label="踢出开门红，支持左右滑动及方向键浏览" hidden>
+        <div class="opening-track">
+          <img class="moving-ram" data-asset="v3/ram-moving.webp" width="864" height="573" alt="" draggable="false" aria-hidden="true">
+          <img class="moving-rail" data-asset="v3/left-rail.webp" width="36" height="1080" alt="" draggable="false" aria-hidden="true">
+          <section class="opening-intro event-brand" data-edit-id="c2/intro" data-edit-kind="group" aria-labelledby="opening-title">
+            <img class="event-brand-title" data-asset="v2/hero-title.png" width="804" height="459" alt="羊名立万" draggable="false">
+            <img class="event-brand-year" data-asset="v2/hero-year.png" width="197" height="44" alt="2027" draggable="false">
+            <img class="event-brand-fc" data-asset="v2/hero-fc.png" width="129" height="50" alt="EA SPORTS FC MOBILE" draggable="false">
+            <h2 id="opening-title" class="event-brand-subtitle">踢出开门红</h2>
+            <p class="event-brand-copy">除夕至正月十四，踢出新春好彩头。<br>每天领红包，比赛攒红包。</p>
+            <div class="event-brand-actions"><button class="cursor-interaction common-action event-rules-button" type="button" data-overview>活动规则</button></div>
+          </section>
+          <section class="opening-daily-panel opening-panel" data-edit-id="c2/daily" data-edit-kind="group" aria-labelledby="opening-daily-title">
+            <img class="opening-daily-art" data-asset="chapter2/envelope-1.png" alt="每日赠送的羊年主题红包" width="1024" height="1536" draggable="false">
+            <div class="opening-daily-copy"><p class="opening-kicker">新春比赛礼</p><h2 id="opening-daily-title">每日红包</h2><p>每日领取100个红包</p></div>
+            <button class="cursor-interaction common-gift opening-daily-gift" type="button" data-opening-daily data-edit-id="c2/daily/claim" data-edit-kind="component" data-state="available" aria-label="领取每日红包"><img class="common-gift-art" data-asset="reward-left-state.webp" width="234" height="222" alt="" draggable="false"><span class="claim-caption">领取红包</span></button>
+          </section>
+
+          <section class="opening-rewards opening-panel" data-edit-id="c2/cards" data-edit-kind="group" aria-labelledby="opening-rewards-title">
+            <div class="opening-section-heading"><h2 id="opening-rewards-title">攒红包，领球星</h2><p>累计红包：<strong data-opening-total>0</strong><span>／<span data-opening-card-max>4,888</span></span></p></div>
+            <div id="opening-progress" class="opening-progress" role="progressbar" aria-label="五份卡牌奖励累计进度" aria-valuemin="0" aria-valuemax="4888" aria-valuenow="0"><div id="opening-progress-fill" class="opening-progress-fill"></div><span class="opening-progress-zero" aria-hidden="true">0</span></div>
+            <div id="opening-cards" class="opening-cards"></div>
+          </section>
+
+          <section class="opening-level-combination opening-panel" aria-label="红包累计与奖励" data-edit-id="c2/growth" data-edit-kind="group">
+            <div class="opening-level-status" data-edit-id="c2/growth/progress-group" data-edit-kind="group">
+              <h2 data-edit-id="c2/growth/title" data-edit-kind="text">累计红包</h2>
+              <p class="opening-level-total"><strong data-opening-total data-edit-id="c2/growth/total" data-edit-kind="dynamic">2,800</strong><span>个</span></p>
+              <div class="opening-level-labels" data-edit-id="c2/growth/labels" data-edit-kind="group"><span data-opening-level-name data-edit-id="c2/growth/current-name" data-edit-kind="dynamic">一级红包</span><span data-opening-next-level data-edit-id="c2/growth/next-name" data-edit-kind="dynamic">二级红包</span></div>
+              <div class="opening-level-progress"><div id="opening-level-fill"></div></div>
+              <p class="opening-level-numbers" data-opening-level-progress data-edit-id="c2/growth/progress" data-edit-kind="dynamic">400／2,400</p>
+            </div>
+            <div class="opening-level-reward" data-edit-id="c2/growth/reward-group" data-edit-kind="group">
+              <p class="opening-level-reward-name" data-opening-level-display data-edit-id="c2/growth/reward-name" data-edit-kind="dynamic">一级红包 · Lv.1</p>
+              <img id="opening-level-image" class="opening-level-image" data-asset="chapter2/envelope-2.png" alt="红包奖励" width="1024" height="1536" draggable="false" data-edit-id="c2/growth/envelope" data-edit-kind="image">
+              <button class="cursor-interaction common-gift opening-level-gift" type="button" data-opening-level-claim data-state="available" aria-label="领取红包奖励" data-edit-id="c2/growth/claim" data-edit-kind="component"><img class="common-gift-art" data-asset="reward-left-state.webp" width="234" height="222" alt="" draggable="false"><span class="claim-caption">领取红包</span></button>
+            </div>
+          </section>
+        </div>
+      </div>
+      <div id="greeting-scroll" class="reward-scroll greeting-scroll" tabindex="0" aria-label="拜年有名堂，支持左右滑动及方向键浏览" hidden><div id="greeting-track" class="greeting-track"></div></div>
+      <div id="kings-scroll" class="reward-scroll kings-scroll" tabindex="0" aria-label="三羊开泰，支持左右滑动及方向键浏览" hidden><div id="kings-track" class="kings-track"></div></div>
+      <header class="top-chrome" data-edit-id="shared/navigation" data-edit-kind="group" aria-label="活动导航">
+        <img data-asset="v3/top-chrome-alpha.webp" width="2160" height="220" alt="羊名立万" draggable="false">
+        <button class="cursor-interaction art-button back" data-edit-id="shared/navigation/back" data-edit-kind="component" type="button" data-home aria-label="返回活动首屏"></button>
+        <nav class="chapters" aria-label="活动章节">
+          <button class="cursor-interaction art-button chapter is-active" type="button" data-chapter="0" aria-current="page" aria-label="新春见面礼，当前章节">新春见面礼</button>
+          <button class="cursor-interaction art-button chapter" type="button" data-chapter="1" aria-label="踢出开门红">踢出开门红</button>
+          <button class="cursor-interaction art-button chapter" type="button" data-chapter="2" aria-label="拜年有名堂">拜年有名堂</button>
+          <button class="cursor-interaction art-button chapter" type="button" data-chapter="3" aria-label="三羊开泰">三羊开泰</button>
+        </nav>
+        <button class="cursor-interaction art-button utility utility-rules" type="button" data-overview aria-label="查看活动说明"></button>
+        <button class="cursor-interaction art-button utility utility-records" type="button" data-records aria-label="查看已领取奖励"></button>
+        <button class="cursor-interaction art-button utility utility-home" data-edit-id="shared/navigation/home" data-edit-kind="component" type="button" data-home aria-label="回到活动首页"></button>
+        <div class="gm-tools">
+          <button class="cursor-interaction common-action gm-toggle" type="button" data-gm-toggle aria-expanded="false" aria-controls="gm-menu">GM</button>
+          <div id="gm-menu" class="gm-menu" aria-label="GM菜单" hidden>
+            <p class="gm-menu-date" data-gm-date>腊月廿四</p>
+            <button type="button" class="cursor-interaction common-action" data-gm-match>打一场多人</button>
+            <button type="button" class="cursor-interaction common-action" data-gm-reset>全部重置</button>
+            <button type="button" class="cursor-interaction common-action" data-gm-next>下一天</button>
+          </div>
+        </div>
+      </header>
+    </div>
+  </main>
+  <aside id="greeting-demo-controls" class="greeting-demo-controls prototype-test-controls" hidden></aside>
+
+  <dialog id="reward-dialog" data-edit-id="dialog/shell" data-edit-kind="group" aria-labelledby="dialog-title">
+    <div class="dialog-shell">
+      <button type="button" class="cursor-interaction dialog-close" data-close aria-label="关闭弹窗">×</button>
+      <p id="dialog-eyebrow" class="dialog-eyebrow">羊名立万 · 新春见面礼</p>
+      <h2 id="dialog-title"></h2>
+      <div id="dialog-body"></div>
+    </div>
+  </dialog>
+  <div id="toast" class="toast" role="status" hidden></div>
+  <div id="announcements" class="sr-only" aria-live="polite"></div>
+</div>
+<script>
+(function(global){
+  'use strict';
+  const doc=global.document;
+  const BOOT=global.__H5_EDITOR_BOOT__||{};
+  const own=(o,k)=>Object.prototype.hasOwnProperty.call(o,k);
+  const clone=o=>JSON.parse(JSON.stringify(o));
+  const finite=n=>typeof n==='number'&&Number.isFinite(n);
+  const escapeHTML=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const token=s=>String(s??'').trim().replace(/[^a-zA-Z0-9_.:/-]+/g,'-').replace(/^-+|-+$/g,'');
+  const safeValue=s=>typeof s==='string'&&s.length<500&&!/[;{}<>]|url\s*\(|expression\s*\(/i.test(s);
+  const safeImage=s=>typeof s==='string'&&s.length<30000000&&/^data:image\/(?:png|jpe?g|webp|gif|avif|svg\+xml);base64,[a-zA-Z0-9+/=\r\n]+$/i.test(s);
+  const variablesIn=s=>[...new Set([...String(s).matchAll(/\{([a-zA-Z_][\w.]*)\}/g)].map(m=>m[1]))];
+  const templates=new Map();
+  const meta=new WeakMap();
+  let config={version:1,patches:{},templates:{}};
+  let lastRoot=null;
+  let catalogWarnings=[];
+  let activeOwner=null;
+  const styleFields={fontSize:'font-size',fontFamily:'font-family',fontWeight:'font-weight',lineHeight:'line-height',color:'color',textAlign:'text-align',z:'z-index',objectFit:'object-fit',objectPosition:'object-position',backgroundSize:'background-size',backgroundPosition:'background-position'};
+  function normalizeConfig(input){
+    const value=input&&typeof input==='object'?input:{};
+    const out={version:1,patches:{},templates:{}};
+    if(value.patches&&typeof value.patches==='object'&&!Array.isArray(value.patches)){
+      Object.entries(value.patches).slice(0,10000).forEach(([id,raw])=>{
+        if(!id||id.length>250||!raw||typeof raw!=='object'||['__proto__','constructor','prototype'].includes(id))return;
+        const p={};
+        for(const k of ['x','y'])if(finite(raw[k])&&Math.abs(raw[k])<=100000)p[k]=raw[k];
+        for(const k of ['width','height'])if(finite(raw[k])&&raw[k]>=1&&raw[k]<=50000)p[k]=raw[k];
+        if(finite(raw.z)&&Math.abs(raw.z)<=9999)p.z=Math.round(raw.z);
+        if(finite(raw.fontSize)&&raw.fontSize>=1&&raw.fontSize<=1000)p.fontSize=raw.fontSize;
+        if((finite(raw.fontWeight)&&raw.fontWeight>=100&&raw.fontWeight<=1000)||['normal','bold','bolder','lighter'].includes(raw.fontWeight))p.fontWeight=raw.fontWeight;
+        if(typeof raw.fontFamily==='string'&&safeValue(raw.fontFamily))p.fontFamily=raw.fontFamily;
+        if(finite(raw.lineHeight)&&raw.lineHeight>=0.2&&raw.lineHeight<=20)p.lineHeight=raw.lineHeight;
+        else if(typeof raw.lineHeight==='string'&&/^(?:normal|\d+(?:\.\d+)?(?:px|em|%|))$/.test(raw.lineHeight))p.lineHeight=raw.lineHeight;
+        if(typeof raw.color==='string'&&safeValue(raw.color)&&(/^(?:#[a-f\d]{3,8}|rgba?\([\d\s.,%/]+\)|hsla?\([\d\s.,%/deg]+\)|[a-z]+)$/i.test(raw.color)))p.color=raw.color;
+        if(['left','center','right','justify','start','end'].includes(raw.textAlign))p.textAlign=raw.textAlign;
+        if(['contain','cover','fill','none','scale-down'].includes(raw.objectFit))p.objectFit=raw.objectFit;
+        if(typeof raw.objectPosition==='string'&&safeValue(raw.objectPosition)&&/^[\d.\-%px\sleftcenterrighttopbottom]+$/i.test(raw.objectPosition))p.objectPosition=raw.objectPosition;
+        for(const k of ['backgroundSize','backgroundPosition'])if(typeof raw[k]==='string'&&safeValue(raw[k])&&/^[\d.\-%px\sautocontaincoverleftcenterrighttopbottom]+$/i.test(raw[k]))p[k]=raw[k];
+        if(typeof raw.text==='string'&&raw.text.length<=50000)p.text=raw.text;
+        const image=typeof raw.image==='string'?raw.image:raw.image&&typeof raw.image.src==='string'?raw.image.src:null;
+        if(image&&safeImage(image))p.image=image;
+        if(['background','image'].includes(raw.target))p.target=raw.target;
+        else if(raw.image&&raw.image.target==='background')p.target='background';
+        for(const k of ['hidden','locked'])if(typeof raw[k]==='boolean')p[k]=raw[k];
+        out.patches[id]=p;
+      });
+    }
+    if(value.templates&&typeof value.templates==='object'&&!Array.isArray(value.templates))Object.entries(value.templates).slice(0,10000).forEach(([key,row])=>{
+      const text=typeof row==='string'?row:row&&row.text;
+      if(key&&key.length<=250&&typeof text==='string'&&text.length<=50000&&!['__proto__','constructor','prototype'].includes(key))out.templates[key]={text};
+    });
+    return out;
+  }
+  function validTemplate(candidate,defaultText){
+    const required=variablesIn(defaultText),actual=variablesIn(candidate);
+    return required.every(k=>actual.includes(k))&&actual.every(k=>required.includes(k));
+  }
+  function sourceTemplate(key,defaultText,patchText){
+    const candidate=config.templates[key]?.text??patchText;
+    return typeof candidate==='string'&&validTemplate(candidate,defaultText)?candidate:defaultText;
+  }
+  function renderText(source,vars){return String(source).replace(/\{([a-zA-Z_][\w.]*)\}/g,(_,key)=>own(vars,key)?String(vars[key]??''):'{'+key+'}');}
+  function registerTemplate(key,defaultText,vars={}){
+    const clean={};
+    if(vars&&typeof vars==='object')for(const [k,v] of Object.entries(vars))if(/^[a-zA-Z_][\w.]*$/.test(k)&&['string','number','boolean'].includes(typeof v))clean[k]=v;
+    const entry={key:String(key),defaultText:String(defaultText),variables:clean};
+    templates.set(entry.key,entry);return entry;
+  }
+  function template(key,defaultText,vars={}){
+    const row=registerTemplate(key,defaultText,vars),source=sourceTemplate(row.key,row.defaultText,config.patches[row.key]?.text);
+    return '<span data-edit-id="'+escapeHTML(row.key)+'" data-edit-template="'+escapeHTML(row.key)+'" data-edit-default-template="'+escapeHTML(row.defaultText)+'" data-edit-vars="'+escapeHTML(JSON.stringify(row.variables))+'">'+escapeHTML(renderText(source,row.variables))+'</span>';
+  }
+  function bindTemplate(element,key,defaultText,vars={}){
+    if(!element)return;
+    const row=registerTemplate(key,defaultText,vars);
+    element.dataset.editId=row.key;element.dataset.editTemplate=row.key;element.dataset.editDefaultTemplate=row.defaultText;element.dataset.editVars=JSON.stringify(row.variables);
+    const text=renderText(sourceTemplate(row.key,row.defaultText,config.patches[row.key]?.text),row.variables);
+    if(element.textContent!==text)element.textContent=text;
+  }
+  const player3=['van-dijk','carvajal','pirlo','de-bruyne','baggio','griezmann','milito','julio-cesar'];
+  const player4=['pele','maradona','messi'];
+  const groupClasses=['event-brand','login-daily-main','reward-panel','opening-daily-panel','opening-rewards','opening-level-combination','opening-level-status','opening-level-reward','greeting-figures','greeting-milestones','greeting-milestone','greeting-visual','greeting-story-area','kings-acquisitions','kings-acquire-card','kings-mini-card','kings-photo-panel','kings-story','kings-upgrade-panel'];
+  const candidateSelector=['button','img','h1','h2','h3','h4','p','figcaption','[data-edit-id]','[data-edit-template]','[data-opening-total]','[data-opening-level-name]','[data-opening-level-progress]','[data-opening-next-level]','[data-opening-pending]','[data-mode-status]','.greeting-light-progress strong','.greeting-milestone-progress','#opening-progress',...groupClasses.map(c=>'.'+c)].join(',');
+  const actions=['chapter','gift','card','claim','opening-card','opening-card-claim','mode-status','greeting-light','greeting-reveal','greeting-quiz','greeting-claim','greeting-upgrade','greeting-page','greeting-milestone','greeting-answer','greeting-select','kings-player','kings-page','kings-acquire','kings-buy','kings-stage','kings-challenge','kings-result','kings-exchange','kings-phase'];
+  function scopeOf(el){
+    const explicit=el.closest('[data-edit-scope]');
+    if(explicit)return token(explicit.dataset.editScope)||'dialog/current';
+    const modal=el.closest('dialog');
+    if(modal)return 'dialog/'+(token(modal.dataset.editView)||'current');
+    const g=el.closest('[data-greeting-index]');
+    if(g){const i=Number(g.dataset.greetingIndex);return i<0?'c3/overview':'c3/player/'+(player3[i]||'unknown');}
+    const k=el.closest('[data-kings-index]');
+    if(k){const i=Number(k.dataset.kingsIndex);return i===0?'c4/claim':'c4/battle/'+(player4[i-1]||'unknown');}
+    if(el.closest('.top-chrome'))return 'shared/navigation';
+    if(el.closest('#opening-scroll'))return 'c2';
+    if(el.closest('#greeting-scroll'))return 'c3';
+    if(el.closest('#kings-scroll'))return 'c4';
+    if(el.closest('#reward-scroll'))return 'c1';
+    return 'shared';
+  }
+  function semanticRole(el){
+    if(el.dataset.editTemplate)return token(el.dataset.editTemplate);
+    for(const key of actions)if(el.hasAttribute('data-'+key)){
+      let value=el.getAttribute('data-'+key);
+      if(key.startsWith('greeting-')&&/^\d+$/.test(value))value=player3[Number(value)]||value;
+      if(['kings-player','kings-acquire','kings-challenge','kings-exchange'].includes(key)&&/^\d+$/.test(value))value=player4[Number(value)]||value;
+      return token(key+(value!==''?'/'+value:''));
+    }
+    for(const key of ['login-daily','opening-daily','opening-level-claim','opening-total','opening-level-name','opening-level-progress','opening-next-level','opening-pending','overview','home','records','close','greeting-rules','kings-rules','kings-unlock'])if(el.hasAttribute('data-'+key))return key;
+    const classes=[...el.classList].filter(c=>!/^is-|^has-|^cursor-|^greeting-answered$/.test(c));
+    return token(classes.find(c=>c!=='common-action'&&c!=='art-button')||el.id||el.tagName.toLowerCase());
+  }
+  function isGroup(el){return el.dataset.editKind==='group'||groupClasses.some(c=>el.classList.contains(c));}
+  function skipAuto(el){
+    if(el.closest('[data-h5-editor-ui]')||el.classList.contains('sr-only')||el.closest('.sr-only')||el.matches('.greeting-demo-controls *'))return true;
+    if(el.closest('.greeting-figures')&&!el.classList.contains('greeting-figures'))return true;
+    const button=el.closest('button');
+    if(button&&button!==el&&!el.dataset.editTemplate)return true;
+    const mini=el.closest('.kings-mini-card');
+    if(mini&&mini!==el&&!el.hasAttribute('data-edit-id'))return true;
+    return false;
+  }
+  function catalog(root=doc){
+    if(!root||!root.querySelectorAll)return [];
+    const nodes=[...(root.matches?.(candidateSelector)?[root]:[]),...root.querySelectorAll(candidateSelector)];
+    const seen=new Map(),warnings=[];
+    for(const el of nodes){
+      if(skipAuto(el)&&!el.hasAttribute('data-edit-id'))continue;
+      let id=el.dataset.editId;
+      if(!id){
+        if(el.dataset.editTemplate)id=el.dataset.editTemplate;
+        else{
+          const scope=scopeOf(el),role=semanticRole(el);
+          const group=el.parentElement?.closest('[data-edit-id]');
+          const parentId=group&&isGroup(group)&&scopeOf(group)===scope?group.dataset.editId:scope;
+          id=parentId+'/'+role;
+          if(el.classList.contains('reward-panel')){
+            const key=el.querySelector('[data-card]')?.dataset.card?.split(',')[0];
+            if(key!==undefined)id='c1/reward-group/'+key;
+          }
+          if(el.classList.contains('greeting-milestone')){
+            const key=el.querySelector('[data-greeting-milestone]')?.dataset.greetingMilestone;
+            if(key!==undefined)id='c3/overview/milestone/'+(key==='0'?'four':'eight');
+          }
+        }
+        if(!id||seen.has(id)||root.querySelector('[data-edit-id="'+String(id).replace(/["\\]/g,'\\$&')+'"]')){warnings.push('缺少唯一语义键：'+scopeOf(el)+' / '+semanticRole(el));continue;}
+        el.dataset.editId=id;el.dataset.editAuto='true';
+      }
+      if(seen.has(id)&&seen.get(id)!==el){warnings.push('重复编辑ID：'+id);continue;}
+      seen.set(id,el);
+    }
+    catalogWarnings=[...new Set(warnings)];return [...seen.values()];
+  }
+  function imageTarget(el){return el.tagName==='IMG'?el:el.querySelector?.('.kings-card-face,.common-gift-art')||el.querySelector?.('img')||null;}
+  function isComposite(el){return el.classList.contains('greeting-figures')||el.dataset.editComposite==='true';}
+  function compositeChild(el){const group=el.closest('.greeting-figures,[data-edit-composite="true"]');return group&&group!==el;}
+  function textOnly(el){return [...el.childNodes].every(node=>node.nodeType===3||(node.nodeType===1&&node.tagName==='BR'));}
+  function plainText(el){return el?[...el.childNodes].map(node=>node.nodeType===1&&node.tagName==='BR'?'\n':node.textContent||'').join(''):'';}
+  function textTarget(el){
+    if(el.dataset.editTemplate)return el;
+    if(el.tagName==='BUTTON')return el.querySelector('[data-edit-template],.claim-caption')||(textOnly(el)?el:null);
+    return textOnly(el)?el:null;
+  }
+  function isDynamic(el){
+    const probe=el.closest('button')||el;
+    return !!(el.closest('[data-edit-kind="dynamic"]')||el.dataset.editTemplate||probe.hasAttribute('data-state')||actions.some(k=>k!=='chapter'&&probe.hasAttribute('data-'+k))||[...el.attributes].some(a=>/^data-opening-|^data-mode-status/.test(a.name))||/greeting-(?:number-only|milestone-progress)|kings-(?:rating|price|stage-caption|owned|exchange-condition|challenge-status)/.test(el.className||''));
+  }
+  function getMeta(el){
+    let m=meta.get(el);
+    if(!m){m={styles:new Map(),imageOriginal:null,textOriginal:null,textOriginalNodes:null,lastText:null,hiddenOriginal:el.hidden,baseRect:null};meta.set(el,m);}
+    return m;
+  }
+  function styleSet(el,key,value,m){
+    if(!m.styles.has(key))m.styles.set(key,{value:el.style.getPropertyValue(key),priority:el.style.getPropertyPriority(key),owner:activeOwner});
+    else m.styles.get(key).owner=activeOwner;
+    const str=String(value);
+    if(el.style.getPropertyValue(key)!==str||el.style.getPropertyPriority(key)!=='important')el.style.setProperty(key,str,'important');
+  }
+  function styleReset(el,key,m){
+    const original=m.styles.get(key);if(!original)return;
+    if(original.owner!==activeOwner)return;
+    if(original.value)el.style.setProperty(key,original.value,original.priority);else el.style.removeProperty(key);
+    m.styles.delete(key);
+  }
+  function scaleFor(el){
+    const canvas=el.closest('.design-canvas');
+    if(canvas){const value=canvas.getBoundingClientRect().width/2160;if(value>0)return value;}
+    return 1;
+  }
+  function scalePair(value){
+    if(!value||value==='none')return [1,1];
+    const parts=String(value).split(/\s+/).map(Number);
+    return [Number.isFinite(parts[0])?parts[0]:1,Number.isFinite(parts[1])?parts[1]:(Number.isFinite(parts[0])?parts[0]:1)];
+  }
+  function ancestorScale(el){
+    let x=1,y=1;
+    for(let parent=el.parentElement;parent;parent=parent.parentElement){
+      const cs=global.getComputedStyle(parent),individual=scalePair(cs.scale);x*=individual[0];y*=individual[1];
+      const matrix=cs.transform&&cs.transform.match(/^matrix\(([^)]+)\)$/);
+      if(matrix){const n=matrix[1].split(',').map(Number);x*=Math.hypot(n[0],n[1])||1;y*=Math.hypot(n[2],n[3])||1;}
+      const matrix3=cs.transform&&cs.transform.match(/^matrix3d\(([^)]+)\)$/);
+      if(matrix3){const n=matrix3[1].split(',').map(Number);x*=Math.hypot(n[0],n[1],n[2])||1;y*=Math.hypot(n[4],n[5],n[6])||1;}
+    }
+    const design=scaleFor(el);return {x:Math.abs(x/design)||1,y:Math.abs(y/design)||1};
+  }
+  function temporaryOriginal(el,key,m){
+    const original=m.styles.get(key);if(!original)return;
+    if(original.value)el.style.setProperty(key,original.value,original.priority);else el.style.removeProperty(key);
+  }
+  function componentSize(el){
+    if(el.tagName==='IMG')return false;
+    if(el.tagName==='BUTTON'||isComposite(el))return true;
+    const kind=el.dataset.editKind;
+    if(['text','dynamic','image','background'].includes(kind))return false;
+    return ['group','component'].includes(kind)||(!kind&&isGroup(el));
+  }
+  function spaceFor(el){
+    const parent=el.parentElement;
+    return parent?.closest('[data-edit-space],.event-brand,.login-daily-main,.reward-panel,.opening-daily-panel,.opening-rewards,.opening-level-status,.opening-level-reward,.greeting-figures,.greeting-milestone,.greeting-visual,.greeting-story-area,.kings-acquire-card,.kings-mini-card,.kings-photo-panel,.kings-story,.kings-upgrade-panel,.greeting-page,.kings-page,.top-chrome,dialog,.design-canvas')||el.closest('.design-canvas')||doc.documentElement;
+  }
+  function metrics(el){
+    const scale=scaleFor(el),space=spaceFor(el),r=el.getBoundingClientRect(),s=space.getBoundingClientRect();
+    return {scale,space,rect:{x:(r.left-s.left)/scale,y:(r.top-s.top)/scale,width:r.width/scale,height:r.height/scale},screenRect:{x:r.left,y:r.top,width:r.width,height:r.height}};
+  }
+  function readTemplate(target,id,m){
+    if(!target)return null;
+    let key=target.dataset.editTemplate,defaultText=target.dataset.editDefaultTemplate,vars={};
+    if(key){
+      try{vars=JSON.parse(target.dataset.editVars||'{}');}catch(error){vars={};}
+      defaultText=defaultText??templates.get(key)?.defaultText??plainText(target);
+      return registerTemplate(key,defaultText,vars);
+    }
+    if(isDynamic(target)||isDynamic(target.closest('button')||target)){
+      key=id+'/label';defaultText='{value}';
+      if(plainText(target)!==m.lastText||m.liveValue===undefined)m.liveValue=plainText(target);
+      return registerTemplate(key,defaultText,{value:m.liveValue});
+    }
+    return null;
+  }
+  function applyOne(el){
+    if(compositeChild(el))return;
+    const id=el.dataset.editId,p=config.patches[id]||{},m=getMeta(el),img=imageTarget(el),target=textTarget(el);
+    activeOwner=id;
+    const templateRow=readTemplate(target,id,m);
+    const setKeys=new Set();
+    const mark=(node,key,value,record=m)=>{styleSet(node,key,value,record);setKeys.add(key);};
+    for(const [key,css] of Object.entries(styleFields))if(own(p,key)){
+      const isFont=['fontSize','fontFamily','fontWeight','lineHeight','color','textAlign'].includes(key);
+      const node=(key==='objectFit'||key==='objectPosition')&&img?img:isFont&&el.tagName==='BUTTON'&&target?target:el;
+      const record=node===el?m:getMeta(node);
+      mark(node,css,key==='fontSize'?p[key]+'px':p[key],record);
+    }
+    if(img&&img!==el)for(const key of ['objectFit','objectPosition'])if(!own(p,key))styleReset(img,styleFields[key],getMeta(img));
+    if(target&&target!==el)for(const key of ['fontSize','fontFamily','fontWeight','lineHeight','color','textAlign'])if(!own(p,key))styleReset(target,styleFields[key],getMeta(target));
+    if(own(p,'z')&&(global.getComputedStyle(el).position==='static'||m.styles.get('position')?.owner===id))mark(el,'position','relative');
+    const resizeComponent=componentSize(el)&&(own(p,'width')||own(p,'height'));
+    let resizeBase=null;
+    if(resizeComponent){
+      // Restore native geometry only for measurement. Individual scale composes
+      // with existing transform; no child positions or business hit areas move
+      // independently of the component.
+      for(const key of ['width','height','box-sizing'])styleReset(el,key,m);
+      for(const key of ['translate','scale','transform-origin'])temporaryOriginal(el,key,m);
+      resizeBase=metrics(el).rect;
+      const nativeScale=scalePair(global.getComputedStyle(el).scale);
+      const factor=own(p,'width')&&resizeBase.width>0?p.width/resizeBase.width:own(p,'height')&&resizeBase.height>0?p.height/resizeBase.height:1;
+      mark(el,'transform-origin','0px 0px');
+      mark(el,'scale',(nativeScale[0]*factor)+' '+(nativeScale[1]*factor));
+    }else{
+      if(own(p,'width')||own(p,'height'))mark(el,'box-sizing','border-box');
+      for(const key of ['width','height'])if(own(p,key))mark(el,key,p[key]+'px');
+    }
+    for(const [key] of [...m.styles])if(!setKeys.has(key)&&!['translate','white-space','background-image'].includes(key))styleReset(el,key,m);
+    if(target){
+      let editedText=null;
+      if(templateRow){
+        const source=sourceTemplate(templateRow.key,templateRow.defaultText,p.text),value=renderText(source,templateRow.variables);
+        if(plainText(target)!==value)target.textContent=value;
+        editedText=value;
+        m.lastText=value;
+      }else if(own(p,'text')){
+        if(m.textOriginal===null){m.textOriginal=plainText(target);m.textOriginalNodes=[...target.childNodes].map(node=>node.cloneNode(true));}
+        if(plainText(target)!==p.text)target.textContent=p.text;
+        editedText=p.text;
+        m.lastText=p.text;
+      }else if(m.textOriginal!==null){target.replaceChildren(...m.textOriginalNodes.map(node=>node.cloneNode(true)));m.textOriginal=null;m.textOriginalNodes=null;m.lastText=null;}
+      if(editedText!==null&&editedText.includes('\n')&&!target.querySelector('br'))styleSet(target,'white-space','pre-wrap',getMeta(target));
+      else styleReset(target,'white-space',getMeta(target));
+    }
+    const images=isComposite(el)?[...el.querySelectorAll('img')]:img?[img]:[];
+    if(p.image){
+      if(p.target==='background'||!img){
+        mark(el,'background-image','url("'+p.image.replace(/["\\\n\r]/g,'')+'")');
+        images.forEach(node=>{const im=getMeta(node);if(im.imageOriginal!==null){node.setAttribute('src',im.imageOriginal);im.imageOriginal=null;}});
+      }else{
+        images.forEach(node=>{const im=getMeta(node);if(im.imageOriginal===null)im.imageOriginal=node.getAttribute('src');if(node.getAttribute('src')!==p.image)node.setAttribute('src',p.image);});
+        styleReset(el,'background-image',m);
+      }
+    }else{
+      styleReset(el,'background-image',m);
+      images.forEach(node=>{const im=getMeta(node);if(im.imageOriginal!==null){node.setAttribute('src',im.imageOriginal);im.imageOriginal=null;}});
+    }
+    if(own(p,'hidden')){if(el.hidden!==p.hidden)el.hidden=p.hidden;m.didHide=true;}
+    else if(m.didHide){el.hidden=m.hiddenOriginal;m.didHide=false;}
+    const hasPosition=own(p,'x')||own(p,'y')||resizeComponent;
+    if(hasPosition){
+      if(!m.styles.has('translate'))m.styles.set('translate',{value:el.style.getPropertyValue('translate'),priority:el.style.getPropertyPriority('translate'),owner:id});
+      const original=m.styles.get('translate');
+      if(original.value)el.style.setProperty('translate',original.value,original.priority);else el.style.removeProperty('translate');
+      const native=metrics(el).rect;
+      const ancestors=ancestorScale(el);
+      const dx=(own(p,'x')?p.x-native.x:resizeBase?resizeBase.x-native.x:0)/ancestors.x;
+      const dy=(own(p,'y')?p.y-native.y:resizeBase?resizeBase.y-native.y:0)/ancestors.y;
+      const nativeTranslate=global.getComputedStyle(el).translate;
+      if(nativeTranslate&&nativeTranslate!=='none'){
+        const parts=nativeTranslate.split(/\s+/);styleSet(el,'translate','calc('+parts[0]+' + '+dx+'px) calc('+(parts[1]||'0px')+' + '+dy+'px)',m);
+      }else styleSet(el,'translate',dx+'px '+dy+'px',m);
+    }else styleReset(el,'translate',m);
+    activeOwner=null;
+  }
+  function refresh(root=lastRoot||doc){
+    if(root.nodeType===9||!lastRoot)lastRoot=root.nodeType===9?root:doc;
+    const nodes=catalog(root);
+    nodes.forEach(applyOne);return nodes;
+  }
+  function kindFor(el){if(['group','component','text','image','dynamic','background'].includes(el.dataset.editKind))return el.dataset.editKind;if(el.tagName==='BUTTON')return 'button';if(el.tagName==='IMG')return 'image';if(isGroup(el))return 'group';if(textTarget(el))return 'text';return 'background';}
+  function isVisible(el,rect){
+    if(!el.getClientRects().length||!rect.width||!rect.height||el.closest('[hidden]'))return false;
+    const style=global.getComputedStyle(el);if(style.visibility==='hidden'||style.visibility==='collapse')return false;
+    let left=0,top=0,right=doc.documentElement.clientWidth||global.innerWidth,bottom=doc.documentElement.clientHeight||global.innerHeight;
+    for(let parent=el.parentElement;parent&&parent!==doc.documentElement;parent=parent.parentElement){
+      const cs=global.getComputedStyle(parent),box=parent.getBoundingClientRect();
+      if(/hidden|clip|scroll|auto/.test(cs.overflowX)){left=Math.max(left,box.left);right=Math.min(right,box.right);}
+      if(/hidden|clip|scroll|auto/.test(cs.overflowY)){top=Math.max(top,box.top);bottom=Math.min(bottom,box.bottom);}
+    }
+    return right>left&&bottom>top&&rect.x+rect.width>left&&rect.x<right&&rect.y+rect.height>top&&rect.y<bottom;
+  }
+  function layerFor(el){
+    const id=el.dataset.editId,p=config.patches[id]||{},m=getMeta(el),target=textTarget(el),img=imageTarget(el),t=readTemplate(target,id,m),mtr=metrics(el),cs=global.getComputedStyle(el),ics=img?global.getComputedStyle(img):cs,tcs=target?global.getComputedStyle(target):cs;
+    const scope=scopeOf(el),chapter=/^c[1-4](?:\/|$)/.test(scope)?Number(scope[1])-1:null;
+    const page=el.closest('[data-greeting-index]')?.dataset.greetingIndex??el.closest('[data-kings-index]')?.dataset.kingsIndex??null;
+    const label=el.dataset.editLabel||el.getAttribute('aria-label')||el.getAttribute('alt')||(plainText(target).trim().slice(0,45))||semanticRole(el);
+    const protectedChild=!!compositeChild(el),locked=protectedChild||!!(p.locked??el.dataset.editLocked==='true');
+    const templateText=t?sourceTemplate(t.key,t.defaultText,p.text):undefined;
+    return {id,label,kind:kindFor(el),chapter,page,scope,spaceId:spaceFor(el).dataset?.editId||null,rect:mtr.rect,screenRect:mtr.screenRect,scale:mtr.scale,style:{fontSize:parseFloat(tcs.fontSize)||0,color:tcs.color,lineHeight:tcs.lineHeight,textAlign:tcs.textAlign,fontFamily:tcs.fontFamily,fontWeight:tcs.fontWeight,objectFit:ics.objectFit,objectPosition:ics.objectPosition,z:parseInt(cs.zIndex,10)||0},text:templateText??plainText(target),renderedText:plainText(target),textEditable:!!target&&!protectedChild,image:protectedChild?null:img?.getAttribute('src')||null,imageEditable:!!img&&!protectedChild,composite:isComposite(el),background:cs.backgroundImage,templateKey:t?.key,templateText,defaultTemplate:t?.defaultText,variables:t?clone(t.variables):undefined,locked,hidden:el.hidden,visible:isVisible(el,mtr.screenRect),patched:own(config.patches,id)};
+  }
+  function getLayers(root=lastRoot||doc){return catalog(root).map(layerFor);}
+  function find(id,root=lastRoot||doc){return [...root.querySelectorAll('[data-edit-id]')].find(el=>el.dataset.editId===id)||null;}
+  function getLayer(id,root=lastRoot||doc){const el=find(id,root);return el?layerFor(el):null;}
+  function setConfig(value,root=lastRoot||doc){config=normalizeConfig(value);refresh(root);return clone(config);}
+  config=normalizeConfig(global.__H5_DESIGN_CONFIG__||BOOT.config);
+  global.H5EditorApply={version:1,normalizeConfig,setConfig,getConfig:()=>clone(config),catalog,refresh,getLayers,getLayer,find,metrics,template,bindTemplate,registerTemplate,renderText,validTemplate,escapeHTML,getWarnings:()=>catalogWarnings.slice()};
+  if(!global.H5EditorBridge)global.H5EditorBridge={refresh};
+  const ready=()=>refresh(doc);
+  if(doc.readyState==='loading')doc.addEventListener('DOMContentLoaded',ready,{once:true});else ready();
+})(window);
+
+(function (root, factory) {
+  'use strict';
+  var model = factory();
+  if (typeof module === 'object' && module.exports) module.exports = model;
+  if (root) root.LoginCalendarModel = model;
+})(typeof window !== 'undefined' ? window : null, function () {
+  'use strict';
+
+  // Explicit lunar demonstration dates only; no Gregorian year or clock is inferred.
+  var ACTIVITY_DAYS = 21;
+  var DATE_REWARD_END_DAY = 15;
+  var EVE_DAY = 7;
+  var TOTAL_DATE_REWARDS = 34;
+  var PHASES = Object.freeze(['before', 'active', 'ended']);
+  var lunarNames = ['廿四', '廿五', '廿六', '廿七', '廿八', '廿九', '三十'];
+  var newYearNames = ['初一', '初二', '初三', '初四', '初五', '初六', '初七', '初八', '初九', '初十', '十一', '十二', '十三', '十四'];
+  var DAYS = Object.freeze(Array.from({length: ACTIVITY_DAYS}, function (_, index) {
+    var day = index + 1;
+    var beforeNewYear = index < 7;
+    var shortLabel = beforeNewYear ? (day === EVE_DAY ? '除夕' : lunarNames[index]) : newYearNames[index - 7];
+    return Object.freeze({day: day, index: index, id: beforeNewYear ? 'la' + (24 + index) : 'zy' + String(day - 7).padStart(2, '0'), label: beforeNewYear ? '腊月' + lunarNames[index] + (day === EVE_DAY ? ' · 除夕' : '') : '正月' + shortLabel, shortLabel: shortLabel, rewardCount: day > DATE_REWARD_END_DAY ? 0 : day === EVE_DAY ? 6 : 2});
+  }));
+  var DATE_REWARD_DAYS = Object.freeze(DAYS.slice(0, DATE_REWARD_END_DAY));
+
+  function dateFor(value) {
+    if (typeof value === 'string') {
+      var byId = DAYS.find(function (date) { return date.id === value; });
+      if (byId) return byId;
+      if (value.trim() === '') return null;
+      value = Number(value);
+    }
+    return Number.isInteger(value) && value >= 1 && value <= ACTIVITY_DAYS ? DAYS[value - 1] : null;
+  }
+  function keyFor(day, slot) {
+    var date = dateFor(day);
+    return date && Number.isInteger(slot) && slot >= 0 && slot < date.rewardCount ? date.id + ':' + slot : '';
+  }
+  function canonicalKey(value) {
+    if (value === '0-0') return keyFor(1, 0);
+    if (typeof value !== 'string') return '';
+    var pair = value.split(':');
+    if (pair.length !== 2 || pair[1].trim() === '') return '';
+    return keyFor(pair[0], Number(pair[1]));
+  }
+  function unique(values) {return values.filter(function (value, index, array) {return value !== '' && array.indexOf(value) === index;});}
+  function normalize(input) {
+    var raw = input && typeof input === 'object' && !Array.isArray(input) ? input : {};
+    var candidate = raw.day !== undefined ? raw.day : raw.currentDay !== undefined ? raw.currentDay : raw.activityDay;
+    var date = dateFor(candidate);
+    if (!date && (typeof candidate === 'number' || typeof candidate === 'string')) {
+      var numeric = Number(candidate);
+      if (Number.isFinite(numeric)) date = DAYS[Math.min(ACTIVITY_DAYS, Math.max(1, Math.floor(numeric))) - 1];
+    }
+    if (!date) date = DAYS[0];
+    var claimedInput = Array.isArray(raw.claimed) ? raw.claimed : Array.isArray(raw.claimedRewards) ? raw.claimedRewards : [];
+    var daily = Array.isArray(raw.dailyClaims) ? raw.dailyClaims.map(function (value) {var entry = dateFor(value);return entry ? entry.id : '';}) : [];
+    // Legacy booleans apply once to the selected demonstration date, never all dates.
+    if (raw.dailyClaimed === true || raw.loginDailyClaimed === true) daily.push(date.id);
+    return {version: 1, day: date.day, phase: PHASES.indexOf(raw.phase) !== -1 ? raw.phase : 'active', claimed: unique(claimedInput.map(canonicalKey)), dailyClaims: unique(daily)};
+  }
+  function createState(value) {
+    if (value === 'before') return normalize({phase: 'before'});
+    if (value === 'ended') return normalize({day: ACTIVITY_DAYS, phase: 'ended'});
+    return normalize(typeof value === 'number' || typeof value === 'string' ? {day: value} : value);
+  }
+  function stateFor(state, date, slot) {
+    var key = keyFor(date.day, slot);
+    if (!key) return 'invalid';
+    if (state.claimed.indexOf(key) !== -1) return 'claimed';
+    if (state.phase === 'before') return 'locked';
+    if (state.phase === 'ended') return 'expired';
+    if (date.day > state.day) return 'locked';
+    if (date.day < state.day) return 'expired';
+    return 'available';
+  }
+  function rewardState(input, day, slot) {
+    var date = dateFor(day);
+    return date ? stateFor(normalize(input), date, slot) : 'invalid';
+  }
+  function derive(input) {
+    var state = normalize(input);
+    var date = DAYS[state.day - 1];
+    var dailyClaimed = state.dailyClaims.indexOf(date.id) !== -1;
+    var dailyState = dailyClaimed ? 'claimed' : state.phase === 'before' ? 'locked' : state.phase === 'ended' ? 'expired' : 'available';
+    return {date: date, day: state.day, phase: state.phase, dailyClaimed: dailyClaimed, dailyState: dailyState, canDaily: dailyState === 'available', dateRewards: DATE_REWARD_DAYS.map(function (entry) {
+      return {day: entry.day, index: entry.index, id: entry.id, label: entry.label, shortLabel: entry.shortLabel, rewardCount: entry.rewardCount, states: Array.from({length: entry.rewardCount}, function (_, slot) {return stateFor(state, entry, slot);})};
+    })};
+  }
+  function apply(input, action) {
+    var state = normalize(input);
+    var operation = action && typeof action === 'object' ? action : {};
+    var grants = [];
+    function result(changed, error) {return {state: state, changed: changed, grants: grants, error: error || null};}
+    function inactiveError() {return state.phase === 'before' ? '活动尚未开放' : state.phase === 'ended' ? '活动已结束' : '';}
+    var error, date, key;
+    switch (operation.type) {
+      case 'claim-date':
+        date = dateFor(operation.day !== undefined ? operation.day : operation.dateId !== undefined ? operation.dateId : state.day);
+        key = date ? keyFor(date.day, operation.slot) : '';
+        if (!key) return result(false, '该日期奖励不存在');
+        error = inactiveError();
+        if (error) return result(false, error);
+        if (state.claimed.indexOf(key) !== -1) return result(false, '本份日期奖励已领取');
+        if (date.day > state.day) return result(false, '该日期奖励尚未开放');
+        if (date.day < state.day) return result(false, '该日期奖励已过期，不可补领');
+        state.claimed.push(key);
+        grants.push({kind: 'date', day: date.day, id: date.id, slot: operation.slot, key: key});
+        return result(true);
+      case 'claim-daily':
+        error = inactiveError();
+        if (error) return result(false, error);
+        date = dateFor(operation.day !== undefined ? operation.day : state.day);
+        if (!date || date.day !== state.day) return result(false, '每日登录礼仅可领取演示当天奖励');
+        if (state.dailyClaims.indexOf(date.id) !== -1) return result(false, '今日登录礼已领取');
+        state.dailyClaims.push(date.id);
+        grants.push({kind: 'daily', day: date.day, id: date.id});
+        return result(true);
+      case 'set-day':
+        date = dateFor(operation.day !== undefined ? operation.day : operation.dateId);
+        if (!date) return result(false, '演示日期无效');
+        if (date.day === state.day) return result(false);
+        state.day = date.day;
+        return result(true);
+      case 'next-day':
+        error = inactiveError();
+        if (error) return result(false, error);
+        if (state.day === ACTIVITY_DAYS) state.phase = 'ended';
+        else state.day += 1;
+        return result(true);
+      case 'set-phase':
+        if (PHASES.indexOf(operation.phase) === -1) return result(false, '活动阶段无效');
+        if (state.phase === operation.phase) return result(false);
+        state.phase = operation.phase;
+        return result(true);
+      default:
+        return result(false, '操作无效');
+    }
+  }
+  return Object.freeze({DAYS: DAYS, DATE_REWARD_DAYS: DATE_REWARD_DAYS, ACTIVITY_DAYS: ACTIVITY_DAYS, DATE_REWARD_END_DAY: DATE_REWARD_END_DAY, EVE_DAY: EVE_DAY, TOTAL_DATE_REWARDS: TOTAL_DATE_REWARDS, dateFor: dateFor, keyFor: keyFor, rewardState: rewardState, normalize: normalize, createState: createState, derive: derive, apply: apply});
+});
+
+(function (root, factory) {
+  'use strict';
+  var model = factory();
+  if (typeof module === 'object' && module.exports) module.exports = model;
+  if (root) root.OpeningRedModel = model;
+})(typeof window !== 'undefined' ? window : null, function () {
+  'use strict';
+
+  var ACTIVITY_DAYS = 15;
+  var DAILY_STANDARD = 400;
+  var TOTAL_STANDARD = ACTIVITY_DAYS * DAILY_STANDARD;
+  var COMPLETION_RATIO = 0.8;
+  var MAX_THRESHOLD = TOTAL_STANDARD * COMPLETION_RATIO;
+  // Card requirements are independent of the unchanged 80% growth maximum.
+  var CARD_THRESHOLDS = Object.freeze([988, 1888, 2888, 3888, 4888]);
+  var CARD_MAX_THRESHOLD = CARD_THRESHOLDS[CARD_THRESHOLDS.length - 1];
+  var LEVEL_THRESHOLDS = Object.freeze([0, 2400, MAX_THRESHOLD]);
+  var MODES = Object.freeze(['attack', 'realtime', 'manager']);
+  var PHASES = Object.freeze(['before', 'active', 'ended']);
+
+  function owns(object, key) {
+    return Object.prototype.hasOwnProperty.call(object, key);
+  }
+
+  function firstDefined(object, keys, fallback) {
+    for (var index = 0; index < keys.length; index += 1) {
+      if (owns(object, keys[index]) && object[keys[index]] != null) return object[keys[index]];
+    }
+    return fallback;
+  }
+
+  function integer(value, fallback) {
+    if (typeof value !== 'number' && typeof value !== 'string') return fallback;
+    if (typeof value === 'string' && value.trim() === '') return fallback;
+    var number = Number(value);
+    return Number.isFinite(number) ? Math.floor(number) : fallback;
+  }
+
+  function claimList(input, minimum, maximum) {
+    var values;
+    if (Array.isArray(input)) values = input;
+    else if (input && typeof input === 'object') {
+      values = Object.keys(input).filter(function (key) { return input[key] === true; });
+    } else values = [];
+    return values.map(function (value) { return integer(value, -1); }).filter(function (value, index, array) {
+      return value >= minimum && value <= maximum && array.indexOf(value) === index;
+    }).sort(function (left, right) { return left - right; });
+  }
+
+  function eventId(value) {
+    if (typeof value !== 'string' && typeof value !== 'number') return '';
+    return String(value).trim();
+  }
+
+  function normalize(input) {
+    var source = input && typeof input === 'object' && !Array.isArray(input) ? input : {};
+    var first = firstDefined(source, ['firstMatches', 'dailyFirstMatches'], {});
+    var phase = firstDefined(source, ['phase', 'activityPhase'], 'active');
+    if (PHASES.indexOf(phase) === -1) phase = 'active';
+    var seen = Array.isArray(source.seenMatchIds) ? source.seenMatchIds : [];
+    var ids = seen.map(eventId).filter(function (id, index, array) {
+      return id !== '' && array.indexOf(id) === index;
+    });
+    var state = {
+      day: Math.min(ACTIVITY_DAYS, Math.max(1, integer(firstDefined(source, ['day', 'activityDay'], 1), 1))),
+      phase: phase,
+      total: Math.max(0, integer(firstDefined(source, ['total', 'totalRedPackets', 'cumulative'], 0), 0)),
+      dailyClaimed: firstDefined(source, ['dailyClaimed', 'dailyGiftClaimed'], false) === true,
+      firstMatches: {},
+      cardClaims: claimList(firstDefined(source, ['cardClaims', 'claimedCards'], []), 0, 4),
+      levelClaims: claimList(firstDefined(source, ['levelClaims', 'claimedLevels'], []), 1, 3),
+      seenMatchIds: ids
+    };
+    MODES.forEach(function (mode) {
+      state.firstMatches[mode] = Array.isArray(first) ? first.indexOf(mode) !== -1 : Boolean(first && first[mode] === true);
+    });
+    return state;
+  }
+
+  function createState(scenario) {
+    var base = {
+      day: 8,
+      phase: 'active',
+      total: 2800,
+      dailyClaimed: false,
+      firstMatches: {attack: false, realtime: false, manager: false},
+      cardClaims: [0, 1],
+      levelClaims: [1],
+      seenMatchIds: []
+    };
+    switch (scenario) {
+      case 'zero':
+        base.day = 1;
+        base.total = 0;
+        base.cardClaims = [];
+        base.levelClaims = [];
+        break;
+      case 'max':
+        base.day = 12;
+        base.total = MAX_THRESHOLD;
+        base.cardClaims = [];
+        base.levelClaims = [];
+        break;
+      case 'all-claimed':
+        base.day = 13;
+        base.total = 5200;
+        base.dailyClaimed = true;
+        base.cardClaims = [0, 1, 2, 3, 4];
+        base.levelClaims = [1, 2, 3];
+        break;
+      case 'before':
+        base.day = 1;
+        base.phase = 'before';
+        base.total = 0;
+        base.cardClaims = [];
+        base.levelClaims = [];
+        break;
+      case 'ended':
+        base.day = ACTIVITY_DAYS;
+        base.phase = 'ended';
+        break;
+    }
+    return normalize(base);
+  }
+
+  function derive(input) {
+    var state = normalize(input);
+    var level = state.total >= LEVEL_THRESHOLDS[2] ? 3 : state.total >= LEVEL_THRESHOLDS[1] ? 2 : 1;
+    var max = level === 3;
+    var levelTarget = LEVEL_THRESHOLDS[1] - LEVEL_THRESHOLDS[0];
+    return {
+      level: level,
+      levelProgress: max ? levelTarget : state.total - LEVEL_THRESHOLDS[level - 1],
+      levelTarget: levelTarget,
+      nextLevel: max ? null : level + 1,
+      max: max,
+      pendingLevels: [1, 2, 3].filter(function (candidate) {
+        return candidate <= level && state.levelClaims.indexOf(candidate) === -1;
+      }),
+      cardStates: CARD_THRESHOLDS.map(function (threshold, index) {
+        if (state.cardClaims.indexOf(index) !== -1) return 'claimed';
+        return state.total >= threshold ? 'available' : 'locked';
+      }),
+      canDaily: state.phase === 'active' && !state.dailyClaimed,
+      overallProgress: Math.min(1, state.total / CARD_MAX_THRESHOLD)
+    };
+  }
+
+  function apply(input, action, configuration) {
+    // Always clone nested state before an action, including unsuccessful actions.
+    var state = normalize(input);
+    var operation = action && typeof action === 'object' ? action : {};
+    var config = configuration && typeof configuration === 'object' ? configuration : {};
+    var grants = [];
+    function result(changed, error) {
+      return {state: state, changed: changed, grants: grants, error: error || null};
+    }
+    function accrualError() {
+      if (state.phase === 'before') return '活动尚未开放';
+      if (state.phase === 'ended') return '红包获取阶段已结束';
+      return null;
+    }
+    function claimError() {
+      if (state.phase === 'before') return '活动尚未开放';
+      if (state.phase === 'ended' && config.allowClaimsAfterEnd !== true) {
+        return config.allowClaimsAfterEnd === false ? '活动已结束，暂不可领取奖励' : '活动结束后的领奖规则待配置';
+      }
+      return null;
+    }
+    var error;
+    switch (operation.type) {
+      case 'claim-daily':
+        error = accrualError();
+        if (error) return result(false, error);
+        if (state.dailyClaimed) return result(false, '今日红包已领取');
+        state.dailyClaimed = true;
+        state.total += 100;
+        grants.push({kind: 'daily', amount: 100});
+        return result(true);
+
+      case 'claim-card': {
+        error = claimError();
+        if (error) return result(false, error);
+        var cardIndex = operation.index;
+        if (!Number.isInteger(cardIndex) || cardIndex < 0 || cardIndex >= CARD_THRESHOLDS.length) return result(false, '奖励不存在');
+        if (state.cardClaims.indexOf(cardIndex) !== -1) return result(false, '该卡牌奖励已领取');
+        if (state.total < CARD_THRESHOLDS[cardIndex]) return result(false, '累计红包尚未达到领取条件');
+        state.cardClaims.push(cardIndex);
+        state.cardClaims.sort(function (left, right) { return left - right; });
+        grants.push({kind: 'card', index: cardIndex});
+        return result(true);
+      }
+
+      case 'claim-levels': {
+        error = claimError();
+        if (error) return result(false, error);
+        var pending = derive(state).pendingLevels;
+        if (pending.length === 0) return result(false, '已解锁的等级红包均已领取');
+        pending.forEach(function (level) {
+          state.levelClaims.push(level);
+          grants.push({kind: 'level', level: level});
+        });
+        state.levelClaims.sort(function (left, right) { return left - right; });
+        return result(true);
+      }
+
+      case 'match': {
+        error = accrualError();
+        if (error) return result(false, error);
+        if (operation.valid !== true) return result(false, '该场比赛尚无有效结算');
+        var mode = operation.mode;
+        var known = MODES.indexOf(mode) !== -1;
+        var configured = Array.isArray(config.allowedOtherModes) && config.allowedOtherModes.indexOf(mode) !== -1;
+        if (typeof mode !== 'string' || (!known && !configured)) return result(false, '该比赛模式尚未纳入活动');
+        var id = eventId(operation.eventId);
+        if (id && state.seenMatchIds.indexOf(id) !== -1) return result(false, '该场比赛已结算');
+        var amount = known && !state.firstMatches[mode] ? 100 : 25;
+        if (known) state.firstMatches[mode] = true;
+        if (id) state.seenMatchIds.push(id);
+        state.total += amount;
+        grants.push({kind: 'progress', amount: amount, mode: mode});
+        return result(true);
+      }
+
+      case 'next-day':
+        error = accrualError();
+        if (error) return result(false, error);
+        if (state.day === ACTIVITY_DAYS) {
+          state.phase = 'ended';
+          return result(true);
+        }
+        state.day += 1;
+        state.dailyClaimed = false;
+        MODES.forEach(function (mode) { state.firstMatches[mode] = false; });
+        // Settlement IDs survive day changes, so a late duplicate cannot grant again.
+        return result(true);
+
+      case 'set-phase':
+        if (PHASES.indexOf(operation.phase) === -1) return result(false, '活动阶段无效');
+        if (state.phase === operation.phase) return result(false);
+        state.phase = operation.phase;
+        return result(true);
+
+      default:
+        return result(false, '操作无效');
+    }
+  }
+
+  return Object.freeze({
+    ACTIVITY_DAYS: ACTIVITY_DAYS,
+    DAILY_STANDARD: DAILY_STANDARD,
+    TOTAL_STANDARD: TOTAL_STANDARD,
+    COMPLETION_RATIO: COMPLETION_RATIO,
+    MAX_THRESHOLD: MAX_THRESHOLD,
+    CARD_THRESHOLDS: CARD_THRESHOLDS,
+    CARD_MAX_THRESHOLD: CARD_MAX_THRESHOLD,
+    LEVEL_THRESHOLDS: LEVEL_THRESHOLDS,
+    createState: createState,
+    normalize: normalize,
+    derive: derive,
+    apply: apply
+  });
+});
+
+(function(root,factory){
+  'use strict';
+  if(typeof module==='object'&&module.exports)module.exports=factory(require('./opening-red-model.js'));
+  else if(typeof define==='function'&&define.amd)define(['./opening-red-model'],factory);
+  else root.GMModel=factory(root.OpeningRedModel);
+})(typeof globalThis!=='undefined'?globalThis:typeof self!=='undefined'?self:this,function(defaultOpeningModel){
+  'use strict';
+
+  var LOGIN_DAYS=21;
+  var OPENING_DAYS=15;
+  var GREETING_DAYS=14;
+  var CALENDAR_LABELS=Object.freeze([
+    '腊月廿四','腊月廿五','腊月廿六','腊月廿七','腊月廿八','腊月廿九','除夕',
+    '正月初一','正月初二','正月初三','正月初四','正月初五','正月初六','正月初七',
+    '正月初八','正月初九','正月初十','正月十一','正月十二','正月十三','正月十四'
+  ]);
+  function integer(value,fallback){
+    if(typeof value!=='number'&&typeof value!=='string')return fallback;
+    if(typeof value==='string'&&value.trim()==='')return fallback;
+    var number=Number(value);
+    return Number.isFinite(number)?Math.floor(number):fallback;
+  }
+  function clamp(value,min,max){return Math.min(max,Math.max(min,value));}
+  // Calendar fields only. Claim/progress normalization belongs to each chapter.
+  function normalizeCalendar(input){
+    var value=input&&typeof input==='object'&&!Array.isArray(input)?input:{};
+    return {day:clamp(integer(value.day,1),1,LOGIN_DAYS),phase:value.phase==='ended'?'ended':'active'};
+  }
+  function calendarLabel(day){return CALENDAR_LABELS[normalizeCalendar({day:day}).day-1];}
+  function mapCalendar(input){
+    var login=normalizeCalendar(input);
+    return {
+      login:login,
+      opening:{day:clamp(login.day-6,1,OPENING_DAYS),phase:login.day<7?'before':login.phase==='ended'?'ended':'active'},
+      greeting:{day:clamp(login.day-7,1,GREETING_DAYS),phase:login.day<8?'before':login.phase==='ended'?'ended':'active'}
+    };
+  }
+  function blankPlayer(){return {clue:0,solved:false,claimed:false,played:false,upgraded:false,lit:false};}
+  function blankOpening(){
+    return {day:1,phase:'before',total:0,dailyClaimed:false,firstMatches:{attack:false,realtime:false,manager:false},cardClaims:[],levelClaims:[],seenMatchIds:[]};
+  }
+  function openingReset(model){
+    var zero=model&&typeof model.createState==='function'?model.createState('zero'):blankOpening();
+    // Build a fresh value rather than mutating the model's scenario fixture.
+    var state={day:1,phase:'before',total:0,dailyClaimed:false,firstMatches:{attack:false,realtime:false,manager:false},cardClaims:[],levelClaims:[],seenMatchIds:[]};
+    if(zero&&typeof zero==='object')state=Object.assign({},zero,state);
+    return model&&typeof model.normalize==='function'?model.normalize(state):state;
+  }
+  function makeResetSnapshot(options){
+    var opts=options&&typeof options==='object'?options:{};
+    var model=opts.openingModel||defaultOpeningModel;
+    return {
+      version:2,
+      login:{day:1,phase:'active',claimed:[],dailyClaimed:false},
+      openingRed:openingReset(model),
+      greeting:{day:1,phase:'before',players:Array.from({length:8},blankPlayer),selections:[null,null]},
+      kings:{version:1,phase:'active',unlocked:1,stage:1,owned:[false,false,false],wins:Array.from({length:3},function(){return [false,false];}),exchanged:Array.from({length:3},function(){return [false,false];})},
+      ui:{activeChapter:0,scrollPositions:{0:0,1:0,2:0,3:0}}
+    };
+  }
+  return Object.freeze({
+    version:1,
+    LOGIN_DAYS:LOGIN_DAYS,
+    OPENING_DAYS:OPENING_DAYS,
+    GREETING_DAYS:GREETING_DAYS,
+    CALENDAR_LABELS:CALENDAR_LABELS,
+    normalizeCalendar:normalizeCalendar,
+    calendarLabel:calendarLabel,
+    mapCalendar:mapCalendar,
+    makeResetSnapshot:makeResetSnapshot
+  });
+});
+
+(() => {
+  'use strict';
+  const calendarDates=['初一','初二','初三','初四','初五','初六','初七','初八','初九','初十','十一','十二','十三','十四'];
+  const openDays=[1,1,3,5,7,9,11,13];
+  const dates=openDays.map(day=>calendarDates[day-1]);
+  // Preserve each complete PNG's scale while aligning its visible hem to y=680.
+  const shirtOffsets=[-15.80,-17.58,-12.22,-11.33,7.90,1.42,7.47,11.31];
+  const players=[
+    {name:'范戴克',title:'第118分钟的头球',birthday:'1991年7月8日',number:'4',kit:'利物浦2023/24赛季红色主场球衣',answer:1,options:['拉莫斯','范戴克','费迪南德','皮克'],story:'2024年的温布利，决赛已经来到第118分钟。我迎着角球跃起，用一记头球打破漫长的僵局。终场哨响，比分定格在一比零。我戴着队长袖标，和身边的年轻队友一起，捧起了冠军奖杯。'},
+    {name:'卡瓦哈尔',title:'第十五冠，从这一跃开始',birthday:'1992年1月11日',number:'2',kit:'皇家马德里2023/24赛季白色主场球衣',answer:3,options:['拉姆','卡福','阿尔维斯','卡瓦哈尔'],story:'2024年的温布利之夜，欧冠决赛迟迟没有进球。第74分钟，我迎向克罗斯开出的角球，高高跃起，将球顶进球门。那一刻，僵局终于被打破，也为我们捧起第十五座欧冠奖杯推开了大门。'},
+    {name:'皮尔洛',title:'点球点上的轻轻一挑',birthday:'1979年5月19日',number:'21',kit:'意大利2012年蓝色国家队球衣',answer:0,options:['皮尔洛','哈维','莫德里奇','克罗斯'],story:'2012年的基辅之夜，鏖战120分钟后，我们与英格兰走上点球点。我助跑向前，轻轻将球挑向球门中央。门将已经扑向一侧，皮球缓缓落入网中。那记勺子点球，成为了那个夏天被反复回看的画面。'},
+    {name:'德布劳内',title:'左脚写下的四粒进球',birthday:'1991年6月28日',number:'17',kit:'曼城2021/22赛季白色客场球衣，带浅蓝细节',answer:2,options:['杰拉德','兰帕德','德布劳内','斯科尔斯'],story:'2022年的莫利纽之夜，我连续用左脚攻破狼队球门，开场24分钟便完成帽子戏法。下半场，我又一次将球送进球网。终场比分是五比一，而其中四粒进球，都来自我的脚下。'},
+    {name:'罗伯特·巴乔',title:'第88分钟，还没有结束',birthday:'1967年2月18日',number:'10',kit:'意大利1994年白色客场球衣',answer:3,options:['托蒂','皮耶罗','佐拉','罗伯特·巴乔'],story:'1994年的波士顿，比分落后，场上也少了一人。第88分钟，我迎着队友的回传低射破门，把意大利从出局边缘拉回。加时赛，我又将点球送进球网。那个下午，我们的世界杯还没有结束。'},
+    {name:'格列兹曼',title:'两次欢呼，通往决赛',birthday:'1991年3月21日',number:'7',kit:'法国2016年蓝色主场球衣，配深蓝袖',answer:0,options:['格列兹曼','里贝里','亨利','姆巴佩'],story:'2016年的马赛之夜，面对世界冠军德国，我先罚入一粒点球，又在门前抓住机会补射破门。两次进球，两次欢呼。终场哨响时，法国已经拿到了欧洲杯决赛的入场券。'},
+    {name:'迭戈·米利托',title:'两粒进球，结束45年等待',birthday:'1979年6月12日',number:'22',kit:'国际米兰2009/10赛季蓝黑竖条主场球衣',answer:1,options:['阿德里亚诺','迭戈·米利托','埃托奥','维埃里'],story:'2010年的马德里之夜，我先接直塞射门得手，随后在反击中带球杀入禁区，晃开面前的后卫，再将球送进远角。那一晚，我的两粒进球，让蓝黑军团等待了45年的欧洲冠军奖杯终于归来。'},
+    {name:'朱里奥·塞萨尔',title:'用指尖，留住决赛希望',birthday:'1979年9月3日',number:'12',kit:'国际米兰2009/10赛季诺坎普半决赛门将球衣',answer:2,options:['布冯','迪达','朱里奥·塞萨尔','卡西利亚斯'],story:'2010年的诺坎普之夜，我们早早少了一人。对手一脚左脚弧线球直奔远角，我纵身侧扑，将身体伸展到极限，用指尖把球挡出底线。那次扑救，留住了蓝黑军团通往决赛的希望。'}
+  ];
+  function blankPlayer(){return {clue:0,solved:false,claimed:false,played:false,upgraded:false,lit:false};}
+  function normalize(value){
+    const input=value&&typeof value==='object'?value:{};
+    const day=Math.min(14,Math.max(1,Number.isInteger(input.day)?input.day:8));
+    const phase=['before','active','ended'].includes(input.phase)?input.phase:'active';
+    return {
+      day,phase,
+      activityDay:Math.min(21,Math.max(1,Number.isInteger(input.activityDay)?input.activityDay:phase==='before'?1:7+day)),
+      players:players.map((_,i)=>{
+        const raw=Array.isArray(input.players)&&input.players[i]||{},p=blankPlayer();
+        p.solved=raw.solved===true;p.clue=p.solved?2:Math.min(2,Math.max(0,Number(raw.clue)||0));
+        p.claimed=p.solved&&raw.claimed===true;p.played=p.claimed&&raw.played===true;
+        p.upgraded=p.played&&raw.upgraded===true;p.lit=p.upgraded&&raw.lit===true;
+        return p;
+      }),
+      selections:[0,1].map(i=>Array.isArray(input.selections)&&Number.isInteger(input.selections[i])&&input.selections[i]>=0&&input.selections[i]<8?input.selections[i]:null)
+    };
+  }
+  function create(options){
+    const {viewport,track,controls,asset,openDialog,closeDialog,notify,onChange}=options;
+    let state=normalize(null),selection=null;
+    const demoSelected=new Set();
+    const clone=()=>JSON.parse(JSON.stringify(state));
+    const validPlayer=i=>Number.isInteger(i)&&i>=0&&i<players.length;
+    const validTier=tier=>tier===0||tier===1;
+    const active=()=>state.phase==='active';
+    const opened=i=>active()&&validPlayer(i)&&state.day>=openDays[i];
+    function unavailable(){
+      if(active())return false;
+      notify(state.phase==='before'?'活动尚未开放':'活动已结束，历史进度保留');return true;
+    }
+    const litCount=()=>state.players.filter(p=>p.lit).length;
+    const groupArt=()=>asset('chapter3-v2/group-user.png');
+    const shirtArt=i=>asset('chapter3-v2/shirt-'+i+'.png');
+    const cardArt=()=>asset('v2/reward-placeholder.png');
+    // Trace the original 1403 × 1121 composition in its own coordinates.
+    // Back-to-front paint order also makes every unlit foreground player an
+    // opaque occluder, so lighting a rear player cannot reveal a neighbour.
+    const groupRegions=[
+      [[310,245],[340,246],[363,256],[377,279],[388,310],[390,335],[383,359],[388,378],[388,403],[394,422],[398,435],[406,444],[407,450],[429,460],[454,470],[468,480],[477,490],[485,500],[493,520],[498,540],[500,560],[505,580],[510,600],[517,620],[522,640],[531,660],[539,680],[536,695],[525,711],[502,716],[481,704],[465,684],[455,652],[444,628],[440,711],[443,767],[415,815],[377,840],[238,852],[193,800],[172,739],[154,708],[114,704],[89,683],[68,662],[69,640],[84,607],[102,573],[113,531],[129,487],[145,465],[167,449],[204,442],[243,439],[260,424],[267,400],[260,381],[252,366],[247,350],[247,328],[253,301],[269,275],[290,255]],
+      [[335,697],[358,688],[387,688],[412,698],[433,713],[446,733],[451,750],[448,769],[461,786],[477,797],[492,790],[501,795],[507,800],[511,805],[514,810],[514,815],[518,820],[503,825],[502,830],[501,835],[500,840],[499,845],[497,850],[493,855],[490,861],[495,883],[494,913],[487,943],[488,971],[497,992],[263,992],[256,923],[259,880],[276,836],[295,808],[317,797],[333,779],[334,760],[326,741],[327,720]],
+      [[649,450],[660,450],[681,460],[700,477],[708,488],[723,492],[741,511],[751,530],[754,547],[746,570],[754,589],[743,608],[726,624],[716,646],[711,660],[717,677],[744,686],[770,703],[805,718],[828,740],[842,764],[844,788],[832,808],[817,821],[796,835],[813,863],[814,992],[449,992],[443,936],[444,869],[446,807],[456,777],[460,733],[470,732],[480,724],[490,716],[500,711],[510,707],[520,704],[530,701],[540,697],[550,693],[560,699],[570,681],[591,694],[592,680],[577,663],[563,645],[555,626],[552,603],[552,578],[551,558],[552,537],[555,530],[558,525],[560,520],[563,515],[565,510],[567,505],[571,500],[574,495],[577,490],[579,485],[586,480],[596,475],[601,470],[611,465],[620,460],[629,455]],
+      [[997,565],[1025,568],[1043,575],[1069,585],[1074,595],[1072,605],[1077,615],[1078,625],[1078,635],[1072,645],[1069,655],[1067,665],[1077,675],[1075,685],[1072,695],[1067,705],[1058,715],[1056,725],[1056,745],[1055,765],[1060,775],[1067,785],[1096,791],[1124,806],[1145,827],[1159,858],[1172,903],[1181,951],[1184,993],[814,993],[818,952],[823,914],[834,874],[849,840],[866,816],[887,800],[934,775],[951,765],[956,755],[956,735],[954,725],[952,715],[938,705],[936,695],[936,685],[935,675],[939,665],[940,655],[941,645],[939,635],[936,625],[935,615],[937,605],[938,595],[945,585],[958,575],[977,568]],
+      [[393,442],[415,418],[434,397],[464,381],[483,367],[487,348],[480,327],[478,301],[479,273],[483,247],[492,218],[511,193],[537,178],[564,180],[590,193],[611,216],[624,245],[629,270],[624,294],[613,322],[601,345],[602,365],[621,375],[642,343],[667,309],[689,264],[711,216],[731,170],[750,134],[763,91],[789,52],[802,49],[814,62],[812,80],[799,106],[796,121],[814,132],[823,157],[818,180],[807,197],[797,218],[780,242],[765,261],[747,290],[730,319],[706,349],[687,381],[680,436],[695,507],[690,599],[667,676],[591,711],[429,709],[392,627],[382,549]],
+      [[788,274],[809,264],[831,260],[850,258],[875,261],[896,275],[907,298],[915,323],[914,347],[903,363],[899,392],[917,413],[934,392],[946,366],[960,338],[961,324],[944,298],[926,276],[916,252],[900,239],[879,232],[864,220],[853,211],[854,198],[864,190],[878,192],[897,193],[917,202],[939,214],[966,232],[987,257],[1018,292],[1031,326],[1043,350],[1057,380],[1055,408],[1042,431],[1014,465],[983,489],[968,520],[955,553],[946,601],[925,655],[917,704],[906,757],[886,792],[844,809],[806,830],[772,811],[738,759],[710,695],[692,629],[685,556],[674,498],[674,456],[661,440],[653,430],[647,420],[640,410],[635,400],[629,390],[624,380],[620,370],[618,360],[621,350],[627,340],[633,330],[638,320],[646,310],[651,300],[676,278],[702,253],[719,239],[737,230],[750,217],[775,201],[796,194],[815,193],[825,202],[820,216],[800,221],[825,221],[829,229],[815,239],[800,244],[784,245],[775,252],[793,253],[797,265],[778,274],[758,277],[750,289],[743,307],[728,326],[715,348],[706,368],[699,390],[715,416],[737,431],[762,447],[780,447],[797,426],[809,417],[796,403],[786,384],[781,362],[774,341],[770,318],[777,293]],
+      [[977,426],[997,410],[1019,408],[1041,419],[1066,426],[1080,449],[1080,481],[1089,486],[1079,509],[1068,529],[1068,544],[1085,559],[1131,569],[1176,583],[1269,588],[1295,571],[1308,550],[1314,548],[1321,558],[1316,575],[1329,574],[1343,568],[1348,574],[1340,587],[1354,583],[1359,590],[1344,600],[1356,600],[1358,608],[1337,616],[1340,621],[1314,628],[1281,627],[1219,639],[1175,635],[1147,629],[1144,679],[1129,761],[1108,801],[1080,837],[991,846],[929,878],[873,878],[871,777],[890,719],[910,671],[914,613],[873,616],[846,598],[810,582],[775,578],[749,558],[734,541],[727,528],[744,518],[777,528],[818,536],[850,546],[878,552],[911,544],[936,532],[963,528],[968,506],[956,479],[955,454],[961,437]],
+      [[90,403],[109,398],[132,402],[151,413],[162,438],[150,463],[124,480],[109,486],[93,520],[73,553],[70,564],[126,565],[170,558],[194,558],[200,550],[195,535],[185,520],[181,515],[175,505],[169,490],[164,467],[173,444],[196,426],[228,420],[258,431],[277,452],[282,473],[296,483],[302,507],[287,530],[271,545],[272,559],[314,581],[329,580],[335,590],[345,600],[349,610],[345,620],[358,630],[350,640],[352,650],[356,660],[359,670],[363,680],[367,700],[341,719],[313,740],[318,760],[321,780],[325,800],[330,819],[327,850],[327,934],[318,992],[145,992],[138,926],[137,895],[133,852],[128,815],[128,780],[135,743],[142,708],[139,686],[132,666],[123,653],[115,644],[97,640],[73,637],[51,636],[30,631],[17,617],[9,599],[9,581],[10,578],[19,548],[34,510],[47,484],[62,460],[73,434],[81,418]]
+    ];
+    const groupMask=i=>'polygon('+groupRegions[i].map(([x,y])=>(x/1403*100).toFixed(3)+'% '+(y/1121*100).toFixed(3)+'%').join(',')+')';
+    const escapeText=value=>String(value).replace(/[&<>"']/g,character=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[character]));
+    const edit=(id,kind='group')=>' data-edit-id="'+id+'" data-edit-kind="'+kind+'"';
+    const text=(id,value,vars={})=>window.H5EditorApply?.template?window.H5EditorApply.template(id,value,vars):'<span'+edit(id,'text')+'>'+escapeText(String(value).replace(/\{([a-zA-Z_][\w.]*)\}/g,(_,key)=>Object.prototype.hasOwnProperty.call(vars,key)?String(vars[key]):'{'+key+'}'))+'</span>';
+    const dynamic=(id,value)=>'<span'+edit(id,'dynamic')+'>'+escapeText(value)+'</span>';
+    const button=(label,attr,extra='')=>'<button type="button" class="common-action '+extra+'" '+attr+'>'+label+'</button>';
+    const action=(id,label,attr,extra='',vars={})=>button(text(id+'/label',label,vars),attr+edit(id,'component'),extra);
+    const calendarNote=(id,details)=>Number.isInteger(details.remaining)?'<p class="greeting-open-countdown"'+edit(id+'/countdown','dynamic')+'>距开放还有 '+details.remaining+' 天</p>':details.calendarStatus?'<p class="greeting-calendar-status">'+text(id+'/calendar/'+state.phase,details.calendarStatus)+'</p>':'';
+    function gift(label,attr,status='available',hint='',id='c3/gift',hintState=status,details={}){
+      const art=status==='available'?'v3/hero-gift-alpha.webp':status==='claimed'?'reward-left-state.webp':'reward-right-state.webp';
+      return '<div class="greeting-gift-wrap '+(details.className||'')+'"'+edit(id,'group')+'><button type="button" class="common-gift" '+attr+' data-state="'+status+'" aria-label="'+label+'"'+edit(id+'/button','component')+(status==='available'?'':' aria-disabled="true"')+'><img class="common-gift-art" src="'+asset(art)+'" alt="" draggable="false"'+edit(id+'/art/'+status,'image')+' data-edit-asset="'+art+'"><span class="claim-caption">'+text(id+'/'+status,label)+'</span></button>'+(hint?'<p class="greeting-gift-hint">'+text(id+'/hint/'+hintState,hint,details.hintVars||{})+'</p>':'')+'</div>';
+    }
+    function exchange(index,status,condition,hintState,details){
+      const id='c3/player/'+index+'/upgrade',label=status==='claimed'?'已兑换':'兑换';
+      const iconState=status==='claimed'?'check':status==='available'?'ready':!opened(index)&&state.phase!=='ended'?'clock':'lock';
+      const badge=iconState==='ready'?'':'<img class="greeting-exchange-badge" src="'+asset('chapter4/badge-'+iconState+'.png')+'" alt="" aria-hidden="true" draggable="false"'+edit(id+'/badge/'+iconState,'image')+' data-edit-asset="chapter4/badge-'+iconState+'.png">';
+      return '<div class="greeting-gift-wrap greeting-upgrade-slot"'+edit(id,'group')+'><p class="greeting-upgrade-condition">'+text(id+'/condition/'+hintState,condition)+'</p><button type="button" class="greeting-exchange-action" data-greeting-upgrade="'+index+'" data-state="'+status+'" data-icon-state="'+iconState+'" aria-label="'+label+'个人升级"'+(status==='available'?'':' aria-disabled="true"')+edit(id+'/button','component')+'><img class="greeting-exchange-art" src="'+asset('chapter4/exchange-base.png')+'" alt="" aria-hidden="true" draggable="false"'+edit(id+'/art/'+status,'image')+' data-edit-asset="chapter4/exchange-base.png">'+badge+'<span class="greeting-exchange-caption">'+text(id+'/'+status,label)+'</span></button>'+calendarNote(id,details)+'</div>';
+    }
+    function overviewMarkup(){
+      const count=litCount();
+      const figures=[4,0,5,6,7,2,1,3].map(i=>{
+        const p=players[i];
+        const progress=state.players[i],status=progress.lit?'lit':opened(i)&&progress.upgraded?'ready':opened(i)?'open':'future';
+        const label=progress.solved?p.name:dates[i]+'来客';
+        const caption=progress.lit?'已点亮':!active()?(state.phase==='before'?'活动未开放':'活动已结束'):!opened(i)?dates[i]+'开启':progress.upgraded?'点击点亮':progress.solved?'继续任务':'寻找线索';
+        const particles=status==='ready'?'<svg class="greeting-ready-particles" viewBox="0 0 1403 1121" aria-hidden="true" focusable="false"><polygon points="'+groupRegions[i].map(point=>point.join(',')).join(' ')+'"/></svg>':'';
+        return '<button type="button" class="greeting-person" style="clip-path:'+groupMask(i)+'" data-greeting-light="'+i+'" data-status="'+status+'" aria-label="'+label+'，'+caption+'"'+edit('c3/overview/group/player/'+i,'dynamic')+'><img src="'+groupArt()+'" alt="" draggable="false"'+edit('c3/overview/group/player/'+i+'/art','dynamic')+' data-edit-asset="chapter3-v2/group-user.png" data-edit-shared-image="c3/overview/group/art">'+particles+'</button>';
+      }).join('');
+      const milestones=[4,8].map((threshold,tier)=>{
+        const used=state.selections[tier]!==null,available=active()&&count>=threshold;
+        const id='c3/overview/milestone/'+tier;
+        const rewardState=used?'claimed':!active()?state.phase:available?'available':'locked';
+        const rewardLabel=used?'已领取自选升级':state.phase==='before'?'活动未开放':state.phase==='ended'?'活动已结束':'领取自选升级';
+        return '<article class="greeting-milestone" data-state="'+rewardState+'"'+edit(id,'component')+'><img src="'+cardArt()+'" alt="自选升级奖励占位卡" draggable="false"'+edit(id+'/card','image')+' data-edit-asset="v2/reward-placeholder.png"><div'+edit(id+'/copy','group')+'><h3>'+text(id+'/title',threshold===8?'点亮全部{threshold}位球星':'点亮{threshold}位球星',{threshold})+'</h3><p>'+text(id+'/reward','八人自选升级 ×{quantity}',{quantity:1})+'</p><span class="greeting-milestone-progress"'+edit(id+'/progress','dynamic')+'>'+Math.min(count,threshold)+'/'+threshold+'</span>'+action(id+'/claim/'+rewardState,rewardLabel,'data-greeting-milestone="'+tier+'"'+(used||!available?' aria-disabled="true"':''))+'</div></article>';
+      }).join('');
+      return '<section class="greeting-overview greeting-page" data-greeting-index="-1" aria-label="拜年有名堂群像总览"'+edit('c3/overview','group')+'><div class="event-brand greeting-brand"'+edit('c3/overview/brand','group')+'><img class="greeting-brand-ram" src="'+asset('v3/ram-moving.webp')+'" alt="" draggable="false"'+edit('c3/overview/brand/ram','image')+' data-edit-asset="v3/ram-moving.webp"><img class="event-brand-title" src="'+asset('v2/hero-title.png')+'" width="804" height="459" alt="羊名立万" draggable="false"'+edit('c3/overview/brand/title','image')+' data-edit-asset="v2/hero-title.png"><img class="event-brand-year" src="'+asset('v2/hero-year.png')+'" width="197" height="44" alt="2027" draggable="false"'+edit('c3/overview/brand/year','image')+' data-edit-asset="v2/hero-year.png"><img class="event-brand-fc" src="'+asset('v2/hero-fc.png')+'" width="129" height="50" alt="EA SPORTS FC MOBILE" draggable="false"'+edit('c3/overview/brand/fc','image')+' data-edit-asset="v2/hero-fc.png"><h2 class="event-brand-subtitle">'+text('c3/overview/subtitle','拜年有名堂')+'</h2><p class="event-brand-copy">'+text('c3/overview/copy/intro','八位属羊球星前来拜年。')+'<br>'+text('c3/overview/copy/instruction','循着号码、球衣与往事，认出他们，点亮新春群像。')+'</p><div class="event-brand-actions"'+edit('c3/overview/actions','group')+'>'+action('c3/overview/rules','活动规则','data-greeting-rules','event-rules-button')+'</div></div><div class="greeting-collection"'+edit('c3/overview/collection','group')+'><div class="greeting-figures" data-complete="'+(count===8)+'"'+edit('c3/overview/group','group')+'><img class="greeting-group-base" src="'+groupArt()+'" width="1403" height="1121" alt="八位球星组成的拜年群像" draggable="false"'+edit('c3/overview/group/art','image')+' data-edit-asset="chapter3-v2/group-user.png">'+figures+'</div><aside class="greeting-reward-area" aria-label="群像累计点亮奖励"'+edit('c3/overview/reward-area','group')+'><p class="greeting-light-progress"'+edit('c3/overview/progress','dynamic')+'>'+text('c3/overview/progress/label','已点亮')+' <strong'+edit('c3/overview/progress/count','dynamic')+'>'+count+'</strong><span'+edit('c3/overview/progress/total','dynamic')+'>/8</span></p><div class="greeting-milestones"'+edit('c3/overview/milestones','group')+'>'+milestones+'</div></aside></div></section>';
+    }
+    function personalMarkup(p,i){
+      const progress=state.players[i],open=opened(i);
+      const id='c3/player/'+i;
+      const title=progress.solved?dynamic(id+'/name',p.name):text(id+'/title',p.title);
+      let image,copy;
+      if(progress.solved){
+        image='<div class="greeting-revealed-card"'+edit(id+'/reward','group')+'><img src="'+cardArt()+'" alt="'+p.name+'球员奖励占位卡，无能力数值" draggable="false"'+edit(id+'/reward/card','image')+' data-edit-asset="v2/reward-placeholder.png"><span'+edit(id+'/reward/name','dynamic')+'>'+p.name+'</span></div>';
+        copy='<p class="greeting-birthday"'+edit(id+'/birthday','dynamic')+'>'+p.birthday+'出生 · 生肖：羊</p><p class="greeting-story">'+text(id+'/story',p.story)+'</p>';
+      }else{
+        image='<div class="greeting-shirt" data-open="'+open+'" style="--shirt-offset-y:'+shirtOffsets[i]+'px"'+edit(id+'/clue','group')+'><img src="'+shirtArt(i)+'" alt="隐藏姓名的背面球衣，号码'+p.number+'" draggable="false"'+edit(id+'/clue/shirt','image')+' data-edit-asset="chapter3-v2/shirt-'+i+'.png"></div>';
+        if(!open){
+          const message=state.phase==='ended'?'活动已结束':state.phase==='before'?'活动未开放':'正月{date}开放';
+          copy='<p class="greeting-story-hint">'+text(id+'/unopened/message/'+state.phase,message,{date:dates[i]})+'<br>'+text(id+'/unopened/catch-up/'+state.phase,state.phase==='ended'?'已完成的领取与点亮进度保留':state.phase==='before'?'开放后可寻找拜年来客':'已开放任务可补做到正月十四')+'</p>';
+        }else{
+          copy='<p class="greeting-story">'+text(id+'/story',p.story)+'</p>';
+        }
+      }
+      const inactiveStatus=state.phase==='ended'?'ended':'locked';
+      const claimStatus=progress.claimed?'claimed':open&&progress.solved?'available':inactiveStatus;
+      const claimHintState=progress.claimed?'claimed':!active()?state.phase:!open?'future':progress.solved?'available':'need-answer';
+      const claimHint=progress.claimed?'活动球员已领取':!active()?(state.phase==='before'?'活动未开放':'活动已结束，历史进度保留'):!open?'正月{date}开放，答对身份后领取':progress.solved?'点击获得这位活动球员':'猜对他的身份后可领取';
+      const upgradeStatus=progress.upgraded?'claimed':open&&progress.played?'available':inactiveStatus;
+      const upgradeHintState=progress.upgraded?'claimed':!active()?state.phase:!open?'future':!progress.claimed?'need-player':!progress.played?'need-match':'available';
+      const upgradeCondition=progress.upgraded?'个人升级已兑换':!progress.claimed?'领取球员后，带他完成任意一场游戏':!progress.played?'带他完成任意一场游戏':'比赛已完成，可兑换升级';
+      const remaining=state.phase==='before'?Math.max(0,openDays[i]+7-state.activityDay):openDays[i]-state.day;
+      const actions='<div class="greeting-player-actions"'+edit(id+'/rewards','group')+'>'+gift(progress.claimed?'已领取神秘奖励':'领取神秘奖励','data-greeting-claim="'+i+'"',claimStatus,claimHint,id+'/claim',claimHintState,{className:'greeting-claim-slot',hintVars:{date:dates[i]}})+exchange(i,upgradeStatus,upgradeCondition,upgradeHintState,!progress.upgraded&&!open?(state.phase==='ended'?{calendarStatus:'活动已结束'}:{remaining}):{})+'</div>';
+      const guessState=progress.solved?'answered':open?'available':active()?'locked':state.phase;
+      const guess=action(id+'/quiz/'+(progress.solved?'solved':'guess'),progress.solved?'已揭晓：{name}':'猜猜他是谁','data-greeting-quiz="'+i+'" data-state="'+guessState+'"'+(!open||progress.solved?' aria-disabled="true"':''),'greeting-guess-action'+(progress.solved?' greeting-answered':''),progress.solved?{name:p.name}:{});
+      return '<section class="greeting-personal greeting-page" data-greeting-index="'+i+'" aria-label="正月'+dates[i]+'拜年来客'+(progress.solved?'，'+p.name:'')+'"'+edit(id,'group')+'><div class="greeting-personal-panel" aria-hidden="true"'+edit(id+'/panel','background')+'></div><div class="greeting-personal-header"'+edit(id+'/header','group')+'><p'+edit(id+'/date','dynamic')+'>正月'+dates[i]+'</p></div>'+actions+'<div class="greeting-visual"'+edit(id+'/visual','group')+'><span class="greeting-zodiac">'+text(id+'/zodiac','生肖 · 羊')+'</span>'+image+'</div><div class="greeting-story-area"'+edit(id+'/copy','group')+'><p class="greeting-story-eyebrow">'+text(id+'/eyebrow/'+(progress.solved?'solved':'hidden'),'拜年有名堂 · '+(progress.solved?'名字已揭晓':'认出那一刻的他'))+'</p><h2>'+title+'</h2>'+copy+guess+'</div></section>';
+    }
+    function renderControls(){
+      if(!controls)return;
+      const wasOpen=controls.querySelector('details')?.open||false;
+      const eligible=state.players.map((p,i)=>opened(i)&&p.claimed&&!p.upgraded?i:null).filter(i=>i!==null);
+      controls.innerHTML='<details class="greeting-demo"'+(wasOpen?' open':'')+'><summary>原型演示设置 · 模拟活动日与比赛结算</summary><p>仅用于演示交互，不向真实游戏账号发放奖励。初一开放两位来客，此后每两天开放一位，十三全部开放，可补做到十四。</p><label>活动日 <select data-greeting-day>'+calendarDates.map((date,i)=>'<option value="'+(i+1)+'"'+(state.day===i+1?' selected':'')+'>正月'+date+'</option>').join('')+'</select></label><fieldset><legend>本场出场的活动球员（可选多人）</legend>'+(eligible.length?eligible.map(i=>'<label><input type="checkbox" data-greeting-demo-player="'+i+'"'+(demoSelected.has(i)?' checked':'')+'> '+players[i].name+(state.players[i].played?'（已完成比赛）':'')+'</label>').join(''):'<span>先猜对并领取已开放的活动球员，再选择他参加模拟比赛。</span>')+'</fieldset>'+button('模拟比赛结算','data-greeting-demo-match')+'<p class="greeting-demo-result" role="status"></p></details>';
+    }
+    function render(){
+      track.innerHTML='<img class="moving-rail" src="'+asset('v3/left-rail.webp')+'" width="36" height="1080" alt="" draggable="false" aria-hidden="true"'+edit('c3/frame/rail','image')+' data-edit-asset="v3/left-rail.webp">'+overviewMarkup()+players.map(personalMarkup).join('');
+      renderControls();
+      window.H5EditorBridge?.refresh(track);
+    }
+    function changed(){render();if(typeof onChange==='function')onChange(clone());}
+    function goPage(index){
+      closeDialog();
+      const page=track.querySelector('[data-greeting-index="'+index+'"]');
+      if(page)viewport.scrollTo({left:page.offsetLeft,behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+    }
+    function quiz(index,error='',preview=false){
+      if(!validPlayer(index))return;
+      const p=players[index],progress=state.players[index];
+      if(!preview){
+        if(unavailable())return;
+        if(!opened(index)){notify('正月'+dates[index]+'开放');return;}
+        if(progress.solved){notify('已揭晓：'+p.name);return;}
+      }
+      openDialog('猜猜他是谁','<p class="dialog-copy">正月'+dates[index]+' · 根据球衣与往事，认出拜年来客</p><div class="greeting-answer-options">'+p.options.map((name,j)=>button('<span>'+String.fromCharCode(65+j)+'</span>'+name,(preview?'data-editor-preview-choice':'data-greeting-answer')+'="'+index+','+j+'"'+edit('c3/player/'+index+'/quiz/option/'+j,'dynamic'))).join('')+'</div><p class="greeting-answer-feedback" role="status">'+error+'</p>');
+    }
+    function previewView({view,player=0}={}){
+      if(view!=='quiz'||!Number.isInteger(player)||player<0||player>=players.length)return false;
+      quiz(player,'',true);return true;
+    }
+    function setDemoDay(day){
+      if(!Number.isInteger(day)||day<1||day>14)return false;
+      state.day=day;if(active())state.activityDay=7+day;changed();return true;
+    }
+    function restore(value){
+      state=normalize(value);selection=null;demoSelected.clear();render();
+    }
+    function syncCalendar(calendar={}){
+      const next=clone();
+      if(Object.prototype.hasOwnProperty.call(calendar,'day'))next.day=calendar.day;
+      if(Object.prototype.hasOwnProperty.call(calendar,'phase'))next.phase=calendar.phase;
+      if(Object.prototype.hasOwnProperty.call(calendar,'activityDay'))next.activityDay=calendar.activityDay;
+      restore(next);return clone();
+    }
+    function answer(index,choice){
+      if(unavailable()||!validPlayer(index))return;
+      const progress=state.players[index],p=players[index];
+      if(!opened(index)||progress.solved)return;
+      if(choice!==p.answer){quiz(index,'还没猜对，再想一想。');return;}
+      progress.solved=true;progress.clue=2;changed();closeDialog();
+      notify('原来是你，'+p.name+'！属羊的他，来向你拜年了。');
+    }
+    function claimPlayer(index){
+      if(unavailable()||!validPlayer(index))return;
+      const p=state.players[index];
+      if(!opened(index)){notify('正月'+dates[index]+'开放，届时可领取神秘奖励');return;}
+      if(!p.solved){notify('先猜对他的身份，再领取神秘奖励');return;}
+      if(p.claimed){notify('这位活动球员已领取');return;}
+      p.claimed=true;changed();
+      openDialog('拜年球员已领取','<img class="dialog-card" src="'+cardArt()+'" alt="球员占位卡"><p class="dialog-copy">'+players[index].name+'来向你拜年了。<br>带他完成任意一场游戏，返回兑换个人升级。</p>'+button('收下球员','data-close'));
+    }
+    function upgrade(index){
+      if(unavailable()||!validPlayer(index))return;
+      const p=state.players[index];
+      if(!opened(index)){notify('正月'+dates[index]+'开放，届时可完成比赛与兑换升级');return;}
+      if(!p.claimed){notify('先领取球员');return;}
+      if(p.upgraded){notify('个人升级已兑换，可查看群像点亮状态');return;}
+      if(!p.played){notify('带他完成任意一场游戏，再返回兑换个人升级');return;}
+      p.upgraded=true;changed();
+      openDialog('个人升级已兑换','<img class="dialog-card" src="'+cardArt()+'" alt="球员升级奖励"><p class="dialog-copy">'+players[index].name+'已兑换个人升级。<br>回到群像，点击对应剪影迎他加入。</p>'+button('前往群像点亮','data-greeting-page="-1"'));
+    }
+    function light(index){
+      if(unavailable()||!validPlayer(index))return;
+      const p=state.players[index];
+      if(!opened(index)){notify('正月'+dates[index]+'开放，届时可寻找他的线索');return;}
+      if(p.upgraded&&!p.lit){p.lit=true;changed();notify(players[index].name+'加入新春群像！已点亮'+litCount()+'/8');return;}
+      if(p.lit){
+        openDialog(players[index].name+' · 已点亮','<p class="dialog-copy">'+players[index].birthday+'出生 · 生肖：羊<br><br>'+players[index].story+'<br><br>球员、个人升级与群像点亮均已完成。</p>'+button('查看个人页','data-greeting-page="'+index+'"'));return;
+      }
+      goPage(index);
+    }
+    function chooseDialog(tier,message=''){
+      if(unavailable()||!validTier(tier))return;
+      const threshold=tier===0?4:8,count=litCount(),used=state.selections[tier];
+      if(count<threshold){openDialog('点亮'+threshold+'位球星','<p class="dialog-copy">已点亮 '+count+'/'+threshold+'<br>完成个人升级后，返回点击人物点亮。<br>达标可领取八人自选升级 ×1。</p>'+button('继续拜年','data-close'));return;}
+      if(used!==null){openDialog('本档自选升级已领取','<p class="dialog-copy">已为'+players[used].name+'领取本档自选升级。<br>点亮进度与个人升级均保留。</p>'+button('知道了','data-close'));return;}
+      if(!selection||selection.tier!==tier)selection={tier,index:null};
+      const optionsMarkup=players.map((p,i)=>{
+        const progress=state.players[i],eligible=progress.upgraded;
+        return '<button type="button" class="greeting-choice'+(selection.index===i?' is-selected':'')+'" data-greeting-select="'+tier+','+i+'" aria-pressed="'+(selection.index===i)+'"'+(!eligible?' aria-disabled="true"':'')+'>'+(progress.solved?'<img src="'+cardArt()+'" alt="'+p.name+'奖励占位卡">':'<span class="greeting-choice-hidden" aria-hidden="true">?</span>')+'<strong>'+(progress.solved?p.name:'尚未揭晓')+'</strong><small>'+(eligible?'可选择':progress.solved?'完成个人任务后可选':'揭晓后可选')+'</small></button>';
+      }).join('');
+      const repeated=selection.index!==null&&state.selections[1-tier]===selection.index;
+      openDialog('选择一位球员领取升级','<p class="dialog-copy">点亮'+threshold+'位球星 · 八人自选升级 ×1<br>确认前可关闭弹窗，保留本次机会。</p><div class="greeting-choices">'+optionsMarkup+'</div><p class="greeting-selection-note" role="status">'+(message||'两次自选能否用于同一人及升级档位，待正式规则确认。')+'</p>'+button(repeated?'同人升级规则待确认':'确认领取升级','data-greeting-confirm="'+tier+'"')+'<p class="greeting-choice-cancel">关闭弹窗不会消耗机会</p>');
+    }
+    function confirmChoice(tier){
+      if(unavailable()||!validTier(tier))return;
+      if(!selection||selection.tier!==tier||selection.index===null){notify('请先选择已完成个人任务的球员');return;}
+      const index=selection.index;
+      if(state.selections[tier]!==null||!state.players[index].upgraded||litCount()<(tier===0?4:8))return;
+      if(state.selections[1-tier]===index){chooseDialog(tier,'两次自选用于同一人的规则待确认。本次机会保留，可关闭后稍后使用。');return;}
+      state.selections[tier]=index;selection=null;changed();
+      openDialog('自选升级已领取','<img class="dialog-card" src="'+cardArt()+'" alt="自选升级奖励"><p class="dialog-copy">'+players[index].name+'已领取本档自选升级。<br>个人升级与点亮进度保留。</p>'+button('收下升级','data-close'));
+    }
+    function overview(){
+      openDialog('拜年有名堂 · 活动规则','<p class="dialog-copy">正月初一至初十四，共14天。<br>初一开放两名球员，此后每两天开放一名，十三全部开放。<br>已开放任务可补做到初十四。<br><br>查看背面球衣与故事，点击“猜猜他是谁”答题。<br>答错可以立即重选，不扣次数。<br>答对后主动领取球员，再带对应活动球员完成任意一场游戏。<br>个人升级与对应球员在同一天开放，无额外等待。<br>无需首发、获胜或进球，同场多位活动球员可同时完成。<br><br>比赛结算后，返回主动兑换个人升级；<br>再回到总览，点击对应剪影，才增加群像点亮数。<br><br>点亮4位和全部8位，各获得八人自选升级一次。<br>两档独立，领奖不扣进度，确认选择才消耗机会。<br>两次自选用于同一人的规则与具体升级档位待定。</p>'+button('去群像看看','data-greeting-page="-1"'));
+    }
+    function records(){
+      const rows=state.players.map((p,i)=>p.claimed?'<li><img src="'+cardArt()+'" alt=""><span>'+players[i].name+'<br><small>'+(p.lit?'已点亮群像':p.upgraded?'已升级，待点亮':p.played?'比赛完成，待领升级':'已领球员，待上场')+'</small></span><em>已领取</em></li>':'').join('');
+      const extra=state.selections.map((i,t)=>i!==null?'<li><img src="'+cardArt()+'" alt=""><span>点亮'+(t===0?4:8)+'人自选升级<br><small>'+players[i].name+'</small></span><em>已领取</em></li>':'').join('');
+      openDialog('拜年有名堂 · 领取记录',rows||extra?'<ul class="record-list">'+rows+extra+'</ul>'+button('关闭','data-close'):'<p class="dialog-copy">还没有领取活动球员。<br>循着号码、球衣与往事，认出拜年来客。</p>'+button('开始寻找','data-greeting-page="0"'));
+    }
+    function simulateMatch(indices){
+      if(unavailable())return 0;
+      if(Array.isArray(indices)){demoSelected.clear();indices.forEach(i=>{if(Number.isInteger(i)&&i>=0&&i<players.length)demoSelected.add(i);});}
+      const selected=[...demoSelected].filter(i=>opened(i)&&state.players[i].claimed&&!state.players[i].upgraded);
+      if(!selected.length){notify('请选择已经开放并领取的活动球员参加比赛');return 0;}
+      selected.forEach(i=>{state.players[i].played=true;});changed();
+      const result=controls&&controls.querySelector('.greeting-demo-result');
+      if(result)result.textContent='模拟结算完成：'+selected.map(i=>players[i].name).join('、')+'。请回到各自个人页兑换升级。';
+      notify('模拟比赛已结算，'+selected.length+'位球员可主动兑换个人升级');
+      return selected.length;
+    }
+    function handleClick(target){
+      const d=target.dataset;
+      if(d.greetingPage!==undefined){goPage(Number(d.greetingPage));return true;}
+      if(d.greetingLight!==undefined){light(Number(d.greetingLight));return true;}
+      if(d.greetingQuiz!==undefined){quiz(Number(d.greetingQuiz));return true;}
+      if(d.greetingAnswer!==undefined){const [i,j]=d.greetingAnswer.split(',').map(Number);answer(i,j);return true;}
+      if(d.greetingClaim!==undefined){claimPlayer(Number(d.greetingClaim));return true;}
+      if(d.greetingUpgrade!==undefined){upgrade(Number(d.greetingUpgrade));return true;}
+      if(d.greetingMilestone!==undefined){if(unavailable())return true;const tier=Number(d.greetingMilestone);if(!validTier(tier))return true;selection={tier,index:null};chooseDialog(tier);return true;}
+      if(d.greetingSelect!==undefined){if(unavailable())return true;const [tier,index]=d.greetingSelect.split(',').map(Number);if(!validTier(tier)||!validPlayer(index))return true;if(!state.players[index].upgraded){notify(state.players[index].solved?'完成个人任务后可选':'揭晓后可选');return true;}selection={tier,index};chooseDialog(tier);return true;}
+      if(d.greetingConfirm!==undefined){confirmChoice(Number(d.greetingConfirm));return true;}
+      if(target.hasAttribute('data-greeting-rules')){overview();return true;}
+      if(target.hasAttribute('data-greeting-demo-match')){simulateMatch();return true;}
+      return false;
+    }
+    if(controls)controls.addEventListener('change',event=>{
+      const element=event.target;
+      if(element.hasAttribute('data-greeting-day')){setDemoDay(Number(element.value));}
+      else if(element.dataset.greetingDemoPlayer!==undefined){if(unavailable())return;const i=Number(element.dataset.greetingDemoPlayer);if(element.checked)demoSelected.add(i);else demoSelected.delete(i);}
+    });
+    render();
+    return {getState:clone,restore,render,handleClick,overview,records,previewView,setDemoDay,syncCalendar,simulateMatch};
+  }
+  window.GreetingChapter={create};
+})();
+
+(() => {
+  'use strict';
+  const players=[
+    {id:'pele',name:'贝利',title:'三冠加冕',year:'1970',round:'世界杯决赛',opponent:'意大利',score:'巴西 4∶1 意大利',short:'三次捧杯，传奇加冕。',story:'1970年，墨西哥。贝利在世界杯决赛中贡献一粒进球和两次助攻，帮助巴西4∶1击败意大利。第三次捧起世界杯，他为自己的球王传奇写下加冕篇章。'},
+    {id:'maradona',name:'马拉多纳',title:'世纪传奇',year:'1986',round:'世界杯四分之一决赛',opponent:'英格兰',score:'阿根廷 2∶1 英格兰',short:'一场比赛，两个传奇瞬间。',story:'1986年，阿兹特克球场。一场比赛留下两个被反复讲述的瞬间：“上帝之手”，以及连过五人的世纪进球。马拉多纳包办两球，带领阿根廷2∶1战胜英格兰，继续向冠军前进。'},
+    {id:'messi',name:'梅西',title:'封王之战',year:'2022',round:'世界杯决赛',opponent:'法国',score:'120分钟 3∶3 · 点球大战 4∶2',short:'终章捧杯，梦想成真。',story:'2022年，卢赛尔。梅西两度破门，阿根廷与法国鏖战120分钟，比分定格在3∶3。点球大战，阿根廷4∶2胜出，梅西终于捧起世界杯，完成自己的封王之战。'}
+  ];
+  function normalize(value){
+    const raw=value&&typeof value==='object'?value:{};
+    const owned=players.map((_,i)=>Array.isArray(raw.owned)&&raw.owned[i]===true);
+    const wins=players.map((_,i)=>[0,1].map(s=>Array.isArray(raw.wins)&&Array.isArray(raw.wins[i])&&raw.wins[i][s]===true));
+    return {version:1,phase:['before','active','ended'].includes(raw.phase)?raw.phase:'active',unlocked:raw.unlocked===2?2:1,stage:raw.stage===2?2:1,owned,wins,exchanged:players.map((_,i)=>[0,1].map(s=>owned[i]&&wins[i][s]&&Array.isArray(raw.exchanged)&&Array.isArray(raw.exchanged[i])&&raw.exchanged[i][s]===true))};
+  }
+  function create(options){
+    const {viewport,track,asset,openDialog,closeDialog,notify,onChange}=options;
+    let state=normalize(null);
+    const clone=()=>JSON.parse(JSON.stringify(state));
+    const validPlayer=i=>Number.isInteger(i)&&i>=0&&i<players.length;
+    const validStage=s=>s===1||s===2;
+    const photo=i=>asset('chapter4/'+(i===1?'maradona-color':players[i].id)+'.jpg');
+    const card=()=>asset('v2/reward-placeholder.png');
+    const rating=(i,s)=>'P'+(s+(i===2?1:0)===0?'':'+'+(s+(i===2?1:0)));
+    const phaseLabel=()=>state.phase==='before'?'演示：活动未开放':state.phase==='ended'?'演示：活动已结束':'演示阶段'+state.stage;
+    const stageOpen=s=>state.phase==='active'&&s<=state.unlocked;
+    const escapeHTML=value=>String(value).replace(/[&<>"']/g,character=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[character]));
+    const edit=(id,kind)=>' data-edit-id="'+escapeHTML(id)+'" data-edit-kind="'+kind+'"';
+    function template(key,defaultText,vars={}){
+      const apply=window.H5EditorApply;
+      if(apply&&typeof apply.template==='function')return apply.template(key,defaultText,vars);
+      return escapeHTML(defaultText.replace(/\{([a-zA-Z0-9_]+)\}/g,(match,name)=>Object.prototype.hasOwnProperty.call(vars,name)?String(vars[name]):match));
+    }
+    function button(label,attrs,extra='',disabled=false,id='',captionKind='text'){
+      const caption=id?'<span'+edit(id+'/caption',captionKind)+'>'+(captionKind==='dynamic'?label:escapeHTML(label))+'</span>':label;
+      return '<button type="button" class="common-action kings-action '+extra+'" '+attrs+(disabled?' aria-disabled="true"':'')+(id?edit(id,'component'):'')+'>'+caption+'</button>';
+    }
+    const modalButton=(label,attrs,secondary=false)=>'<button type="button" class="dialog-action'+(secondary?' secondary':'')+'" '+attrs+'>'+label+'</button>';
+    function change(){render();if(typeof onChange==='function')onChange(clone());}
+    function unavailable(){
+      if(state.phase==='active')return false;
+      notify(state.phase==='before'?'演示状态：活动尚未开放':'演示状态：活动已结束；正式领取截止与补领规则待定');
+      return true;
+    }
+    function miniCard(i,id,link=false){
+      const tag=link?'button':'div';
+      return '<'+tag+' class="kings-mini-card'+(link?' kings-card-link':'')+'"'+(link?' type="button" data-kings-page="'+(i+1)+'" aria-label="查看'+players[i].name+'经典战役"':'')+edit(id,link?'component':'group')+'><img class="kings-card-frame"'+edit(id+'/frame','image')+' src="'+card()+'" alt="'+players[i].name+'球员卡占位" draggable="false"></'+tag+'>';
+    }
+    function iconAction(i,type,iconState,disabled,id,label,caption=''){
+      const art=type==='challenge'?'challenge-football':'exchange-base';
+      const badge=iconState==='ready'?'':'<img class="kings-action-badge" src="'+asset('chapter4/badge-'+iconState+'.png')+'" alt="" aria-hidden="true" draggable="false">';
+      return '<button type="button" class="kings-icon-action kings-'+type+'-action" data-kings-'+type+'="'+i+'" data-state="'+iconState+'" aria-label="'+escapeHTML(label)+'" aria-disabled="'+disabled+'"'+(disabled?' disabled':'')+edit(id,'component')+'><img class="kings-action-art" src="'+asset('chapter4/'+art+'.png')+'" alt="" aria-hidden="true" draggable="false">'+badge+(caption?'<span class="kings-icon-caption"'+edit(id+'/caption','dynamic')+'>'+template(id+'/label/'+iconState,caption)+'</span>':'')+'</button>';
+    }
+    function claimPage(){
+      const cards=players.map((p,i)=>{
+        const base='c4/acquire/'+p.id;
+        const owned=state.owned[i],active=state.phase==='active';
+        const label=owned?(i===2?'已模拟购买':'已模拟领取'):!active?(state.phase==='before'?'未开放':'已结束'):i===2?'FC币购买':'免费领取';
+        const labelState=owned?'owned':!active?state.phase:'available';
+        return [
+          '<article class="kings-acquire-card" data-kings-player="'+i+'"'+edit(base,'group')+'>',
+          '<h3'+edit(base+'/name','text')+'>'+p.name+'</h3><p class="kings-acquire-intro"'+edit(base+'/intro','text')+'>'+p.short+'</p>',
+          miniCard(i,base+'/card',true),
+          button(template(base+'/claim-label/'+labelState,label),'data-kings-acquire="'+i+'"','kings-acquire-action',owned||!active,base+'/claim-button','dynamic'),
+          '</article>'
+        ].join('');
+      }).join('');
+      return [
+        '<section class="kings-page kings-claim-page" data-kings-index="0" aria-label="三羊开泰，球员领取页"'+edit('c4/acquire/page','group')+'>',
+        '<div class="event-brand kings-brand"'+edit('c4/acquire/brand','group')+'>',
+        '<img class="kings-brand-ram"'+edit('c4/acquire/brand/ram','image')+' src="'+asset('v3/ram-moving.webp')+'" alt="" draggable="false">',
+        '<img class="event-brand-title"'+edit('c4/acquire/brand/title','image')+' src="'+asset('v2/hero-title.png')+'" width="804" height="459" alt="羊名立万" draggable="false">',
+        '<img class="event-brand-year"'+edit('c4/acquire/brand/year','image')+' src="'+asset('v2/hero-year.png')+'" width="197" height="44" alt="2027" draggable="false">',
+        '<img class="event-brand-fc"'+edit('c4/acquire/brand/fc','image')+' src="'+asset('v2/hero-fc.png')+'" width="129" height="50" alt="EA SPORTS FC MOBILE" draggable="false">',
+        '<h2 class="event-brand-subtitle"'+edit('c4/acquire/subtitle','text')+'>三羊开泰</h2>',
+        '<p class="event-brand-copy"'+edit('c4/acquire/intro','group')+'><span'+edit('c4/acquire/intro/lead','text')+'>三代球王，共赴新春。</span><br><span'+edit('c4/acquire/intro/body','text')+'>领取传奇球员，重温经典战役，挑战人机，兑换升级。</span></p>',
+        button('活动规则','data-kings-rules','event-rules-button',false,'c4/acquire/rules-button')+'</div>',
+        '<div class="kings-acquisitions"'+edit('c4/acquire/players','group')+'>'+cards+'</div></section>'
+      ].join('');
+    }
+    function battlePage(p,i){
+      const base='c4/battle/'+p.id;
+      const s=state.stage,won=state.wins[i][s-1],done=state.exchanged[i][s-1],open=stageOpen(s),owned=state.owned[i];
+      const challengeState=!open?(state.phase==='active'?'clock':'lock'):won?'check':'ready';
+      const challengeLabel=!open?(state.phase==='active'?'阶段未开放':state.phase==='before'?'活动未开放':'活动已结束'):won?'已模拟获胜':'挑战'+p.opponent+'队 · 演示';
+      const exchangeState=done?'check':!open||!owned?'lock':!won?'clock':'ready';
+      const exchangeLabel=done?'已兑换':!open?'阶段未开放，暂不可兑换':!owned?'先获取初始卡后兑换':!won?'挑战获胜后兑换':'兑换升级 · 演示';
+      return [
+        '<section class="kings-page kings-battle" data-kings-index="'+(i+1)+'" aria-label="'+p.name+'，'+p.title+'"'+edit(base+'/page','group')+'>',
+        '<header class="kings-battle-heading"'+edit(base+'/heading','group')+'><h2'+edit(base+'/title','text')+'>'+p.name+' · '+p.title+'</h2></header>',
+        '<figure class="kings-photo-panel"'+edit(base+'/photo-panel','group')+'><img'+edit(base+'/photo','image')+' src="'+photo(i)+'" alt="'+p.year+'年世界杯，'+p.name+'经典战役照片" draggable="false">',
+        '<figcaption'+edit(base+'/photo-caption','group')+'><strong'+edit(base+'/name','text')+'>'+p.name+'</strong><span'+edit(base+'/match','text')+'>'+p.year+' · '+p.round+' · 对阵'+p.opponent+'</span><small'+edit(base+'/historical-score','text')+'>历史赛果：'+p.score+'</small></figcaption></figure>',
+        '<div class="kings-story"'+edit(base+'/story-panel','group')+'><p class="kings-section-label"'+edit(base+'/story-label','text')+'>经典战役回顾</p><p class="kings-story-copy"'+edit(base+'/story','text')+'>'+p.story+'</p>',
+        '<h3'+edit(base+'/objective','text')+'>战胜'+p.opponent+'队</h3>',
+        iconAction(i,'challenge',challengeState,!open||won,base+'/challenge-button',challengeLabel),
+        '</div><aside class="kings-upgrade-panel"'+edit(base+'/upgrade-panel','group')+'>',
+        miniCard(i,base+'/card'),
+        '<p class="kings-rating-route"'+edit(base+'/rating-route','dynamic')+'>'+rating(i,s-1)+' <span>→</span> '+rating(i,s)+'</p>',
+        iconAction(i,'exchange',exchangeState,done||!open||!owned||!won,base+'/exchange-button',exchangeLabel,done?'已兑换':'兑换'),
+        '</aside></section>'
+      ].join('');
+    }
+    function render(){
+      track.innerHTML='<img class="moving-rail"'+edit('c4/rail','image')+' src="'+asset('v3/left-rail.webp')+'" width="36" height="1080" alt="" draggable="false" aria-hidden="true">'+claimPage()+players.map(battlePage).join('');
+      window.H5EditorBridge?.refresh(track);
+    }
+    function goPage(index){
+      if(!Number.isInteger(index)||index<0||index>3)return;
+      closeDialog();
+      const page=track.querySelector('[data-kings-index="'+index+'"]');
+      if(page)viewport.scrollTo({left:page.offsetLeft,behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+    }
+    function acquire(i){
+      if(!validPlayer(i)||unavailable())return;
+      if(state.owned[i]){notify(players[i].name+'已完成模拟获取，不重复领取');return;}
+      if(i===2){
+        openDialog('梅西 · 模拟FC币购买','<p class="dialog-copy">售价待定。本次仅演示购买确认流程，<br>不会读取余额、扣除FC币或向真实账号发放球员。<br><br>初始总评示意为P+1，各对应阶段始终比免费路线高1级。</p><div class="dialog-actions">'+modalButton('确认模拟购买（不扣费）','data-kings-buy')+modalButton('取消','data-close',true)+'</div>');return;
+      }
+      state.owned[i]=true;change();
+      openDialog('已模拟领取'+players[i].name,'<p class="dialog-copy">本次为原型领取演示，不向真实账号发卡。<br>'+players[i].name+'的获取状态已同步至其战役页。</p>'+modalButton('查看经典战役','data-kings-page="'+(i+1)+'"'));
+    }
+    function buy(){
+      if(unavailable())return;
+      if(state.owned[2]){notify('梅西已模拟购买，不重复处理');return;}
+      state.owned[2]=true;change();
+      openDialog('梅西 · 模拟购买完成','<p class="dialog-copy">未扣除FC币，未向真实账号发卡。<br>售价及正式FC币接口待定。</p>'+modalButton('查看封王之战','data-kings-page="3"'));
+    }
+    function challenge(i){
+      if(!validPlayer(i)||unavailable())return;
+      const s=state.stage;
+      if(!stageOpen(s)){notify('演示阶段'+s+'未开放；可在活动规则中演示开放下一阶段');return;}
+      if(state.wins[i][s-1]){notify('本阶段已记录模拟获胜，前往右侧独立兑换');return;}
+      openDialog(players[i].name+' · 模拟挑战','<p class="dialog-copy">演示阶段'+s+'，对战'+players[i].opponent+'人机。<br>本弹窗仅模拟结算，不启动真实比赛。<br><br>演示允许未持卡挑战；正式持卡要求、阵容、<br>比赛形式、难度与重试规则均待确认。</p><div class="dialog-actions">'+modalButton('演示获胜','data-kings-result="'+i+','+s+',win"')+modalButton('演示未获胜','data-kings-result="'+i+','+s+',loss"',true)+'</div>');
+    }
+    function result(i,s,outcome){
+      if(!validPlayer(i)||!validStage(s)||unavailable()||!stageOpen(s)||!['win','loss'].includes(outcome))return;
+      if(state.wins[i][s-1]){closeDialog();notify('本阶段模拟获胜已经记录');return;}
+      if(outcome==='loss'){openDialog('模拟结算 · 未获胜','<p class="dialog-copy">本阶段尚未达成升级兑换条件。<br>未发放或消耗任何资源。演示可再次尝试，<br>正式挑战次数与重试规则待定。</p>'+modalButton('知道了','data-close'));return;}
+      state.wins[i][s-1]=true;change();
+      openDialog('模拟结算 · 获胜','<p class="dialog-copy">'+players[i].name+'的演示阶段'+s+'已记录获胜。<br>获胜与兑换分开，请回右侧点击兑换升级。<br>'+(state.owned[i]?'对应初始卡已在演示中获取。':'本原型兑换展示还需先获取对应初始卡；正式前提待确认。')+'<br>本次未发放道具或真实奖励。</p>'+modalButton('返回战役页','data-close'));
+    }
+    function exchange(i){
+      if(!validPlayer(i)||unavailable())return;
+      const s=state.stage;
+      if(!stageOpen(s)){notify('本演示阶段尚未开放');return;}
+      if(state.exchanged[i][s-1]){notify('本阶段已模拟兑换，不重复处理');return;}
+      if(!state.owned[i]){openDialog('先获取对应初始卡','<p class="dialog-copy">本原型以持有对应初始卡作为兑换展示前提，<br>正式持卡要求待确认。<br>贝利和马拉多纳各自免费领取，梅西使用FC币购买。</p>'+modalButton('前往领取页','data-kings-page="0"'));return;}
+      if(!state.wins[i][s-1]){notify('先在本演示阶段战胜对应人机，再独立兑换');return;}
+      state.exchanged[i][s-1]=true;change();
+      openDialog('已模拟兑换'+players[i].name+'升级','<p class="dialog-copy">演示阶段'+s+'：'+rating(i,s-1)+' → '+rating(i,s)+'。<br>正式总评待定；梅西在对应节点始终高1级。<br><br>此次仅更新原型状态，不发卡、不扣资源。<br>兑换消耗、旧卡替换及培养继承均待确认。</p>'+modalButton('完成','data-close'));
+    }
+    function overview(){
+      const next=state.unlocked<2?modalButton('演示：开放下一阶段','data-kings-unlock'):'';
+      const stages=[1,2].map(s=>modalButton('演示阶段'+s+(s>state.unlocked?' · 未开放':'')+(s===state.stage?' · 当前':''),'data-kings-stage="'+s+'" aria-pressed="'+(s===state.stage)+'"',s!==state.stage)).join('');
+      openDialog('三羊开泰 · 活动规则','<p class="dialog-copy">贝利与马拉多纳的初始卡分别免费领取；梅西使用FC币购买，售价待定。<br>三条挑战路线同时开放，并共享后续阶段开放节点。<br><br>查看经典战役 → 模拟战胜对应人机 → 单独兑换升级。<br>梅西在每个对应节点始终比免费路线高1级；P仅表示总评关系。<br><br>本原型仅设2个明确标识的演示阶段，不代表正式阶段数；默认阶段1开放，阶段2未开放。<br>演示允许不持卡挑战；兑换展示需先获取对应卡并在本阶段模拟获胜。<br>演示不设上一阶段前置。正式持卡、前置与旧阶段补做规则待定。<br><br>不设置终极大奖，不增加活动货币；所有领取、购买、比赛结算和兑换均为演示，不扣费、不发卡。<br>开放日期、活动期限、正式总评、兑换消耗、旧卡处理、比赛难度与重复收益均待定。<br>演示的未开放与结束状态暂不办理领取、挑战或兑换，正式截止与补领规则待定。</p><div class="dialog-actions">'+stages+next+modalButton('演示：活动未开放','data-kings-phase="before"',true)+modalButton('演示：活动进行中','data-kings-phase="active"',true)+modalButton('演示：活动已结束','data-kings-phase="ended"',true)+'</div><p class="dialog-copy">当前演示：'+phaseLabel()+'；已开放'+state.unlocked+'个演示阶段。<br>切换状态保留现有演示进度。</p>');
+    }
+    function records(){
+      const rows=players.map((p,i)=>{
+        const initial=state.owned[i]?'<li><img src="'+card()+'" alt=""><span>'+p.name+' · 初始卡<br><small>'+ (i===2?'模拟FC币购买，未扣费':'模拟免费领取')+'</small></span><em>已模拟获取</em></li>':'';
+        return initial+[1,2].map(s=>state.exchanged[i][s-1]?'<li><img src="'+card()+'" alt=""><span>'+p.name+' · 演示阶段'+s+'<br><small>总评关系：'+rating(i,s-1)+' → '+rating(i,s)+'</small></span><em>已模拟兑换</em></li>':'').join('');
+      }).join('');
+      openDialog('三羊开泰 · 演示领取记录',rows?'<ul class="record-list">'+rows+'</ul><p class="dialog-copy">以上仅为原型记录，没有真实扣费或发卡。</p>'+modalButton('关闭','data-close'):'<p class="dialog-copy">暂无模拟领取、购买或兑换记录。</p>'+modalButton('前往领取页','data-kings-page="0"'));
+    }
+    function handleClick(target){
+      const d=target&&target.dataset;
+      if(!d)return false;
+      if(d.kingsPage!==undefined){goPage(Number(d.kingsPage));return true;}
+      if(d.kingsAcquire!==undefined){acquire(Number(d.kingsAcquire));return true;}
+      if(d.kingsBuy!==undefined){buy();return true;}
+      if(d.kingsStage!==undefined){const s=Number(d.kingsStage);if(validStage(s)){if(state.stage!==s){state.stage=s;change();}overview();}return true;}
+      if(d.kingsChallenge!==undefined){challenge(Number(d.kingsChallenge));return true;}
+      if(d.kingsResult!==undefined){const [i,s,outcome]=d.kingsResult.split(',');result(Number(i),Number(s),outcome);return true;}
+      if(d.kingsExchange!==undefined){exchange(Number(d.kingsExchange));return true;}
+      if(d.kingsRules!==undefined){overview();return true;}
+      if(d.kingsUnlock!==undefined){if(state.unlocked<2){state.unlocked=2;state.stage=2;change();}overview();return true;}
+      if(d.kingsPhase!==undefined){if(['before','active','ended'].includes(d.kingsPhase)){state.phase=d.kingsPhase;change();overview();}return true;}
+      return false;
+    }
+    render();
+    return {getState:clone,restore(value){state=normalize(value);render();},render,handleClick,overview,records};
+  }
+  window.KingsChapter={create};
+})();
+
+(() => {
+  'use strict';
+  const root=document.getElementById('yangnian-login-inline');
+  if(!root)return;
+  const byId=(id)=>root.querySelector('#'+id);
+  const assetData={"v3/background-fixed.webp":"[EMBEDDED_RESOURCE:131431]","v2/hero-title.png":"[EMBEDDED_RESOURCE:88935]","v2/hero-year.png":"[EMBEDDED_RESOURCE:1191]","v2/hero-fc.png":"[EMBEDDED_RESOURCE:6559]","v3/hero-gift-alpha.webp":"[EMBEDDED_RESOURCE:16027]","v3/ram-moving.webp":"[EMBEDDED_RESOURCE:140759]","v3/left-rail.webp":"[EMBEDDED_RESOURCE:15735]","v3/top-chrome-alpha.webp":"[EMBEDDED_RESOURCE:23115]","v2/reward-placeholder.png":"[EMBEDDED_RESOURCE:380135]","reward-left-state.webp":"[EMBEDDED_RESOURCE:11031]","reward-right-state.webp":"[EMBEDDED_RESOURCE:7127]","reward-check.png":"[EMBEDDED_RESOURCE:1447]","reward-gift.png":"[EMBEDDED_RESOURCE:5483]","hero-gift.png":"[EMBEDDED_RESOURCE:5483]","chapter2/envelope-1.png":"[EMBEDDED_RESOURCE:456943]","chapter2/envelope-2.png":"[EMBEDDED_RESOURCE:439159]","chapter2/envelope-3.png":"[EMBEDDED_RESOURCE:492031]","chapter3-v2/group-user.png":"[EMBEDDED_RESOURCE:345343]","chapter4/pele.jpg":"[EMBEDDED_RESOURCE:977319]","chapter4/messi.jpg":"[EMBEDDED_RESOURCE:499659]","chapter4/maradona-color.jpg":"[EMBEDDED_RESOURCE:533603]","chapter4/challenge-football.png":"[EMBEDDED_RESOURCE:373319]","chapter4/exchange-base.png":"[EMBEDDED_RESOURCE:321879]","chapter4/badge-check.png":"[EMBEDDED_RESOURCE:88727]","chapter4/badge-clock.png":"[EMBEDDED_RESOURCE:97735]","chapter4/badge-lock.png":"[EMBEDDED_RESOURCE:102295]","chapter3-v2/shirt-0.png":"[EMBEDDED_RESOURCE:276623]","chapter3-v2/shirt-1.png":"[EMBEDDED_RESOURCE:291695]","chapter3-v2/shirt-2.png":"[EMBEDDED_RESOURCE:326751]","chapter3-v2/shirt-3.png":"[EMBEDDED_RESOURCE:249635]","chapter3-v2/shirt-4.png":"[EMBEDDED_RESOURCE:289151]","chapter3-v2/shirt-5.png":"[EMBEDDED_RESOURCE:265211]","chapter3-v2/shirt-6.png":"[EMBEDDED_RESOURCE:258687]","chapter3-v2/shirt-7.png":"[EMBEDDED_RESOURCE:207639]"};
+  const resolveAsset=(name)=>assetData[name]||'';
+  root.querySelectorAll('[data-asset]').forEach(img=>{img.src=resolveAsset(img.dataset.asset);});
+  const cssAssets={"v3/background-fixed.webp":"--art-v3-background-fixed-webp","v3/ram-moving.webp":"--art-v3-ram-moving-webp"};
+  Object.entries(cssAssets).forEach(([name,key])=>root.style.setProperty(key,'url("'+resolveAsset(name)+'")'));
+  const stage=byId('login-preview');
+  const viewport=byId('reward-scroll');
+  const openingViewport=byId('opening-scroll');
+  const greetingViewport=byId('greeting-scroll');
+  const kingsViewport=byId('kings-scroll');
+  const greetingControls=byId('greeting-demo-controls');
+  const panels=byId('reward-panels');
+  const openingCards=byId('opening-cards');
+  const dialog=byId('reward-dialog');
+  const dialogTitle=byId('dialog-title');
+  const dialogEyebrow=byId('dialog-eyebrow');
+  const dialogBody=byId('dialog-body');
+  const toast=byId('toast');
+  const announcements=byId('announcements');
+  const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)');
+  const params=new URLSearchParams(location.search);
+  const editorBoot=window.__H5_EDITOR_BOOT__||null;
+  const demoEnabled=params.get('demo')==='1';
+  const session=params.get('session');
+  const storageKey='yangnian-activity-v2:'+(window.__H5_EXPORT_ID__||session);
+  const legacyStorageKey='yangnian-login-psd-v1:'+session;
+  const Model=window.OpeningRedModel;
+  const gameConfig={allowedOtherModes:[],allowClaimsAfterEnd:false};
+  const cardThresholds=Model.CARD_THRESHOLDS;
+  const cardMax=Model.CARD_MAX_THRESHOLD;
+  const Login=window.LoginCalendarModel;
+  const GM=window.GMModel;
+  let loginState=Login.createState();
+  const scrollPositions={0:0,1:0,2:0,3:0};
+  const chapterNames=['新春见面礼','踢出开门红','拜年有名堂','三羊开泰'];
+  const groups=Login.DATE_REWARD_DAYS;
+  const asset=(name)=>resolveAsset(name);
+  const rewardName=()=> '日期限定奖励';
+  const keyFor=(day,slot)=>Login.keyFor(day,slot);
+  const number=(value)=>Number(value).toLocaleString('en-US');
+  const levelName=(level)=>'红包奖励'+level;
+  const envelopeNames=['一级红包','二级红包','三级红包'];
+  const behavior=()=>reducedMotion.matches?'auto':'smooth';
+  let openingState=Model.createState(params.get('openingScenario')||'zero');
+  let activeChapter=0,scale=1,lastDragEnd=0,toastTimer=0,lastFocus=null,focusOnClose=null,lastPublishedSnapshot='';
+  let hasRestoredBusiness=false,gmBatch=false;
+  const bridgeWriter=window.crypto?.randomUUID?.()||Date.now().toString(36)+'-'+Math.random().toString(36).slice(2);
+  let bridgeRevision=0;
+
+  const greeting=window.GreetingChapter.create({viewport:greetingViewport,track:byId('greeting-track'),controls:greetingControls,asset,openDialog,closeDialog,notify,onChange:save});
+  const kings=window.KingsChapter.create({viewport:kingsViewport,track:byId('kings-track'),asset,openDialog,closeDialog,notify,onChange:save});
+  function stateFor(day,slot){return Login.rewardState(loginState,day,slot);}
+  function editorRefresh(root=stage){window.H5EditorBridge?.refresh(root);window.H5EditorApply?.refresh(root);}
+  function bindTemplate(el,key,text,vars={}){if(!el)return;if(window.H5EditorApply)window.H5EditorApply.bindTemplate(el,key,text,vars);else el.textContent=text.replace(/\{(\w+)\}/g,(_,k)=>vars[k]??'');}
+  function currentViewport(){return [viewport,openingViewport,greetingViewport,kingsViewport][activeChapter];}
+  function readJSON(key){if(editorBoot)return null;try{return JSON.parse(localStorage.getItem(key)||'null');}catch(error){return null;}}
+  function validScroll(value){return typeof value==='number'&&Number.isFinite(value)?Math.max(0,value):0;}
+  function restoreSnapshot(snapshot,render){
+    if(!snapshot||typeof snapshot!=='object')return false;
+    const state=snapshot.privateContent||snapshot;
+    const model=snapshot.modelContent||snapshot;
+    if((state.exportId||window.__H5_EXPORT_ID__)&&state.exportId!==window.__H5_EXPORT_ID__)return false;
+    let restored=false;
+    if(state&&state.version===2){
+      if(state.login)loginState=Login.normalize(state.login);
+      if(state.openingRed&&typeof state.openingRed==='object')openingState=Model.normalize(state.openingRed);
+      if(state.greeting){greeting.restore(state.greeting);greeting.syncCalendar({activityDay:loginState.day});}
+      if(state.kings)kings.restore(state.kings);
+      if(state.ui&&typeof state.ui==='object'){
+        activeChapter=[0,1,2,3].includes(state.ui.activeChapter)?state.ui.activeChapter:0;
+        const positions=state.ui.scrollPositions||{};
+        for(const index of [0,1,2,3])scrollPositions[index]=validScroll(positions[index]);
+      }
+      restored=true;
+    }else{
+      const legacy=state&&state.version===1&&Array.isArray(state.claimed)?state.claimed:
+        model&&model.preview==='羊年登录礼'&&Array.isArray(model.claimedRewards)?model.claimedRewards:null;
+      if(legacy){loginState=Login.normalize({claimed:legacy});restored=true;}
+    }
+    if(restored)hasRestoredBusiness=true;
+    if(restored&&render){
+      if(dialog.open)dialog.close();
+      makePanels();renderLoginDaily();renderOpening();greeting.render();kings.render();renderChapter();
+    }
+    return restored;
+  }
+  restoreSnapshot(readJSON(storageKey),false);
+  const legacySaved=window.__H5_EXPORT_ID__?null:readJSON(legacyStorageKey);
+  if(legacySaved&&Array.isArray(legacySaved.claimed)&&!readJSON(storageKey))loginState=Login.normalize(legacySaved);
+  if(editorBoot)restoreSnapshot(editorBoot.businessState,false);
+  else restoreSnapshot(window.openai&&window.openai.widgetState,false);
+  if(!hasRestoredBusiness&&!params.has('openingScenario'))syncActivityCalendar();
+  if(params.get('chapter')==='2')activeChapter=1;
+  else if(params.get('chapter')==='1')activeChapter=0;
+  else if(params.get('chapter')==='3')activeChapter=2;
+  else if(params.get('chapter')==='4')activeChapter=3;
+  window.addEventListener('openai:set_globals',event=>{
+    if(editorBoot)return;
+    const globals=event.detail&&event.detail.globals;
+    if(globals&&Object.prototype.hasOwnProperty.call(globals,'widgetState')){
+      const incoming=globals.widgetState;
+      const incomingState=incoming&&(incoming.privateContent||incoming);
+      if(incomingState?.sync?.writer===bridgeWriter&&Number.isInteger(incomingState.sync.revision)&&incomingState.sync.revision<=bridgeRevision)return;
+      if(incoming&&JSON.stringify(incoming.privateContent||incoming)===lastPublishedSnapshot)return;
+      restoreSnapshot(incoming,true);
+    }
+  });
+  function snapshot(){
+    scrollPositions[activeChapter]=currentViewport().scrollLeft;
+    return {version:2,sync:{writer:bridgeWriter,revision:bridgeRevision},...(window.__H5_EXPORT_ID__?{exportId:window.__H5_EXPORT_ID__}:{}),login:Login.normalize(loginState),openingRed:Model.normalize(openingState),greeting:greeting.getState(),kings:kings.getState(),ui:{activeChapter,scrollPositions:{...scrollPositions}}};
+  }
+  function save(){
+    if(gmBatch)return;
+    bridgeRevision+=1;
+    const state=snapshot();
+    lastPublishedSnapshot=JSON.stringify(state);
+    if(editorBoot)parent.postMessage({type:'h5-activity',channel:editorBoot.channel,event:'state',state},'*');
+    else try{localStorage.setItem(storageKey,JSON.stringify(state));}catch(error){}
+    if(!editorBoot&&window.openai&&typeof window.openai.setWidgetState==='function'){
+      const derived=Model.derive(openingState);
+      const greetingState=greeting.getState();
+      const widgetState={modelContent:{preview:'羊名立万',activeChapter:chapterNames[activeChapter],dailyLoginClaimed:Login.derive(loginState).dailyClaimed,claimedRewards:[...loginState.claimed],openingRed:{day:openingState.day,total:openingState.total,level:derived.level,cardClaims:[...openingState.cardClaims],levelClaims:[...openingState.levelClaims]},greeting:{day:greetingState.day,lit:greetingState.players.filter(player=>player.lit).length,selections:greetingState.selections},kings:kings.getState()},privateContent:state};
+      try{Promise.resolve(window.openai.setWidgetState(widgetState)).catch(()=>{});}catch(error){}
+    }
+  }
+  function gmMenu(open){
+    const menu=byId('gm-menu');
+    if(!menu)return;
+    menu.hidden=!open;
+    stage.querySelector('[data-gm-toggle]').setAttribute('aria-expanded',String(open));
+    stage.querySelector('[data-gm-date]').textContent=GM.calendarLabel(loginState.day)+(loginState.phase==='ended'?' · 已结束':'');
+  }
+  function syncActivityCalendar(){
+    const calendar=GM.mapCalendar(loginState);
+    const crossed=openingState.day!==calendar.opening.day||openingState.phase==='before'&&calendar.opening.phase==='active';
+    openingState=Model.normalize({...openingState,...calendar.opening,...(crossed?{dailyClaimed:false,firstMatches:{attack:false,realtime:false,manager:false}}:{})});
+    greeting.syncCalendar({...calendar.greeting,activityDay:loginState.day});
+  }
+  function renderActivities(){
+    makePanels();renderLoginDaily();renderOpening();greeting.render();kings.render();renderChapter();
+  }
+  function gmNextDay(){
+    scrollPositions[activeChapter]=currentViewport().scrollLeft;
+    gmMenu(false);closeDialog();
+    if(loginState.phase==='ended'){notify('活动已结束');return;}
+    loginState=Login.normalize({...loginState,...(loginState.day>=Login.ACTIVITY_DAYS?{phase:'ended'}:{day:loginState.day+1,phase:'active'})});
+    syncActivityCalendar();renderActivities();save();
+    notify(loginState.phase==='ended'?'活动已结束':GM.calendarLabel(loginState.day));
+  }
+  function gmReset(){
+    gmMenu(false);closeDialog();
+    const blank=GM.makeResetSnapshot();
+    if(window.__H5_EXPORT_ID__)blank.exportId=window.__H5_EXPORT_ID__;
+    if(!editorBoot)try{localStorage.removeItem(storageKey);localStorage.removeItem(legacyStorageKey);}catch(error){}
+    restoreSnapshot(blank,false);
+    renderActivities();
+    [viewport,openingViewport,greetingViewport,kingsViewport].forEach(element=>element.scrollTo({left:0,behavior:'auto'}));
+    save();notify('全部重置完成 · 腊月廿四');
+  }
+  function gmMatch(){
+    gmMenu(false);closeDialog();
+    let packets=0,participants=0;
+    gmBatch=true;
+    try{
+      const result=Model.apply(openingState,{type:'match',mode:'realtime',valid:true,eventId:'gm-'+(window.crypto?.randomUUID?.()||Date.now()+'-'+Math.random())},gameConfig);
+      if(result.changed){openingState=result.state;packets=result.grants.reduce((sum,grant)=>sum+(grant.amount||0),0);renderOpening();}
+      const current=greeting.getState();
+      const eligible=current.phase==='active'?current.players.map((player,i)=>player.claimed&&!player.upgraded?i:null).filter(i=>i!==null):[];
+      if(eligible.length){participants=greeting.simulateMatch(eligible)||0;}
+    }finally{gmBatch=false;}
+    save();
+    notify('多人比赛已结算'+(packets?' · 红包 +'+packets:'')+(participants?' · '+participants+'位拜年球员已参赛':'')+(!packets&&!participants?' · 当前没有开放的活动收益':''));
+  }
+  window.render_game_to_text=()=>JSON.stringify({coordinateSystem:'设计画布2160×1080，原点左上，x向右/y向下',...snapshot()});
+  function sizeCanvas(){scale=stage.getBoundingClientRect().width/2160;stage.style.setProperty('--design-scale',String(scale));}
+  function textTemplate(key,text,vars={}){return window.H5EditorApply?window.H5EditorApply.template(key,text,vars):text;}
+  function giftMarkup(day,slot){
+    const status=stateFor(day,slot),date=Login.DAYS[day-1];
+    const label={available:'领取奖励',claimed:'已领取',locked:'未开放',expired:'已过期',invalid:'不可领取'}[status];
+    const art=status==='available'?'v3/hero-gift-alpha.webp':status==='claimed'?'reward-left-state.webp':'reward-right-state.webp';
+    return '<button type="button" class="common-gift date-gift" data-edit-id="c1/date/'+date.id+'/gift/'+slot+'" data-edit-kind="component" data-gift="'+day+','+slot+'" data-state="'+status+'" aria-label="'+date.label+'奖励'+(slot+1)+'，'+label+'"><img class="common-gift-art" src="'+asset(art)+'" alt="" draggable="false"><span class="claim-caption">'+textTemplate('c1/date/'+date.id+'/gift/'+slot+'/caption/'+status,label)+'</span></button>';
+  }
+  function makePanels(){
+    panels.innerHTML=groups.map(date=>'<section class="reward-panel date-panel'+(date.rewardCount===6?' is-eve':'')+'" data-edit-id="c1/date/'+date.id+'" data-edit-kind="group" data-login-date="'+date.day+'" aria-label="'+date.label+'限定奖励"><h2 class="date-panel-title" data-edit-id="c1/date/'+date.id+'/title" data-edit-kind="dynamic">'+date.label+'</h2><div class="date-reward-grid">'+Array.from({length:date.rewardCount},(_,slot)=>'<div class="date-reward-item" data-edit-id="c1/date/'+date.id+'/item/'+slot+'" data-edit-kind="group"><button type="button" class="date-reward-card" data-card="'+date.day+','+slot+'" data-edit-id="c1/date/'+date.id+'/card/'+slot+'" data-edit-kind="component" aria-label="查看'+date.label+'奖励'+(slot+1)+'"><img src="'+asset('v2/reward-placeholder.png')+'" alt="球员奖励占位卡" draggable="false" data-edit-id="c1/date/'+date.id+'/image/'+slot+'" data-edit-kind="image"></button>'+giftMarkup(date.day,slot)+'</div>').join('')+'</div></section>').join('');
+    editorRefresh(panels);
+  }
+  function renderGift(){makePanels();}
+  function setOpeningText(selector,text){stage.querySelectorAll(selector).forEach(element=>{element.textContent=text;});}
+  function renderCommonGift(button,label,state){
+    if(!button)return;
+    button.dataset.state=state;
+    button.setAttribute('aria-disabled',String(state!=='available'));
+    button.setAttribute('aria-label',label);
+    const art=button.querySelector('.common-gift-art'),caption=button.querySelector('.claim-caption');
+    if(art)art.src=asset(state==='claimed'?'reward-left-state.webp':state==='available'?'v3/hero-gift-alpha.webp':'reward-right-state.webp');
+    if(caption){const id=button.dataset.editId||button.getAttribute('data-opening-daily')!==null&&'c2/daily/claim'||button.hasAttribute('data-login-daily')&&'c1/daily/claim'||'c2/growth/claim';bindTemplate(caption,id+'/caption/'+state,label);}
+    editorRefresh(button);
+  }
+  function renderLoginDaily(){
+    const d=Login.derive(loginState),label={available:'领取奖励',claimed:'今日已领取',locked:'未开放',expired:'已结束'}[d.dailyState]||'已结束';
+    renderCommonGift(stage.querySelector('[data-login-daily]'),label,d.dailyState);
+  }
+  function applyLogin(action){const r=Login.apply(loginState,action);if(!r.changed){if(r.error)notify(r.error);return null;}loginState=r.state;makePanels();renderLoginDaily();save();return r;}
+  function claimLoginDaily(){
+    if(!applyLogin({type:'claim-daily'}))return;
+    focusOnClose=stage.querySelector('[data-login-daily]');
+    openDialog('新春见面礼 · 领取成功','<img class="dialog-gift" src="'+asset('hero-gift.png')+'" alt="登录见面礼"><p class="dialog-copy">今日登录见面礼已领取</p><button type="button" class="dialog-action" data-close>收下奖励</button>');
+  }
+  function renderOpening(){
+    const state=openingState,derived=Model.derive(state);
+    setOpeningText('[data-opening-total]',number(state.total));
+    setOpeningText('[data-opening-card-max]',number(cardMax));
+    setOpeningText('[data-opening-level-progress]',derived.max?'MAX':number(derived.levelProgress)+'／'+number(derived.levelTarget));
+    setOpeningText('[data-opening-level-name]',envelopeNames[derived.level-1]);
+    setOpeningText('[data-opening-next-level]',derived.nextLevel?envelopeNames[derived.nextLevel-1]:'已满级');
+    setOpeningText('[data-opening-level-display]',envelopeNames[derived.level-1]+' · Lv.'+derived.level);
+    for(const mode of ['attack','realtime','manager']){
+      const element=stage.querySelector('[data-mode-status="'+mode+'"]');
+      if(element){element.textContent=state.firstMatches[mode]?'今日已完成':'待完成';element.dataset.complete=String(state.firstMatches[mode]);}
+    }
+    const daily=stage.querySelector('[data-opening-daily]');
+    renderCommonGift(daily,state.phase==='before'?'未开放':state.phase==='ended'?'已结束':state.dailyClaimed?'今日已领取':'领取红包',derived.canDaily?'available':state.dailyClaimed?'claimed':'locked');
+    const levelButton=stage.querySelector('[data-opening-level-claim]');
+    const canLevel=state.phase==='active'&&derived.pendingLevels.length>0;
+    renderCommonGift(levelButton,state.phase==='before'?'未开放':state.phase==='ended'?'已结束':derived.pendingLevels.length?'领取红包':'已领取',canLevel?'available':derived.pendingLevels.length?'locked':'claimed');
+    const envelope=byId('opening-level-image');
+    envelope.src=asset('chapter2/envelope-'+derived.level+'.png');envelope.alt=envelopeNames[derived.level-1]+'，等级'+derived.level;
+    byId('opening-level-fill').style.width=(derived.levelProgress/derived.levelTarget*100)+'%';
+    const progress=byId('opening-progress');
+    progress.setAttribute('aria-valuenow',String(Math.min(cardMax,state.total)));
+    progress.setAttribute('aria-valuetext','活动累计'+number(state.total)+'个红包，五份奖励进度'+Math.round(derived.overallProgress*100)+'%');
+    byId('opening-progress-fill').style.width=(derived.overallProgress*100)+'%';
+    progress.setAttribute('aria-valuemax',String(cardMax));
+    openingCards.innerHTML=cardThresholds.map((threshold,index)=>{
+      const cardState=derived.cardStates[index],label={claimed:'已领取',available:'领取',locked:'未达成'}[cardState];
+      const giftArt=cardState==='claimed'?'reward-left-state.webp':cardState==='available'?'v3/hero-gift-alpha.webp':'reward-right-state.webp';
+      return '<article class="opening-card" data-edit-id="c2/card/'+index+'" data-edit-kind="group" data-state="'+cardState+'" aria-label="第'+(index+1)+'份卡牌奖励，累计'+number(threshold)+'个红包，'+label+'"><button type="button" class="opening-card-art" data-opening-card="'+index+'" aria-label="查看第'+(index+1)+'份卡牌奖励，具体奖励待定"><img src="'+asset('v2/reward-placeholder.png')+'" width="1211" height="1299" alt="无数值剪影球员占位卡" draggable="false"></button><p class="opening-card-threshold" data-edit-id="c2/card/'+index+'/threshold" data-edit-kind="dynamic">'+number(threshold)+'<span> 个红包</span></p><span class="opening-card-node" aria-hidden="true"></span><button type="button" class="opening-card-claim common-gift" data-state="'+cardState+'" data-opening-card-claim="'+index+'" aria-label="'+label+'第'+(index+1)+'份卡牌奖励"'+(cardState==='available'?'':' aria-disabled="true"')+'><img class="common-gift-art" src="'+asset(giftArt)+'" alt="" draggable="false"><span class="claim-caption">'+textTemplate('c2/card/'+index+'/caption/'+cardState,label)+'</span></button></article>';
+    }).join('');
+    editorRefresh();
+  }
+  function renderChapter(){
+    viewport.hidden=activeChapter!==0;openingViewport.hidden=activeChapter!==1;greetingViewport.hidden=activeChapter!==2;
+    kingsViewport.hidden=activeChapter!==3;
+    greetingControls.hidden=activeChapter!==2||!demoEnabled;
+    stage.querySelectorAll('[data-chapter]').forEach(button=>{
+      const selected=Number(button.dataset.chapter)===activeChapter;
+      button.classList.toggle('is-active',selected);
+      if(selected)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');
+      button.setAttribute('aria-label',button.textContent.trim()+(selected?'，当前章节':''));
+    });
+    currentViewport().scrollLeft=scrollPositions[activeChapter];
+    if(dialogEyebrow)dialogEyebrow.textContent='羊名立万 · '+chapterNames[activeChapter];
+    editorRefresh();
+  }
+  function switchChapter(index){
+    if(![0,1,2,3].includes(index)){notify('该章节暂未开放');return;}
+    if(index===activeChapter)return;
+    scrollPositions[activeChapter]=currentViewport().scrollLeft;
+    if(dialog.open)dialog.close();
+    activeChapter=index;renderChapter();save();
+    announcements.textContent='已切换至'+chapterNames[index];
+  }
+  function notify(message){
+    clearTimeout(toastTimer);toast.textContent=message;toast.hidden=false;
+    announcements.textContent=message;
+    toastTimer=setTimeout(()=>{toast.hidden=true;},2600);
+  }
+  function openDialog(title,html){
+    if(!dialog.open){lastFocus=document.activeElement;dialog.showModal();}
+    if(dialogEyebrow)dialogEyebrow.textContent='羊名立万 · '+chapterNames[activeChapter];
+    dialog.dataset.editScope=String(activeChapter)+'/'+title.replace(/[^a-zA-Z0-9\u4e00-\u9fff]/g,'-');
+    const viewId='dialog/'+dialog.dataset.editScope;
+    dialog.dataset.editId=viewId+'/shell';
+    dialog.querySelector('[data-close]').dataset.editId=viewId+'/close';
+    bindTemplate(dialogTitle,viewId+'/title',title);
+    if(dialogEyebrow)bindTemplate(dialogEyebrow,viewId+'/eyebrow','羊名立万 · '+chapterNames[activeChapter]);
+    dialogBody.innerHTML=html;
+    editorRefresh(dialog);
+    dialog.querySelector('[data-close]').focus({preventScroll:true});
+  }
+  function closeDialog(){if(dialog.open)dialog.close();}
+  function cardImage(){return '<img class="dialog-card" src="'+asset('v2/reward-placeholder.png')+'" alt="紫绿金边球员占位卡，中央为黑色球员剪影，无能力数值">';}
+  function showCard(day,slot){
+    const status=stateFor(day,slot),date=Login.DAYS[day-1];if(!date)return;
+    const message={available:'今日限定奖励，仅限当天领取',claimed:'本项奖励已领取',locked:date.label+'开放，尚未到开放日期',expired:'仅限'+date.label+'当天领取，已过期，不可补领',invalid:'奖励不存在'}[status];
+    openDialog(date.label+' · 奖励'+(slot+1),cardImage()+'<p class="dialog-copy">'+message+'<br>具体奖励待定</p>'+(status==='available'?'<button type="button" class="dialog-action" data-claim="'+day+','+slot+'">领取奖励</button>':'<button type="button" class="dialog-action secondary" data-close>知道了</button>'));
+  }
+  function claim(day,slot){
+    if(stateFor(day,slot)!=='available'){showCard(day,slot);return;}
+    if(!applyLogin({type:'claim-date',day,slot}))return;
+    focusOnClose=panels.querySelector('[data-gift="'+day+','+slot+'"]');
+    openDialog('领取成功',cardImage()+'<p class="dialog-copy">日期限定奖励已领取</p><button type="button" class="dialog-action" data-close>收下奖励</button>');
+  }
+  function showOpeningCard(index){
+    if(!Number.isInteger(index)||index<0||index>=5)return;
+    const state=Model.derive(openingState).cardStates[index];
+    const status=state==='claimed'?'本项奖励已领取':openingState.phase==='before'?'除夕开放，尚未到开放日期':openingState.phase==='ended'?'活动已结束，不能领取':state==='locked'?'还需累计'+number(Math.max(0,cardThresholds[index]-openingState.total))+'个红包':'已达成，可以领取';
+    const canClaim=state==='available'&&openingState.phase==='active';
+    const action=canClaim?'<button type="button" class="dialog-action" data-opening-card-claim="'+index+'">领取奖励</button>':'<button type="button" class="dialog-action secondary" data-close>知道了</button>';
+    openDialog('卡牌奖励'+(index+1),cardImage()+'<p class="dialog-copy">具体奖励待定<br>累计需求：'+number(cardThresholds[index])+'个红包<br>'+status+'</p>'+action);
+  }
+  function applyOpening(action){
+    const result=Model.apply(openingState,action,gameConfig);
+    if(!result.changed){if(result.error)notify(result.error);return null;}
+    openingState=result.state;renderOpening();save();return result;
+  }
+  function claimOpeningDaily(){
+    const previous=Model.derive(openingState),result=applyOpening({type:'claim-daily'});
+    if(!result)return;
+    const derived=Model.derive(openingState),newCards=derived.cardStates.filter((state,index)=>state==='available'&&previous.cardStates[index]==='locked').length;
+    let message='活动累计红包：'+number(openingState.total);
+    if(newCards)message+='<br>'+newCards+'份卡牌奖励已解锁';
+
+    focusOnClose=stage.querySelector('[data-opening-daily]');
+    openDialog('每日红包领取成功','<img class="dialog-gift" src="'+asset('chapter2/envelope-1.png')+'" alt="每日红包"><p class="dialog-copy"><strong>红包 ×100</strong><br>'+message+'</p><button type="button" class="dialog-action" data-close>收下红包</button>');
+    announcements.textContent='每日红包领取成功，累计'+number(openingState.total)+'个';
+  }
+  function claimOpeningCard(index){
+    if(!Number.isInteger(index)||index<0||index>=5)return;
+    if(Model.derive(openingState).cardStates[index]!=='available'){showOpeningCard(index);return;}
+    const result=applyOpening({type:'claim-card',index});if(!result)return;
+    focusOnClose=openingCards.querySelector('[data-opening-card-claim="'+index+'"]');
+    openDialog('卡牌奖励领取成功',cardImage()+'<p class="dialog-copy">第'+(index+1)+'份卡牌奖励已领取<br>具体奖励待定<br>活动累计红包保持为'+number(openingState.total)+'</p><button type="button" class="dialog-action" data-close>收下奖励</button>');
+    announcements.textContent='第'+(index+1)+'份卡牌奖励已领取，累计数量不变';
+  }
+  function claimOpeningLevels(){
+    const result=applyOpening({type:'claim-levels'});if(!result)return;
+    const levels=result.grants.filter(grant=>grant.kind==='level').map(grant=>grant.level);
+    const rows=levels.map(level=>'<li><img src="'+asset('chapter2/envelope-'+level+'.png')+'" alt=""><span>'+levelName(level)+'<br><small>具体奖励待定</small></span><em>已领取</em></li>').join('');
+    focusOnClose=stage.querySelector('[data-opening-level-claim]');
+    openDialog('红包奖励领取成功','<ul class="record-list">'+rows+'</ul><p class="dialog-copy">本次领取'+levels.length+'份奖励<br>累计数量不变，当前外观与升级进度保留</p><button type="button" class="dialog-action" data-close>收下奖励</button>');
+    announcements.textContent='已领取'+levels.length+'份等级红包奖励，累计数量不变';
+  }
+  function showRecords(){
+    if(activeChapter===3){kings.records();return;}
+    if(activeChapter===2){greeting.records();return;}
+    if(activeChapter===1){
+      const daily=openingState.dailyClaimed?'<li><img src="'+asset('chapter2/envelope-1.png')+'" alt=""><span>今日每日红包 ×100</span><em>已领取</em></li>':'';
+      const cards=openingState.cardClaims.map(index=>'<li><img src="'+asset('v2/reward-placeholder.png')+'" alt=""><span>卡牌奖励'+(index+1)+'<br><small>具体奖励待定</small></span><em>已领取</em></li>').join('');
+      const levels=openingState.levelClaims.map(level=>'<li><img src="'+asset('chapter2/envelope-'+level+'.png')+'" alt=""><span>'+levelName(level)+'<br><small>具体奖励待定</small></span><em>已领取</em></li>').join('');
+      const records=daily+cards+levels;
+      openDialog('踢出开门红 · 领取记录',records?'<ul class="record-list">'+records+'</ul><button type="button" class="dialog-action secondary" data-close>关闭</button>':'<p class="dialog-copy">还没有领取奖励<br>每日红包和成长奖励均可领取</p><button type="button" class="dialog-action secondary" data-close>知道了</button>');return;
+    }
+    const records=loginState.dailyClaims.map(id=>'<li><img src="'+asset('hero-gift.png')+'" alt=""><span>'+Login.DAYS.find(d=>d.id===id).label+' · 登录礼</span><em>已领取</em></li>').join('')+loginState.claimed.map(key=>{const [id,slot]=key.split(':');const date=Login.DAYS.find(d=>d.id===id);return '<li><img src="'+asset('reward-gift.png')+'" alt=""><span>'+date.label+' · 奖励'+(Number(slot)+1)+'</span><em>已领取</em></li>';}).join('');
+    openDialog('已领取奖励',records?'<ul class="record-list">'+records+'</ul><button type="button" class="dialog-action secondary" data-close>关闭</button>':'<img class="dialog-gift" src="'+asset('reward-gift.png')+'" alt="礼盒"><p class="dialog-copy">还没有领取奖励<br>点击亮起的礼盒即可领取</p><button type="button" class="dialog-action" data-browse>查看奖励</button>');
+  }
+  function browse(){
+    closeDialog();
+    if(activeChapter===3){home();return;}
+    if(activeChapter===2){greeting.handleClick({dataset:{greetingPage:'0'}});return;}
+    if(activeChapter===1){browseOpening();return;}
+    const firstPanel=panels.querySelector('.reward-panel');
+    const left=firstPanel?firstPanel.offsetLeft-(viewport.clientWidth-firstPanel.offsetWidth)/2:2400;
+    viewport.scrollTo({left:Math.max(0,left),behavior:behavior()});
+  }
+  function browseOpening(){
+    closeDialog();
+    const section=byId('opening-daily-title').closest('section');
+    openingViewport.scrollTo({left:Math.max(0,section.offsetLeft-80),behavior:behavior()});
+  }
+  function home(){currentViewport().scrollTo({left:0,behavior:behavior()});}
+  function overview(){
+    if(activeChapter===3){kings.overview();return;}
+    if(activeChapter===2){greeting.overview();return;}
+    if(activeChapter===1){
+      openDialog('踢出开门红 · 活动规则','<p class="dialog-copy">除夕至正月十四，共15个活动日。<br><br>每天进入本板块，可手动领取红包100个。<br>进攻对战、实时对战、经理人模式，<br>各模式每日首场完成比赛获得100个。<br>首场不叠加25个；后续有效比赛每场25个，次数不限。<br><br>完成即可，无需获胜。比赛收益在有效结算后自动累计。<br>每日刷新领取资格和各模式首场状态。<br><br>五档累计奖励门槛：988、1888、2888、3888、4888。<br>成长仍在2400、4800个红包时升级。<br>卡牌达到门槛后独立领取；成长奖励一次补领<br>所有已解锁、尚未领取的奖励。<br>领奖不扣累计，满级后仍保留实际累计数量。</p><button type="button" class="dialog-action" data-opening-browse>查看累计奖励</button>');return;
+    }
+    openDialog('新春见面礼 · 活动规则','<img class="dialog-gift" src="'+asset('hero-gift.png')+'" alt="登录礼盒"><p class="dialog-copy">腊月廿四至正月十四，每日登录可领取一份见面礼。<br>首屏圆形礼盒点击即可领取，共21份，与日期限定奖励独立。<br><br>日期限定奖励从腊月廿四至正月初八，每天开放一个版面，共15天。<br>除夕6份，其他日期每天2份，共34份。<br>正月初九至十四不设日期限定奖励。<br>未到开放日期时按钮为灰色，点击可查看开放日期。<br>日期奖励仅限当天领取；错过后已过期，不可补领。<br>具体奖励内容待定。</p><button type="button" class="dialog-action" data-browse>查看日期限定奖励</button>');
+  }
+  root.addEventListener('click',event=>{
+    const button=event.target.closest('button');if(!button)return;
+    if(button.hasAttribute('data-gm-toggle')){gmMenu(byId('gm-menu').hidden);return;}
+    if(button.hasAttribute('data-gm-match')){gmMatch();return;}
+    if(button.hasAttribute('data-gm-reset')){gmReset();return;}
+    if(button.hasAttribute('data-gm-next')){gmNextDay();return;}
+    gmMenu(false);
+    if(kings.handleClick(button))return;
+    if(greeting.handleClick(button))return;
+    if(button.hasAttribute('data-close')){closeDialog();return;}
+    if(button.hasAttribute('data-browse')){browse();return;}
+    if(button.hasAttribute('data-home')){home();return;}
+    if(button.hasAttribute('data-overview')){overview();return;}
+    if(button.hasAttribute('data-records')){showRecords();return;}
+    if(button.dataset.chapter!==undefined){switchChapter(Number(button.dataset.chapter));return;}
+    if(button.hasAttribute('data-opening-browse')){browseOpening();return;}
+    if(button.hasAttribute('data-opening-daily')){claimOpeningDaily();return;}
+    if(button.hasAttribute('data-login-daily')){claimLoginDaily();return;}
+    if(button.hasAttribute('data-opening-level-claim')){claimOpeningLevels();return;}
+    if(button.dataset.openingCard!==undefined){showOpeningCard(Number(button.dataset.openingCard));return;}
+    if(button.dataset.openingCardClaim!==undefined){claimOpeningCard(Number(button.dataset.openingCardClaim));return;}
+    const pair=button.dataset.gift||button.dataset.card||button.dataset.claim;if(!pair)return;
+    const [group,slot]=pair.split(',').map(Number);
+    if(button.dataset.card!==undefined)showCard(group,slot);else claim(group,slot);
+  });
+  document.addEventListener('keydown',event=>{if(event.key==='Escape')gmMenu(false);});
+  dialog.addEventListener('click',event=>{if(event.target===dialog){const box=dialog.getBoundingClientRect();if(event.clientX<box.left||event.clientX>box.right||event.clientY<box.top||event.clientY>box.bottom)closeDialog();}});
+  dialog.addEventListener('close',()=>{const target=focusOnClose||lastFocus;focusOnClose=null;if(target&&target.isConnected&&!target.closest('[hidden]'))target.focus({preventScroll:true});});
+  function setupScroll(element,index){
+    let drag=null,scrollTimer=0;
+    element.addEventListener('pointerdown',event=>{if(event.pointerType==='mouse'&&event.button===0&&!dialog.open)drag={id:event.pointerId,x:event.clientX,left:element.scrollLeft,moved:false};});
+    element.addEventListener('pointermove',event=>{
+      if(!drag||drag.id!==event.pointerId)return;
+      const delta=event.clientX-drag.x;
+      if(!drag.moved&&Math.abs(delta)>7){drag.moved=true;element.classList.add('is-dragging');element.setPointerCapture(event.pointerId);}
+      if(drag.moved){event.preventDefault();element.scrollLeft=drag.left-delta/scale;}
+    });
+    function endDrag(){if(!drag)return;if(drag.moved){lastDragEnd=Date.now();element.classList.remove('is-dragging');try{element.releasePointerCapture(drag.id);}catch(error){}}drag=null;}
+    element.addEventListener('pointerup',endDrag);element.addEventListener('pointercancel',endDrag);
+    element.addEventListener('pointerleave',()=>{if(drag&&!drag.moved)drag=null;});
+    element.addEventListener('click',event=>{if(Date.now()-lastDragEnd<300){event.preventDefault();event.stopImmediatePropagation();}},true);
+    element.addEventListener('wheel',event=>{
+      if(event.ctrlKey||dialog.open)return;
+      const delta=Math.abs(event.deltaX)>Math.abs(event.deltaY)?event.deltaX:event.deltaY;
+      const end=element.scrollWidth-element.clientWidth;
+      if((delta>0&&element.scrollLeft<end-1)||(delta<0&&element.scrollLeft>1)){event.preventDefault();element.scrollLeft+=delta/scale;}
+    },{passive:false});
+    element.addEventListener('scroll',()=>{
+      // Focus may scroll a tall transparent image's box vertically; this track only browses horizontally.
+      if(element.scrollTop)element.scrollTop=0;
+      if(activeChapter!==index||element.hidden)return;
+      scrollPositions[index]=element.scrollLeft;
+      clearTimeout(scrollTimer);scrollTimer=setTimeout(()=>{const range=element.scrollWidth-element.clientWidth;const name=chapterNames[index];element.setAttribute('aria-label',name+'，已横向浏览至'+(range>0?Math.round(element.scrollLeft/range*100):0)+'%，支持方向键浏览');},100);
+    });
+    element.addEventListener('keydown',event=>{
+      if(dialog.open)return;
+      if(event.key==='ArrowRight'||event.key==='ArrowLeft'){event.preventDefault();element.scrollBy({left:event.key==='ArrowRight'?803:-803,behavior:behavior()});}
+      else if(event.key==='Home'){event.preventDefault();element.scrollTo({left:0,behavior:behavior()});}
+      else if(event.key==='End'){event.preventDefault();element.scrollTo({left:element.scrollWidth,behavior:behavior()});}
+    });
+  }
+  window.H5EditorRuntime={
+    getState:snapshot,
+    navigate({chapter=activeChapter,page=0,ratio}={}){
+      if([0,1,2,3].includes(Number(chapter)))switchChapter(Number(chapter));
+      if(Number.isFinite(ratio)){const e=currentViewport();e.scrollTo({left:(e.scrollWidth-e.clientWidth)*Math.max(0,Math.min(100,ratio))/100,behavior:'instant'});editorRefresh();return;}
+      const targets=activeChapter===0?[stage.querySelector('.hero'),...panels.querySelectorAll('.date-panel')]:activeChapter===1?[stage.querySelector('.opening-intro'),stage.querySelector('.opening-daily-panel'),stage.querySelector('.opening-rewards'),stage.querySelector('.opening-level-combination')]:activeChapter===2?[...greetingViewport.querySelectorAll('.greeting-page')]:[...kingsViewport.querySelectorAll('.kings-page')];
+      const target=targets[Number(page)]||targets[0];if(target)currentViewport().scrollTo({left:target.offsetLeft,behavior:'instant'});editorRefresh();
+    },
+    openView({view='rules',payload={}}={}){
+      if(view==='close'){closeDialog();return;}
+      if(view==='rules'){overview();return;}
+      if(view==='records'){showRecords();return;}
+      if(view==='login-date'){applyLogin({type:'set-day',day:Number(payload.day)||1});return;}
+      if(view==='opening-match'){applyOpening({type:'match',mode:payload.mode||'attack',valid:true,eventId:'editor-'+Date.now()});return;}
+      if(view==='opening-next-day'){applyOpening({type:'next-day'});return;}
+      if(view==='greeting-match'){greeting.simulateMatch?.(payload.players||[]);return;}
+      if(view==='greeting-day'){greeting.setDemoDay?.(payload.day||8);return;}
+      if(view==='quiz'){switchChapter(2);greeting.previewView?.({view:'quiz',player:payload.player||0});return;}
+      if(view==='kings-buy'){switchChapter(3);kings.handleClick({dataset:{kingsAcquire:'2'}});return;}
+      if(view==='kings-challenge'){switchChapter(3);kings.handleClick({dataset:{kingsChallenge:String(payload.player||0)}});return;}
+    }
+  };
+  makePanels();renderLoginDaily();renderOpening();renderChapter();setupScroll(viewport,0);setupScroll(openingViewport,1);setupScroll(greetingViewport,2);setupScroll(kingsViewport,3);sizeCanvas();new ResizeObserver(sizeCanvas).observe(stage);
+})();
+
+</script>
+</body></html>

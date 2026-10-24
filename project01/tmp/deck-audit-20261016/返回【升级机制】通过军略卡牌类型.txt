@@ -1,7 +1,0 @@
-ON /action/0 SET_VARIABLE STRING:result:local, ""
-ON /action/1 TRAVERSE_TABLE_NEW TABLE:军令卡牌base-表, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), {actions} OPTIONAL True
-ON /action/1/args_list/1/args_list/0 IF_THEN_ELSE ABILITY_COMPARE(GET_ABILITY_NAME_TABLE_VAR_ND(TABLE:军令卡牌base-表, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), ITER_TABLE_KEY_INT(), "技能类型"), "==", ABILITY_NAME:军略卡牌技能类型:local), {actions}, {actions}
-ON /action/1/args_list/1/args_list/0/args_list/0/args_list/0 CONDITION ABILITY_COMPARE(GET_ABILITY_NAME_TABLE_VAR_ND(TABLE:军令卡牌base-表, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), ITER_TABLE_KEY_INT(), "技能类型"), "==", ABILITY_NAME:军略卡牌技能类型:local)
-ON /action/1/args_list/1/args_list/0/args_list/1/args_list/0 SET_VARIABLE STRING:result:local, GET_STRING_TABLE_VAR_ND(TABLE:军令卡牌base-表, 返回【玩家】在playerDetail的数组索引值(PLAYER:执行玩家:local), ITER_TABLE_KEY_INT(), "升级机制")
-ON /action/1/args_list/1/args_list/0/args_list/1/args_list/1 BREAK_LOOP 
-ON /action/2 400342 2(STRING:result:local)

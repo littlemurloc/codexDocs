@@ -1,8 +1,0 @@
-ON /trigger_dict/225054724/action/0 UNREG_TRIGGER DYNAMIC_TRIGGER_INSTANCE:temp触发器:actor
-ON /trigger_dict/225054724/action/1 PRINT_MESSAGE_ACTION_TO_DIALOG 3, STR_JOIN(GET_ABILITY_STR_ATTR(CUR_ABILITY(), "name"), "触发了 失去 事件")
-ON /trigger_dict/225054724/event/0 ABILITY_LOSE 
-ON /trigger_dict/792481795/action/0 SET_VARIABLE BOOLEAN:军令卡牌免费刷新开关, 返回【玩家】在playerDetail的数组索引值(OWNER_PLAYER(ABILITY_OWNER())), True
-ON /trigger_dict/792481795/condition/0 CONDITION FLOAT_COMPARE(GET_CUS_EVENT_PARAM("阶段编号"), "==", 1)
-ON /trigger_dict/792481795/event/0 RECEIVE_CUSTOM_EVENT 1646669129
-ON /trigger_dict/792481795/sub_trigger_owner_set_var_action SET_VARIABLE DYNAMIC_TRIGGER_INSTANCE:temp触发器:actor, REG_ABILITY_TRIGGER(792481795)
-ON /trigger_dict/1959489540/event/0 ABILITY_OBTAIN 

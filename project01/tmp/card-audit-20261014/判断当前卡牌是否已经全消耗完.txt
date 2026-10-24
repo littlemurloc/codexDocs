@@ -1,7 +1,0 @@
-ON /action/0 IF_THEN_ELSE FLOAT_COMPARE(6(INTEGER:当前游戏进程阶段), "==", 2), {actions}, {actions}
-ON /action/0/args_list/0/args_list/0 CONDITION FLOAT_COMPARE(6(INTEGER:当前游戏进程阶段), "==", 2)
-ON /action/0/args_list/1/args_list/0 SET_VARIABLE BOOLEAN:result:local, True
-ON /action/0/args_list/2/args_list/0 SET_VARIABLE BOOLEAN:result:local, False
-ON /action/1 ITER_UI_COMP_DO PLAYER:执行玩家:local, "ed9e9488-d381-4d8a-a6df-2c78bc079153", {actions}
-ON /action/1/args_list/2/args_list/0 SET_VARIABLE BOOLEAN:result:local, False
-ON /action/2 400342 BOOLEAN:result:local

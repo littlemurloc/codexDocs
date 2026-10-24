@@ -1,9 +1,0 @@
-ON /trigger_dict/1930846210/action/0 CLEAR_MODIFIER_OWNER_ATTR CUR_MODIFIER()
-ON /trigger_dict/1930846210/event/0 LOSS_MODIFIER 
-ON /trigger_dict/1980923905/action/0 IF_THEN_ELSE UNIT_TYPE_COMPARE(GET_UNIT_TYPE(MODIFIER_OWNER()), "==", 1), {actions}, {actions}
-ON /trigger_dict/1980923905/action/0/args_list/0/args_list/0 CONDITION UNIT_TYPE_COMPARE(GET_UNIT_TYPE(MODIFIER_OWNER()), "==", 1)
-ON /trigger_dict/1980923905/action/0/args_list/1/args_list/0 ADD_MODIFIER_OWNER_ATTR CUR_MODIFIER(), "attack_phy", "ATTR_ALL_RATIO", 8.0
-ON /trigger_dict/1980923905/action/1 IF_THEN_ELSE UNIT_TYPE_COMPARE(GET_UNIT_TYPE(MODIFIER_OWNER()), "==", 4), {actions}, {actions}
-ON /trigger_dict/1980923905/action/1/args_list/0/args_list/0 CONDITION UNIT_TYPE_COMPARE(GET_UNIT_TYPE(MODIFIER_OWNER()), "==", 4)
-ON /trigger_dict/1980923905/action/1/args_list/1/args_list/0 ADD_MODIFIER_OWNER_ATTR CUR_MODIFIER(), "attack_phy", "ATTR_ALL_RATIO", 4.0
-ON /trigger_dict/1980923905/event/0 OBTAIN_MODIFIER 
