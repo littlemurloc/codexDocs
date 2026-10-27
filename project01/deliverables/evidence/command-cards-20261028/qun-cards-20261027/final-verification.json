@@ -1,0 +1,64 @@
+{
+  "full_resources_published": true,
+  "cards": 54,
+  "buffs": 2,
+  "embedded_triggers": 171,
+  "new_functions": 22,
+  "modified_shared_functions": 2,
+  "unique_eca_resources": 80,
+  "unique_file_paths": 142,
+  "offline_cases_passed": 20,
+  "standalone_structure_checks_passed": 24,
+  "actual_editor_card_kv_match_count": 54,
+  "actual_editor_embedded_eca_match_count": 56,
+  "invalid_exported_triggers": 0,
+  "full_map_and_header_backed_up_before_each_release": true,
+  "normal_play_representative_evidence": "littlemurloc_2026_10_27_22_48_52.log",
+  "normal_play_verified": [
+    "both first sets selectable",
+    "both first set merges",
+    "reputation 20+12=32",
+    "base level 2",
+    "both next tier cards selected",
+    "west normal UR 藤甲兵 granted once with west stage 5 and yellow stage 4",
+    "yellow stage 4 completed after UR; reputation paid, no later unlock in log",
+    "final snapshot retains exactly one Qun UR; reputation 137, base level 5"
+  ],
+  "not_runtime_verified": [
+    "normal yellow UR outcome",
+    "later stage numerical combat outcomes",
+    "failed grant retry",
+    "lost and reacquired cards",
+    "multiplayer"
+  ],
+  "page_visual_verified": false,
+  "formal_pool_changed": false,
+  "source_catalog_changed": false,
+  "new_special_visual_effects": false,
+  "normal_west_terminal_runtime_evidence": "littlemurloc_2026_10_27_23_17_36.log",
+  "latest_runtime_evidence": "../qun-ur-quote-fix-20261028/littlemurloc_2026_10_28_00_39_01.log",
+  "latest_runtime_passed": true,
+  "known_issues": [
+    {
+      "issue": "Terminal URs leak into ordinary quotes when yellow stage 5 unlocks, allowing two URs in one game",
+      "evidence": "special-runtime-quote-leak-evidence.json",
+      "status": "repaired; special-terminal gameplay retest passed 2026-10-28 00:39-00:41; all quote UI contents not logged"
+    }
+  ],
+  "offline_case_limitations": "Existing 20 cases selected component IDs directly; they did not assert the complete quote-eligible set excludes terminal URs.",
+  "repair_20261028": {
+    "published": true,
+    "files": [
+      "global_trigger/function/new/群雄军略/19_未达终局才解锁下一组.json"
+    ],
+    "offline_cases_passed": 27,
+    "structure_valid": true,
+    "editor_verified": false,
+    "engine_verified": true,
+    "receipt": "../qun-ur-quote-fix-20261028/published.json",
+    "user_catalog_changes_preserved": true,
+    "runtime_receipt": "../qun-ur-quote-fix-20261028/runtime-acceptance.json"
+  },
+  "source_catalog_changed_by_user": true,
+  "latest_runtime_scope": "special terminal path, UR acquisition uniqueness and held snapshots; not full numerical combat or UI acceptance"
+}
