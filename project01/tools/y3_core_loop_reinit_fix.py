@@ -1,4 +1,9 @@
-"""Scoped loop UI lifecycle repair; stage only, publish with the receipt tool."""
+"""HISTORICAL 2026-10-22 migration, not a current map generator.
+
+2026-10-30 batch03 adds presentation-cache invalidation to the live lifecycle.
+Never re-run this migration to restore/rebuild the current map; maintain that
+behavior through y3_combat_optimization_batch03.py and its differential tests.
+"""
 import copy
 import json
 from pathlib import Path

@@ -18,9 +18,43 @@ from y3_native_skill_log_probe import PREFIX, instrument, read, save, sha, walk
 
 PROJECT = Path(__file__).resolve().parents[1]
 REGISTRY = PROJECT / 'tools/data/y3-skill-trace-registry.json'
+TRACE_MODE = PROJECT / 'tools/data/y3-skill-trace-mode.json'
+LEGACY_REGISTRY = PROJECT / 'tools/data/y3-legacy-skill-diagnostics-registry.json'
 LEGACY = PROJECT / 'tmp/native-skill-log-20261023/manifest.json'
 SLOTS = [(1, '技能1'), (2, '技能5'), (3, '技能2'),
          (4, '技能6'), (5, '技能3'), (6, '技能7')]
+
+
+def tracing_enabled():
+    if not TRACE_MODE.exists():
+        return True
+    mode = read(TRACE_MODE)
+    assert mode['schema'] == 1 and isinstance(mode['enabled'], bool)
+    return mode['enabled']
+
+
+def legacy_records():
+    """Dynamic diagnostics use exact argument snapshots, not literal messages."""
+    if not LEGACY_REGISTRY.exists():
+        return {}
+    registry = read(LEGACY_REGISTRY)
+    assert registry['schema'] == 1 and registry['map_identity'] == 'ProjectMonster02/map3'
+    return registry['entries']
+
+
+def toggle_legacy_registered(document, records, enabled):
+    candidate = deepcopy(document)
+    changes = []
+    for record in records:
+        matches = [n for n in walk(candidate) if n.get('element_id') == record['element_id']]
+        assert len(matches) == 1, 'Legacy log missing or duplicated; review before toggling'
+        node = matches[0]
+        assert node.get('action_type') == 'PRINT_MESSAGE_ACTION_TO_DIALOG'
+        assert node['args_list'] == record['args_list'], 'Legacy dynamic expression changed; review required'
+        assert record['label'].startswith('[技能排查/20261024')
+        changes.append(dict(element_id=record['element_id'], before=node['enable']))
+        node['enable'] = enabled
+    return candidate, changes
 
 
 def files(root):
@@ -184,6 +218,11 @@ def prepare(root, work, operation):
             label = metadata['hero'] + '/' + metadata['role'] + '#' + str(metadata['resource_id'])
             candidate, logs = instrument(source, label, ids)
             assert logs, 'No diagnostic nodes generated: ' + relative
+            registered_ids = {entry['element_id'] for entry in logs}
+            enabled = tracing_enabled()
+            for node in walk(candidate):
+                if node.get('element_id') in registered_ids:
+                    node['enable'] = enabled
             assert remove_registered(candidate, logs) == source
             registry['entries'][relative] = {**metadata, 'logs': logs, 'batch': work.name}
         else:
