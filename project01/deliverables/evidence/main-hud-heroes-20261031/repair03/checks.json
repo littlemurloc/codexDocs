@@ -1,0 +1,37 @@
+{
+    "structural": {
+        "global_trigger/trigger/UI/\u4e3bHUD\u82f1\u96c4\u4fe1\u606f.json": {
+            "structure_valid": true,
+            "issues": [],
+            "issue_count": 0,
+            "warnings": [],
+            "warning_count": 0,
+            "editor_verified": false,
+            "coverage": "Observed JSON structure and element IDs; not full Y3 semantics."
+        }
+    },
+    "native_integer_child_nodes": 8,
+    "configured_children_enabled_false": 8,
+    "unchanged_child_action_bodies": true,
+    "unchanged_event_names": true,
+    "unchanged_diagnostic_nodes": true,
+    "status": "PASS",
+    "test_count": 30,
+    "manifest_sha256": "5b9fcd67b82ff72b73869c97725cedb24fa1f5d24713e7b9c2973b4115e7a1e7",
+    "tools": {
+        "tools/y3_main_hud_hero_layout.py": "3677109d968b18d9a5c77cdf5cd8d54aa122915803ed2cb6486175bbc96123a8",
+        "tools/y3_main_hud_hero_registration_repair.py": "1ea07a3651deb5afc3cf91a321dfe4cd1bc92a066cc338f3012dcc51566e9924",
+        "tools/test_y3_main_hud_hero_layout.py": "0dc84da38963a7d8d6f48ca51c669d2c5350ab3d93e44ac6a4b7062689d7f2da",
+        "tools/y3_main_hud_hero_layout_repair.py": "5d0f85c3056d1b6bc92244d9657c07db503b87c08ddba8b6cddcd6abfbb0a919",
+        "tests/fixtures/y3-main-hud-heroes/source.json.gz": "fba88bb6a35546325e53c875e5894bde3e3ef0f45616c6abc249e8df749e596b",
+        "tests/fixtures/y3-main-hud-heroes/published-v1.json.gz": "7aa3b8abbfd7b8f8ae2357f2d63db523d59aa2b0ac5b3e04faf2c255b90687cb",
+        "tests/fixtures/y3-main-hud-heroes/published-repair02.json.gz": "120398f2f9b6217efde8958a9dce458cee6eb176405fba67c57e3ce49ca0c26b"
+    },
+    "editor_verified": false,
+    "runtime_verified": false,
+    "limitations": [
+        "Native root initialization was observed; real clicks did not enter the old handlers.",
+        "Old tests wrongly treated four-item action-block references as child registration. Current model rejects that assumption.",
+        "Corrected serialization follows existing native examples; actual engine click acceptance remains required."
+    ]
+}

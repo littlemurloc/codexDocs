@@ -1,0 +1,89 @@
+{
+    "structural": {
+        "global_trigger/function/new/UI/\u5237\u65b0\u4e3bHUD\u82f1\u96c4\u5217\u8868\u4e0e\u8be6\u60c5.json": {
+            "structure_valid": true,
+            "issues": [],
+            "issue_count": 0,
+            "warnings": [],
+            "warning_count": 0,
+            "editor_verified": false,
+            "coverage": "Observed JSON structure and element IDs; not full Y3 semantics."
+        },
+        "global_trigger/trigger/\u5173\u5361\u521d\u59cb\u5316\u5185\u5bb9/universe01.json": {
+            "structure_valid": true,
+            "issues": [],
+            "issue_count": 0,
+            "warnings": [
+                {
+                    "pointer": "/sub_trigger/804811438/action/2/element_id",
+                    "message": "Repeated element ID; existing Y3 examples also contain repeats, so uniqueness scope requires editor verification."
+                },
+                {
+                    "pointer": "/sub_trigger/819237541/condition/0/element_id",
+                    "message": "Repeated element ID; existing Y3 examples also contain repeats, so uniqueness scope requires editor verification."
+                },
+                {
+                    "pointer": "/sub_trigger/985387695/action/1/args_list/1/args_list/2/args_list/2/args_list/5/element_id",
+                    "message": "Repeated element ID; existing Y3 examples also contain repeats, so uniqueness scope requires editor verification."
+                },
+                {
+                    "pointer": "/sub_trigger/985387695/condition/0/element_id",
+                    "message": "Repeated element ID; existing Y3 examples also contain repeats, so uniqueness scope requires editor verification."
+                },
+                {
+                    "pointer": "/sub_trigger/985387695/condition/1/element_id",
+                    "message": "Repeated element ID; existing Y3 examples also contain repeats, so uniqueness scope requires editor verification."
+                },
+                {
+                    "pointer": "/sub_trigger/1252758182/action/1/args_list/1/args_list/0/args_list/1/args_list/1/element_id",
+                    "message": "Repeated element ID; existing Y3 examples also contain repeats, so uniqueness scope requires editor verification."
+                },
+                {
+                    "pointer": "/sub_trigger/1570808599/action/4/element_id",
+                    "message": "Repeated element ID; existing Y3 examples also contain repeats, so uniqueness scope requires editor verification."
+                },
+                {
+                    "pointer": "/sub_trigger/1573966520/condition/0/element_id",
+                    "message": "Repeated element ID; existing Y3 examples also contain repeats, so uniqueness scope requires editor verification."
+                },
+                {
+                    "pointer": "/sub_trigger/1573966520/event/0/element_id",
+                    "message": "Repeated element ID; existing Y3 examples also contain repeats, so uniqueness scope requires editor verification."
+                },
+                {
+                    "pointer": "/sub_trigger/2100363942/action/0/args_list/1/args_list/0/element_id",
+                    "message": "Repeated element ID; existing Y3 examples also contain repeats, so uniqueness scope requires editor verification."
+                },
+                {
+                    "pointer": "/sub_trigger/2100363942/action/0/args_list/1/args_list/1/element_id",
+                    "message": "Repeated element ID; existing Y3 examples also contain repeats, so uniqueness scope requires editor verification."
+                }
+            ],
+            "warning_count": 11,
+            "editor_verified": false,
+            "coverage": "Observed JSON structure and element IDs; not full Y3 semantics."
+        }
+    },
+    "combat_phase": 2,
+    "preparation_phase": 1,
+    "unchanged_UI_and_roster_focus": true,
+    "existing_global_phase_read_only": true,
+    "new_timers": 0,
+    "scope": "One phase visibility literal in universe01; phase guard around existing shell-show action in refresh",
+    "status": "PASS",
+    "test_count": 34,
+    "manifest_sha256": "5cb14a1598163175bd401ec7ddc4ccce6317419655d6559bd94c00f5932dc9d9",
+    "tools": {
+        "tools/y3_main_hud_hero_layout.py": "aa6ef2d519a5a24fd1aa3ccb1939c8d44d80485c563b28d1310f91c750ea6120",
+        "tools/y3_main_hud_battle_visibility.py": "34bb1b37868fbf16373c3b9b7d44202af2b3721b8e0b58d87315d3e91375472a",
+        "tools/y3_main_hud_hero_layout_repair.py": "5d0f85c3056d1b6bc92244d9657c07db503b87c08ddba8b6cddcd6abfbb0a919",
+        "tools/test_y3_main_hud_hero_layout.py": "ec5a269cef123a289b6829931c6f340bed12058e1379743f83bc808c8219a81a",
+        "tests/fixtures/y3-main-hud-heroes/source.json.gz": "fba88bb6a35546325e53c875e5894bde3e3ef0f45616c6abc249e8df749e596b",
+        "tests/fixtures/y3-main-hud-heroes/published-v1.json.gz": "7aa3b8abbfd7b8f8ae2357f2d63db523d59aa2b0ac5b3e04faf2c255b90687cb"
+    },
+    "editor_verified": false,
+    "runtime_verified": false,
+    "limitations": [
+        "Phase entry visibility literal and periodic refresh were checked separately; actual wave transitions/card occlusion require gameplay."
+    ]
+}

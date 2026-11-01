@@ -1,0 +1,32 @@
+{
+  "source_log": "D:\\Program Files\\y3\\games\\2.0\\game\\LocalData\\trigger_log\\map3\\Log\\littlemurloc_2026_10_31_22_11_43.log",
+  "snapshot": "littlemurloc_2026_10_31_22_11_43.log",
+  "bytes": 3828,
+  "sha256": "441343ee3da30d853618b6a1d43a89b19265a1f91fa4c5dba423b1b35d3a0ed4",
+  "first_timestamp": "2026-10-31-22-11-43",
+  "last_timestamp": "2026-10-31-22-12-27",
+  "severity_counts": {
+    "Info": 13,
+    "Warning": 29,
+    "Error": 0,
+    "Fatal": 0
+  },
+  "warnings": {
+    "code_create_event_fail_by_double_name:hide_tips": 6,
+    "code_create_event_fail_by_double_name:show_equits_tips": 14,
+    "code_create_event_fail_by_double_name:备战区布阵选择": 9
+  },
+  "session_start_markers": 2,
+  "user_report": [
+    "角色头像无法点击切换",
+    "右侧英雄详情的装备／道具格不见了",
+    "函数库里的新UI相关函数红色有报错"
+  ],
+  "editor_observation": "负责人打开并展开后，直接观察刷新主HUD英雄列表与详情第21、22行：选中详情与首名详情的初始化资源字段显示红色“界面控件 无效的变量”。",
+  "confirmed_causes": [
+    "新公共触发器根event与action均为空；8个子触发器只有定义，未接入本项目初始化事件和注册入口。",
+    "两处arg_type100070/sub_type1/args_list[空字符串]把缺失UI资源标识当作空控件。"
+  ],
+  "equipment_status": "原生装备控件及绑定动作仍在；已准备固定位置、显式可见的修订，实际渲染根因及恢复待原生复测。",
+  "limits": "日志无Error不能证明点击或渲染正常。尚未发布本次三文件修订，不把离线结构通过视作编辑器／试玩通过。"
+}

@@ -1,0 +1,1399 @@
+{
+    "action": [
+        {
+            "action_type": "SET_VARIABLE", 
+            "args_list": [
+                {
+                    "arg_type": 100030, 
+                    "args_list": [
+                        {
+                            "__tuple__": true, 
+                            "items": [
+                                "UNIT_NAME", 
+                                "参战单位类型", 
+                                "local"
+                            ]
+                        }
+                    ], 
+                    "sub_type": 1
+                }, 
+                {
+                    "arg_type": 100116, 
+                    "args_list": [
+                        {
+                            "arg_type": 100002, 
+                            "args_list": [
+                                {
+                                    "__tuple__": true, 
+                                    "items": [
+                                        "INTEGER", 
+                                        "英雄类型编号", 
+                                        "local"
+                                    ]
+                                }
+                            ], 
+                            "sub_type": 6
+                        }
+                    ], 
+                    "call_rt_index": 0, 
+                    "op_arg": [], 
+                    "op_arg_enable": [], 
+                    "sub_type": "ca0d6f70383e11ee8046e454e8e29cb0"
+                }
+            ], 
+            "bp": false, 
+            "element_id": 2008040148000001, 
+            "enable": true
+        }, 
+        {
+            "action_type": "IF_THEN_ELSE", 
+            "args_list": [
+                {
+                    "arg_type": 100021, 
+                    "args_list": [
+                        {
+                            "args_list": [
+                                {
+                                    "arg_type": 100001, 
+                                    "args_list": [
+                                        {
+                                            "arg_type": 100025, 
+                                            "args_list": [
+                                                {
+                                                    "__tuple__": true, 
+                                                    "items": [
+                                                        "PLAYER", 
+                                                        "执行玩家", 
+                                                        "local"
+                                                    ]
+                                                }
+                                            ], 
+                                            "sub_type": "VARIABLE"
+                                        }, 
+                                        {
+                                            "arg_type": 100001, 
+                                            "args_list": [
+                                                false
+                                            ], 
+                                            "sub_type": 1
+                                        }
+                                    ], 
+                                    "call_rt_index": 0, 
+                                    "op_arg": [], 
+                                    "op_arg_enable": [], 
+                                    "sub_type": "8f416b0b9b6711f1b1f4bbedd4def87d"
+                                }, 
+                                {
+                                    "arg_type": 100035, 
+                                    "args_list": [
+                                        "=="
+                                    ], 
+                                    "sub_type": 1
+                                }, 
+                                {
+                                    "arg_type": 100001, 
+                                    "args_list": [
+                                        true
+                                    ], 
+                                    "sub_type": 1
+                                }
+                            ], 
+                            "condition_type": "BOOL_COMPARE", 
+                            "element_id": 2008040148000145, 
+                            "enable": true
+                        }
+                    ], 
+                    "sub_type": 1
+                }, 
+                {
+                    "arg_type": 100022, 
+                    "args_list": [
+                        {
+                            "action_type": "TRAVERSE_TABLE_NEW", 
+                            "args_list": [
+                                {
+                                    "arg_type": 100011, 
+                                    "args_list": [
+                                        {
+                                            "arg_type": 100025, 
+                                            "args_list": [
+                                                {
+                                                    "__tuple__": true, 
+                                                    "items": [
+                                                        "PLAYER", 
+                                                        "执行玩家", 
+                                                        "local"
+                                                    ]
+                                                }
+                                            ], 
+                                            "sub_type": "VARIABLE"
+                                        }, 
+                                        {
+                                            "arg_type": 100247, 
+                                            "args_list": [
+                                                16
+                                            ], 
+                                            "sub_type": 1
+                                        }
+                                    ], 
+                                    "sub_type": "GET_PLAYER_SAVE_DATA_TABLE_VALUE"
+                                }, 
+                                {
+                                    "arg_type": 100022, 
+                                    "args_list": [
+                                        {
+                                            "action_type": "IF_THEN_ELSE", 
+                                            "args_list": [
+                                                {
+                                                    "arg_type": 100021, 
+                                                    "args_list": [
+                                                        {
+                                                            "args_list": [
+                                                                {
+                                                                    "arg_type": 100001, 
+                                                                    "args_list": [
+                                                                        {
+                                                                            "arg_type": 100025, 
+                                                                            "args_list": [
+                                                                                {
+                                                                                    "__tuple__": true, 
+                                                                                    "items": [
+                                                                                        "PLAYER", 
+                                                                                        "执行玩家", 
+                                                                                        "local"
+                                                                                    ]
+                                                                                }
+                                                                            ], 
+                                                                            "sub_type": "VARIABLE"
+                                                                        }, 
+                                                                        {
+                                                                            "arg_type": 100247, 
+                                                                            "args_list": [
+                                                                                16
+                                                                            ], 
+                                                                            "sub_type": 1
+                                                                        }, 
+                                                                        {
+                                                                            "arg_type": 100002, 
+                                                                            "args_list": [], 
+                                                                            "sub_type": "ITER_TABLE_KEY_INT"
+                                                                        }
+                                                                    ], 
+                                                                    "op_arg": [
+                                                                        {
+                                                                            "arg_type": 100003, 
+                                                                            "args_list": [
+                                                                                "是否上阵"
+                                                                            ], 
+                                                                            "sub_type": 1
+                                                                        }, 
+                                                                        null
+                                                                    ], 
+                                                                    "op_arg_enable": [
+                                                                        true, 
+                                                                        false
+                                                                    ], 
+                                                                    "sub_type": "GET_PLAYER_SAVE_TABLE_VALUE_BOOLEAN"
+                                                                }, 
+                                                                {
+                                                                    "arg_type": 100035, 
+                                                                    "args_list": [
+                                                                        "=="
+                                                                    ], 
+                                                                    "sub_type": 1
+                                                                }, 
+                                                                {
+                                                                    "arg_type": 100001, 
+                                                                    "args_list": [
+                                                                        true
+                                                                    ], 
+                                                                    "sub_type": 1
+                                                                }
+                                                            ], 
+                                                            "condition_type": "BOOL_COMPARE", 
+                                                            "element_id": 2008040148000617, 
+                                                            "enable": true
+                                                        }, 
+                                                        {
+                                                            "args_list": [
+                                                                {
+                                                                    "arg_type": 100116, 
+                                                                    "args_list": [
+                                                                        {
+                                                                            "__tuple__": true, 
+                                                                            "items": [
+                                                                                "UNIT_NAME", 
+                                                                                "参战单位类型", 
+                                                                                "local"
+                                                                            ]
+                                                                        }
+                                                                    ], 
+                                                                    "sub_type": 2
+                                                                }, 
+                                                                {
+                                                                    "arg_type": 100035, 
+                                                                    "args_list": [
+                                                                        "!="
+                                                                    ], 
+                                                                    "sub_type": 1
+                                                                }, 
+                                                                {
+                                                                    "arg_type": 100116, 
+                                                                    "args_list": [
+                                                                        {
+                                                                            "arg_type": 100025, 
+                                                                            "args_list": [
+                                                                                {
+                                                                                    "__tuple__": true, 
+                                                                                    "items": [
+                                                                                        "PLAYER", 
+                                                                                        "执行玩家", 
+                                                                                        "local"
+                                                                                    ]
+                                                                                }
+                                                                            ], 
+                                                                            "sub_type": "VARIABLE"
+                                                                        }, 
+                                                                        {
+                                                                            "arg_type": 100247, 
+                                                                            "args_list": [
+                                                                                16
+                                                                            ], 
+                                                                            "sub_type": 1
+                                                                        }, 
+                                                                        {
+                                                                            "arg_type": 100002, 
+                                                                            "args_list": [], 
+                                                                            "sub_type": "ITER_TABLE_KEY_INT"
+                                                                        }
+                                                                    ], 
+                                                                    "op_arg": [
+                                                                        {
+                                                                            "arg_type": 100003, 
+                                                                            "args_list": [
+                                                                                "单位类型"
+                                                                            ], 
+                                                                            "sub_type": 1
+                                                                        }, 
+                                                                        null
+                                                                    ], 
+                                                                    "op_arg_enable": [
+                                                                        true, 
+                                                                        false
+                                                                    ], 
+                                                                    "sub_type": "GET_PLAYER_SAVE_TABLE_VALUE_UNIT_NAME"
+                                                                }
+                                                            ], 
+                                                            "condition_type": "UNIT_CLASS_COMPARE", 
+                                                            "element_id": 2008040148000504, 
+                                                            "enable": true
+                                                        }
+                                                    ], 
+                                                    "sub_type": 1
+                                                }, 
+                                                {
+                                                    "arg_type": 100022, 
+                                                    "args_list": [
+                                                        {
+                                                            "action_type": "SET_VARIABLE", 
+                                                            "args_list": [
+                                                                {
+                                                                    "arg_type": 100030, 
+                                                                    "args_list": [
+                                                                        {
+                                                                            "__tuple__": true, 
+                                                                            "items": [
+                                                                                "UNIT_NAME", 
+                                                                                "被替换单位类型", 
+                                                                                "local"
+                                                                            ]
+                                                                        }
+                                                                    ], 
+                                                                    "sub_type": 1
+                                                                }, 
+                                                                {
+                                                                    "arg_type": 100116, 
+                                                                    "args_list": [
+                                                                        {
+                                                                            "arg_type": 100025, 
+                                                                            "args_list": [
+                                                                                {
+                                                                                    "__tuple__": true, 
+                                                                                    "items": [
+                                                                                        "PLAYER", 
+                                                                                        "执行玩家", 
+                                                                                        "local"
+                                                                                    ]
+                                                                                }
+                                                                            ], 
+                                                                            "sub_type": "VARIABLE"
+                                                                        }, 
+                                                                        {
+                                                                            "arg_type": 100247, 
+                                                                            "args_list": [
+                                                                                16
+                                                                            ], 
+                                                                            "sub_type": 1
+                                                                        }, 
+                                                                        {
+                                                                            "arg_type": 100002, 
+                                                                            "args_list": [], 
+                                                                            "sub_type": "ITER_TABLE_KEY_INT"
+                                                                        }
+                                                                    ], 
+                                                                    "op_arg": [
+                                                                        {
+                                                                            "arg_type": 100003, 
+                                                                            "args_list": [
+                                                                                "单位类型"
+                                                                            ], 
+                                                                            "sub_type": 1
+                                                                        }, 
+                                                                        null
+                                                                    ], 
+                                                                    "op_arg_enable": [
+                                                                        true, 
+                                                                        false
+                                                                    ], 
+                                                                    "sub_type": "GET_PLAYER_SAVE_TABLE_VALUE_UNIT_NAME"
+                                                                }
+                                                            ], 
+                                                            "bp": false, 
+                                                            "element_id": 2008040148001162, 
+                                                            "enable": true
+                                                        }, 
+                                                        {
+                                                            "action_type": "SET_PLAYER_SAVE_TABLE_VALUE", 
+                                                            "args_list": [
+                                                                {
+                                                                    "arg_type": 100025, 
+                                                                    "args_list": [
+                                                                        {
+                                                                            "__tuple__": true, 
+                                                                            "items": [
+                                                                                "PLAYER", 
+                                                                                "执行玩家", 
+                                                                                "local"
+                                                                            ]
+                                                                        }
+                                                                    ], 
+                                                                    "sub_type": "VARIABLE"
+                                                                }, 
+                                                                {
+                                                                    "arg_type": 100247, 
+                                                                    "args_list": [
+                                                                        16
+                                                                    ], 
+                                                                    "sub_type": 1
+                                                                }, 
+                                                                {
+                                                                    "arg_type": 100002, 
+                                                                    "args_list": [], 
+                                                                    "sub_type": "ITER_TABLE_KEY_INT"
+                                                                }, 
+                                                                {
+                                                                    "arg_type": 100001, 
+                                                                    "args_list": [
+                                                                        false
+                                                                    ], 
+                                                                    "sub_type": 1
+                                                                }
+                                                            ], 
+                                                            "bp": false, 
+                                                            "element_id": 2008040148000647, 
+                                                            "enable": true, 
+                                                            "op_arg": [
+                                                                {
+                                                                    "arg_type": 100003, 
+                                                                    "args_list": [
+                                                                        "是否上阵"
+                                                                    ], 
+                                                                    "sub_type": 1
+                                                                }, 
+                                                                null
+                                                            ], 
+                                                            "op_arg_enable": [
+                                                                true, 
+                                                                false
+                                                            ]
+                                                        }, 
+                                                        {
+                                                            "action_type": "REMOVE_PLAYER_SAVE_TABLE_VALUE", 
+                                                            "args_list": [
+                                                                {
+                                                                    "arg_type": 100025, 
+                                                                    "args_list": [
+                                                                        {
+                                                                            "__tuple__": true, 
+                                                                            "items": [
+                                                                                "PLAYER", 
+                                                                                "执行玩家", 
+                                                                                "local"
+                                                                            ]
+                                                                        }
+                                                                    ], 
+                                                                    "sub_type": "VARIABLE"
+                                                                }, 
+                                                                {
+                                                                    "arg_type": 100247, 
+                                                                    "args_list": [
+                                                                        16
+                                                                    ], 
+                                                                    "sub_type": 1
+                                                                }, 
+                                                                {
+                                                                    "arg_type": 100002, 
+                                                                    "args_list": [], 
+                                                                    "sub_type": "ITER_TABLE_KEY_INT"
+                                                                }
+                                                            ], 
+                                                            "bp": false, 
+                                                            "element_id": 2008040148000658, 
+                                                            "enable": true, 
+                                                            "op_arg": [
+                                                                {
+                                                                    "arg_type": 100003, 
+                                                                    "args_list": [
+                                                                        "上阵9宫格"
+                                                                    ], 
+                                                                    "sub_type": 1
+                                                                }, 
+                                                                null
+                                                            ], 
+                                                            "op_arg_enable": [
+                                                                true, 
+                                                                false
+                                                            ]
+                                                        }, 
+                                                        {
+                                                            "action_type": "SET_PLAYER_SAVE_TABLE_VALUE", 
+                                                            "args_list": [
+                                                                {
+                                                                    "arg_type": 100025, 
+                                                                    "args_list": [
+                                                                        {
+                                                                            "__tuple__": true, 
+                                                                            "items": [
+                                                                                "PLAYER", 
+                                                                                "执行玩家", 
+                                                                                "local"
+                                                                            ]
+                                                                        }
+                                                                    ], 
+                                                                    "sub_type": "VARIABLE"
+                                                                }, 
+                                                                {
+                                                                    "arg_type": 100247, 
+                                                                    "args_list": [
+                                                                        16
+                                                                    ], 
+                                                                    "sub_type": 1
+                                                                }, 
+                                                                {
+                                                                    "arg_type": 100002, 
+                                                                    "args_list": [], 
+                                                                    "sub_type": "ITER_TABLE_KEY_INT"
+                                                                }, 
+                                                                {
+                                                                    "arg_type": 100002, 
+                                                                    "args_list": [
+                                                                        -1
+                                                                    ], 
+                                                                    "sub_type": 1
+                                                                }
+                                                            ], 
+                                                            "bp": false, 
+                                                            "element_id": 2008040148000667, 
+                                                            "enable": true, 
+                                                            "op_arg": [
+                                                                {
+                                                                    "arg_type": 100003, 
+                                                                    "args_list": [
+                                                                        "上阵9宫格"
+                                                                    ], 
+                                                                    "sub_type": 1
+                                                                }, 
+                                                                null
+                                                            ], 
+                                                            "op_arg_enable": [
+                                                                true, 
+                                                                false
+                                                            ]
+                                                        }, 
+                                                        {
+                                                            "action_type": "ITER_UI_COMP_DO", 
+                                                            "args_list": [
+                                                                {
+                                                                    "arg_type": 100025, 
+                                                                    "args_list": [
+                                                                        {
+                                                                            "__tuple__": true, 
+                                                                            "items": [
+                                                                                "PLAYER", 
+                                                                                "执行玩家", 
+                                                                                "local"
+                                                                            ]
+                                                                        }
+                                                                    ], 
+                                                                    "sub_type": "VARIABLE"
+                                                                }, 
+                                                                {
+                                                                    "arg_type": 100070, 
+                                                                    "args_list": [
+                                                                        "de1f3e01-b139-4d4f-9160-77d88f679e36"
+                                                                    ], 
+                                                                    "sub_type": 1
+                                                                }, 
+                                                                {
+                                                                    "arg_type": 100022, 
+                                                                    "args_list": [
+                                                                        {
+                                                                            "action_type": "IF_THEN_ELSE", 
+                                                                            "args_list": [
+                                                                                {
+                                                                                    "arg_type": 100021, 
+                                                                                    "args_list": [
+                                                                                        {
+                                                                                            "args_list": [
+                                                                                                {
+                                                                                                    "arg_type": 100116, 
+                                                                                                    "args_list": [
+                                                                                                        {
+                                                                                                            "arg_type": 1001558, 
+                                                                                                            "args_list": [
+                                                                                                                {
+                                                                                                                    "arg_type": 100025, 
+                                                                                                                    "args_list": [
+                                                                                                                        {
+                                                                                                                            "__tuple__": true, 
+                                                                                                                            "items": [
+                                                                                                                                "PLAYER", 
+                                                                                                                                "执行玩家", 
+                                                                                                                                "local"
+                                                                                                                            ]
+                                                                                                                        }
+                                                                                                                    ], 
+                                                                                                                    "sub_type": "VARIABLE"
+                                                                                                                }, 
+                                                                                                                {
+                                                                                                                    "arg_type": 100070, 
+                                                                                                                    "args_list": [], 
+                                                                                                                    "sub_type": "FOR_EACH_UI_COMP"
+                                                                                                                }
+                                                                                                            ], 
+                                                                                                            "sub_type": "GET_UI_COMP_PREFAB"
+                                                                                                        }, 
+                                                                                                        {
+                                                                                                            "arg_type": 100003, 
+                                                                                                            "args_list": [
+                                                                                                                "绑定英雄单位类型"
+                                                                                                            ], 
+                                                                                                            "sub_type": 1
+                                                                                                        }
+                                                                                                    ], 
+                                                                                                    "sub_type": "GET_UNIT_NAME_KV"
+                                                                                                }, 
+                                                                                                {
+                                                                                                    "arg_type": 100035, 
+                                                                                                    "args_list": [
+                                                                                                        "=="
+                                                                                                    ], 
+                                                                                                    "sub_type": 1
+                                                                                                }, 
+                                                                                                {
+                                                                                                    "arg_type": 100116, 
+                                                                                                    "args_list": [
+                                                                                                        {
+                                                                                                            "__tuple__": true, 
+                                                                                                            "items": [
+                                                                                                                "UNIT_NAME", 
+                                                                                                                "被替换单位类型", 
+                                                                                                                "local"
+                                                                                                            ]
+                                                                                                        }
+                                                                                                    ], 
+                                                                                                    "sub_type": 2
+                                                                                                }
+                                                                                            ], 
+                                                                                            "condition_type": "UNIT_CLASS_COMPARE", 
+                                                                                            "element_id": 2008040148001012, 
+                                                                                            "enable": true
+                                                                                        }
+                                                                                    ], 
+                                                                                    "sub_type": 1
+                                                                                }, 
+                                                                                {
+                                                                                    "arg_type": 100022, 
+                                                                                    "args_list": [
+                                                                                        {
+                                                                                            "action_type": "CALL_TRIGGER_FUNC", 
+                                                                                            "args_list": [
+                                                                                                {
+                                                                                                    "arg_type": 100177, 
+                                                                                                    "args_list": [
+                                                                                                        {
+                                                                                                            "arg_type": 100070, 
+                                                                                                            "args_list": [], 
+                                                                                                            "sub_type": "FOR_EACH_UI_COMP"
+                                                                                                        }, 
+                                                                                                        {
+                                                                                                            "arg_type": 100025, 
+                                                                                                            "args_list": [
+                                                                                                                {
+                                                                                                                    "__tuple__": true, 
+                                                                                                                    "items": [
+                                                                                                                        "PLAYER", 
+                                                                                                                        "执行玩家", 
+                                                                                                                        "local"
+                                                                                                                    ]
+                                                                                                                }
+                                                                                                            ], 
+                                                                                                            "sub_type": "VARIABLE"
+                                                                                                        }
+                                                                                                    ], 
+                                                                                                    "op_arg": [], 
+                                                                                                    "op_arg_enable": [], 
+                                                                                                    "sub_type": "1256b722874711f0bd9f39369fefeb26"
+                                                                                                }
+                                                                                            ], 
+                                                                                            "bp": false, 
+                                                                                            "call_rt_arg_idxes": [], 
+                                                                                            "element_id": 593396238000009, 
+                                                                                            "enable": true
+                                                                                        }, 
+                                                                                        {
+                                                                                            "action_type": "BREAK_LOOP", 
+                                                                                            "args_list": [], 
+                                                                                            "bp": false, 
+                                                                                            "element_id": 2008040148001032, 
+                                                                                            "enable": true
+                                                                                        }
+                                                                                    ], 
+                                                                                    "sub_type": 1
+                                                                                }, 
+                                                                                {
+                                                                                    "arg_type": 100022, 
+                                                                                    "args_list": [], 
+                                                                                    "sub_type": 1
+                                                                                }
+                                                                            ], 
+                                                                            "bp": false, 
+                                                                            "element_id": 2008040148000989, 
+                                                                            "enable": true, 
+                                                                            "fake_op": []
+                                                                        }
+                                                                    ], 
+                                                                    "sub_type": 1
+                                                                }
+                                                            ], 
+                                                            "bp": false, 
+                                                            "element_id": 2008040148000983, 
+                                                            "enable": true
+                                                        }, 
+                                                        {
+                                                            "action_type": "BREAK_LOOP", 
+                                                            "args_list": [], 
+                                                            "bp": false, 
+                                                            "element_id": 2008040148000598, 
+                                                            "enable": true
+                                                        }
+                                                    ], 
+                                                    "sub_type": 1
+                                                }, 
+                                                {
+                                                    "arg_type": 100022, 
+                                                    "args_list": [], 
+                                                    "sub_type": 1
+                                                }
+                                            ], 
+                                            "bp": false, 
+                                            "element_id": 2008040148000500, 
+                                            "enable": true, 
+                                            "fake_op": []
+                                        }
+                                    ], 
+                                    "sub_type": 1
+                                }
+                            ], 
+                            "bp": false, 
+                            "element_id": 2008040148000490, 
+                            "enable": true, 
+                            "op_arg": [
+                                {
+                                    "arg_type": 100001, 
+                                    "args_list": [
+                                        true
+                                    ], 
+                                    "sub_type": 1
+                                }
+                            ], 
+                            "op_arg_enable": [
+                                true
+                            ]
+                        }
+                    ], 
+                    "sub_type": 1
+                }, 
+                {
+                    "arg_type": 100022, 
+                    "args_list": [], 
+                    "sub_type": 1
+                }
+            ], 
+            "bp": false, 
+            "element_id": 2008040148000136, 
+            "enable": true, 
+            "fake_op": []
+        }, 
+        {
+            "action_type": "TRAVERSE_TABLE_NEW", 
+            "args_list": [
+                {
+                    "arg_type": 100011, 
+                    "args_list": [
+                        {
+                            "arg_type": 100025, 
+                            "args_list": [
+                                {
+                                    "__tuple__": true, 
+                                    "items": [
+                                        "PLAYER", 
+                                        "执行玩家", 
+                                        "local"
+                                    ]
+                                }
+                            ], 
+                            "sub_type": "VARIABLE"
+                        }, 
+                        {
+                            "arg_type": 100247, 
+                            "args_list": [
+                                16
+                            ], 
+                            "sub_type": 1
+                        }
+                    ], 
+                    "sub_type": "GET_PLAYER_SAVE_DATA_TABLE_VALUE"
+                }, 
+                {
+                    "arg_type": 100022, 
+                    "args_list": [
+                        {
+                            "action_type": "IF_THEN_ELSE", 
+                            "args_list": [
+                                {
+                                    "arg_type": 100021, 
+                                    "args_list": [
+                                        {
+                                            "args_list": [
+                                                {
+                                                    "arg_type": 100116, 
+                                                    "args_list": [
+                                                        {
+                                                            "__tuple__": true, 
+                                                            "items": [
+                                                                "UNIT_NAME", 
+                                                                "参战单位类型", 
+                                                                "local"
+                                                            ]
+                                                        }
+                                                    ], 
+                                                    "sub_type": 2
+                                                }, 
+                                                {
+                                                    "arg_type": 100035, 
+                                                    "args_list": [
+                                                        "=="
+                                                    ], 
+                                                    "sub_type": 1
+                                                }, 
+                                                {
+                                                    "arg_type": 100116, 
+                                                    "args_list": [
+                                                        {
+                                                            "arg_type": 100025, 
+                                                            "args_list": [
+                                                                {
+                                                                    "__tuple__": true, 
+                                                                    "items": [
+                                                                        "PLAYER", 
+                                                                        "执行玩家", 
+                                                                        "local"
+                                                                    ]
+                                                                }
+                                                            ], 
+                                                            "sub_type": "VARIABLE"
+                                                        }, 
+                                                        {
+                                                            "arg_type": 100247, 
+                                                            "args_list": [
+                                                                16
+                                                            ], 
+                                                            "sub_type": 1
+                                                        }, 
+                                                        {
+                                                            "arg_type": 100002, 
+                                                            "args_list": [], 
+                                                            "sub_type": "ITER_TABLE_KEY_INT"
+                                                        }
+                                                    ], 
+                                                    "op_arg": [
+                                                        {
+                                                            "arg_type": 100003, 
+                                                            "args_list": [
+                                                                "单位类型"
+                                                            ], 
+                                                            "sub_type": 1
+                                                        }, 
+                                                        null
+                                                    ], 
+                                                    "op_arg_enable": [
+                                                        true, 
+                                                        false
+                                                    ], 
+                                                    "sub_type": "GET_PLAYER_SAVE_TABLE_VALUE_UNIT_NAME"
+                                                }
+                                            ], 
+                                            "condition_type": "UNIT_CLASS_COMPARE", 
+                                            "element_id": 2008040148000032, 
+                                            "enable": true
+                                        }
+                                    ], 
+                                    "sub_type": 1
+                                }, 
+                                {
+                                    "arg_type": 100022, 
+                                    "args_list": [
+                                        {
+                                            "action_type": "IF_THEN_ELSE", 
+                                            "args_list": [
+                                                {
+                                                    "arg_type": 100021, 
+                                                    "args_list": [
+                                                        {
+                                                            "args_list": [
+                                                                {
+                                                                    "arg_type": 100001, 
+                                                                    "args_list": [
+                                                                        {
+                                                                            "arg_type": 100025, 
+                                                                            "args_list": [
+                                                                                {
+                                                                                    "__tuple__": true, 
+                                                                                    "items": [
+                                                                                        "PLAYER", 
+                                                                                        "执行玩家", 
+                                                                                        "local"
+                                                                                    ]
+                                                                                }
+                                                                            ], 
+                                                                            "sub_type": "VARIABLE"
+                                                                        }, 
+                                                                        {
+                                                                            "arg_type": 100247, 
+                                                                            "args_list": [
+                                                                                16
+                                                                            ], 
+                                                                            "sub_type": 1
+                                                                        }, 
+                                                                        {
+                                                                            "arg_type": 100002, 
+                                                                            "args_list": [], 
+                                                                            "sub_type": "ITER_TABLE_KEY_INT"
+                                                                        }
+                                                                    ], 
+                                                                    "op_arg": [
+                                                                        {
+                                                                            "arg_type": 100003, 
+                                                                            "args_list": [
+                                                                                "是否上阵"
+                                                                            ], 
+                                                                            "sub_type": 1
+                                                                        }, 
+                                                                        null
+                                                                    ], 
+                                                                    "op_arg_enable": [
+                                                                        true, 
+                                                                        false
+                                                                    ], 
+                                                                    "sub_type": "GET_PLAYER_SAVE_TABLE_VALUE_BOOLEAN"
+                                                                }, 
+                                                                {
+                                                                    "arg_type": 100035, 
+                                                                    "args_list": [
+                                                                        "=="
+                                                                    ], 
+                                                                    "sub_type": 1
+                                                                }, 
+                                                                {
+                                                                    "arg_type": 100001, 
+                                                                    "args_list": [
+                                                                        false
+                                                                    ], 
+                                                                    "sub_type": 1
+                                                                }
+                                                            ], 
+                                                            "condition_type": "BOOL_COMPARE", 
+                                                            "element_id": 2008040148000064, 
+                                                            "enable": true
+                                                        }
+                                                    ], 
+                                                    "sub_type": 1
+                                                }, 
+                                                {
+                                                    "arg_type": 100022, 
+                                                    "args_list": [
+                                                        {
+                                                            "action_type": "SET_PLAYER_SAVE_TABLE_VALUE", 
+                                                            "args_list": [
+                                                                {
+                                                                    "arg_type": 100025, 
+                                                                    "args_list": [
+                                                                        {
+                                                                            "__tuple__": true, 
+                                                                            "items": [
+                                                                                "PLAYER", 
+                                                                                "执行玩家", 
+                                                                                "local"
+                                                                            ]
+                                                                        }
+                                                                    ], 
+                                                                    "sub_type": "VARIABLE"
+                                                                }, 
+                                                                {
+                                                                    "arg_type": 100247, 
+                                                                    "args_list": [
+                                                                        16
+                                                                    ], 
+                                                                    "sub_type": 1
+                                                                }, 
+                                                                {
+                                                                    "arg_type": 100002, 
+                                                                    "args_list": [], 
+                                                                    "sub_type": "ITER_TABLE_KEY_INT"
+                                                                }, 
+                                                                {
+                                                                    "arg_type": 100001, 
+                                                                    "args_list": [
+                                                                        true
+                                                                    ], 
+                                                                    "sub_type": 1
+                                                                }
+                                                            ], 
+                                                            "bp": false, 
+                                                            "element_id": 2008040148000048, 
+                                                            "enable": true, 
+                                                            "op_arg": [
+                                                                {
+                                                                    "arg_type": 100003, 
+                                                                    "args_list": [
+                                                                        "是否上阵"
+                                                                    ], 
+                                                                    "sub_type": 1
+                                                                }, 
+                                                                null
+                                                            ], 
+                                                            "op_arg_enable": [
+                                                                true, 
+                                                                false
+                                                            ]
+                                                        }, 
+                                                        {
+                                                            "action_type": "REMOVE_PLAYER_SAVE_TABLE_VALUE", 
+                                                            "args_list": [
+                                                                {
+                                                                    "arg_type": 100025, 
+                                                                    "args_list": [
+                                                                        {
+                                                                            "__tuple__": true, 
+                                                                            "items": [
+                                                                                "PLAYER", 
+                                                                                "执行玩家", 
+                                                                                "local"
+                                                                            ]
+                                                                        }
+                                                                    ], 
+                                                                    "sub_type": "VARIABLE"
+                                                                }, 
+                                                                {
+                                                                    "arg_type": 100247, 
+                                                                    "args_list": [
+                                                                        16
+                                                                    ], 
+                                                                    "sub_type": 1
+                                                                }, 
+                                                                {
+                                                                    "arg_type": 100002, 
+                                                                    "args_list": [], 
+                                                                    "sub_type": "ITER_TABLE_KEY_INT"
+                                                                }
+                                                            ], 
+                                                            "bp": false, 
+                                                            "element_id": 2008040148000130, 
+                                                            "enable": true, 
+                                                            "op_arg": [
+                                                                {
+                                                                    "arg_type": 100003, 
+                                                                    "args_list": [
+                                                                        "上阵9宫格"
+                                                                    ], 
+                                                                    "sub_type": 1
+                                                                }, 
+                                                                null
+                                                            ], 
+                                                            "op_arg_enable": [
+                                                                true, 
+                                                                false
+                                                            ]
+                                                        }, 
+                                                        {
+                                                            "action_type": "SET_PLAYER_SAVE_TABLE_VALUE", 
+                                                            "args_list": [
+                                                                {
+                                                                    "arg_type": 100025, 
+                                                                    "args_list": [
+                                                                        {
+                                                                            "__tuple__": true, 
+                                                                            "items": [
+                                                                                "PLAYER", 
+                                                                                "执行玩家", 
+                                                                                "local"
+                                                                            ]
+                                                                        }
+                                                                    ], 
+                                                                    "sub_type": "VARIABLE"
+                                                                }, 
+                                                                {
+                                                                    "arg_type": 100247, 
+                                                                    "args_list": [
+                                                                        16
+                                                                    ], 
+                                                                    "sub_type": 1
+                                                                }, 
+                                                                {
+                                                                    "arg_type": 100002, 
+                                                                    "args_list": [], 
+                                                                    "sub_type": "ITER_TABLE_KEY_INT"
+                                                                }, 
+                                                                {
+                                                                    "arg_type": 100002, 
+                                                                    "args_list": [
+                                                                        {
+                                                                            "__tuple__": true, 
+                                                                            "items": [
+                                                                                "INTEGER", 
+                                                                                "指定上阵编号", 
+                                                                                "local"
+                                                                            ]
+                                                                        }
+                                                                    ], 
+                                                                    "sub_type": 6
+                                                                }
+                                                            ], 
+                                                            "bp": false, 
+                                                            "element_id": 2008040148000102, 
+                                                            "enable": true, 
+                                                            "op_arg": [
+                                                                {
+                                                                    "arg_type": 100003, 
+                                                                    "args_list": [
+                                                                        "上阵9宫格"
+                                                                    ], 
+                                                                    "sub_type": 1
+                                                                }, 
+                                                                null
+                                                            ], 
+                                                            "op_arg_enable": [
+                                                                true, 
+                                                                false
+                                                            ]
+                                                        }
+                                                    ], 
+                                                    "sub_type": 1
+                                                }, 
+                                                {
+                                                    "arg_type": 100022, 
+                                                    "args_list": [
+                                                        {
+                                                            "action_type": "SET_PLAYER_SAVE_TABLE_VALUE", 
+                                                            "args_list": [
+                                                                {
+                                                                    "arg_type": 100025, 
+                                                                    "args_list": [
+                                                                        {
+                                                                            "__tuple__": true, 
+                                                                            "items": [
+                                                                                "PLAYER", 
+                                                                                "执行玩家", 
+                                                                                "local"
+                                                                            ]
+                                                                        }
+                                                                    ], 
+                                                                    "sub_type": "VARIABLE"
+                                                                }, 
+                                                                {
+                                                                    "arg_type": 100247, 
+                                                                    "args_list": [
+                                                                        16
+                                                                    ], 
+                                                                    "sub_type": 1
+                                                                }, 
+                                                                {
+                                                                    "arg_type": 100002, 
+                                                                    "args_list": [], 
+                                                                    "sub_type": "ITER_TABLE_KEY_INT"
+                                                                }, 
+                                                                {
+                                                                    "arg_type": 100001, 
+                                                                    "args_list": [
+                                                                        false
+                                                                    ], 
+                                                                    "sub_type": 1
+                                                                }
+                                                            ], 
+                                                            "bp": false, 
+                                                            "element_id": 2008040148000084, 
+                                                            "enable": true, 
+                                                            "op_arg": [
+                                                                {
+                                                                    "arg_type": 100003, 
+                                                                    "args_list": [
+                                                                        "是否上阵"
+                                                                    ], 
+                                                                    "sub_type": 1
+                                                                }, 
+                                                                null
+                                                            ], 
+                                                            "op_arg_enable": [
+                                                                true, 
+                                                                false
+                                                            ]
+                                                        }, 
+                                                        {
+                                                            "action_type": "REMOVE_PLAYER_SAVE_TABLE_VALUE", 
+                                                            "args_list": [
+                                                                {
+                                                                    "arg_type": 100025, 
+                                                                    "args_list": [
+                                                                        {
+                                                                            "__tuple__": true, 
+                                                                            "items": [
+                                                                                "PLAYER", 
+                                                                                "执行玩家", 
+                                                                                "local"
+                                                                            ]
+                                                                        }
+                                                                    ], 
+                                                                    "sub_type": "VARIABLE"
+                                                                }, 
+                                                                {
+                                                                    "arg_type": 100247, 
+                                                                    "args_list": [
+                                                                        16
+                                                                    ], 
+                                                                    "sub_type": 1
+                                                                }, 
+                                                                {
+                                                                    "arg_type": 100002, 
+                                                                    "args_list": [], 
+                                                                    "sub_type": "ITER_TABLE_KEY_INT"
+                                                                }
+                                                            ], 
+                                                            "bp": false, 
+                                                            "element_id": 2008040148000133, 
+                                                            "enable": true, 
+                                                            "op_arg": [
+                                                                {
+                                                                    "arg_type": 100003, 
+                                                                    "args_list": [
+                                                                        "上阵9宫格"
+                                                                    ], 
+                                                                    "sub_type": 1
+                                                                }, 
+                                                                null
+                                                            ], 
+                                                            "op_arg_enable": [
+                                                                true, 
+                                                                false
+                                                            ]
+                                                        }, 
+                                                        {
+                                                            "action_type": "SET_PLAYER_SAVE_TABLE_VALUE", 
+                                                            "args_list": [
+                                                                {
+                                                                    "arg_type": 100025, 
+                                                                    "args_list": [
+                                                                        {
+                                                                            "__tuple__": true, 
+                                                                            "items": [
+                                                                                "PLAYER", 
+                                                                                "执行玩家", 
+                                                                                "local"
+                                                                            ]
+                                                                        }
+                                                                    ], 
+                                                                    "sub_type": "VARIABLE"
+                                                                }, 
+                                                                {
+                                                                    "arg_type": 100247, 
+                                                                    "args_list": [
+                                                                        16
+                                                                    ], 
+                                                                    "sub_type": 1
+                                                                }, 
+                                                                {
+                                                                    "arg_type": 100002, 
+                                                                    "args_list": [], 
+                                                                    "sub_type": "ITER_TABLE_KEY_INT"
+                                                                }, 
+                                                                {
+                                                                    "arg_type": 100002, 
+                                                                    "args_list": [
+                                                                        -1
+                                                                    ], 
+                                                                    "sub_type": 1
+                                                                }
+                                                            ], 
+                                                            "bp": false, 
+                                                            "element_id": 2008040148000113, 
+                                                            "enable": true, 
+                                                            "op_arg": [
+                                                                {
+                                                                    "arg_type": 100003, 
+                                                                    "args_list": [
+                                                                        "上阵9宫格"
+                                                                    ], 
+                                                                    "sub_type": 1
+                                                                }, 
+                                                                null
+                                                            ], 
+                                                            "op_arg_enable": [
+                                                                true, 
+                                                                false
+                                                            ]
+                                                        }
+                                                    ], 
+                                                    "sub_type": 1
+                                                }
+                                            ], 
+                                            "bp": false, 
+                                            "element_id": 2008040148000055, 
+                                            "enable": true, 
+                                            "fake_op": [
+                                                2
+                                            ]
+                                        }, 
+                                        {
+                                            "action_type": "BREAK_LOOP", 
+                                            "args_list": [], 
+                                            "bp": false, 
+                                            "element_id": 2008040148000099, 
+                                            "enable": true
+                                        }
+                                    ], 
+                                    "sub_type": 1
+                                }, 
+                                {
+                                    "arg_type": 100022, 
+                                    "args_list": [], 
+                                    "sub_type": 1
+                                }
+                            ], 
+                            "bp": false, 
+                            "element_id": 2008040148000023, 
+                            "enable": true, 
+                            "fake_op": []
+                        }
+                    ], 
+                    "sub_type": 1
+                }
+            ], 
+            "bp": false, 
+            "element_id": 2008040148000012, 
+            "enable": true, 
+            "op_arg": [
+                {
+                    "arg_type": 100001, 
+                    "args_list": [
+                        true
+                    ], 
+                    "sub_type": 1
+                }
+            ], 
+            "op_arg_enable": [
+                true
+            ]
+        }
+    ], 
+    "call_enabled": true, 
+    "condition": [], 
+    "enabled": true, 
+    "event": [], 
+    "func_category": "t_function", 
+    "func_comment": "", 
+    "func_des": "函数描述：英雄类型编号{英雄类型编号}，执行玩家{执行玩家}，指定上阵编号{指定上阵编号}", 
+    "func_id": "739fb9e279ac11f18f9a096f48f60133", 
+    "func_name": "记录英雄单位上阵信息", 
+    "func_param_list": [
+        {
+            "__tuple__": true, 
+            "items": [
+                "英雄类型编号", 
+                true
+            ]
+        }, 
+        {
+            "__tuple__": true, 
+            "items": [
+                "执行玩家", 
+                true
+            ]
+        }, 
+        {
+            "__tuple__": true, 
+            "items": [
+                "指定上阵编号", 
+                true
+            ]
+        }
+    ], 
+    "group_id": "wj2MznmVEfGuHwlvSPYBMx", 
+    "is_func": true, 
+    "is_official_func": false, 
+    "p_trigger_id": null, 
+    "trigger_id": 2008040148, 
+    "trigger_name": "记录英雄单位上阵信息", 
+    "valid": true, 
+    "var_data": [
+        {
+            "BOOLEAN": {}, 
+            "INTEGER": {
+                "指定上阵编号": 0, 
+                "英雄类型编号": 0
+            }, 
+            "NEW_TIMER": {}, 
+            "PLAYER": {
+                "执行玩家": 0
+            }, 
+            "UI_PREFAB_INSTANCE": {}, 
+            "UNIT_NAME": {
+                "参战单位类型": 0, 
+                "被替换单位类型": 0
+            }
+        }, 
+        {
+            "参战单位类型": 0, 
+            "执行玩家": 0, 
+            "指定上阵编号": 0, 
+            "英雄类型编号": 0, 
+            "被替换单位类型": 0
+        }, 
+        [
+            "英雄类型编号", 
+            "参战单位类型", 
+            "执行玩家", 
+            "指定上阵编号", 
+            "被替换单位类型"
+        ]
+    ]
+}

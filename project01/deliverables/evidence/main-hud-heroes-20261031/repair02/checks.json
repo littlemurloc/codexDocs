@@ -1,0 +1,37 @@
+{
+    "structural": {
+        "global_trigger/trigger/UI/\u4e3bHUD\u82f1\u96c4\u4fe1\u606f.json": {
+            "structure_valid": true,
+            "issues": [],
+            "issue_count": 0,
+            "warnings": [],
+            "warning_count": 0,
+            "editor_verified": false,
+            "coverage": "Observed JSON structure and element IDs; not full Y3 semantics."
+        }
+    },
+    "unchanged_detail_and_equipment_subtree": true,
+    "unchanged_other_seven_handlers": true,
+    "unique_roster_buttons": 10,
+    "diagnostic_prefix": "[\u4e3bHUD\u8bca\u65ad/v2]",
+    "diagnostic_scope": "Root initialization and actual roster click only; no periodic logging",
+    "source_cause": "Image event/hit target and parent-name parsing are unverified native contracts; use existing button pattern and observe actual event entry.",
+    "status": "PASS",
+    "test_count": 29,
+    "manifest_sha256": "18e1d7433dfcf71539f6f225331627cba517cf65b71b2f8a5952971b0f19f3b3",
+    "tools": {
+        "tools/y3_main_hud_hero_layout.py": "6f816c28bf2c20f0749e814ca77e3c283209225c5ed21c0442130eff235cde13",
+        "tools/y3_main_hud_hero_click_repair.py": "a5a77656580455d5f3914ff8279d982b181268c696a0c87f927ebc5f4dc1f016",
+        "tools/y3_main_hud_hero_layout_repair.py": "5d0f85c3056d1b6bc92244d9657c07db503b87c08ddba8b6cddcd6abfbb0a919",
+        "tools/test_y3_main_hud_hero_layout.py": "a48c0f950252d94820bdd9628078ec0ab3a4618fa70058a586de8a5efdd69d1d",
+        "tests/fixtures/y3-main-hud-heroes/source.json.gz": "fba88bb6a35546325e53c875e5894bde3e3ef0f45616c6abc249e8df749e596b",
+        "tests/fixtures/y3-main-hud-heroes/published-v1.json.gz": "7aa3b8abbfd7b8f8ae2357f2d63db523d59aa2b0ac5b3e04faf2c255b90687cb",
+        "tests/fixtures/y3-main-hud-heroes/published-repair01.json.gz": "3a8a9b2b0c9f68a1e353750ef66a2007aa1dd68e52618fb42770e61a11d5f0a0"
+    },
+    "editor_verified": false,
+    "runtime_verified": false,
+    "limitations": [
+        "Tests model declared-component dispatch; they do not generate engine mouse events or prove native hit testing.",
+        "First repair loaded without red references but actual click remained broken; this candidate still requires native play."
+    ]
+}
