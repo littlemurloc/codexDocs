@@ -155,10 +155,14 @@ var _summoned_total: int = 0
 ##
 ## loadout_by_id（M19）同理：hid -> 已装备技能 id 列表。缺省空字典 = 每人全装，
 ## 和 M1~M18 的历史行为逐位相同，bench 靠这一点复现旧基线。
+##
+## def_by_key（M34）：`hero_ids` 里的每一项是**名册实例 id**（同职业多人时
+## 是 `crusader#2` 这种），而这个字典把它映射回职业 id，用来查数值表。
+## 缺省空字典 = 两者相同（职业 id 就是实例 id），也就是 M33 及以前的行为。
 func setup(hero_ids: Array, monster_ids: Array, seed_value: int = 1,
 		gear_level: int = 0, skill_level: int = 0,
 		gear_by_id: Dictionary = {}, skill_by_id: Dictionary = {},
-		loadout_by_id: Dictionary = {}) -> bool:
+		loadout_by_id: Dictionary = {}, def_by_key: Dictionary = {}) -> bool:
 	db = DdDb.shared()
 	if db == null or db.heroes.is_empty():
 		push_error("Battle: 数据未加载")
@@ -167,11 +171,14 @@ func setup(hero_ids: Array, monster_ids: Array, seed_value: int = 1,
 
 	for hid in hero_ids:
 		var c := Combatant.new()
-		var g: int = int(gear_by_id.get(str(hid), gear_level))
-		var s: int = int(skill_by_id.get(str(hid), skill_level))
-		var lo: Array = loadout_by_id.get(str(hid), [])
-		if not c.setup_from_hero(db, str(hid), g, s, lo):
+		var key: String = str(hid)
+		var d: String = str(def_by_key.get(key, key))
+		var g: int = int(gear_by_id.get(key, gear_level))
+		var s: int = int(skill_by_id.get(key, skill_level))
+		var lo: Array = loadout_by_id.get(key, [])
+		if not c.setup_from_hero(db, d, g, s, lo):
 			return false
+		c.hero_key = key
 		c.side = Combatant.SIDE_PARTY
 		c.uid = _next_uid
 		_next_uid += 1
@@ -625,7 +632,7 @@ func set_environment(e: Dictionary) -> void:
 ## 资源层就退化成「打了几场」的计数器。
 func apply_party_state(state: Dictionary) -> void:
 	for u in party:
-		var s: Dictionary = state.get(u.def_id, {})
+		var s: Dictionary = state.get(_state_key(u), {})
 		if s.is_empty():
 			continue
 		var ratio: float = float(s.get("hp_ratio", 1.0))
@@ -707,10 +714,18 @@ func _refresh_all_quirks() -> void:
 
 ## 战斗结束后把队伍状态交给远征层。血量存比例而不是绝对值——
 ## 各英雄上限不同，存绝对值在换装备阶后必然错。
+## 状态快照按**名册实例**存（M34）。
+##
+## 原来按 `def_id` 存，同职业多人时两个人会挤在同一个键上——
+## 后写的那份覆盖前一份，症状是「两个十字军里有一个永远满血」。
+func _state_key(u: Combatant) -> String:
+	return u.hero_key if not u.hero_key.is_empty() else u.def_id
+
+
 func capture_party_state() -> Dictionary:
 	var out: Dictionary = {}
 	for u in party:
-		out[u.def_id] = {
+		out[_state_key(u)] = {
 			"hp_ratio": 0.0 if u.dead else u.hp_ratio(),
 			"hp": u.hp,
 			"stress": u.stress,

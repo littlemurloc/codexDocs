@@ -640,17 +640,14 @@ static func _test_roster(t: TestLib, db: DdDb) -> void:
 	t.eq(c.roster_full(), false, "开局没满")
 
 	var start_n: int = c.hero_ids().size()
-	t.eq(c.hireable_pool().size(), all_n - start_n, "候选池 = 还没入册的职业")
+	# M34 起同职业可以多人：池子不再排除「已入册的职业」，就是全部职业
+	t.eq(c.hireable_pool().size(), all_n, "候选池 = 全部已知职业（同职业可多人）")
 
 	c.roll_recruit_candidates()
 	t.eq(c.recruit_candidates.size(), 2, "本周来 2 个新面孔")
 	t.eq((c.hire_cost().get("heirlooms", {}) as Dictionary).is_empty(), true,
 		"招新只收金币（传家宝留给建筑）")
-	var fresh: bool = true
-	for cls in c.recruit_candidates:
-		if c.roster.has(str(cls)):
-			fresh = false
-	t.eq(fresh, true, "候选都不在名册里")
+	t.eq(c.recruit_candidates[0] != c.recruit_candidates[1], true, "一周内两个候选不重复")
 
 	# —— 招一个 ——
 	c.add_loot(99999, {"bust": 99, "portrait": 99, "crest": 99, "deed": 99})
@@ -662,8 +659,8 @@ static func _test_roster(t: TestLib, db: DdDb) -> void:
 	t.eq(c.resolve_of(pick), 1, "新人是 1 级")
 	t.eq(c.gear_of(pick), 0, "装备 0 阶")
 	t.eq(c.can_join(pick, 1), true, "新人能打学徒本")
-	t.eq(c.recruit_candidates.has(pick), false, "招走后从候选里移除")
-	t.eq(c.can_hire(pick), false, "同一个人不能招两次")
+	t.eq(c.recruit_candidates.has(pick), false, "招走后从这一周的候选里移除")
+	t.eq(c.can_hire(pick), false, "同一张卡不能连招两次")
 
 	# —— 再招一批，凑到 8 人以上（这才是扩容真正开始起作用的地方）——
 	c.roll_recruit_candidates()
@@ -695,13 +692,17 @@ static func _test_roster(t: TestLib, db: DdDb) -> void:
 	t.eq(c3.hero_ids().slice(0, cfg_n), order_before.slice(0, cfg_n),
 		"配置里的那几个人排在最前")
 
-	# —— 名册满 ——
+	# —— 名册满（M34：上限是 15 人头，不再是职业数量）——
 	var c4 := Campaign.new()
 	c4.setup_from_cfg(db.campaign_cfg, TEST_PATH + ".roster4.json")
-	c4.known_heroes = c4.hero_ids().duplicate()   # 只承认现有这几个人
-	t.eq(c4.roster_full(), true, "上限等于现有名册时就是满的")
-	t.eq(c4.hireable_pool().is_empty(), true, "没有可招的人")
+	c4.known_heroes = db.hero_ids()
+	c4.add_loot(999999, {"bust": 99, "portrait": 99, "crest": 99, "deed": 99})
+	_fill_roster(c4)
+	t.eq(c4.roster_full(), true, "招到 15 人就是满的（%d）" % c4.hero_ids().size())
 	t.eq(c4.can_hire("vestal"), false, "满员时谁都不能招")
+	# 满了之后池子仍然非空——只是招不进来。这两件事必须分开：
+	# 池子空 = 游戏里没有这个名字，招不了 = 你名册没位置。
+	t.ok(c4.hireable_pool().size() > 0, "满员时候选池仍然非空（是名额满了，不是没人）")
 
 
 ## 解雇（M28）：名册唯一的出口。
@@ -754,14 +755,18 @@ static func _test_dismiss(t: TestLib, db: DdDb) -> void:
 	t.eq(c2.graveyard().is_empty(), true, "墓园记录也没了")
 
 	# 解雇要把名额让出来，否则「满了不能换人」还是没解
+	# （M34：上限是 15 人头，所以要真的招满才测得出这条）
 	var c3 := Campaign.new()
 	c3.setup_from_cfg(db.campaign_cfg, TEST_PATH + ".dismiss3.json")
-	c3.known_heroes = c3.hero_ids().duplicate()   # 上限 = 现有 5 人
-	t.eq(c3.roster_full(), true, "一开始是满的")
+	c3.known_heroes = db.hero_ids()
+	c3.add_loot(999999, {"bust": 99, "portrait": 99, "crest": 99, "deed": 99})
+	_fill_roster(c3)
+	t.eq(c3.roster_full(), true, "先招满")
 	var gone: String = str(c3.hero_ids()[0])
+	var gone_def: String = c3.def_of(gone)
 	c3.dismiss(gone)
 	t.eq(c3.roster_full(), false, "解雇后有名额了")
-	t.eq(c3.hireable_pool().has(gone), true, "被解雇的人回到候选池")
+	t.eq(c3.hireable_pool().has(gone_def), true, "被解雇的职业仍在候选池里（M34）")
 
 	# 存档往返：删掉的人不能读档又回来
 	var c4 := Campaign.new()
@@ -777,6 +782,24 @@ static func _test_dismiss(t: TestLib, db: DdDb) -> void:
 	t.eq(c5.load_or_new(), true, "读档成功")
 	t.eq(c5.hero_ids(), left, "名册和存档前一致")
 	t.eq(c5.hero_ids().has(drop), false, "解雇掉的人没有回来")
+
+
+## 把名册招满（M34）。
+##
+## 上限是人头 15，而职业只有 15 个、开局已经占了 5 个——所以**必须靠同职业重复**
+## 才填得满。这个 helper 本身就是这一期的证据：填不满就说明同职业多人没生效。
+static func _fill_roster(c: Campaign) -> void:
+	var guard: int = 0
+	while not c.roster_full() and guard < 300:
+		guard += 1
+		c.roll_recruit_candidates()
+		var hired: bool = false
+		for cls in c.recruit_candidates.duplicate():
+			if c.can_hire(str(cls)):
+				c.hire(str(cls))
+				hired = true
+		if not hired:
+			break
 
 
 static func _cleanup() -> void:

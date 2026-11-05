@@ -90,10 +90,12 @@ const BOARD_REGIONS: Array = ["weald", "crypts", "warrens", "cove"]
 ##
 ## 三条硬约束，改这张表之前必须先想清楚：
 ##  1. **清剿有短/中/长三档图参数**，探索也有三档，首领只有中/长。
-##  2. **收集 / 激活在 `dungeons.json` 里只有 medium 一档**。
+##  2. **收集 / 激活 / 带道具激活在 `dungeons.json` 里只有 medium 一档**。
 ##     写成 short 会拿到空地图参数，`MapGen` 直接返回空字典（出发失败）。
-##  3. **激活的目标是铁处女，只在墓穴（Ruins）有**。
+##  3. **普通激活的目标是铁处女，只在墓穴（Ruins）有**。
 ##     放进荒野的板上就是一张永远做不完的卡。
+##  4. **带道具激活（M35）每个区域的目标不同**（祭坛/尸骸/神龛/护符），
+##     四个区域都能解析，但同样只有一张卡——别让四块板子全长一样。
 const BOARD_SLOTS_BY_REGION: Dictionary = {
 	"weald": [
 		["short", "cleanse"], ["medium", "gather"],
@@ -104,7 +106,7 @@ const BOARD_SLOTS_BY_REGION: Dictionary = {
 		["long", "cleanse"], ["medium", "kill_boss"],
 	],
 	"warrens": [
-		["short", "explore"], ["medium", "gather"],
+		["short", "explore"], ["medium", "inventory_activate"],
 		["long", "cleanse"], ["medium", "kill_boss"],
 	],
 	"cove": [
@@ -166,7 +168,8 @@ var _order: Array = []              # 名册显示顺序（已入册的职业，
 ## 其余逻辑照旧——测试里很多地方不关心这件事。
 var known_heroes: Array = []
 
-## 名册上限（M27）。我们的 key 是职业 id，所以「一个职业最多一个人」，
+## 名册上限（M27）。**M34 起它是一个人头上限，和职业数量无关**——
+## 那时 key 还是职业 id，所以上限只能等于职业总数；现在同职业能多人了。
 ## 上限就等于职业总数（`heroes.json` 15 个）。
 const ROSTER_HARD_MAX: int = 15
 
@@ -242,7 +245,7 @@ func setup_from_cfg(c: Dictionary, save_path: String = DEFAULT_PATH) -> bool:
 		["man_at_arms", "highwayman", "vestal", "plague_doctor"]).duplicate()
 	var start_q: Dictionary = (cfg.get("roster_start", {}) as Dictionary).get("quirks", {})
 	for hid in _order:
-		roster[str(hid)] = {"gear": 0, "skill": 0, "alive": true,
+		roster[str(hid)] = {"def": str(hid), "gear": 0, "skill": 0, "alive": true,
 			"stress": 0.0, "runs": 0, "deaths": 0,
 			# 新兵 = 1 级 0 经验（M25）。原版新招募的英雄也是 1 级起步。
 			"resolve": 1, "xp": 0,
@@ -432,14 +435,27 @@ func from_dict(d: Dictionary) -> void:
 		var hs3: String = str(hid)
 		if _order.has(hs3):
 			continue
-		if not known_heroes.is_empty() and not known_heroes.has(hs3):
+		# 校验要用**职业 id**（M34）：实例 id 可能是 `crusader#2`，
+		# 直接拿它去查 known_heroes 会被当成未知职业丢掉——正好把同职业的第二个人吃了。
+		var def3: String = str((src[hs3] as Dictionary).get("def", ""))
+		if def3.is_empty():
+			var cut3: int = hs3.find("#")
+			def3 = hs3.substr(0, cut3) if cut3 > 0 else hs3
+		if not known_heroes.is_empty() and not known_heroes.has(def3):
 			push_warning("Campaign: 存档里的 %s 不是已知职业，已跳过" % hs3)
 			continue
 		_order.append(hs3)
 	for hid in _order:
 		var hid_s: String = str(hid)
 		var row: Dictionary = src.get(hid_s, {})
+		# 职业 id（M34）：第一个同职业的实例 id 就是职业 id 本身，
+		# 第二个起是 `crusader#2`。老档没有 def 字段 → 实例 id 即职业 id。
+		var def: String = str(row.get("def", ""))
+		if def.is_empty():
+			var cut: int = hid_s.find("#")
+			def = hid_s.substr(0, cut) if cut > 0 else hid_s
 		roster[hid_s] = {
+			"def": def,
 			"gear": clampi(int(row.get("gear", 0)), 0, MAX_GEAR),
 			"skill": clampi(int(row.get("skill", 0)), 0, MAX_GEAR),
 			"alive": bool(row.get("alive", true)),
@@ -613,6 +629,62 @@ func hero_ids() -> Array:
 
 func hero(hid: String) -> Dictionary:
 	return roster.get(hid, {})
+
+
+## 名册实例 id → 职业 id（M34）。
+##
+## **这是这一期唯一的一条规则：查数据用 def，记状态用 key。**
+##
+## 命名方案是刻意的：第一个同职业的实例 id 就是职业 id 本身（`crusader`），
+## 第二个起才加后缀（`crusader#2`）。这样 M0~M33 的所有存档、测试、
+## 以及「按职业 id 找数据」的代码一行都不用改——它们的 key 本来就更等于 def。
+func def_of(hid: String) -> String:
+	var r: Dictionary = roster.get(hid, {})
+	var d: String = str(r.get("def", ""))
+	if not d.is_empty():
+		return d
+	# 名册里没有这个人 / 老档没写 def：按命名规则推
+	var cut: int = hid.find("#")
+	return hid.substr(0, cut) if cut > 0 else hid
+
+
+## 给某个职业分配一个新的实例 id。
+##
+## 不复用已解雇的编号：`crusader#2` 被解雇之后，下一个新十字军仍然是 `crusader#2`
+## ——反正那个位置已经空了。这样做的好处是编号永远从 1 开始连续，
+## 界面上不会出现「十字军 5」却只有两个人的怪象。
+func next_uid_for(cls: String) -> String:
+	# 传进来的是实例 id 时先归到职业：`crusader#2` 和 `crusader` 问的是同一件事
+	# ——「再给这个职业分配一个号」。不归的话会去查 `crusader#2#2` 这种鬼名字。
+	var d: String = def_of(cls)
+	if not roster.has(d):
+		return d
+	var n: int = 2
+	while roster.has("%s#%d" % [d, n]):
+		n += 1
+	return "%s#%d" % [d, n]
+
+
+## 这个人显示成什么。同职业多人时用罗马数字区分（界面层会补上职业名）。
+##
+## 返回的是**后缀**（"" 或 "Ⅱ"），不是完整名字：核心层不认识中文名，
+## 名字表在 `DdNames` 里。这条边界和 `QuestGoal.describe` 收 curio_label 是同一条理由。
+func variant_suffix(hid: String) -> String:
+	var cut: int = hid.find("#")
+	if cut <= 0:
+		return ""
+	var n: int = int(hid.substr(cut + 1))
+	return _roman(n)
+
+
+static func _roman(n: int) -> String:
+	# 直接查表，不做减法拼装：拼装会把 2 拼成「ⅠⅠ」而不是「Ⅱ」，
+	# 而这一共只有 15 个可能的号（名册上限）。
+	const R: Array = ["", "Ⅰ", "Ⅱ", "Ⅲ", "Ⅳ", "Ⅴ", "Ⅵ", "Ⅶ", "Ⅷ",
+		"Ⅸ", "Ⅹ", "Ⅺ", "Ⅻ", "ⅩⅢ", "ⅩⅣ", "ⅩⅤ"]
+	if n < 1 or n >= R.size():
+		return ""
+	return str(R[n])
 
 
 ## 可以带上路的人（活着、**且这周没被建筑占着**）。
@@ -1077,13 +1149,15 @@ func board_has_runnable() -> bool:
 ## 默认技能组。判定在 `SkillLoadout` 里（bench 也要用同一套）。
 ##
 ## 返回空数组 = 全装：不可选职业（憎恶），或者这张表还没注入。
+##
+## 注意传进去的是**职业 id**（M34）：技能表按职业建，两个十字军共用一份。
 func _default_loadout(hid: String) -> Array:
-	return SkillLoadout.default_for(skill_table, cfg, hid)
+	return SkillLoadout.default_for(skill_table, cfg, def_of(hid))
 
 
 ## 读档时的技能组：合法的留下，非法的丢掉，空了或超了就回默认。
 func _loadout_or_default(hid: String, raw: Variant) -> Array:
-	return SkillLoadout.sanitize(skill_table, cfg, hid, raw)
+	return SkillLoadout.sanitize(skill_table, cfg, def_of(hid), raw)
 
 
 ## 这个英雄这一趟带哪几个技能。空 = 全装（不可选职业）。
@@ -1097,7 +1171,7 @@ func equipped_skills(hid: String) -> Array:
 
 ## 技能栏有几个格子。不可选职业返回它自己的技能总数（7）。
 func skill_slot_max(hid: String) -> int:
-	return SkillLoadout.max_slots(skill_table, hid)
+	return SkillLoadout.max_slots(skill_table, def_of(hid))
 
 
 ## 这个职业能不能自己选技能（M31）。
@@ -1106,12 +1180,12 @@ func skill_slot_max(hid: String) -> int:
 ## 7 个技能全开、不进技能组。界面上必须能区分「他没选」和「他不用选」，
 ## 否则公会屏会显示「已装备 0 / 7」加七个「未装备」——正好是反的意思。
 func skill_selectable(hid: String) -> bool:
-	return (skill_table.get(hid, {}) as Dictionary).get("can_select", false) == true
+	return (skill_table.get(def_of(hid), {}) as Dictionary).get("can_select", false) == true
 
 
 ## 所有可选技能 id（公会用）。
 func skill_choices(hid: String) -> Array:
-	return ((skill_table.get(hid, {}) as Dictionary).get("ids", []) as Array).duplicate()
+	return ((skill_table.get(def_of(hid), {}) as Dictionary).get("ids", []) as Array).duplicate()
 
 
 ## 改技能组。返回空串 = 成功，否则是给玩家看的原因。
@@ -1123,7 +1197,7 @@ func set_skills(hid: String, ids: Array) -> String:
 		return "名册里没有这个人"
 	if not bool((roster[hid] as Dictionary).get("alive", true)):
 		return "这个人已经阵亡"
-	var rule: Dictionary = skill_table.get(hid, {})
+	var rule: Dictionary = skill_table.get(def_of(hid), {})
 	if rule.get("can_select", false) != true:
 		return "这个职业不能换技能"
 	var allowed: Array = rule.get("ids", [])
@@ -1387,7 +1461,7 @@ func can_equip(hid: String, id: String) -> bool:
 		return false
 	if equipped_of(hid).size() >= equip_slots:
 		return false
-	if trinket_lib != null and trinket_lib.is_loaded() and not trinket_lib.fits_class(id, hid):
+	if trinket_lib != null and trinket_lib.is_loaded() and not trinket_lib.fits_class(id, def_of(hid)):
 		return false
 	return true
 
@@ -1399,7 +1473,7 @@ func equip_trinket(hid: String, id: String) -> String:
 	if not can_equip(hid, id):
 		if equipped_of(hid).size() >= equip_slots:
 			return "slots_full"
-		if trinket_lib != null and trinket_lib.is_loaded() and not trinket_lib.fits_class(id, hid):
+		if trinket_lib != null and trinket_lib.is_loaded() and not trinket_lib.fits_class(id, def_of(hid)):
 			return "class_mismatch"
 		return "refused"
 	trinket_store.erase(id)
@@ -1561,14 +1635,15 @@ func recruit(hid: String) -> bool:
 # M25 的等级断层、M26 的废卡率压不下去，根都在这里：
 # 5 个人练到同一档之后，名册就只剩一种强度。
 #
-# 我们的 key 是职业 id，所以「一个职业最多一个人」，名册上限 = 职业总数。
-# 这比原版简单（原版同职业可以有好几个叫不同名字的人），
-# 但 15 个职业已经足够让名册出现「1 级新人 + 5 级老将」的梯队。
+# M27 当时 key 就是职业 id，所以「一个职业最多一个人」，名册上限 = 职业总数。
+# M34 把 key 换成了实例 id（`crusader#2`），这条限制才解开——
+# 名册上限从此是**人头数**，不是职业数。
 
 func roster_max() -> int:
-	if known_heroes.is_empty():
-		return ROSTER_HARD_MAX
-	return known_heroes.size()
+	# 名册上限（M34）：原来是「职业总数」（因为 key 就是职业 id），
+	# 现在同职业能多人，所以它是一个**人头上限**，和职业数量无关。
+	# 仍然取 15：城镇名册两列 15 格的排版（M31）是按这个数排的。
+	return ROSTER_HARD_MAX
 
 
 ## 名册满了没有。
@@ -1580,20 +1655,23 @@ func roster_full() -> bool:
 	return alive_ids().size() >= roster_max()
 
 
-## 还没入册的职业。死掉的人不算——他们还在名册里，只是不能出征。
-func hireable_pool() -> Array:
-	var out: Array = []
-	for h in known_heroes:
-		var hs: String = str(h)
-		if not roster.has(hs) or (roster[hs] as Dictionary).is_empty():
-			out.append(hs)
-	return out
-
-
-## 马车本周的新面孔：从没入册的职业里抽 2 个。
+## 马车能摆出哪些职业。
 ##
-## 每周重抽，抽到招走为止。**不重复抽已经能招的**，
+## M27 时这里是「还没入册的职业」——因为名册 key 就是职业 id，一个职业只能一个人。
+## M34 起同职业可以多人，所以**池子就是全部已知职业**：你名册里已经有两个修女，
+## 马车照样可以再摆一个修女出来。这也是原版的行为。
+func hireable_pool() -> Array:
+	return known_heroes.duplicate()
+
+
+## 马车本周的新面孔：从全部职业里抽 2 个**不同**的职业。
+##
+## 每周重抽，抽到招走为止。不重复抽已经能招的，
 ## 否则「同一批人挂一周」会让人以为功能坏了。
+##
+## M34 起候选可以是名册里已有的职业（同职业多人）——
+## 但仍然**一周两个不重复**：同一周摆两个修女没有信息量，只是占格子。
+## 「按阵容短板加权」（缺治疗更容易来修女）仍然没做，见 M27 §7。
 func roll_recruit_candidates() -> void:
 	var pool: Array = hireable_pool()
 	recruit_candidates = []
@@ -1618,8 +1696,9 @@ func hire_cost() -> Dictionary:
 func can_hire(cls: String) -> bool:
 	if not recruit_candidates.has(cls):
 		return false
-	if roster.has(cls):
-		return false
+	# 同职业多人（M34）：不再要求「这个职业还没入册」。
+	# 原来那一条是把「名册 key = 职业 id」这个实现限制泄漏成了游戏规则——
+	# 玩家看到的是「马车永远不给我第二个修女」，而不是「代码里字典键不够用」。
 	if roster_full():
 		return false
 	return can_afford(hire_cost())
@@ -1638,18 +1717,24 @@ func hire(cls: String) -> bool:
 		return false
 	if not pay(hire_cost()):
 		return false
-	roster[cls] = {
+	# 实例 id（M34）：同职业第二个起是 `crusader#2`。
+	# 名册的 key 从此不再等于职业 id，这一行就是起点。
+	var uid: String = next_uid_for(cls)
+	roster[uid] = {
+		"def": cls,
 		"gear": 0, "skill": 0, "alive": true,
 		"stress": 0.0, "runs": 0, "deaths": 0,
 		# 新人和新档一样掷开局怪癖：原版的新英雄不是白纸，
 		# 而「招来的人是干净的」会变成一条洗怪癖的捷径。
 		"quirks": _roll_start_quirks(cls, DdRng.new(randi())),
 		"equipped": [],
-		"skills": _default_loadout(cls),
+		"skills": _default_loadout(uid),
 		"busy": 0,
 		"resolve": 1, "xp": 0,
 	}
-	_order.append(cls)
+	_order.append(uid)
+	# 招走的是**这一周的这张卡**，不是这个职业。
+	# 下周马车会重新抽——同职业还能再来一次，那正是 M34 想要的效果。
 	recruit_candidates.erase(cls)
 	return true
 
@@ -1691,7 +1776,8 @@ func dismiss(hid: String) -> bool:
 		return false
 	roster.erase(hid)
 	_order.erase(hid)
-	recruit_candidates.erase(hid)
+	# 不清马车候选（M34）：那里放的是**职业**，不是人。
+	# 赶走一个十字军不等于「本周不卖十字军」——想再招一个随时可以。
 	return true
 
 

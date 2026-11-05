@@ -56,9 +56,11 @@ static func _test_parse(t: TestLib, db: DdDb) -> void:
 	for qt in ["gather", "activate"]:
 		var g: Dictionary = QuestGoal.parse(db.quests, qt, "cove")
 		t.eq(bool(g["supported"]), false, "%s 没有奇物表时解析不出目标" % qt)
+	# M35 起 inventory_activate 也接了（任务物品容器）——这里只确认它不再被挡在门外，
+	# 具体的行为断言在 test_m35.gd。
 	var inv: Dictionary = QuestGoal.parse(db.quests, "inventory_activate", "cove",
 		db.curio_lib.curios)
-	t.eq(bool(inv["supported"]), false, "inventory_activate 还要任务道具，仍然没接")
+	t.eq(bool(inv["supported"]), true, "inventory_activate 在 M35 接上了")
 	# 区域变体：同一类型在不同区域指向不同奇物
 	var gw: Dictionary = QuestGoal.parse(db.quests, "gather", "weald")
 	t.eq(str(gw["curio_raw"]), "chirurgeons_satchel", "weald 的收集目标是外科医生的包")

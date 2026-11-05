@@ -26,6 +26,9 @@ var preset_name: String = ""
 var dungeon: String = "weald"     # 只用于查地图参数（每步走几格）
 var size_name: String = "short"
 var hero_ids: Array = []
+## 名册实例 id → 职业 id（M34）。同职业多人时两个十字军共用一个 def，
+## 但各自有独立的实例 id。缺省空字典 = 两者相同（M33 及以前的行为）。
+var hero_defs: Dictionary = {}
 var route: Array = []
 var step_index: int = 0
 
@@ -209,10 +212,32 @@ var active_source: String = ""
 ## 记在这里才不会因为重走一条走廊重复计数。
 var quest_curios_used: Dictionary = {}
 
+## 任务物品（M35）：id -> 剩余件数。
+##
+## **不放进 `supplies`**，理由有三条：
+##   1. 有些任务物品根本不是补给（镐、邪光提灯、信标之光），
+##      混进去会被商店逻辑当成在售补给；
+##   2. 补给可以被玩家在出发前买、在奇物上用掉，任务物品不行——
+##      丢一件任务就做不完了；
+##   3. 原版的任务物品本来就独立于补给栏。
+##
+## 装的是数据里 `starting_items` 说的量，出发时自动带上（`set_location`）。
+var quest_items: Dictionary = {}
+
+
+## 名册实例 id → 职业 id（M34）。
+##
+## 一条规则贯穿这一期：**查数据用 def，记状态用 key**。
+## 两个十字军的 `def` 都是 crusader（血量表、抗性表、技能表同一份），
+## 但他们的 `key` 不同（压力、血量比例、怪癖各归各的）。
+func _def_of(key: String) -> String:
+	return str(hero_defs.get(key, key))
+
 
 func setup(p_db: DdDb, p_heroes: Array, p_route: Array, p_preset: Dictionary,
 		seed_value: int = 1, p_preset_name: String = "",
-		p_loot_cfg: Dictionary = {}, p_gear: Dictionary = {}) -> bool:
+		p_loot_cfg: Dictionary = {}, p_gear: Dictionary = {},
+		p_defs: Dictionary = {}) -> bool:
 	db = p_db
 	if db == null or db.heroes.is_empty():
 		push_error("Expedition: 数据未加载")
@@ -221,6 +246,7 @@ func setup(p_db: DdDb, p_heroes: Array, p_route: Array, p_preset: Dictionary,
 	cfg = p_preset
 	preset_name = p_preset_name
 	hero_ids = p_heroes.duplicate()
+	hero_defs = p_defs.duplicate()
 	route = p_route.duplicate(true)
 	hero_gear = p_gear.duplicate()
 
@@ -296,6 +322,9 @@ func setup(p_db: DdDb, p_heroes: Array, p_route: Array, p_preset: Dictionary,
 		"curio_unsupported": 0, "curio_hp_lost": 0.0,
 		# 任务奇物进度（M33）：收集到几件 / 激活了几处。
 		"quest_gathered": 0, "quest_activated": 0,
+		# 任务物品（M35）：用掉几件 / 撞上目标奇物却已无道具可用的次数。
+		# 后者单独记，才能分清「图里没奇物」和「道具不够」。
+		"quest_items_used": 0, "quest_items_missing": 0,
 		"traps": 0, "traps_dodged": 0, "obstacles": 0, "obstacles_cleared": 0,
 		"hp_low_water": 1.0, "min_light": float(light),
 		# 怪癖（M14）：获得/被拒/染病/抗病/清负面分开计。
@@ -333,6 +362,16 @@ func set_location(p_dungeon: String, p_size: String, p_level: int = 1,
 	if db != null and db.curio_lib != null and db.curio_lib.is_loaded():
 		curios = db.curio_lib.curios
 	quest_goal = QuestGoal.parse(db.quests if db != null else {}, p_quest, p_dungeon, curios)
+	# 任务物品（M35）：按目标说的量自动带上。玩家没有「带不带」的选择——
+	# 原版也是这样，任务物品是系统发的凭证，不是可买补给。
+	quest_items = {}
+	for it in (quest_goal.get("items", []) as Array):
+		if not (it is Dictionary):
+			continue
+		var iid: String = str((it as Dictionary).get("id", ""))
+		if iid.is_empty():
+			continue
+		quest_items[iid] = int(quest_items.get(iid, 0)) + int((it as Dictionary).get("amount", 1))
 	# 战利品表按「地牢 × 难度」选变体：C 表 d1 期望 253 金、d5 期望 559，
 	# H 表 d1 给 1–4 件、d5 给 2–8 件。不设语境的话会退化成同一档。
 	if db != null and db.loot_tables != null:
@@ -723,6 +762,17 @@ func _note_quest_curio(cid: String, step: Dictionary = {}) -> void:
 		QuestGoal.KIND_GATHER:
 			stat_key = "quest_gathered"
 		QuestGoal.KIND_ACTIVATE:
+			# 带道具的任务（M35）：没道具就不算——这是「收集 3 件去激活 3 次」
+			# 和「碰到就算」的唯一区别，也是这一期存在的理由。
+			var need_item: String = QuestGoal.required_item(quest_goal)
+			if not need_item.is_empty():
+				var left: int = int(quest_items.get(need_item, 0))
+				if left <= 0:
+					stats["quest_items_missing"] = int(stats.get("quest_items_missing", 0)) + 1
+					_emit({"t": "quest_item_missing", "curio": cid, "item": need_item})
+					return
+				quest_items[need_item] = left - 1
+				stats["quest_items_used"] = int(stats.get("quest_items_used", 0)) + 1
 			stat_key = "quest_activated"
 		_:
 			return
@@ -747,12 +797,23 @@ func _resolve_curio_table(step: Dictionary) -> Dictionary:
 	# 任务目标奇物（M33）：碰到就算一次进度，**不看这次交互的结果**。
 	# 收集任务要的是「去那儿翻」，不是「翻出好东西」——
 	# 挂上结果判定的话，一个给疾病的箱子会让任务反而更难，那不是原版语义。
+	#
+	# 带道具的激活任务（M35）：这一步会扣一件任务物品；没道具就不计数。
+	# 所以在调用**之前**先记下「到底有没有道具可用」——
+	# 这一件同时也是下面 `use_item` 的候选，扣完了再查会差一件。
+	var qitem: String = QuestGoal.required_item(quest_goal)
+	var has_qitem: bool = not qitem.is_empty() and int(quest_items.get(qitem, 0)) > 0
 	_note_quest_curio(cid, step)
 
-	# 自动选补给：该奇物能用、且背包里有的第一个。
-	# 顺序按奇物自己的 items 表（已排序），结果稳定，便于对照。
+	# 自动选道具：**任务物品优先**，其次才是补给。
+	#
+	# 「这个奇物吃不吃这件道具」由数据说了算（curios.json 的 items 表），
+	# 我们不猜。四个区域里只有一个能对上（墓穴：圣水 × 光照祭坛），
+	# 其余三个对不上——那就当普通交互结算，任务照样计数。
 	var use_item: String = ""
-	if curio_auto_item_enabled:
+	if has_qitem and cl.items_for(cid).has(qitem):
+		use_item = qitem
+	if use_item.is_empty() and curio_auto_item_enabled:
 		for it in cl.items_for(cid):
 			if supply_count(str(it)) > 0:
 				use_item = str(it)
@@ -762,7 +823,10 @@ func _resolve_curio_table(step: Dictionary) -> Dictionary:
 	if use_item.is_empty():
 		pass
 	elif bool(out.get("item", "") != ""):
-		take_supply(use_item)
+		# 任务物品在 `_note_quest_curio` 里已经扣了，这里不能再扣一次
+		# （它不在 supplies 里，`take_supply` 本来也会失败）。
+		if use_item != qitem:
+			take_supply(use_item)
 		stats["curio_items_used"] = int(stats.get("curio_items_used", 0)) + 1
 
 	var got_gold: int = 0
@@ -1167,7 +1231,7 @@ func contract_disease(hid: String, which: String, rng: DdRng) -> String:
 		return ""
 	if disease_roll_enabled:
 		var resist: float = 0.0
-		var h: Dictionary = db.hero(hid)
+		var h: Dictionary = db.hero(_def_of(hid))
 		resist = float((h.get("resistances", {}) as Dictionary).get("disease", 0.0))
 		var p: float = clampf(1.0 - resist, 0.05, 1.0)
 		if not rng.chance(p):
@@ -1291,7 +1355,7 @@ func trap_resist() -> float:
 	var best: float = 0.0
 	var ids: Array = _alive_ids()
 	for hid in ids:
-		var h: Dictionary = db.hero(str(hid))
+		var h: Dictionary = db.hero(_def_of(str(hid)))
 		var r: Dictionary = h.get("resistances", {})
 		best = maxf(best, float(r.get("trap", 0.0)))
 	return best
@@ -1431,9 +1495,12 @@ func start_battle(step: Dictionary) -> Battle:
 		return null
 
 	var b := Battle.new()
+	var defs: Dictionary = {}
+	for key in alive:
+		defs[str(key)] = _def_of(str(key))
 	var ok: bool = b.setup(alive, step.get("monsters", []),
 		rng.next_int_range(1, 1 << 30), int(step.get("gear", 0)), int(step.get("skill", 0)),
-		hero_gear, hero_skill, hero_loadout)
+		hero_gear, hero_skill, hero_loadout, defs)
 	if not ok:
 		push_warning("Expedition: 装配失败，跳过该步 %s" % str(step.get("monsters", [])))
 		return null
@@ -1465,7 +1532,10 @@ func start_battle(step: Dictionary) -> Battle:
 	# 不能塞进 set_environment——那个每场都会整个覆盖 stress_in_mult。
 	if not join_stress_mult.is_empty():
 		for u in b.party:
-			u.join_stress_mult = float(join_stress_mult.get(str(u.def_id), 1.0))
+			# 按实例取倍率（M34）：同职业多人的受压惩罚各算各的
+			# （老人带新人时两个人本来就该不一样）。
+			u.join_stress_mult = float(join_stress_mult.get(
+				u.hero_key if not u.hero_key.is_empty() else u.def_id, 1.0))
 	b.surprised = _roll_surprise(m)
 	b.apply_party_state(state)
 	b.heal_charges = heal_charges
@@ -1483,7 +1553,7 @@ func start_battle(step: Dictionary) -> Battle:
 		stats["boss_fought"] = true
 	_active_uids = {}
 	for u in b.party:
-		_active_uids[u.uid] = u.def_id
+		_active_uids[u.uid] = u.hero_key if not u.hero_key.is_empty() else u.def_id
 
 	_emit({"t": "battle_start", "index": active_index, "monsters": step.get("monsters", []),
 		"light": light, "surprised": b.surprised, "gear": int(step.get("gear", 0))})
@@ -2072,7 +2142,7 @@ func is_dead(hid: String) -> bool:
 
 
 func _max_hp(hid: String) -> int:
-	var b: Dictionary = db.hero_base(hid, _gear_of_current_step())
+	var b: Dictionary = db.hero_base(_def_of(hid), _gear_of_current_step())
 	return int(b.get("hp_max", 1))
 
 
@@ -2086,7 +2156,7 @@ func _gear_of_current_step() -> int:
 
 
 func _deathblow_resist(hid: String) -> float:
-	var h: Dictionary = db.hero(hid)
+	var h: Dictionary = db.hero(_def_of(hid))
 	var r: Dictionary = h.get("resistances", {})
 	return clampf(float(r.get("death_blow", 0.67)), 0.0, 1.0)
 
@@ -2131,6 +2201,8 @@ func summary() -> Dictionary:
 	out["quest_curio"] = str(quest_goal.get("curio", ""))
 	out["quest_gathered"] = int(stats.get("quest_gathered", 0))
 	out["quest_activated"] = int(stats.get("quest_activated", 0))
+	out["quest_items"] = quest_items.duplicate()
+	out["quest_items_used"] = int(stats.get("quest_items_used", 0))
 	if map_mode:
 		out["steps_total"] = (map["room_ids"] as Array).size()
 		out["steps_done"] = int(stats["rooms_visited"])

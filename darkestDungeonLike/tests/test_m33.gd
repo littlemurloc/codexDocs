@@ -262,7 +262,7 @@ static func _test_board(t: TestLib, db: DdDb) -> void:
 				bad += 1
 				t.ok(false, "%s/%s/%s 没有地图参数" % [rgn2, sz, qt2])
 	t.eq(bad, 0, "四区十六张卡：目标都能解析、地图参数都有")
-	t.ok(seen_gather >= 3, "收集任务出现在 %d 个区域" % seen_gather)
+	t.ok(seen_gather >= 2, "收集任务出现在 %d 个区域" % seen_gather)
 	t.ok(seen_activate >= 1, "激活任务出现在 %d 个区域" % seen_activate)
 
 	# 板上只有这四种：探索 / 清剿 / 收集 / 激活 / 首领

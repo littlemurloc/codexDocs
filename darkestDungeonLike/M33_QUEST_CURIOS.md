@@ -176,6 +176,8 @@
 2. **`inventory_activate` 仍然没接**。它要求「先带任务道具，再在奇物上用它」——
    那需要任务物品能进背包并被指定为交互道具，属于道具系统。
    现在 `parse` 对它永远返回 `supported = false`。
+   **（M35 已解决：任务物品有了独立容器，六种类型全开。见
+   [M35_QUEST_ITEMS.md](M35_QUEST_ITEMS.md)。）**
 3. **`activate` 只在墓穴可玩**。数据里 `activate` 的目标是铁处女，
    而铁处女只属于 Ruins；其他三个区域的板子上没有这张卡。
 4. **收集/激活只有 medium 一档**。`dungeons.json` 里这两类各只有一行地图参数，

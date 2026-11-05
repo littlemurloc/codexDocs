@@ -375,6 +375,24 @@ const SUPPLY_NAMES: Dictionary = {
 	"dog_treats": "狗饼干", "laudanum": "鸦片酊", "firewood": "柴火",
 }
 
+## 任务物品（M35）。和补给分开放：这些不能买、不能卖、用完就没了。
+##
+## 有些任务物品**本身就是补给**（圣水、解毒剂），所以查名字时先看这张表，
+## 查不到再退回 `SUPPLY_NAMES`——两边都有的话以任务物品为准，
+## 因为屏幕上这个位置说的就是「任务物品」。
+const QUEST_ITEM_NAMES: Dictionary = {
+	"pickaxe": "镐", "eldritch_lantern": "邪光提灯", "beacon_light": "信标之光",
+	"holy_relic": "圣髑", "grain_sack": "粮袋", "medicines": "药材",
+	"ancestors_crate": "先祖木箱",
+}
+
+
+static func quest_item_name(id: String) -> String:
+	if QUEST_ITEM_NAMES.has(id):
+		return str(QUEST_ITEM_NAMES[id])
+	return supply_name(id)
+
+
 const HEIRLOOM_NAMES: Dictionary = {
 	"bust": "半身像", "portrait": "画像", "crest": "纹章", "deed": "地契",
 }

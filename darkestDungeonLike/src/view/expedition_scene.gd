@@ -715,11 +715,12 @@ func _selftest_run() -> void:
 	# 任务目标（M32 / M33）：类型、目标、达成与否、各类进度。
 	# 自检走最短路径，所以清剿/收集「走到出口但没做完」是**正常结果**——
 	# 这一行要把这种情况和「机制坏了」区分开。
-	print("SELFTEST 任务 类型=%s 目标=%s 达成=%s 奇物=%s 战斗房=%d/%d 收集=%d 激活=%d" % [
+	print("SELFTEST 任务 类型=%s 目标=%s 达成=%s 奇物=%s 战斗房=%d/%d 收集=%d 激活=%d 物品用=%d 缺=%d" % [
 		exp.quest_type, str(exp.quest_goal.get("kind", "")), str(exp.quest_met()),
 		str(exp.quest_goal.get("curio", "")),
 		int(exp.stats.get("quest_battles_cleared", 0)), int(exp.stats.get("quest_battles_total", 0)),
-		int(exp.stats.get("quest_gathered", 0)), int(exp.stats.get("quest_activated", 0))])
+		int(exp.stats.get("quest_gathered", 0)), int(exp.stats.get("quest_activated", 0)),
+		int(exp.stats.get("quest_items_used", 0)), int(exp.stats.get("quest_items_missing", 0))])
 
 	# 失败时要说清是哪一项挂了。之前只打一个 FAIL，
 	# 遇到偶发（跑五次过一次）根本没法查——那等于自己给自己出难题。
@@ -775,6 +776,8 @@ func _start_expedition(size_name: String, level: int, pack: Dictionary = {},
 			_flash_msg("首领任务：终点房间必有一战")
 		"cleanse":
 			_flash_msg("清剿任务：图上的战斗全打完，走到出口才算完成")
+		"inventory_activate":
+			_flash_msg("仪式任务：带着任务物品去激活，用完就没了")
 		_:
 			pass
 	var m: Dictionary = MapGen.build(db, _dungeon, _size, _level, DdRng.new(randi()), quest)
@@ -800,8 +803,13 @@ func _start_expedition(size_name: String, level: int, pack: Dictionary = {},
 		js_mult[str(hid_j)] = campaign.stress_mult_for(str(hid_j), _level)
 	exp.join_stress = js
 	exp.join_stress_mult = js_mult
+	# 名册实例 id → 职业 id（M34）。`party` 里装的是实例（可能是 `crusader#2`），
+	# 而数值表、技能表、饰品职业限制全都按职业查，所以这张映射必须一起递下去。
+	var defs: Dictionary = {}
+	for hid_d in party:
+		defs[str(hid_d)] = campaign.def_of(str(hid_d))
 	exp.setup(db, party, [], db.expedition_cfg.preset(_preset), randi(), _preset,
-		_loot_cfg(), gear)
+		_loot_cfg(), gear, defs)
 	exp.hero_skill = skill
 	# 技能组（M19）：只传这四个人带的 4 个技能，没上路的人不影响战斗。
 	exp.hero_loadout = campaign.loadout_map(party)
@@ -862,7 +870,7 @@ func _consume_exp_event(e: Dictionary) -> void:
 			_add_log("【火把】光照 %.0f（剩 %d 根）" % [float(e["light"]), int(e["left"])], DdTheme.LIGHT)
 		"hallway_stress":
 			_add_log("走过走廊：%s 压力 +%.0f" % [
-				DdNames.hero_name(str(e.get("hero", ""))), float(e.get("amount", 0.0))], DdTheme.DIM)
+				_hero_label(str(e.get("hero", ""))), float(e.get("amount", 0.0))], DdTheme.DIM)
 		"hunger":
 			if bool(e["fed"]):
 				_add_log("【饥饿】吃了口粮（剩 %d 份），全队略回血" % int(e["food"]), DdTheme.FOOD)
@@ -907,7 +915,7 @@ func _consume_exp_event(e: Dictionary) -> void:
 				tail.append("全员掉血 %.0f%%" % (float(e["hp_lost"]) * 100.0))
 			# 怪癖与疾病必须点名报到人：这是玩家唯一能看见的获得渠道，
 			# 只写「获得了负面怪癖」等于让人不知道自己被坑在哪。
-			var who: String = DdNames.hero_name(str(e.get("quirk_target", "")))
+			var who: String = _hero_label(str(e.get("quirk_target", "")))
 			if not str(e.get("quirk", "")).is_empty():
 				tail.append("%s 获得「%s」" % [who, DdNames.quirk_name(str(e["quirk"]))])
 			if not str(e.get("disease", "")).is_empty():
@@ -927,20 +935,20 @@ func _consume_exp_event(e: Dictionary) -> void:
 			_add_log("【奇物】%s%s：%s" % [cname, item_txt, verb],
 				DdTheme.WARN if float(e.get("stress", 0.0)) > 0.0 or float(e.get("hp_lost", 0.0)) > 0.0 else DdTheme.TEXT)
 		"affliction":
-			_add_log("【崩溃】%s 陷入 %s" % [DdNames.hero_name(str(e.get("hero", ""))), str(e.get("kind", ""))], DdTheme.WARN)
+			_add_log("【崩溃】%s 陷入 %s" % [_hero_label(str(e.get("hero", ""))), str(e.get("kind", ""))], DdTheme.WARN)
 			_flash_msg("崩溃！")
 		"virtue":
-			_add_log("【美德】%s 觉醒（%s）" % [DdNames.hero_name(str(e.get("hero", ""))), str(e.get("kind", ""))], DdTheme.CRIT)
+			_add_log("【美德】%s 觉醒（%s）" % [_hero_label(str(e.get("hero", ""))), str(e.get("kind", ""))], DdTheme.CRIT)
 			_flash_msg("美德觉醒")
 		"heart_attack":
-			_add_log("【心脏骤停】%s" % DdNames.hero_name(str(e.get("hero", ""))), DdTheme.WARN)
+			_add_log("【心脏骤停】%s" % _hero_label(str(e.get("hero", ""))), DdTheme.WARN)
 			_flash_msg("心脏骤停")
 		"deaths_door":
-			_add_log("【死门】%s" % DdNames.hero_name(str(e.get("hero", ""))), DdTheme.WARN)
+			_add_log("【死门】%s" % _hero_label(str(e.get("hero", ""))), DdTheme.WARN)
 		"death":
-			_add_log("【阵亡】%s（%s）" % [DdNames.hero_name(str(e.get("hero", ""))), str(e.get("cause", ""))], DdTheme.WARN)
+			_add_log("【阵亡】%s（%s）" % [_hero_label(str(e.get("hero", ""))), str(e.get("cause", ""))], DdTheme.WARN)
 		"act_out":
-			_add_log("　%s 崩溃发作，本回合不行动" % DdNames.hero_name(str(e.get("hero", ""))), DdTheme.WARN)
+			_add_log("　%s 崩溃发作，本回合不行动" % _hero_label(str(e.get("hero", ""))), DdTheme.WARN)
 		"camp":
 			_add_log("【休整】回血减压，光照 %.0f" % float(e["light"]), DdTheme.HEAL)
 		"camp_ambush":
@@ -1291,13 +1299,13 @@ func _activate(id: String) -> void:
 		var hid_u: String = id.substr(8)
 		if campaign.upgrade(hid_u):
 			campaign.save()
-			_flash_msg("%s 升到 %d 阶" % [DdNames.hero_name(hid_u), campaign.gear_of(hid_u)])
+			_flash_msg("%s 升到 %d 阶" % [_hero_label(hid_u), campaign.gear_of(hid_u)])
 		return
 	if id.begins_with("recruit:"):
 		var hid_r: String = id.substr(8)
 		if campaign.recruit(hid_r):
 			campaign.save()
-			_flash_msg("%s 归队" % DdNames.hero_name(hid_r))
+			_flash_msg("%s 归队" % _hero_label(hid_r))
 		return
 	if id.begins_with("goto:"):
 		if _battle != null:
@@ -1900,7 +1908,7 @@ func _draw_hero_tile(hid: String, r: Rect2) -> void:
 		DdTheme.PARTY if alive else Color("#3a3a3a"))
 
 	# 名字最长四字（瘟疫医生），13px 约 52px，144 宽的卡放得下
-	_text(Vector2(r.position.x + 10, r.position.y + 22), DdNames.hero_name(hid), DdTheme.FONT_BD, DdTheme.TEXT if alive else DdTheme.FAINT)
+	_text(Vector2(r.position.x + 10, r.position.y + 22), _hero_label(hid), DdTheme.FONT_BD, DdTheme.TEXT if alive else DdTheme.FAINT)
 
 	# 忙要单独标：名册里「忙」和「阵亡」看起来一样（都是不能出征），
 	# 但一个是等几周、一个是花钱重招。不区分玩家会点进去骂人。
@@ -2227,7 +2235,15 @@ func _draw_room_panel(r: Rect2) -> void:
 		_text(Vector2(r.position.x + 14, r.position.y + 66), "任务 " + ql,
 			DdTheme.FONT_TAG, DdTheme.OK if exp.quest_met() else DdTheme.WARN,
 			HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 28.0)
+	# 任务物品（M35）：只有带道具的任务才有这一行。
+	# 不显示的话玩家无法判断「还剩几次能激活」——而那直接决定要不要绕路。
+	var qi: String = _quest_items_line()
+	if not qi.is_empty():
+		_text(Vector2(r.position.x + 14, r.position.y + 78), qi,
+			DdTheme.FONT_TAG, DdTheme.FAINT, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 28.0)
 
+	# 有物品行时整体下移一行，避免和下面的房间状态挤在一起
+	var lines_y: float = r.position.y + (98.0 if not qi.is_empty() else 88.0)
 	var lines: Array = []
 	if kind == MapGen.K_GOAL:
 		# 目标房间不再无条件写「可以离开」（M32）：清剿任务走到出口
@@ -2252,7 +2268,7 @@ func _draw_room_panel(r: Rect2) -> void:
 		lines.append(["这里的奇物已经搜过", DdTheme.DIM])
 	else:
 		lines.append(["空房间，没有东西", DdTheme.FAINT])
-	var ly: float = r.position.y + 88.0
+	var ly: float = lines_y
 	for ln in lines:
 		_text(Vector2(r.position.x + 14, ly), str(ln[0]), DdTheme.FONT_MD, ln[1])
 		ly += 20.0
@@ -2296,6 +2312,35 @@ func _quest_line() -> String:
 		return ""
 	var cid: String = str(exp.quest_goal.get("curio", ""))
 	return exp.quest_line(DdNames.curio_name(cid) if not cid.is_empty() else "")
+
+
+## 名册里的人显示成什么（M34）。
+##
+## 名字表按**职业**建（`DdNames.hero_name`），而屏幕上要区分的**人**。
+## 同职业第二个起带罗马数字：`十字军 Ⅱ`。
+## 这条后缀来自实例 id 本身（`crusader#2`），所以读档之后仍然一样。
+func _hero_label(hid: String) -> String:
+	var nm: String = DdNames.hero_name(campaign.def_of(str(hid)))
+	var sfx: String = campaign.variant_suffix(str(hid))
+	return nm if sfx.is_empty() else "%s %s" % [nm, sfx]
+
+
+## 任务物品那一行（M35）。没有任务物品时返回空串。
+##
+## 只报「还剩几件」，不报「总共带了几件」：玩家关心的是还能做几次，
+## 而总数已经在任务行里（激活 0/3）说过了。
+func _quest_items_line() -> String:
+	if exp == null or exp.quest_items.is_empty():
+		return ""
+	var bits: Array = []
+	for id in exp.quest_items.keys():
+		var n: int = int(exp.quest_items[id])
+		if n <= 0 and not str(id).is_empty():
+			# 用完的也列出来（写 ×0），否则玩家会以为「本来就没带」
+			bits.append("%s ×0" % DdNames.quest_item_name(str(id)))
+			continue
+		bits.append("%s ×%d" % [DdNames.quest_item_name(str(id)), n])
+	return "任务物品 " + "、".join(bits)
 
 
 func _hazard_name(kind: String) -> String:
@@ -2351,7 +2396,7 @@ func _draw_party_strip(r: Rect2) -> void:
 		draw_rect(Rect2(cr.position, Vector2(cr.size.x, 3)),
 			Color("#3a3a3a") if dead else DdTheme.PARTY)
 
-		_text(Vector2(cr.position.x + 12, cr.position.y + 24), DdNames.hero_name(hid), DdTheme.FONT_BD, DdTheme.FAINT if dead else DdTheme.TEXT)
+		_text(Vector2(cr.position.x + 12, cr.position.y + 24), _hero_label(hid), DdTheme.FONT_BD, DdTheme.FAINT if dead else DdTheme.TEXT)
 		_text(Vector2(cr.position.x + cr.size.x - 64, cr.position.y + 24),
 			"装备 %d" % _hero_gear(hid), DdTheme.FONT_SM, DdTheme.FAINT)
 
@@ -2703,7 +2748,7 @@ func _draw_result() -> void:
 		var names_u: Array = []
 		var max_lv: int = 0
 		for uk in ups.keys():
-			names_u.append(DdNames.hero_name(str(uk)))
+			names_u.append(_hero_label(str(uk)))
 			max_lv = maxi(max_lv, campaign.resolve_of(str(uk)))
 		var tail: String = "" if names_u.size() <= 2 else " 等 %d 人" % names_u.size()
 		_text(Vector2(card.position.x + 190, y),
@@ -2731,7 +2776,7 @@ func _draw_result() -> void:
 		y += 24.0
 		var names: Array = []
 		for d in deaths:
-			names.append(DdNames.hero_name(str(d)))
+			names.append(_hero_label(str(d)))
 		_text(Vector2(card.position.x + 190, y), "永久损失：" + "、".join(names), DdTheme.FONT_MD, DdTheme.WARN)
 
 	_add_button(Rect2(cx - 120, 634, 240, 44), "restart", "回城镇")
@@ -2927,7 +2972,7 @@ func _draw_prep() -> void:
 		# 光靠边框粗细分辨「选没选」在小屏上几乎看不出来，
 		# 所以再给一个文字标记——这是唯一能一眼确认的地方。
 		_text(Vector2(br.position.x + 8, br.position.y + 20), ("✓ " if picked else "＋ ") +
-			DdNames.hero_name(hid), DdTheme.FONT_MD, DdTheme.TEXT if picked else (DdTheme.FAINT if fit else DdTheme.CRIT))
+			_hero_label(hid), DdTheme.FONT_MD, DdTheme.TEXT if picked else (DdTheme.FAINT if fit else DdTheme.CRIT))
 		if fit:
 			# 够格但等级不够（会吃惩罚）：这一行转警告色，具体代价在下面的队伍摘要里
 			var gap_h: int = campaign.level_gap(hid, _prep_level)
@@ -3053,7 +3098,7 @@ func _draw_building() -> void:
 		# 死人在马车里也要能认出来（M28）：他们会出现在同一列里，
 		# 但可做的事完全不同（复活 / 移除记录，而不是解雇）。
 		var is_alive: bool = bool((campaign.hero(hid) as Dictionary).get("alive", true))
-		_text(Vector2(r.position.x + 10, r.position.y + 16), DdNames.hero_name(hid), DdTheme.FONT_MD,
+		_text(Vector2(r.position.x + 10, r.position.y + 16), _hero_label(hid), DdTheme.FONT_MD,
 			(DdTheme.TEXT if sel else DdTheme.DIM) if is_alive else DdTheme.FAINT)
 		# 压力放右边：它和名字同属「一眼要看到」的那一档。
 		# draw_string 的 width 是从 pos.x **向右**量的文本框宽度，
@@ -3105,7 +3150,7 @@ func _draw_building_panel(r: Rect2) -> void:
 		_panel_coach(r, hid)
 		return
 	var row: Dictionary = campaign.hero(hid)
-	_text(Vector2(r.position.x + 16, r.position.y + 30), DdNames.hero_name(hid), DdTheme.FONT_H1, DdTheme.TEXT)
+	_text(Vector2(r.position.x + 16, r.position.y + 30), _hero_label(hid), DdTheme.FONT_H1, DdTheme.TEXT)
 	_text(Vector2(r.position.x + 16, r.position.y + 52),
 		"出征 %d 次 · 阵亡 %d 次" % [int(row.get("runs", 0)), int(row.get("deaths", 0))], DdTheme.FONT_SM, DdTheme.FAINT)
 	# 忙的时候按钮会全灰，光灰着不解释等于「点了没反应」
@@ -3153,7 +3198,7 @@ func _panel_coach(r: Rect2, hid: String) -> void:
 			var cls: String = str(cands[i])
 			var cost: Dictionary = campaign.hire_cost()
 			_add_button(Rect2(x, y + 16.0 + float(i) * 48.0, 340, 42), "hire:" + cls,
-				"%s（%d 金币）" % [DdNames.hero_name(cls), int(cost.get("gold", 0))],
+				"%s（%d 金币）" % [_hero_label(cls), int(cost.get("gold", 0))],
 				campaign.can_hire(cls))
 	y += 130.0
 	draw_line(Vector2(x, y), Vector2(x + 340, y), DdTheme.PANEL_EDGE, 1.0)
@@ -3166,7 +3211,7 @@ func _panel_coach(r: Rect2, hid: String) -> void:
 		_text(Vector2(x, y + 16), "左侧点一个人。", DdTheme.FONT_MD, DdTheme.FAINT)
 		return
 	var alive: bool = bool((campaign.hero(hid) as Dictionary).get("alive", true))
-	var nm: String = DdNames.hero_name(hid)
+	var nm: String = _hero_label(hid)
 	y += 12.0
 	if alive:
 		_text(Vector2(x, y),
@@ -3210,7 +3255,7 @@ func _panel_coach(r: Rect2, hid: String) -> void:
 ## 真的解雇（M28）。到这一步时玩家已经点过两次了。
 func _do_fire(hid: String) -> void:
 	_fire_pending = ""
-	var nm: String = DdNames.hero_name(hid)
+	var nm: String = _hero_label(hid)
 	var alive: bool = bool((campaign.hero(hid) as Dictionary).get("alive", true))
 	if not campaign.dismiss(hid):
 		if campaign.busy_of(hid) > 0:
@@ -3252,8 +3297,8 @@ func _panel_smith(r: Rect2, hid: String) -> void:
 						Campaign.MAX_RESOLVE)])], DdTheme.FONT_MD, DdTheme.FAINT)
 			# 只说「不行」不够：这一屏得告诉玩家「练上去能拿到什么」，
 			# 否则他没有任何理由继续投这个人的等级。
-			var c0: Dictionary = db.hero_base(hid, gear)
-			var n0: Dictionary = db.hero_base(hid, mini(gear + 1, Campaign.MAX_GEAR))
+			var c0: Dictionary = db.hero_base(campaign.def_of(hid), gear)
+			var n0: Dictionary = db.hero_base(campaign.def_of(hid), mini(gear + 1, Campaign.MAX_GEAR))
 			if not c0.is_empty() and not n0.is_empty():
 				_text(Vector2(r.position.x + 16, y + 46),
 					"升上去会变成：生命 %d（+%d）· 护甲 %.0f%% · 速度 %.0f" % [
@@ -3266,8 +3311,8 @@ func _panel_smith(r: Rect2, hid: String) -> void:
 	if not hb.is_empty():
 		var k: String = str(hb.keys()[0])
 		extra = " + %d %s" % [int(hb[k]), DdNames.heirloom_name(k)]
-	var cur: Dictionary = db.hero_base(hid, gear)
-	var nxt: Dictionary = db.hero_base(hid, mini(gear + 1, Campaign.MAX_GEAR))
+	var cur: Dictionary = db.hero_base(campaign.def_of(hid), gear)
+	var nxt: Dictionary = db.hero_base(campaign.def_of(hid), mini(gear + 1, Campaign.MAX_GEAR))
 	var dhp: int = int(nxt.get("hp_max", 0)) - int(cur.get("hp_max", 0))
 	_text(Vector2(r.position.x + 16, y), "当前：生命 %d · 护甲 %.0f%% · 闪避 %.0f%%" % [
 		int(cur.get("hp_max", 0)), float(cur.get("prot", 0.0)) * 100.0,
@@ -3339,7 +3384,7 @@ func _draw_graveyard(r: Rect2) -> void:
 	var y: float = r.position.y + 88
 	for g in gv:
 		var row: Dictionary = g
-		_text(Vector2(r.position.x + 16, y), DdNames.hero_name(str(row["hero"])), DdTheme.FONT_BD, DdTheme.TEXT if bool(row["alive"]) else DdTheme.DIM)
+		_text(Vector2(r.position.x + 16, y), _hero_label(str(row["hero"])), DdTheme.FONT_BD, DdTheme.TEXT if bool(row["alive"]) else DdTheme.DIM)
 		_text(Vector2(r.position.x + 180, y), "阵亡 %d 次 · 出征 %d 次 · %s" % [
 			int(row["deaths"]), int(row["runs"]),
 			"已归队" if bool(row["alive"]) else "未归队"], DdTheme.FONT_MD, DdTheme.FAINT)
@@ -3445,14 +3490,15 @@ func _do_hire(cls: String) -> void:
 	if not campaign.hire(cls):
 		# 三种失败原因分开说：钱不够 / 名册满 / 候选过期（换周了）
 		if campaign.roster_full():
-			_flash_msg("名册满了（%d 人）—— 解雇功能还没做" % campaign.roster_max())
+			# M28 起能解雇了，这句「还没做」从那时起就是错的
+			_flash_msg("名册满了（%d 人）—— 先去马车赶走一个" % campaign.roster_max())
 		elif not campaign.recruit_candidates.has(cls):
 			_flash_msg("这个人已经不在本周的马车上了")
 		else:
 			_flash_msg("金币不足（需 %d）" % int(campaign.hire_cost().get("gold", 0)))
 		return
 	campaign.save()
-	_flash_msg("%s 入册了 · Lv1，装备 0 阶" % DdNames.hero_name(cls))
+	_flash_msg("%s 入册了 · Lv1，装备 0 阶" % _hero_label(cls))
 	queue_redraw()
 
 
@@ -3489,7 +3535,7 @@ func _draw_guild() -> void:
 		var rowi: int = i / 2
 		var r := Rect2(28.0 + float(col) * 126.0, 100.0 + float(rowi) * 46.0, 118.0, 42.0)
 		_tile(r, TILE_ACTIVE if sel else (TILE_HOVER if r.has_point(_mouse) else TILE_IDLE))
-		_text(Vector2(r.position.x + 10, r.position.y + 16), DdNames.hero_name(hid), DdTheme.FONT_MD,
+		_text(Vector2(r.position.x + 10, r.position.y + 16), _hero_label(hid), DdTheme.FONT_MD,
 			DdTheme.TEXT if sel else DdTheme.DIM)
 		var n: int = campaign.equipped_skills(hid).size()
 		var mx: int = campaign.skill_slot_max(hid)
@@ -3511,10 +3557,10 @@ func _draw_guild() -> void:
 	var selectable: bool = campaign.skill_selectable(_guild_hero)
 	if not selectable:
 		_text(Vector2(rx, 88), "%s · 变身职业，%d 个技能全开" % [
-			DdNames.hero_name(_guild_hero), slots], DdTheme.FONT_BD, DdTheme.OK)
+			_hero_label(_guild_hero), slots], DdTheme.FONT_BD, DdTheme.OK)
 	else:
 		_text(Vector2(rx, 88), "%s · 已装备 %d / %d" % [
-			DdNames.hero_name(_guild_hero), taken.size(), slots], DdTheme.FONT_BD,
+			_hero_label(_guild_hero), taken.size(), slots], DdTheme.FONT_BD,
 			DdTheme.TEXT if taken.size() >= slots else DdTheme.WARN)
 
 	var ids: Array = campaign.skill_choices(_guild_hero)
@@ -3572,7 +3618,7 @@ func _toggle_skill(sid: String) -> void:
 ## `target` 还带两种前缀（`@` 己方、`~` 全体）。第一版直接 `str()` + 逐字符拆，
 ## 结果 null 变成 `<null>`，显示成「打 <、11、1、1、> 位」。
 func _skill_line(hid: String, sid: String) -> String:
-	var h: Dictionary = db.hero(hid)
+	var h: Dictionary = db.hero(campaign.def_of(hid))
 	var lv_i: int = campaign.skill_of(hid)
 	for s in (h.get("skills", []) as Array):
 		if not (s is Dictionary) or str((s as Dictionary).get("id", "")) != sid:
@@ -3719,6 +3765,10 @@ static func _quest_size_word(quest: String, size_id: String) -> String:
 		head = "收集"
 	elif quest == "activate":
 		head = "激活"
+	elif quest == "inventory_activate":
+		# 和「激活」分开写：两者在数据里同 type，但一个是碰到就算、
+		# 一个是必须带道具。卡片上混成一个词，玩家进去才发现进度不动。
+		head = "仪式"
 	var tail: String = "短途"
 	match size_id:
 		"medium": tail = "中程"
@@ -3741,6 +3791,10 @@ static func _board_note(size_id: String, quest: String) -> String:
 		return "翻找指定奇物，集齐 3 件"
 	if quest == "activate":
 		return "找到铁处女，交互一次"
+	if quest == "inventory_activate":
+		# 和普通激活的区别就是「要带道具」——不写出来，玩家会以为
+		# 这张卡和墓穴那张是一样的，进去才发现进度不动。
+		return "带任务物品，用 3 次"
 	match size_id:
 		"short": return "4-7 场，休整 1 次"
 		"medium": return "7-8 场，补给吃紧"
@@ -3865,7 +3919,7 @@ func _toggle_slot(hid: String, slot: int) -> void:
 		return
 	var why: String = campaign.equip_trinket(hid, _sel_trinket)
 	if why.is_empty():
-		_flash_msg("%s 戴上 %s" % [DdNames.hero_name(hid), DdNames.trinket_name(_sel_trinket)])
+		_flash_msg("%s 戴上 %s" % [_hero_label(hid), DdNames.trinket_name(_sel_trinket)])
 		_sel_trinket = ""
 		campaign.save()
 	else:
@@ -3950,7 +4004,7 @@ func _draw_trinket() -> void:
 		var alive: bool = bool(row2.get("alive", true))
 		var e: Array = campaign.equipped_of(hid)
 		var by: float = ry + float(hi) * 118.0
-		_text(Vector2(rx, by + 20), DdNames.hero_name(hid), DdTheme.FONT_BD, DdTheme.TEXT if alive else DdTheme.FAINT)
+		_text(Vector2(rx, by + 20), _hero_label(hid), DdTheme.FONT_BD, DdTheme.TEXT if alive else DdTheme.FAINT)
 		var lv: int = int(row2.get("gear", 0))
 		_text(Vector2(rx + 120, by + 20), "装备 %d 阶" % lv, DdTheme.FONT_SM, DdTheme.DIM)
 		for s in campaign.equip_slots:
@@ -4197,5 +4251,5 @@ func _hero_gear(hid: String) -> int:
 
 
 func _max_hp(hid: String) -> int:
-	var b: Dictionary = db.hero_base(hid, _hero_gear(hid))
+	var b: Dictionary = db.hero_base(campaign.def_of(hid), _hero_gear(hid))
 	return int(b.get("hp_max", 1))

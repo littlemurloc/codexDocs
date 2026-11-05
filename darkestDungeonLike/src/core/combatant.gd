@@ -14,6 +14,12 @@ const SIDE_ENEMY: String = "enemy"
 
 var uid: int = 0
 var def_id: String = ""          # hero id 或 monster id
+## 名册上的实例 id（M34）。英雄才有，怪物留空。
+##
+## `def_id` 回答「这个人是干什么的」（查数值表用），`hero_key` 回答
+## 「这是名册上的哪一个人」（记状态用）。同职业多人之后这两件事必须分开：
+## 两个十字军的 def_id 一样，但他们的血量、压力、怪癖各归各的。
+var hero_key: String = ""
 var display_name: String = ""
 var side: String = SIDE_PARTY
 var rank: int = 0                # 0 基站位

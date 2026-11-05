@@ -21,16 +21,19 @@ extends RefCounted
 ##   2. 地图的支线是死胡同（M18 量过），要求 90% 会把「探索」变成「绕完所有死路」。
 ## 90% 这条留在 `raw` 字段里可查，等将来真的要做「完整探索」任务时再启用。
 
-## 数据里存在、但我们还没接的任务类型。它出现在这里而不是被静默忽略：
-## 任务板只从 `supported()` 为真的类型里抽卡，玩家不会看到一张点不动的卡。
+## 数据里存在、但我们还没接的任务类型。
 ##
-## `inventory_activate` 需要「先带任务道具，再在奇物上用它」——那要求
-## 任务物品能进背包、能被指定为交互道具，属于道具系统（M34 之后）。
-## `gather` / `activate` 在 M33 接上：它们只要求「在某个奇物上交互」。
-const UNSUPPORTED_TYPES: Array = ["inventory_activate"]
+## M35 起这里是**空的**：`inventory_activate` 接上了（任务物品容器 + 消耗）。
+## 保留这个常量而不是删掉，是因为任务板与存档清洗都靠 `supported()` 过滤，
+## 将来某类任务要下线时，把 id 加回来就行。
+const UNSUPPORTED_TYPES: Array = []
 
-## 需要「目标奇物」的任务类型（M33）。
-const CURIO_TYPES: Array = ["gather", "activate"]
+## 需要「目标奇物」的任务类型（M33 / M35）。
+##
+## `inventory_activate` 也在这里，虽然它的 goal `type` 写的是 `activate`——
+## 两者在数据里唯一的差别就是有没有 `starting_items`：
+## 有道具 = 必须带着任务物品去用，没道具 = 碰到就算。
+const CURIO_TYPES: Array = ["gather", "activate", "inventory_activate"]
 
 const KIND_REACH: String = "reach_goal"
 const KIND_BOSS: String = "kill_monster"
@@ -94,13 +97,14 @@ static func supported(quest_type: String) -> bool:
 ##   goal_id     命中的 goal id，排查数据用
 ##   curio_raw   数据里写的奇物名（可能就是 9 个不存在的之一）
 ##   curio       落到本作真实奇物上的 id（M33）；解析不出来是空串
+##   items       出发时要带的**任务物品**（M35）：[{id, amount}, ...]，可为空
 ##   supported   现在能不能结算
 static func parse(quests: Dictionary, quest_type: String, region: String = "",
 		curios: Dictionary = {}) -> Dictionary:
 	var out: Dictionary = {
 		"quest_type": quest_type, "kind": KIND_REACH, "amount": 0,
 		"percentage": 0.0, "curio": "", "curio_raw": "", "item": "", "raw_type": "",
-		"goal_id": "", "supported": supported(quest_type),
+		"goal_id": "", "supported": supported(quest_type), "items": [],
 	}
 	# `kill_boss` 在数据里 goals 是 `[[]]`（空目标），它的语义写在
 	# dungeons.json 的遭遇表里（终点房间放 boss）。所以这一条不查 goal 表，
@@ -156,6 +160,16 @@ static func parse(quests: Dictionary, quest_type: String, region: String = "",
 			out["kind"] = KIND_BOSS
 		_:
 			out["kind"] = KIND_REACH
+	# 出发时要带的**任务物品**（M35）。数据里叫 `starting_items`，
+	# 位置在 goal 上而不是 goal.data 里——这一点和数量/比例不一样，
+	# 第一次读的时候找错地方了（`data` 里只有 curio_name 和 amount）。
+	for it in (def.get("starting_items", []) as Array):
+		if not (it is Dictionary):
+			continue
+		var iid: String = str((it as Dictionary).get("id", ""))
+		if iid.is_empty():
+			continue
+		out["items"].append({"id": iid, "amount": maxi(1, int((it as Dictionary).get("amount", 1)))})
 	# 需要目标奇物的任务：解析不出来就不能算「可结算」。
 	# 这一条必须在**解析阶段**定下来，而不是等交互的时候才发现——
 	# 那时候玩家已经在图里走了一半，任务却永远做不完。
@@ -289,6 +303,18 @@ static func _need(goal: Dictionary, st: Dictionary) -> int:
 	return maxi(0, int(goal.get("amount", 0)))
 
 
+## 这个任务要不要用任务物品（M35）。空串 = 碰到就算，不用道具。
+##
+## 数据里只有 `inventory_activate_*` 那一族带 `starting_items`，
+## 而它们和 `activate_iron_maiden` 在 goal 里的 `type` 完全一样（都是 activate）。
+## 所以「要不要道具」不能靠 type 判断，只能看有没有这件东西。
+static func required_item(goal: Dictionary) -> String:
+	var items: Array = goal.get("items", [])
+	if items.is_empty():
+		return ""
+	return str((items[0] as Dictionary).get("id", ""))
+
+
 ## 任务目标的一句话，给任务卡和地图屏用。
 ##
 ## `curio_label` 是目标奇物的显示名（由界面层传进来，核心层不认识名字表）。
@@ -314,8 +340,10 @@ static func describe(goal: Dictionary, st: Dictionary = {},
 			var n2: int = int(goal.get("amount", 1))
 			if not bool(goal.get("supported", false)):
 				return "去出口（激活目标解析失败，本趟不判这个）"
+			var with_item: bool = not required_item(goal).is_empty()
+			var verb: String = "用任务物品激活" if with_item else "激活"
 			if curio_label.is_empty():
-				return "在目标奇物上激活 %d 次" % n2
-			return "在「%s」上激活 %d 次" % [curio_label, n2]
+				return "在目标奇物上%s %d 次" % [verb, n2]
+			return "在「%s」上%s %d 次" % [curio_label, verb, n2]
 		_:
 			return "走到出口"
