@@ -1,0 +1,1967 @@
+[
+ {
+  "id": 1,
+  "name": "First Sheep",
+  "cn": "第一只羊",
+  "goal": "把 INBOX 里的每个数字原样放进 OUTBOX。",
+  "inbox": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "outbox": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX"
+  ],
+  "mem_size": 2,
+  "mem_init": [],
+  "ref": [
+   "INBOX",
+   "OUTBOX",
+   "INBOX",
+   "OUTBOX",
+   "INBOX",
+   "OUTBOX",
+   "INBOX",
+   "OUTBOX"
+  ],
+  "hint": "两条指令按竖着写，程序是从上往下一行一行跑的。写完 OUTBOX 之后它还会继续往下。",
+  "hint2": "这一关只允许 INBOX 和 OUTBOX。把它们交替写满就够——先把流程跑顺，别想循环。"
+ },
+ {
+  "id": 2,
+  "name": "All Night Long",
+  "cn": "整夜地数",
+  "goal": "数据变多了。用 JUMP 加标签让程序自己转圈。",
+  "inbox": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "outbox": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX",
+   "JUMP"
+  ],
+  "mem_size": 2,
+  "mem_init": [],
+  "ref": [
+   "a:INBOX",
+   "OUTBOX",
+   "JUMP a"
+  ],
+  "hint": "要让程序自己转圈，得有个地方跳回去。第一次跳回会回到最上面那一行。",
+  "hint2": "在首行贴标签 a，在末行写 JUMP a。这是后面所有关卡的地基。"
+ },
+ {
+  "id": 3,
+  "name": "Copy That",
+  "cn": "照抄一块",
+  "goal": "木牌上已经放好了一个数，把它重复送到 OUTBOX。",
+  "inbox": [],
+  "outbox": [
+   1,
+   1,
+   1,
+   1
+  ],
+  "allowed": [
+   "COPYFROM",
+   "OUTBOX",
+   "JUMP"
+  ],
+  "mem_size": 1,
+  "mem_init": [
+   1
+  ],
+  "ref": [
+   "a:COPYFROM 0",
+   "OUTBOX",
+   "JUMP a"
+  ],
+  "hint": "手刚开局是空的，所以你手里什么都没有。木牌第 0 格已经放好了一个数。",
+  "hint2": "COPYFROM 0 把木牌的数捡进手，OUTBOX 送出去后会清空手，所以要回到捡的位置。"
+ },
+ {
+  "id": 4,
+  "name": "Swap Around",
+  "cn": "倒个顺序",
+  "goal": "成对输入，交换顺序后输出。（1,2 → 2,1）",
+  "inbox": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "outbox": [
+   2,
+   1,
+   4,
+   3
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX",
+   "COPYFROM",
+   "MOVETO",
+   "JUMP"
+  ],
+  "mem_size": 1,
+  "mem_init": [],
+  "ref": [
+   "a:INBOX",
+   "MOVETO 0",
+   "INBOX",
+   "OUTBOX",
+   "COPYFROM 0",
+   "OUTBOX",
+   "JUMP a"
+  ],
+  "hint": "第一个读进来的数如果不先存起来，第二个 INBOX 会因为它手里有货而直接报错。",
+  "hint2": "INBOX → MOVETO 0 → INBOX → OUTBOX → COPYFROM 0 → OUTBOX → JUMP a。"
+ },
+ {
+  "id": 5,
+  "name": "Triple Flock",
+  "cn": "三只一堆",
+  "goal": "把每个数乘以 3。提示：MOVETO + ADD 可以自加。",
+  "inbox": [
+   1,
+   2,
+   3
+  ],
+  "outbox": [
+   3,
+   6,
+   9
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX",
+   "MOVETO",
+   "COPYFROM",
+   "ADD",
+   "JUMP"
+  ],
+  "mem_size": 1,
+  "mem_init": [],
+  "ref": [
+   "a:INBOX",
+   "MOVETO 0",
+   "COPYFROM 0",
+   "ADD 0",
+   "ADD 0",
+   "OUTBOX",
+   "JUMP a"
+  ],
+  "hint": "想让一个数变大，就把它存进木牌，然后 COPYFROM 把它捡回来再 ADD 同一格。",
+  "hint2": "存 0 之后：COPYFROM 0 → ADD 0 得到两倍，再 ADD 0 拿到三倍。"
+ },
+ {
+  "id": 6,
+  "name": "Shoo the Zero",
+  "cn": "赶走零",
+  "goal": "只把非 0 的数放进 OUTBOX，0 直接丢掉。",
+  "inbox": [
+   0,
+   1,
+   2,
+   0,
+   3
+  ],
+  "outbox": [
+   1,
+   2,
+   3
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX",
+   "JUMP",
+   "JUMPZ",
+   "MOVETO"
+  ],
+  "mem_size": 2,
+  "mem_init": [],
+  "ref": [
+   "a:INBOX",
+   "JUMPZ b",
+   "OUTBOX",
+   "JUMP a",
+   "b:MOVETO 0",
+   "JUMP a"
+  ],
+  "hint": "这关第一次给你 JUMPZ。它没有单独的「比较」牌 —— 比较就长在它身上：看一眼手上的数，等于 0 就跳到标签，不等于 0 就往下走。",
+  "hint2": "INBOX → JUMPZ b → OUTBOX → JUMP a；标签 b 上只放一句「把手上这个 0 扔掉」再 JUMP a。JUMPZ 不会吃掉值，所以要自己动手扔（写进木牌 0 最省事）。"
+ },
+ {
+  "id": 7,
+  "name": "Keep the Zero",
+  "cn": "留下零",
+  "goal": "反过来：只把 0 放进 OUTBOX，其他全部丢掉。",
+  "inbox": [
+   0,
+   1,
+   0,
+   2,
+   0
+  ],
+  "outbox": [
+   0,
+   0,
+   0
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX",
+   "JUMP",
+   "JUMPZ",
+   "MOVETO"
+  ],
+  "mem_size": 2,
+  "mem_init": [],
+  "ref": [
+   "a:INBOX",
+   "JUMPZ b",
+   "MOVETO 0",
+   "JUMP a",
+   "b:OUTBOX",
+   "JUMP a"
+  ],
+  "hint": "和上一关正好相反：现在 JUMPZ 跳过去的才是「要输出」的那条路。",
+  "hint2": "把 JUMPZ 的目标改成直接输出，不跳的那条路去想别的办法结束（比如跳回开头）。"
+ },
+ {
+  "id": 8,
+  "name": "Eight at Once",
+  "cn": "一次八只",
+  "goal": "把每个数乘以 8。三连 ADD 就够。",
+  "inbox": [
+   1,
+   2,
+   3
+  ],
+  "outbox": [
+   8,
+   16,
+   24
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX",
+   "MOVETO",
+   "COPYFROM",
+   "ADD",
+   "JUMP"
+  ],
+  "mem_size": 1,
+  "mem_init": [],
+  "ref": [
+   "a:INBOX",
+   "MOVETO 0",
+   "COPYFROM 0",
+   "ADD 0",
+   "MOVETO 0",
+   "COPYFROM 0",
+   "ADD 0",
+   "MOVETO 0",
+   "COPYFROM 0",
+   "ADD 0",
+   "OUTBOX",
+   "JUMP a"
+  ],
+  "hint": "×8 就是翻倍三次。每次 ADD 之后手是满的，想再翻倍必须先放回去。",
+  "hint2": "存 0 → COPYFROM 0 → ADD 0（×2）→ MOVETO 0 → COPYFROM 0 → ADD 0（×4）→ 再来一次（×8）。"
+ },
+ {
+  "id": 9,
+  "name": "Take Away",
+  "cn": "拿走一只",
+  "goal": "成对输入，输出前一个减后一个。（5,3 → 2）",
+  "inbox": [
+   5,
+   3,
+   2,
+   7,
+   4,
+   4
+  ],
+  "outbox": [
+   2,
+   -5,
+   0
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX",
+   "COPYFROM",
+   "MOVETO",
+   "SUB",
+   "JUMP"
+  ],
+  "mem_size": 2,
+  "mem_init": [],
+  "ref": [
+   "a:INBOX",
+   "MOVETO 0",
+   "INBOX",
+   "MOVETO 1",
+   "COPYFROM 0",
+   "SUB 1",
+   "OUTBOX",
+   "JUMP a"
+  ],
+  "hint": "SUB 会把手里减掉木牌那一格。所以第二个数必须先落地，手才能腾出来被减。",
+  "hint2": "INBOX 存 0 → INBOX 存 1（先别急着减）→ COPYFROM 0 → SUB 1 → OUTBOX。"
+ },
+ {
+  "id": 10,
+  "name": "The Bigger One",
+  "cn": "谁更大",
+  "goal": "成对输入，输出较大的那个。需要用 JUMPN 比较。",
+  "inbox": [
+   5,
+   3,
+   2,
+   7,
+   4,
+   4
+  ],
+  "outbox": [
+   5,
+   7,
+   4
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX",
+   "COPYFROM",
+   "MOVETO",
+   "SUB",
+   "JUMP",
+   "JUMPN"
+  ],
+  "mem_size": 3,
+  "mem_init": [],
+  "ref": [
+   "a:INBOX",
+   "MOVETO 0",
+   "INBOX",
+   "MOVETO 1",
+   "COPYFROM 0",
+   "SUB 1",
+   "JUMPN b",
+   "MOVETO 2",
+   "COPYFROM 0",
+   "OUTBOX",
+   "JUMP a",
+   "b:MOVETO 2",
+   "COPYFROM 1",
+   "OUTBOX",
+   "JUMP a"
+  ],
+  "hint": "减法结果的正负就是大小的答案：减出负数，说明手里那个更小。",
+  "hint2": "COPYFROM 0 → SUB 1 → JUMPN 走「输出 1」的分支，否则输出 0。两条路都要跳回开头。"
+ },
+ {
+  "id": 11,
+  "name": "Never Negative",
+  "cn": "不留负数",
+  "goal": "输出每个数的绝对值。负数要自己动手取反。",
+  "inbox": [
+   -5,
+   3,
+   -2
+  ],
+  "outbox": [
+   5,
+   3,
+   2
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX",
+   "COPYFROM",
+   "MOVETO",
+   "SUB",
+   "JUMP",
+   "JUMPN"
+  ],
+  "mem_size": 2,
+  "mem_init": [],
+  "ref": [
+   "a:INBOX",
+   "JUMPN b",
+   "OUTBOX",
+   "JUMP a",
+   "b:MOVETO 0",
+   "COPYFROM 1",
+   "SUB 0",
+   "OUTBOX",
+   "JUMP a"
+  ],
+  "hint": "负数的绝对值 = 0 减它。但手是满的，你得先把 0 弄进手，再减。",
+  "hint2": "用一格木牌当常量 0。判出负数后：把值存起来 → COPYFROM 0格 → SUB 那格。"
+ },
+ {
+  "id": 12,
+  "name": "One More",
+  "cn": "再多一只",
+  "goal": "输出每个数加 1 的结果。BUMPUP 会把木牌 +1 并同时放进手里。",
+  "inbox": [
+   1,
+   2,
+   3
+  ],
+  "outbox": [
+   2,
+   3,
+   4
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX",
+   "MOVETO",
+   "BUMPUP",
+   "JUMP"
+  ],
+  "mem_size": 1,
+  "mem_init": [],
+  "ref": [
+   "a:INBOX",
+   "MOVETO 0",
+   "BUMPUP 0",
+   "OUTBOX",
+   "JUMP a"
+  ],
+  "hint": "BUMPUP 一格会做两件事：把那格 +1，同时把新值直接放进手。所以它不占两步。",
+  "hint2": "INBOX → MOVETO 0 → BUMPUP 0 → OUTBOX → JUMP a。"
+ },
+ {
+  "id": 13,
+  "name": "One Less",
+  "cn": "再少一只",
+  "goal": "输出每个数减 1 的结果。",
+  "inbox": [
+   2,
+   3,
+   4
+  ],
+  "outbox": [
+   1,
+   2,
+   3
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX",
+   "MOVETO",
+   "BUMPDN",
+   "JUMP"
+  ],
+  "mem_size": 1,
+  "mem_init": [],
+  "ref": [
+   "a:INBOX",
+   "MOVETO 0",
+   "BUMPDN 0",
+   "OUTBOX",
+   "JUMP a"
+  ],
+  "hint": "BUMPDN 和上一关完全对称，只是方向相反。",
+  "hint2": "INBOX → MOVETO 0 → BUMPDN 0 → OUTBOX → JUMP a。"
+ },
+ {
+  "id": 14,
+  "name": "Rainy Night",
+  "cn": "雨夜的两只",
+  "goal": "成对输入，输出两个数之和。",
+  "inbox": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6
+  ],
+  "outbox": [
+   3,
+   7,
+   11
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX",
+   "MOVETO",
+   "ADD",
+   "JUMP"
+  ],
+  "mem_size": 1,
+  "mem_init": [],
+  "ref": [
+   "a:INBOX",
+   "MOVETO 0",
+   "INBOX",
+   "ADD 0",
+   "OUTBOX",
+   "JUMP a"
+  ],
+  "hint": "两个数都要进到手里才能加，可手只有一个。所以第一个必须先存木牌。",
+  "hint2": "INBOX → MOVETO 0 → INBOX → ADD 0 → OUTBOX → JUMP a。"
+ },
+ {
+  "id": 15,
+  "name": "Running Total",
+  "cn": "越数越多",
+  "goal": "输出从第一个数到当前数的累加和。注意 MOVETO 会把手清空。",
+  "inbox": [
+   3,
+   1,
+   4
+  ],
+  "outbox": [
+   3,
+   4,
+   8
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX",
+   "COPYFROM",
+   "MOVETO",
+   "ADD",
+   "JUMP"
+  ],
+  "mem_size": 2,
+  "mem_init": [],
+  "ref": [
+   "a:INBOX",
+   "MOVETO 1",
+   "COPYFROM 0",
+   "ADD 1",
+   "MOVETO 0",
+   "COPYFROM 0",
+   "OUTBOX",
+   "JUMP a"
+  ],
+  "hint": "累加器放 0 号格，这一格要活过整个循环。注意 MOVETO 之后手是空的。",
+  "hint2": "COPYFROM 0 → ADD 当前值 → MOVETO 0 之后，手空了，输出前必须再 COPYFROM 0。"
+ },
+ {
+  "id": 16,
+  "name": "The Smaller One",
+  "cn": "谁更小",
+  "goal": "成对输入，输出较小的那个（相等就输出它）。",
+  "inbox": [
+   5,
+   3,
+   2,
+   7,
+   4,
+   4
+  ],
+  "outbox": [
+   3,
+   2,
+   4
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX",
+   "COPYFROM",
+   "MOVETO",
+   "SUB",
+   "JUMP",
+   "JUMPN"
+  ],
+  "mem_size": 3,
+  "mem_init": [],
+  "ref": [
+   "a:INBOX",
+   "MOVETO 0",
+   "INBOX",
+   "MOVETO 1",
+   "COPYFROM 0",
+   "SUB 1",
+   "JUMPN b",
+   "MOVETO 2",
+   "COPYFROM 1",
+   "OUTBOX",
+   "JUMP a",
+   "b:MOVETO 2",
+   "COPYFROM 0",
+   "OUTBOX",
+   "JUMP a"
+  ],
+  "hint": "比较永远靠减法。上一关你先减后减，这一关要把两条分支的输出对调。",
+  "hint2": "照第 10 关写，但 JUMPN 那条分支改成输出手里的小值（此时 COPYFROM 0）。"
+ },
+ {
+  "id": 17,
+  "name": "Three Signs",
+  "cn": "三种手势",
+  "goal": "成对输入：前者大输出 1，后者大输出 -1，相等输出 0。（木牌上已放好常量 1 和 -1）",
+  "inbox": [
+   5,
+   3,
+   3,
+   5,
+   4,
+   4
+  ],
+  "outbox": [
+   1,
+   -1,
+   0
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX",
+   "COPYFROM",
+   "MOVETO",
+   "SUB",
+   "JUMP",
+   "JUMPN",
+   "JUMPZ"
+  ],
+  "mem_size": 5,
+  "mem_init": [
+   0,
+   0,
+   0,
+   1,
+   -1
+  ],
+  "ref": [
+   "a:INBOX",
+   "MOVETO 0",
+   "INBOX",
+   "MOVETO 1",
+   "COPYFROM 0",
+   "SUB 1",
+   "JUMPN b",
+   "JUMPZ c",
+   "MOVETO 2",
+   "COPYFROM 3",
+   "OUTBOX",
+   "JUMP a",
+   "b:MOVETO 2",
+   "COPYFROM 4",
+   "OUTBOX",
+   "JUMP a",
+   "c:MOVETO 2",
+   "COPYFROM 2",
+   "OUTBOX",
+   "JUMP a"
+  ],
+  "hint": "三路比较：先用减法得出差值，再分别用 JUMPN（负）和 JUMPZ（零）分三条路。",
+  "hint2": "木牌上已经有常量 1 和 -1，直接 COPYFROM 4 / COPYFROM 3 拿来输出就行。"
+ },
+ {
+  "id": 18,
+  "name": "Same Sheep",
+  "cn": "一模一样的羊",
+  "goal": "成对输入：不相等就两个都输出，相等只输出一个。",
+  "inbox": [
+   1,
+   2,
+   3,
+   3,
+   4,
+   5
+  ],
+  "outbox": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX",
+   "COPYFROM",
+   "MOVETO",
+   "SUB",
+   "JUMP",
+   "JUMPZ"
+  ],
+  "mem_size": 3,
+  "mem_init": [],
+  "ref": [
+   "a:INBOX",
+   "MOVETO 0",
+   "INBOX",
+   "MOVETO 1",
+   "COPYFROM 0",
+   "SUB 1",
+   "JUMPZ b",
+   "MOVETO 2",
+   "COPYFROM 0",
+   "OUTBOX",
+   "COPYFROM 1",
+   "OUTBOX",
+   "JUMP a",
+   "b:MOVETO 2",
+   "COPYFROM 0",
+   "OUTBOX",
+   "JUMP a"
+  ],
+  "hint": "相等就只输出一个，不等就输出两个。判等仍然是减法 + JUMPZ。",
+  "hint2": "先比较，JUMPZ 跳到「输出一个」的标签；另一条路输出两个都要 COPYFROM 回来。"
+ },
+ {
+  "id": 19,
+  "name": "Count Till Sleep",
+  "cn": "数到睡着",
+  "goal": "一直累加，直到读到 0 为止，然后输出总和。",
+  "inbox": [
+   3,
+   4,
+   5,
+   0
+  ],
+  "outbox": [
+   12
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX",
+   "COPYFROM",
+   "MOVETO",
+   "ADD",
+   "JUMP",
+   "JUMPZ"
+  ],
+  "mem_size": 2,
+  "mem_init": [],
+  "ref": [
+   "a:INBOX",
+   "JUMPZ b",
+   "MOVETO 1",
+   "COPYFROM 0",
+   "ADD 1",
+   "MOVETO 0",
+   "JUMP a",
+   "b:MOVETO 1",
+   "COPYFROM 0",
+   "OUTBOX"
+  ],
+  "hint": "这一关的 0 是「今天到此为止」的信号，不是要加进去的数。",
+  "hint2": "JUMPZ 跳到结尾之前，先要有一个放总和的格子；输出前别忘了 COPYFROM 它。"
+ },
+ {
+  "id": 20,
+  "name": "Sum to N",
+  "cn": "一路加到N",
+  "goal": "输入 n，输出 1+2+…+n。注意每关都要把上一轮的累加器清零。",
+  "inbox": [
+   3,
+   5
+  ],
+  "outbox": [
+   6,
+   15
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX",
+   "COPYFROM",
+   "MOVETO",
+   "SUB",
+   "ADD",
+   "BUMPDN",
+   "JUMP",
+   "JUMPN"
+  ],
+  "mem_size": 2,
+  "mem_init": [],
+  "ref": [
+   "a:INBOX",
+   "MOVETO 0",
+   "COPYFROM 0",
+   "SUB 0",
+   "MOVETO 1",
+   "b:COPYFROM 1",
+   "ADD 0",
+   "MOVETO 1",
+   "BUMPDN 0",
+   "JUMPN c",
+   "MOVETO 0",
+   "JUMP b",
+   "c:MOVETO 0",
+   "COPYFROM 1",
+   "OUTBOX",
+   "JUMP a"
+  ],
+  "hint": "两个累加器：一个当计数器倒数，一个存总和。计数器到 0 就该输出总和了。",
+  "hint2": "外层循环每次把计数器重置为 n，内层用 BUMPDN 倒数累加，减到负数时输出总和。"
+ },
+ {
+  "id": 21,
+  "name": "Back to Front",
+  "cn": "倒着点名",
+  "goal": "牧羊人今晚倒着点名：先报 n，再一个个往下数到 1，最后报今晚一共数了几只。",
+  "inbox": [
+   4
+  ],
+  "outbox": [
+   4,
+   3,
+   2,
+   1,
+   10
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX",
+   "COPYFROM",
+   "MOVETO",
+   "ADD",
+   "BUMPDN",
+   "JUMP",
+   "JUMPZ"
+  ],
+  "mem_size": 4,
+  "mem_init": [],
+  "ref": [
+   "a:INBOX",
+   "MOVETO 0",
+   "b:COPYFROM 0",
+   "JUMPZ e",
+   "OUTBOX",
+   "COPYFROM 2",
+   "ADD 0",
+   "MOVETO 2",
+   "BUMPDN 0",
+   "MOVETO 3",
+   "JUMP b",
+   "e:MOVETO 3",
+   "COPYFROM 2",
+   "OUTBOX"
+  ],
+  "hint": "这一轮要做两件事：把当前编号报出去，同时把它加进「今晚数了几个」里。",
+  "hint2": "0 号格当倒数计数器，2 号格当累加器。JUMPZ 到出口时倒数已经用完，出口只剩一句「报总数」。"
+ },
+ {
+  "id": 22,
+  "name": "Squash Duplicates",
+  "cn": "连着的只留一只",
+  "goal": "连续重复的编号只输出第一次。1,1,2,2,3,1,1 → 1,2,3,1",
+  "inbox": [
+   1,
+   1,
+   2,
+   2,
+   3,
+   1,
+   1
+  ],
+  "outbox": [
+   1,
+   2,
+   3,
+   1
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX",
+   "COPYFROM",
+   "MOVETO",
+   "SUB",
+   "JUMP",
+   "JUMPZ"
+  ],
+  "mem_size": 4,
+  "mem_init": [
+   -999,
+   0,
+   0,
+   0
+  ],
+  "ref": [
+   "a:INBOX",
+   "MOVETO 1",
+   "COPYFROM 1",
+   "SUB 0",
+   "JUMPZ b",
+   "MOVETO 2",
+   "COPYFROM 1",
+   "MOVETO 0",
+   "COPYFROM 1",
+   "OUTBOX",
+   "JUMP a",
+   "b:MOVETO 2",
+   "JUMP a"
+  ],
+  "hint": "要判断「和上一只一样吗」，就得把上一只记下来。",
+  "hint2": "0 号格存上一只，初始给了 -999 保证第一只一定算新的。相等就扔掉，不等就输出并更新。"
+ },
+ {
+  "id": 23,
+  "name": "Count and Sum",
+  "cn": "数完再报个数",
+  "goal": "读到 0 就收工。先报总和，再报一共数了几只。",
+  "inbox": [
+   4,
+   7,
+   2,
+   0
+  ],
+  "outbox": [
+   13,
+   3
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX",
+   "COPYFROM",
+   "MOVETO",
+   "ADD",
+   "BUMPUP",
+   "JUMP",
+   "JUMPZ"
+  ],
+  "mem_size": 4,
+  "mem_init": [],
+  "ref": [
+   "a:INBOX",
+   "MOVETO 2",
+   "COPYFROM 2",
+   "JUMPZ c",
+   "MOVETO 3",
+   "COPYFROM 0",
+   "ADD 2",
+   "MOVETO 0",
+   "BUMPUP 1",
+   "MOVETO 3",
+   "JUMP a",
+   "c:MOVETO 3",
+   "COPYFROM 0",
+   "OUTBOX",
+   "COPYFROM 1",
+   "OUTBOX"
+  ],
+  "hint": "0 是收工信号，不参与统计。收工之后才输出两份汇总。",
+  "hint2": "0 号格攒和、1 号格攒个数。读进 2 号格后用 JUMPZ 判它是不是收工信号。"
+ },
+ {
+  "id": 24,
+  "name": "Two Pens",
+  "cn": "两个圈",
+  "goal": "用 0 把羊群分成两拨，每遇到一个 0 就报出这一拨的总和。（1,2,0,3,4,5,0 → 3、12）",
+  "inbox": [
+   1,
+   2,
+   0,
+   3,
+   4,
+   5,
+   0
+  ],
+  "outbox": [
+   3,
+   12
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX",
+   "COPYFROM",
+   "MOVETO",
+   "ADD",
+   "SUB",
+   "JUMP",
+   "JUMPZ"
+  ],
+  "mem_size": 3,
+  "mem_init": [],
+  "ref": [
+   "a:INBOX",
+   "MOVETO 1",
+   "COPYFROM 1",
+   "JUMPZ b",
+   "MOVETO 2",
+   "COPYFROM 0",
+   "ADD 1",
+   "MOVETO 0",
+   "JUMP a",
+   "b:MOVETO 2",
+   "COPYFROM 0",
+   "OUTBOX",
+   "COPYFROM 2",
+   "SUB 2",
+   "MOVETO 0",
+   "JUMP a"
+  ],
+  "hint": "0 既当分隔符，也当收工信号 —— 每遇到一个就报一拨，然后把累加器清空。",
+  "hint2": "2 号格是废纸篓，用来把累加器减成 0。清空之后继续读，数据读完自然就收工。"
+ },
+ {
+  "id": 25,
+  "name": "Doubling Nights",
+  "cn": "每晚翻一倍",
+  "goal": "输出 2 的 0 次方一直到 2 的 n 次方。n=4 就是 1,2,4,8,16。",
+  "inbox": [
+   4
+  ],
+  "outbox": [
+   1,
+   2,
+   4,
+   8,
+   16
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX",
+   "COPYFROM",
+   "MOVETO",
+   "ADD",
+   "BUMPUP",
+   "SUB",
+   "JUMP",
+   "JUMPZ"
+  ],
+  "mem_size": 4,
+  "mem_init": [],
+  "ref": [
+   "a:INBOX",
+   "MOVETO 0",
+   "BUMPUP 1",
+   "OUTBOX",
+   "b:COPYFROM 1",
+   "ADD 1",
+   "MOVETO 1",
+   "COPYFROM 1",
+   "OUTBOX",
+   "BUMPUP 2",
+   "MOVETO 3",
+   "COPYFROM 0",
+   "SUB 2",
+   "JUMPZ c",
+   "MOVETO 3",
+   "JUMP b",
+   "c:MOVETO 3"
+  ],
+  "hint": "翻倍不需要乘法牌：自己加自己就是乘 2。",
+  "hint2": "1 号格是当前值，2 号格数翻了几次。翻够 n 次就停。"
+ },
+ {
+  "id": 26,
+  "name": "Triangular Stack",
+  "cn": "堆成三角",
+  "goal": "前 n 个三角数：1，1+2，1+2+3…… n=4 输出 1,3,6,10。",
+  "inbox": [
+   4
+  ],
+  "outbox": [
+   1,
+   3,
+   6,
+   10
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX",
+   "COPYFROM",
+   "MOVETO",
+   "ADD",
+   "BUMPUP",
+   "SUB",
+   "JUMP",
+   "JUMPZ"
+  ],
+  "mem_size": 5,
+  "mem_init": [],
+  "ref": [
+   "a:INBOX",
+   "MOVETO 0",
+   "b:BUMPUP 1",
+   "ADD 2",
+   "MOVETO 2",
+   "COPYFROM 2",
+   "OUTBOX",
+   "BUMPUP 3",
+   "MOVETO 4",
+   "COPYFROM 0",
+   "SUB 3",
+   "JUMPZ c",
+   "MOVETO 4",
+   "JUMP b",
+   "c:MOVETO 4"
+  ],
+  "hint": "每往上一层就多铺一行，铺满 n 层为止。",
+  "hint2": "1 号格是这一层的层号，2 号格是累加到现在的总数。先加层号、再输出、再比层数。"
+ },
+ {
+  "id": 27,
+  "name": "New Records",
+  "cn": "破纪录的羊",
+  "goal": "记下每一个打破纪录的编号。数据以 0 结尾，只输出比之前所有都大的那些。",
+  "inbox": [
+   3,
+   1,
+   5,
+   2,
+   9,
+   0
+  ],
+  "outbox": [
+   3,
+   5,
+   9
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX",
+   "COPYFROM",
+   "MOVETO",
+   "SUB",
+   "JUMP",
+   "JUMPZ",
+   "JUMPN"
+  ],
+  "mem_size": 3,
+  "mem_init": [],
+  "ref": [
+   "a:INBOX",
+   "MOVETO 1",
+   "COPYFROM 1",
+   "JUMPZ c",
+   "SUB 0",
+   "JUMPN b",
+   "MOVETO 2",
+   "COPYFROM 1",
+   "MOVETO 0",
+   "COPYFROM 1",
+   "OUTBOX",
+   "JUMP a",
+   "b:MOVETO 2",
+   "JUMP a",
+   "c:MOVETO 2"
+  ],
+  "hint": "减法在这里不是算术，是比较：v 减去当前纪录，负的就说明没破纪录。",
+  "hint2": "0 号格存当前纪录。判负就跳到「什么也不做」，但记得把手里的差值扔掉（写进废纸篓）。"
+ },
+ {
+  "id": 28,
+  "name": "Sort Two",
+  "cn": "大的站前面",
+  "goal": "每两只一组，按大到小输出。（5,3 → 5,3；2,7 → 7,2）",
+  "inbox": [
+   5,
+   3,
+   2,
+   7,
+   4,
+   4
+  ],
+  "outbox": [
+   5,
+   3,
+   7,
+   2,
+   4,
+   4
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX",
+   "COPYFROM",
+   "MOVETO",
+   "SUB",
+   "JUMP",
+   "JUMPN"
+  ],
+  "mem_size": 4,
+  "mem_init": [],
+  "ref": [
+   "a:INBOX",
+   "MOVETO 0",
+   "INBOX",
+   "MOVETO 1",
+   "COPYFROM 0",
+   "SUB 1",
+   "JUMPN b",
+   "MOVETO 2",
+   "COPYFROM 0",
+   "OUTBOX",
+   "COPYFROM 1",
+   "OUTBOX",
+   "JUMP a",
+   "b:MOVETO 2",
+   "COPYFROM 1",
+   "OUTBOX",
+   "COPYFROM 0",
+   "OUTBOX",
+   "JUMP a"
+  ],
+  "hint": "先比大小，再决定先把谁推出去。两条分支各输出两个，只是顺序不同。",
+  "hint2": "0 号格放第一只、1 号格放第二只。用差值的正负选分支。"
+ },
+ {
+  "id": 29,
+  "name": "Pair Product",
+  "cn": "成对相乘",
+  "goal": "羊总是一对一对来的。把每对的乘积放进 OUTBOX。（2×3=6）",
+  "inbox": [
+   2,
+   3,
+   4,
+   5
+  ],
+  "outbox": [
+   6,
+   20
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX",
+   "COPYFROM",
+   "MOVETO",
+   "ADD",
+   "SUB",
+   "BUMPDN",
+   "JUMP",
+   "JUMPZ"
+  ],
+  "mem_size": 4,
+  "mem_init": [],
+  "ref": [
+   "a:INBOX",
+   "MOVETO 0",
+   "INBOX",
+   "MOVETO 1",
+   "b:COPYFROM 1",
+   "JUMPZ c",
+   "MOVETO 3",
+   "BUMPDN 1",
+   "MOVETO 3",
+   "COPYFROM 2",
+   "ADD 0",
+   "MOVETO 2",
+   "JUMP b",
+   "c:MOVETO 3",
+   "COPYFROM 2",
+   "OUTBOX",
+   "COPYFROM 2",
+   "SUB 2",
+   "MOVETO 2",
+   "JUMP a"
+  ],
+  "hint": "没有乘法牌，乘就是「加若干次」。第二只羊的编号就是加的次数。",
+  "hint2": "0 号格放被乘数，1 号格放次数，2 号格攒结果。每加一次让 1 号格减一，减到 0 就输出。"
+ },
+ {
+  "id": 30,
+  "name": "Climb Check",
+  "cn": "今晚有没有掉队",
+  "goal": "读到 0 收工。报出一共出现过几次「比上一只小」。",
+  "inbox": [
+   3,
+   5,
+   4,
+   8,
+   2,
+   0
+  ],
+  "outbox": [
+   2
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX",
+   "COPYFROM",
+   "MOVETO",
+   "SUB",
+   "BUMPUP",
+   "JUMP",
+   "JUMPZ",
+   "JUMPN"
+  ],
+  "mem_size": 4,
+  "mem_init": [],
+  "ref": [
+   "a:INBOX",
+   "MOVETO 1",
+   "COPYFROM 1",
+   "JUMPZ e",
+   "SUB 0",
+   "JUMPN b",
+   "MOVETO 3",
+   "COPYFROM 1",
+   "MOVETO 0",
+   "JUMP a",
+   "b:MOVETO 3",
+   "BUMPUP 2",
+   "MOVETO 3",
+   "COPYFROM 1",
+   "MOVETO 0",
+   "JUMP a",
+   "e:MOVETO 3",
+   "COPYFROM 2",
+   "OUTBOX"
+  ],
+  "hint": "「比上一只小」就是这一只减上一只为负。掉的次数记在一格木牌里。",
+  "hint2": "0 号格存上一只，2 号格数掉队次数。判负之后别忘了把这一只也记成「上一只」。"
+ },
+ {
+  "id": 31,
+  "name": "Common Den",
+  "cn": "挤一个窝",
+  "goal": "输入两个数，输出它们的最大公约数。（12 和 18 → 6）",
+  "inbox": [
+   12,
+   18
+  ],
+  "outbox": [
+   6
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX",
+   "COPYFROM",
+   "MOVETO",
+   "SUB",
+   "JUMP",
+   "JUMPZ",
+   "JUMPN"
+  ],
+  "mem_size": 4,
+  "mem_init": [],
+  "ref": [
+   "a:INBOX",
+   "MOVETO 0",
+   "INBOX",
+   "MOVETO 1",
+   "b:COPYFROM 0",
+   "SUB 1",
+   "JUMPZ e",
+   "JUMPN c",
+   "MOVETO 2",
+   "COPYFROM 0",
+   "SUB 1",
+   "MOVETO 0",
+   "JUMP b",
+   "c:MOVETO 2",
+   "COPYFROM 1",
+   "SUB 0",
+   "MOVETO 1",
+   "JUMP b",
+   "e:MOVETO 2",
+   "COPYFROM 0",
+   "OUTBOX"
+  ],
+  "hint": "欧几里得的办法：大数减小数，一直减到两个数相等为止。",
+  "hint2": "0 号和 1 号格各放一个数。每轮用减法判谁大，把大的那格削掉一份。相等时输出任意一个。"
+ },
+ {
+  "id": 32,
+  "name": "Truckload",
+  "cn": "每三只一车",
+  "goal": "每数满 3 只就装一车，输出这一车的编号之和。（1+2+3=6）",
+  "inbox": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ],
+  "outbox": [
+   6,
+   15,
+   24
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX",
+   "COPYFROM",
+   "MOVETO",
+   "ADD",
+   "SUB",
+   "BUMPUP",
+   "JUMP",
+   "JUMPZ"
+  ],
+  "mem_size": 5,
+  "mem_init": [
+   0,
+   0,
+   0,
+   0,
+   3
+  ],
+  "ref": [
+   "a:INBOX",
+   "MOVETO 2",
+   "COPYFROM 1",
+   "ADD 2",
+   "MOVETO 1",
+   "BUMPUP 0",
+   "MOVETO 3",
+   "COPYFROM 0",
+   "SUB 4",
+   "JUMPZ b",
+   "MOVETO 3",
+   "JUMP a",
+   "b:MOVETO 3",
+   "COPYFROM 1",
+   "OUTBOX",
+   "COPYFROM 4",
+   "SUB 4",
+   "MOVETO 1",
+   "COPYFROM 4",
+   "SUB 4",
+   "MOVETO 0",
+   "JUMP a"
+  ],
+  "hint": "装车之后车要清空、计数要归零。木牌上没有「清零」牌，用「减自己」得到 0。",
+  "hint2": "4 号格放着常量 3。计数到 3 就输出累加器，然后把 1 号格和 0 号格都清成 0。"
+ },
+ {
+  "id": 33,
+  "name": "Peak Prefix",
+  "cn": "最高的那道坎",
+  "goal": "一路累加，读到 0 收工，报出累加过程中曾经到过的最大值。（负数会把累加拉下来）",
+  "inbox": [
+   3,
+   -1,
+   4,
+   -5,
+   2,
+   -3,
+   0
+  ],
+  "outbox": [
+   6
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX",
+   "COPYFROM",
+   "MOVETO",
+   "ADD",
+   "SUB",
+   "JUMP",
+   "JUMPZ",
+   "JUMPN"
+  ],
+  "mem_size": 4,
+  "mem_init": [],
+  "ref": [
+   "a:INBOX",
+   "MOVETO 1",
+   "COPYFROM 1",
+   "JUMPZ e",
+   "MOVETO 3",
+   "COPYFROM 0",
+   "ADD 1",
+   "MOVETO 0",
+   "COPYFROM 0",
+   "SUB 2",
+   "JUMPN b",
+   "MOVETO 3",
+   "COPYFROM 0",
+   "MOVETO 2",
+   "JUMP c",
+   "b:MOVETO 3",
+   "c:JUMP a",
+   "e:MOVETO 3",
+   "COPYFROM 2",
+   "OUTBOX"
+  ],
+  "hint": "累加器一直在变，但「历史最高」只在新值更高时才更新。",
+  "hint2": "0 号格是累加器，2 号格是历史最高。每轮加完就比一次，正数才更新。"
+ },
+ {
+  "id": 34,
+  "name": "Two Sheep Back",
+  "cn": "往前看两只",
+  "goal": "斐波那契：1,1,2,3,5,8…… 输出前 n 项。",
+  "inbox": [
+   6
+  ],
+  "outbox": [
+   1,
+   1,
+   2,
+   3,
+   5,
+   8
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX",
+   "COPYFROM",
+   "MOVETO",
+   "ADD",
+   "BUMPUP",
+   "SUB",
+   "JUMP",
+   "JUMPZ"
+  ],
+  "mem_size": 6,
+  "mem_init": [],
+  "ref": [
+   "a:INBOX",
+   "MOVETO 0",
+   "BUMPUP 1",
+   "OUTBOX",
+   "BUMPUP 4",
+   "MOVETO 4",
+   "BUMPUP 3",
+   "OUTBOX",
+   "BUMPUP 4",
+   "MOVETO 4",
+   "b:COPYFROM 1",
+   "ADD 3",
+   "MOVETO 2",
+   "COPYFROM 3",
+   "MOVETO 1",
+   "COPYFROM 2",
+   "MOVETO 3",
+   "COPYFROM 3",
+   "OUTBOX",
+   "BUMPUP 4",
+   "MOVETO 4",
+   "COPYFROM 0",
+   "SUB 4",
+   "JUMPZ c",
+   "MOVETO 5",
+   "JUMP b",
+   "c:MOVETO 5"
+  ],
+  "hint": "斐波那契要记住两个数，而手上只抱得动一个 —— 两个数各占一格木牌。",
+  "hint2": "1 号和 3 号格是相邻的两项。每次先把它们加起来放到 2 号格，再整体往前挪一格，最后才输出。"
+ },
+ {
+  "id": 35,
+  "name": "Plus Minus",
+  "cn": "一加一减",
+  "goal": "隔一只加、隔一只减：5-4+3-2+1。读到 0 收工，输出结果。",
+  "inbox": [
+   5,
+   4,
+   3,
+   2,
+   1,
+   0
+  ],
+  "outbox": [
+   3
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX",
+   "COPYFROM",
+   "MOVETO",
+   "ADD",
+   "SUB",
+   "BUMPUP",
+   "JUMP",
+   "JUMPZ"
+  ],
+  "mem_size": 4,
+  "mem_init": [
+   0,
+   0,
+   0,
+   1
+  ],
+  "ref": [
+   "a:INBOX",
+   "MOVETO 1",
+   "COPYFROM 1",
+   "JUMPZ e",
+   "MOVETO 2",
+   "COPYFROM 3",
+   "JUMPZ m",
+   "MOVETO 2",
+   "COPYFROM 0",
+   "ADD 1",
+   "MOVETO 0",
+   "COPYFROM 3",
+   "SUB 3",
+   "MOVETO 3",
+   "JUMP a",
+   "m:MOVETO 2",
+   "COPYFROM 0",
+   "SUB 1",
+   "MOVETO 0",
+   "BUMPUP 3",
+   "MOVETO 2",
+   "JUMP a",
+   "e:MOVETO 2",
+   "COPYFROM 0",
+   "OUTBOX"
+  ],
+  "hint": "要在两件事之间来回切，就得有一格记住「这一轮该加还是该减」。",
+  "hint2": "3 号格当开关：1 表示加、0 表示减。每轮结束把它翻一次（减自己或加一都行）。"
+ },
+ {
+  "id": 36,
+  "name": "High and Low",
+  "cn": "最高的和最低的",
+  "goal": "读到 0 就收工。报出这群羊里最高的编号，再报最低的。",
+  "inbox": [
+   4,
+   7,
+   2,
+   9,
+   1,
+   0
+  ],
+  "outbox": [
+   9,
+   1
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX",
+   "COPYFROM",
+   "MOVETO",
+   "SUB",
+   "JUMP",
+   "JUMPZ",
+   "JUMPN"
+  ],
+  "mem_size": 5,
+  "mem_init": [
+   0,
+   0,
+   -99,
+   0,
+   99
+  ],
+  "ref": [
+   "a:INBOX",
+   "MOVETO 3",
+   "COPYFROM 3",
+   "JUMPZ d",
+   "SUB 1",
+   "JUMPN b1",
+   "MOVETO 4",
+   "COPYFROM 3",
+   "MOVETO 1",
+   "JUMP c1",
+   "b1:MOVETO 2",
+   "c1:COPYFROM 4",
+   "SUB 3",
+   "JUMPN c2",
+   "MOVETO 4",
+   "COPYFROM 3",
+   "MOVETO 4",
+   "JUMP c3",
+   "c2:MOVETO 2",
+   "c3:JUMP a",
+   "d:MOVETO 2",
+   "COPYFROM 1",
+   "OUTBOX",
+   "COPYFROM 4",
+   "OUTBOX"
+  ],
+  "hint": "3 号格放当前读到的值，两把尺子各比一次：一次比高、一次比低。",
+  "hint2": "2 号格是废纸篓。0 号格给了 -99、4 号格给了 99 当初始值，所以第一个数一定同时刷新两项纪录。"
+ },
+ {
+  "id": 37,
+  "name": "Biggest of Three",
+  "cn": "一车里最大的一只",
+  "goal": "每三只一车，只输出这一车里最大的编号。",
+  "inbox": [
+   1,
+   5,
+   3,
+   2,
+   8,
+   4,
+   9,
+   1,
+   2
+  ],
+  "outbox": [
+   5,
+   8,
+   9
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX",
+   "COPYFROM",
+   "MOVETO",
+   "SUB",
+   "BUMPUP",
+   "JUMP",
+   "JUMPZ",
+   "JUMPN"
+  ],
+  "mem_size": 5,
+  "mem_init": [
+   0,
+   0,
+   0,
+   0,
+   3
+  ],
+  "ref": [
+   "a:INBOX",
+   "MOVETO 2",
+   "COPYFROM 2",
+   "SUB 1",
+   "JUMPN b",
+   "MOVETO 3",
+   "COPYFROM 2",
+   "MOVETO 1",
+   "JUMP c",
+   "b:MOVETO 3",
+   "c:BUMPUP 0",
+   "MOVETO 3",
+   "COPYFROM 0",
+   "SUB 4",
+   "JUMPZ d",
+   "MOVETO 3",
+   "JUMP a",
+   "d:MOVETO 3",
+   "COPYFROM 1",
+   "OUTBOX",
+   "COPYFROM 4",
+   "SUB 4",
+   "MOVETO 1",
+   "COPYFROM 4",
+   "SUB 4",
+   "MOVETO 0",
+   "JUMP a"
+  ],
+  "hint": "装车的方式和「每三只一车」一模一样，只是车里不留和、留最大。",
+  "hint2": "每读一只先和 1 号格里当前的冠军比，比它大就换人。满 3 只输出冠军再清空。"
+ },
+ {
+  "id": 38,
+  "name": "Square Dance",
+  "cn": "平方牧场",
+  "goal": "输出 1 到 n 的平方和。n=4 就是 1+4+9+16=30。",
+  "inbox": [
+   4
+  ],
+  "outbox": [
+   30
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX",
+   "COPYFROM",
+   "MOVETO",
+   "ADD",
+   "BUMPUP",
+   "BUMPDN",
+   "SUB",
+   "JUMP",
+   "JUMPZ"
+  ],
+  "mem_size": 7,
+  "mem_init": [],
+  "ref": [
+   "a:INBOX",
+   "MOVETO 0",
+   "b:BUMPUP 1",
+   "MOVETO 6",
+   "COPYFROM 3",
+   "SUB 3",
+   "MOVETO 3",
+   "COPYFROM 1",
+   "MOVETO 4",
+   "c:COPYFROM 4",
+   "JUMPZ d",
+   "MOVETO 6",
+   "BUMPDN 4",
+   "MOVETO 6",
+   "COPYFROM 3",
+   "ADD 1",
+   "MOVETO 3",
+   "JUMP c",
+   "d:MOVETO 6",
+   "COPYFROM 3",
+   "ADD 2",
+   "MOVETO 2",
+   "BUMPUP 5",
+   "MOVETO 6",
+   "COPYFROM 0",
+   "SUB 5",
+   "JUMPZ e",
+   "MOVETO 6",
+   "JUMP b",
+   "e:MOVETO 6",
+   "COPYFROM 2",
+   "OUTBOX"
+  ],
+  "hint": "平方就是 k 个 k 相加。所以这关是「循环里面再套一个加 k 次的循环」。",
+  "hint2": "1 号格是 k，3 号格装 k×k，2 号格攒总和。内层数满 k 次就出来把 3 号格加进总和。"
+ },
+ {
+  "id": 39,
+  "name": "Factorial Night",
+  "cn": "阶乘的夜班",
+  "goal": "输出 n 的阶乘。5! = 1×2×3×4×5 = 120。",
+  "inbox": [
+   5
+  ],
+  "outbox": [
+   120
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX",
+   "COPYFROM",
+   "MOVETO",
+   "ADD",
+   "BUMPUP",
+   "BUMPDN",
+   "SUB",
+   "JUMP",
+   "JUMPZ"
+  ],
+  "mem_size": 7,
+  "mem_init": [],
+  "ref": [
+   "a:INBOX",
+   "MOVETO 0",
+   "BUMPUP 1",
+   "MOVETO 6",
+   "BUMPUP 2",
+   "MOVETO 6",
+   "b:COPYFROM 3",
+   "SUB 3",
+   "MOVETO 3",
+   "COPYFROM 1",
+   "MOVETO 4",
+   "c:COPYFROM 4",
+   "JUMPZ d",
+   "MOVETO 6",
+   "BUMPDN 4",
+   "MOVETO 6",
+   "COPYFROM 3",
+   "ADD 2",
+   "MOVETO 3",
+   "JUMP c",
+   "d:MOVETO 6",
+   "COPYFROM 3",
+   "MOVETO 2",
+   "COPYFROM 1",
+   "SUB 0",
+   "JUMPZ e",
+   "MOVETO 6",
+   "BUMPUP 1",
+   "MOVETO 6",
+   "JUMP b",
+   "e:MOVETO 6",
+   "COPYFROM 2",
+   "OUTBOX"
+  ],
+  "hint": "阶乘不是加法题，是「乘法套在循环里」：每轮的结果要乘上当前的 i。",
+  "hint2": "2 号格是累乘结果（从 1 开始），1 号格是当前的 i。内层用 3 号格一次次加自己，加满 i 次就是乘 i。"
+ },
+ {
+  "id": 40,
+  "name": "The Whole Night",
+  "cn": "一整夜",
+  "goal": "最后一关。读到 0 收工，依次报出：总和、一共几只、最低的编号、最高的编号。四样都要。",
+  "inbox": [
+   6,
+   3,
+   8,
+   2,
+   7,
+   0
+  ],
+  "outbox": [
+   26,
+   5,
+   2,
+   8
+  ],
+  "allowed": [
+   "INBOX",
+   "OUTBOX",
+   "COPYFROM",
+   "MOVETO",
+   "ADD",
+   "SUB",
+   "BUMPUP",
+   "JUMP",
+   "JUMPZ",
+   "JUMPN"
+  ],
+  "mem_size": 7,
+  "mem_init": [
+   0,
+   0,
+   0,
+   0,
+   99,
+   0,
+   -99
+  ],
+  "ref": [
+   "a:INBOX",
+   "MOVETO 1",
+   "COPYFROM 1",
+   "JUMPZ e",
+   "MOVETO 3",
+   "COPYFROM 0",
+   "ADD 1",
+   "MOVETO 0",
+   "BUMPUP 2",
+   "MOVETO 3",
+   "COPYFROM 4",
+   "SUB 1",
+   "JUMPN b",
+   "MOVETO 3",
+   "COPYFROM 1",
+   "MOVETO 4",
+   "JUMP c",
+   "b:MOVETO 3",
+   "c:COPYFROM 1",
+   "SUB 6",
+   "JUMPN d",
+   "MOVETO 3",
+   "COPYFROM 1",
+   "MOVETO 6",
+   "JUMP f",
+   "d:MOVETO 3",
+   "f:JUMP a",
+   "e:MOVETO 5",
+   "COPYFROM 0",
+   "OUTBOX",
+   "COPYFROM 2",
+   "OUTBOX",
+   "COPYFROM 4",
+   "OUTBOX",
+   "COPYFROM 6",
+   "OUTBOX"
+  ],
+  "hint": "这一关是全篇的收尾：一个累加器、一个计数器、两把尺子（最低和最高），四样同时在跑。",
+  "hint2": "0 号格和、2 号格个数、4 号格最低（初始 99）、6 号格最高（初始 -99）。收工后按「和 / 个数 / 最低 / 最高」输出。"
+ }
+]

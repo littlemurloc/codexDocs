@@ -1,0 +1,6378 @@
+{
+ "version": 1,
+ "note": "由 tools/gen_curios.py 从 curio_design_table.json 摊平而来，勿手改。outcomes 的 weight 是该分支的抽取权重（0 = 不出现）；Loot 分支的 draws 是抽几张 loot 表；Effect 里 kind=scripted 的是游戏脚本复合效果，表内无数值，运行期计为未支持。",
+ "source": "data/curio_design_table.json",
+ "stats": {
+  "curios": 60,
+  "outcome_rows": 480,
+  "weighted_outcomes": 139,
+  "item_interaction_rows": 46,
+  "scripted_effects": 21
+ },
+ "curios": {
+  "unlocked_strongbox": {
+   "name": "Unlocked Strongbox",
+   "tier": "Good",
+   "region": "ALL",
+   "full": true,
+   "tags": [
+    "Treasure",
+    "CCrave"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "The strongbox is empty.",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 3,
+     "chance": 0.75,
+     "note": "The strongbox contains valuable treasures.",
+     "results": [
+      {
+       "weight": 2,
+       "pct": -1.0,
+       "raw": "A",
+       "kind": "loot_table",
+       "table": "A",
+       "draws": 2
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 1,
+     "chance": 0.25,
+     "note": "The strongbox is a trap!",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 1.0,
+       "raw": "Blight 1",
+       "kind": "blight",
+       "value": 1
+      }
+     ]
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {}
+  },
+  "locked_strongbox": {
+   "name": "Locked Strongbox",
+   "tier": "Mixed",
+   "region": "ALL",
+   "full": true,
+   "tags": [
+    "Treasure",
+    "CCrave"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 1,
+     "chance": 0.5,
+     "note": "",
+     "results": [
+      {
+       "weight": 2,
+       "pct": -1.0,
+       "raw": "A",
+       "kind": "loot_table",
+       "table": "A",
+       "draws": 2
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 1,
+     "chance": 0.5,
+     "note": "",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 0.5,
+       "raw": "Blight 1",
+       "kind": "blight",
+       "value": 1
+      },
+      {
+       "weight": 1,
+       "pct": 0.5,
+       "raw": "Bleed 1",
+       "kind": "bleed",
+       "value": 1
+      }
+     ]
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {
+    "skeleton_key": [
+     {
+      "type": "loot",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "The Skeleton Key unlocks the strongbox to reveal its contents.",
+      "results": [
+       {
+        "weight": 3,
+        "pct": -1.0,
+        "raw": "A",
+        "kind": "loot_table",
+        "table": "A",
+        "draws": 3
+       }
+      ]
+     }
+    ],
+    "shovel": [
+     {
+      "type": "loot",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "The Shovel smashes the strongbox, risking the integrity of its contents.",
+      "results": [
+       {
+        "weight": 1,
+        "pct": 0.5,
+        "raw": "Nothing",
+        "kind": "loot_table",
+        "table": "Nothing",
+        "draws": 1
+       },
+       {
+        "weight": 2,
+        "pct": -1.0,
+        "raw": "A",
+        "kind": "loot_table",
+        "table": "A",
+        "draws": 2
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "goal_strongbox": {
+   "name": "Goal Strongbox",
+   "tier": "Good",
+   "region": "ALL",
+   "full": true,
+   "tags": [
+    "Treasure",
+    "All"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 1,
+     "chance": 1.0,
+     "note": "Found the sought after treasure!",
+     "results": [
+      {
+       "weight": 3,
+       "pct": -1.0,
+       "raw": "B",
+       "kind": "loot_table",
+       "table": "B",
+       "draws": 3
+      },
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "T",
+       "kind": "loot_table",
+       "table": "T",
+       "draws": 1
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {}
+  },
+  "heirloom_chest": {
+   "name": "Heirloom Chest",
+   "tier": "Mixed",
+   "region": "ALL",
+   "full": true,
+   "tags": [
+    "Treasure",
+    "CCrave"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "The chest has already been rummaged.",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 3,
+     "chance": 0.75,
+     "note": "The chest contains valuable treasures.",
+     "results": [
+      {
+       "weight": 2,
+       "pct": -1.0,
+       "raw": "H",
+       "kind": "loot_table",
+       "table": "H",
+       "draws": 2
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 1,
+     "chance": 0.25,
+     "note": "",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 0.5,
+       "raw": "Blight 1",
+       "kind": "blight",
+       "value": 1
+      },
+      {
+       "weight": 1,
+       "pct": 0.5,
+       "raw": "Bleed 1",
+       "kind": "bleed",
+       "value": 1
+      }
+     ]
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {
+    "skeleton_key": [
+     {
+      "type": "loot",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "",
+      "results": [
+       {
+        "weight": 4,
+        "pct": -1.0,
+        "raw": "H",
+        "kind": "loot_table",
+        "table": "H",
+        "draws": 4
+       }
+      ]
+     }
+    ],
+    "antivenom": [
+     {
+      "type": "loot",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "",
+      "results": [
+       {
+        "weight": 3,
+        "pct": -1.0,
+        "raw": "H",
+        "kind": "loot_table",
+        "table": "H",
+        "draws": 3
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "eldritch_altar": {
+   "name": "Eldritch Altar",
+   "tier": "Mixed",
+   "region": "ALL",
+   "full": true,
+   "tags": [
+    "Haunted",
+    "All"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 5,
+     "chance": 0.5,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 4,
+     "chance": 0.4,
+     "note": "",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 1.0,
+       "raw": "Stress 3",
+       "kind": "stress",
+       "value": 3
+      }
+     ]
+    },
+    {
+     "type": "purge",
+     "weight": 1,
+     "chance": 0.1,
+     "note": "",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 1.0,
+       "raw": "negative",
+       "kind": "purge",
+       "purge": "negative"
+      }
+     ]
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {
+    "holy_water": [
+     {
+      "type": "purge",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "",
+      "results": [
+       {
+        "weight": 1,
+        "pct": 1.0,
+        "raw": "negative",
+        "kind": "purge",
+        "purge": "negative"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "altar_of_light": {
+   "name": "Altar of Light",
+   "tier": "Good",
+   "region": "Ruins",
+   "full": true,
+   "tags": [
+    "Worship"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 1,
+     "chance": 1.0,
+     "note": "The altar invigorates the hero.",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 1.0,
+       "raw": "Curio Damage Buff",
+       "kind": "scripted"
+      }
+     ]
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {
+    "holy_water": [
+     {
+      "type": "effect",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "You have curried favor from the gods!",
+      "results": [
+       {
+        "weight": 1,
+        "pct": 1.0,
+        "raw": "Curio Damage BuffStrong",
+        "kind": "scripted"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "stack_of_books": {
+   "name": "Stack of Books",
+   "tier": "Mixed",
+   "region": "ALL",
+   "full": true,
+   "tags": [
+    "Knowledge"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 2,
+     "chance": 0.16670000000000001,
+     "note": "The volumes are dull and uninteresting.",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 2,
+     "chance": 0.16670000000000001,
+     "note": "",
+     "results": [
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "JOURNALONLY",
+       "kind": "loot_table",
+       "table": "JOURNALONLY",
+       "draws": 1
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 4,
+     "chance": 0.3333,
+     "note": "The text has a lasting impact on the hero.",
+     "results": [
+      {
+       "weight": 2,
+       "pct": 0.6667000000000001,
+       "raw": "positive",
+       "kind": "quirk",
+       "quirk": "positive"
+      },
+      {
+       "weight": 1,
+       "pct": 0.3333,
+       "raw": "negative",
+       "kind": "quirk",
+       "quirk": "negative"
+      }
+     ]
+    },
+    {
+     "type": "effect",
+     "weight": 4,
+     "chance": 0.3333,
+     "note": "The text is dark and unsettling.",
+     "results": [
+      {
+       "weight": 2,
+       "pct": 0.6667000000000001,
+       "raw": "Stress 3",
+       "kind": "stress",
+       "value": 3
+      },
+      {
+       "weight": 1,
+       "pct": 0.3333,
+       "raw": "Darkness 3",
+       "kind": "darkness",
+       "value": 3
+      }
+     ]
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {
+    "torch": [
+     {
+      "type": "effect",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "The hero has destroyed knowledge and now must bear the guilt!",
+      "results": [
+       {
+        "weight": 1,
+        "pct": 1.0,
+        "raw": "Stress 5",
+        "kind": "stress",
+        "value": 5
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "iron_maiden": {
+   "name": "Iron Maiden",
+   "tier": "Mixed",
+   "region": "Ruins",
+   "full": true,
+   "tags": [
+    "Torture",
+    "All"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 1,
+     "chance": 0.2,
+     "note": "Nothing but a foul odour...",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 2,
+     "chance": 0.4,
+     "note": "A few treasures are hidden in the iron maiden.",
+     "results": [
+      {
+       "weight": 2,
+       "pct": -1.0,
+       "raw": "A",
+       "kind": "loot_table",
+       "table": "A",
+       "draws": 2
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 1,
+     "chance": 0.2,
+     "note": "The iron maiden causes great harm to the hero.",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 1.0,
+       "raw": "claustrophobia",
+       "kind": "quirk",
+       "quirk": "claustrophobia"
+      }
+     ]
+    },
+    {
+     "type": "effect",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 1,
+     "chance": 0.2,
+     "note": "",
+     "results": [
+      {
+       "weight": 2,
+       "pct": 0.6667000000000001,
+       "raw": "tetanus",
+       "kind": "disease",
+       "disease": "tetanus"
+      },
+      {
+       "weight": 1,
+       "pct": 0.3333,
+       "raw": "random",
+       "kind": "disease",
+       "disease": "random"
+      }
+     ]
+    }
+   ],
+   "items": {
+    "medicinal_herbs": [
+     {
+      "type": "loot",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "CHECK DATA",
+      "results": [
+       {
+        "weight": 2,
+        "pct": -1.0,
+        "raw": "A",
+        "kind": "loot_table",
+        "table": "A",
+        "draws": 2
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "pile_of_bones": {
+   "name": "Pile of Bones",
+   "tier": "Mixed",
+   "region": "Warrens",
+   "full": true,
+   "tags": [
+    "Haunted",
+    "All"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 1,
+     "chance": 0.25,
+     "note": "Nothing is found amongst the remains.",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 1,
+     "chance": 0.25,
+     "note": "The bones house some supplies.",
+     "results": [
+      {
+       "weight": 2,
+       "pct": -1.0,
+       "raw": "A",
+       "kind": "loot_table",
+       "table": "A",
+       "draws": 2
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 1,
+     "chance": 0.25,
+     "note": "The sight of the bones is unsettling to the hero.",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 1.0,
+       "raw": "bloodthirsty",
+       "kind": "quirk",
+       "quirk": "bloodthirsty"
+      }
+     ]
+    },
+    {
+     "type": "effect",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 1,
+     "chance": 0.25,
+     "note": "",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 1.0,
+       "raw": "random",
+       "kind": "disease",
+       "disease": "random"
+      }
+     ]
+    }
+   ],
+   "items": {
+    "holy_water": [
+     {
+      "type": "loot",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "The Holy Water cleans the bones and uncovers hidden tresures.",
+      "results": [
+       {
+        "weight": 2,
+        "pct": -1.0,
+        "raw": "A",
+        "kind": "loot_table",
+        "table": "A",
+        "draws": 2
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "discarded_pack": {
+   "name": "Discarded Pack",
+   "tier": "Good",
+   "region": "ALL",
+   "full": false,
+   "tags": [
+    "Scrounging",
+    "Treasure"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 1,
+     "chance": 0.2,
+     "note": "The pack has already been rummaged.",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 3,
+     "chance": 0.6,
+     "note": "The pack contains valuable supplies.",
+     "results": [
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "S",
+       "kind": "loot_table",
+       "table": "S",
+       "draws": 1
+      },
+      {
+       "weight": 2,
+       "pct": -1.0,
+       "raw": "B",
+       "kind": "loot_table",
+       "table": "B",
+       "draws": 2
+      },
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "JOURNALONLY",
+       "kind": "loot_table",
+       "table": "JOURNALONLY",
+       "draws": 1
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 1,
+     "chance": 0.2,
+     "note": "",
+     "results": [
+      {
+       "weight": 3,
+       "pct": 0.5,
+       "raw": "2 - all",
+       "kind": "scout",
+       "hops": 2,
+       "target": "all"
+      },
+      {
+       "weight": 2,
+       "pct": 0.3333,
+       "raw": "3 - all",
+       "kind": "scout",
+       "hops": 3,
+       "target": "all"
+      },
+      {
+       "weight": 1,
+       "pct": 0.16670000000000001,
+       "raw": "0 - all",
+       "kind": "scout",
+       "hops": 0,
+       "target": "all"
+      }
+     ]
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {}
+  },
+  "sconce": {
+   "name": "Sconce",
+   "tier": "Good",
+   "region": "ALL",
+   "full": false,
+   "tags": [
+    "Scrounging"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 1,
+     "chance": 1.0,
+     "note": "An unburned torch is found.",
+     "results": [
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "TORCHONLY",
+       "kind": "loot_table",
+       "table": "TORCHONLY",
+       "draws": 1
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {}
+  },
+  "crate": {
+   "name": "Crate",
+   "tier": "Good",
+   "region": "ALL",
+   "full": false,
+   "tags": [
+    "Scrounging"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 1,
+     "chance": 0.25,
+     "note": "The crate is completely empty.",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 3,
+     "chance": 0.75,
+     "note": "The crate contains valuable treasures.",
+     "results": [
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "H",
+       "kind": "loot_table",
+       "table": "H",
+       "draws": 1
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {}
+  },
+  "sack": {
+   "name": "Sack",
+   "tier": "Good",
+   "region": "ALL",
+   "full": false,
+   "tags": [
+    "Scrounging"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 1,
+     "chance": 0.25,
+     "note": "The sack is empty.",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 3,
+     "chance": 0.75,
+     "note": "Some Gold was found in the sack.",
+     "results": [
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "C",
+       "kind": "loot_table",
+       "table": "C",
+       "draws": 1
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {}
+  },
+  "suit_of_armor": {
+   "name": "Suit of Armor",
+   "tier": "Good",
+   "region": "Ruins",
+   "full": true,
+   "tags": [
+    "Haunted",
+    "All"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "quirk",
+     "weight": 1,
+     "chance": 0.25,
+     "note": "",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 0.5,
+       "raw": "ruins_adventurer",
+       "kind": "quirk",
+       "quirk": "ruins_adventurer"
+      },
+      {
+       "weight": 1,
+       "pct": 0.5,
+       "raw": "ruins_tactician",
+       "kind": "quirk",
+       "quirk": "ruins_tactician"
+      }
+     ]
+    },
+    {
+     "type": "effect",
+     "weight": 3,
+     "chance": 0.75,
+     "note": "",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 1.0,
+       "raw": "Suit of Armor Shield",
+       "kind": "scripted"
+      }
+     ]
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {}
+  },
+  "dinner_cart": {
+   "name": "Dinner Cart",
+   "tier": "Mixed",
+   "region": "Warrens",
+   "full": true,
+   "tags": [
+    "Food",
+    "All"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 2,
+     "chance": 0.25,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 3,
+     "chance": 0.375,
+     "note": "",
+     "results": [
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "P",
+       "kind": "loot_table",
+       "table": "P",
+       "draws": 1
+      },
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "CT",
+       "kind": "loot_table",
+       "table": "CT",
+       "draws": 1
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 2,
+     "chance": 0.25,
+     "note": "",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 1.0,
+       "raw": "Blight 1",
+       "kind": "blight",
+       "value": 1
+      }
+     ]
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 1,
+     "chance": 0.125,
+     "note": "",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 1.0,
+       "raw": "the_black_plague",
+       "kind": "disease",
+       "disease": "the_black_plague"
+      }
+     ]
+    }
+   ],
+   "items": {
+    "medicinal_herbs": [
+     {
+      "type": "loot",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "",
+      "results": [
+       {
+        "weight": 3,
+        "pct": -1.0,
+        "raw": "P",
+        "kind": "loot_table",
+        "table": "P",
+        "draws": 3
+       },
+       {
+        "weight": 1,
+        "pct": -1.0,
+        "raw": "CT",
+        "kind": "loot_table",
+        "table": "CT",
+        "draws": 1
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "decorative_urn": {
+   "name": "Decorative Urn",
+   "tier": "Mixed",
+   "region": "Ruins",
+   "full": true,
+   "tags": [
+    "Scrounging",
+    "All"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 2,
+     "chance": 0.22219999999999998,
+     "note": "The urn has nothing but ashes inside.",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 4,
+     "chance": 0.44439999999999996,
+     "note": "Treasures are found in the urn.",
+     "results": [
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "GT",
+       "kind": "loot_table",
+       "table": "GT",
+       "draws": 1
+      },
+      {
+       "weight": 2,
+       "pct": -1.0,
+       "raw": "G",
+       "kind": "loot_table",
+       "table": "G",
+       "draws": 2
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "The ashes cause the hero to cough violently.",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 2,
+     "chance": 0.22219999999999998,
+     "note": "The hero becomes infected by the ashes.",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 1.0,
+       "raw": "Blight 1",
+       "kind": "blight",
+       "value": 1
+      }
+     ]
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 1,
+     "chance": 0.11109999999999999,
+     "note": "",
+     "results": [
+      {
+       "weight": 2,
+       "pct": 0.6667000000000001,
+       "raw": "creeping_cough",
+       "kind": "disease",
+       "disease": "creeping_cough"
+      },
+      {
+       "weight": 1,
+       "pct": 0.3333,
+       "raw": "random",
+       "kind": "disease",
+       "disease": "random"
+      }
+     ]
+    }
+   ],
+   "items": {
+    "holy_water": [
+     {
+      "type": "loot",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "The Holy Water cleanses the ashes, allowing a thorough search.",
+      "results": [
+       {
+        "weight": 2,
+        "pct": -1.0,
+        "raw": "GT",
+        "kind": "loot_table",
+        "table": "GT",
+        "draws": 2
+       },
+       {
+        "weight": 2,
+        "pct": -1.0,
+        "raw": "G",
+        "kind": "loot_table",
+        "table": "G",
+        "draws": 2
+       }
+      ]
+     }
+    ],
+    "shovel": [
+     {
+      "type": "quirk",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "What type of person defiles the dead?",
+      "results": [
+       {
+        "weight": 1,
+        "pct": 1.0,
+        "raw": "guilty_conscience",
+        "kind": "quirk",
+        "quirk": "guilty_conscience"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "locked_display_cabinet": {
+   "name": "Locked Display Cabinet",
+   "tier": "Bad",
+   "region": "Ruins",
+   "full": true,
+   "tags": [
+    "Scrounging",
+    "All"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 1,
+     "chance": 1.0,
+     "note": "The cabinet is a trap!",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 0.5,
+       "raw": "Blight 1",
+       "kind": "blight",
+       "value": 1
+      },
+      {
+       "weight": 1,
+       "pct": 0.5,
+       "raw": "Bleed 1",
+       "kind": "bleed",
+       "value": 1
+      }
+     ]
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {
+    "skeleton_key": [
+     {
+      "type": "loot",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "Treasures are stashed in the cabinet!",
+      "results": [
+       {
+        "weight": 3,
+        "pct": -1.0,
+        "raw": "CH",
+        "kind": "loot_table",
+        "table": "CH",
+        "draws": 3
+       },
+       {
+        "weight": 2,
+        "pct": -1.0,
+        "raw": "B",
+        "kind": "loot_table",
+        "table": "B",
+        "draws": 2
+       }
+      ]
+     }
+    ],
+    "shovel": [
+     {
+      "type": "loot",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "Smashed the cabinet open...",
+      "results": [
+       {
+        "weight": 2,
+        "pct": -1.0,
+        "raw": "CH",
+        "kind": "loot_table",
+        "table": "CH",
+        "draws": 2
+       },
+       {
+        "weight": 2,
+        "pct": -1.0,
+        "raw": "B",
+        "kind": "loot_table",
+        "table": "B",
+        "draws": 2
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "confession_booth": {
+   "name": "Confession Booth",
+   "tier": "Mixed",
+   "region": "Ruins",
+   "full": true,
+   "tags": [
+    "Worship",
+    "All"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 1,
+     "chance": 0.25,
+     "note": "The booth contains hidden treasure...",
+     "results": [
+      {
+       "weight": 6,
+       "pct": -1.0,
+       "raw": "CT",
+       "kind": "loot_table",
+       "table": "CT",
+       "draws": 6
+      },
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "JOURNALONLY",
+       "kind": "loot_table",
+       "table": "JOURNALONLY",
+       "draws": 1
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 2,
+     "chance": 0.5,
+     "note": "The hero's history of sin is too much to bear.",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 1.0,
+       "raw": "Stress 2",
+       "kind": "stress",
+       "value": 2
+      }
+     ]
+    },
+    {
+     "type": "purge",
+     "weight": 1,
+     "chance": 0.25,
+     "note": "The hero is absolved of a sin.",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 1.0,
+       "raw": "negative",
+       "kind": "purge",
+       "purge": "negative"
+      }
+     ]
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {
+    "holy_water": [
+     {
+      "type": "effect",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "The ritual relieves the hero.",
+      "results": [
+       {
+        "weight": 1,
+        "pct": 1.0,
+        "raw": "ConfessionBoothHealStress2",
+        "kind": "scripted"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "holy_fountain": {
+   "name": "Holy Fountain",
+   "tier": "Good",
+   "region": "Ruins",
+   "full": true,
+   "tags": [
+    "Fountain",
+    "All"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 1,
+     "chance": 0.5,
+     "note": "Propitiations are found at the bottom of the fountain.",
+     "results": [
+      {
+       "weight": 2,
+       "pct": -1.0,
+       "raw": "B",
+       "kind": "loot_table",
+       "table": "B",
+       "draws": 2
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 1,
+     "chance": 0.5,
+     "note": "The water reinvigorates the hero.",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 1.0,
+       "raw": "HolyFountainEffects",
+       "kind": "scripted"
+      }
+     ]
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {
+    "holy_water": [
+     {
+      "type": "effect",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "",
+      "results": [
+       {
+        "weight": 1,
+        "pct": 1.0,
+        "raw": "HolyFountainEffectsSuper",
+        "kind": "scripted"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "bookshelf": {
+   "name": "Bookshelf",
+   "tier": "Mixed",
+   "region": "Ruins",
+   "full": true,
+   "tags": [
+    "Knowledge"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 2,
+     "chance": 0.2,
+     "note": "The volumes are dull and uninteresting.",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 2,
+     "chance": 0.2,
+     "note": "",
+     "results": [
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "JOURNALONLY",
+       "kind": "loot_table",
+       "table": "JOURNALONLY",
+       "draws": 1
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 2,
+     "chance": 0.2,
+     "note": "The knowledge within forever changes the hero.",
+     "results": [
+      {
+       "weight": 2,
+       "pct": 0.6667000000000001,
+       "raw": "positive",
+       "kind": "quirk",
+       "quirk": "positive"
+      },
+      {
+       "weight": 1,
+       "pct": 0.3333,
+       "raw": "negative",
+       "kind": "quirk",
+       "quirk": "negative"
+      }
+     ]
+    },
+    {
+     "type": "effect",
+     "weight": 2,
+     "chance": 0.2,
+     "note": "The passages are unsettling.",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 1.0,
+       "raw": "Stress 2",
+       "kind": "stress",
+       "value": 2
+      }
+     ]
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 2,
+     "chance": 0.2,
+     "note": "A map is found tucked into the volumes.",
+     "results": [
+      {
+       "weight": 2,
+       "pct": 0.6667000000000001,
+       "raw": "0 - curios",
+       "kind": "scout",
+       "hops": 0,
+       "target": "curios"
+      },
+      {
+       "weight": 1,
+       "pct": 0.3333,
+       "raw": "0 - all",
+       "kind": "scout",
+       "hops": 0,
+       "target": "all"
+      }
+     ]
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {}
+  },
+  "alchemy_table": {
+   "name": "Alchemy Table",
+   "tier": "Mixed",
+   "region": "Ruins",
+   "full": true,
+   "tags": [
+    "Knowledge",
+    "CCrave"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 1,
+     "chance": 0.25,
+     "note": "The experiments do not yield any findings.",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 1,
+     "chance": 0.25,
+     "note": "New metals are synthesized...somehow.",
+     "results": [
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "B",
+       "kind": "loot_table",
+       "table": "B",
+       "draws": 1
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 2,
+     "chance": 0.5,
+     "note": "An accident occurs during the experiment.",
+     "results": [
+      {
+       "weight": 2,
+       "pct": 1.0,
+       "raw": "Blight 1",
+       "kind": "blight",
+       "value": 1
+      }
+     ]
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {
+    "medicinal_herbs": [
+     {
+      "type": "loot",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "The medicinal herbs disinfected the station, allowing for successful research.",
+      "results": [
+       {
+        "weight": 2,
+        "pct": -1.0,
+        "raw": "B",
+        "kind": "loot_table",
+        "table": "B",
+        "draws": 2
+       }
+      ]
+     }
+    ],
+    "torch": [
+     {
+      "type": "effect",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "The oil helps create a powerful blazing mixture!",
+      "results": [
+       {
+        "weight": 1,
+        "pct": 1.0,
+        "raw": "ChemicalLight",
+        "kind": "scripted"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "knife_rack": {
+   "name": "Knife Rack",
+   "tier": "Mixed",
+   "region": "Warrens",
+   "full": true,
+   "tags": [
+    "Scrounging",
+    "All"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 1,
+     "chance": 0.2,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 2,
+     "chance": 0.4,
+     "note": "",
+     "results": [
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "B",
+       "kind": "loot_table",
+       "table": "B",
+       "draws": 1
+      },
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "P",
+       "kind": "loot_table",
+       "table": "P",
+       "draws": 1
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 2,
+     "chance": 0.4,
+     "note": "",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 1.0,
+       "raw": "Bleed 1",
+       "kind": "bleed",
+       "value": 1
+      }
+     ]
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {
+    "bandage": [
+     {
+      "type": "loot",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "The bandage protects the hero's hands during the search.",
+      "results": [
+       {
+        "weight": 2,
+        "pct": -1.0,
+        "raw": "B",
+        "kind": "loot_table",
+        "table": "B",
+        "draws": 2
+       },
+       {
+        "weight": 1,
+        "pct": -1.0,
+        "raw": "P",
+        "kind": "loot_table",
+        "table": "P",
+        "draws": 1
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "sarcophagus": {
+   "name": "Sarcophagus",
+   "tier": "Mixed",
+   "region": "Ruins",
+   "full": true,
+   "tags": [
+    "Haunted",
+    "All"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 1,
+     "chance": 0.2,
+     "note": "The sarcophagus is completely empty.",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 3,
+     "chance": 0.6,
+     "note": "The sarcophagus contains hidden treasures.",
+     "results": [
+      {
+       "weight": 2,
+       "pct": -1.0,
+       "raw": "CH",
+       "kind": "loot_table",
+       "table": "CH",
+       "draws": 2
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 1,
+     "chance": 0.2,
+     "note": "The hero contemplates mortality...",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 1.0,
+       "raw": "thanatophobia",
+       "kind": "quirk",
+       "quirk": "thanatophobia"
+      }
+     ]
+    },
+    {
+     "type": "effect",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {}
+  },
+  "mummified_remains": {
+   "name": "Mummified Remains",
+   "tier": "Mixed",
+   "region": "Weald",
+   "full": true,
+   "tags": [
+    "Haunted",
+    "All"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 1,
+     "chance": 0.2,
+     "note": "There is nothing of value on the body.",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 2,
+     "chance": 0.4,
+     "note": "The remains are laced with treasures.",
+     "results": [
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "CT",
+       "kind": "loot_table",
+       "table": "CT",
+       "draws": 1
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 2,
+     "chance": 0.4,
+     "note": "The hero becomes diseased by the remains.",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 1.0,
+       "raw": "Blight 1",
+       "kind": "blight",
+       "value": 1
+      }
+     ]
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {
+    "bandage": [
+     {
+      "type": "loot",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "Bandaging the remains prevents infection during the search.",
+      "results": [
+       {
+        "weight": 2,
+        "pct": -1.0,
+        "raw": "CT",
+        "kind": "loot_table",
+        "table": "CT",
+        "draws": 2
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "sacrificial_stone": {
+   "name": "Sacrificial Stone",
+   "tier": "Mixed",
+   "region": "Warrens",
+   "full": true,
+   "tags": [
+    "Unholy",
+    "All"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "quirk",
+     "weight": 1,
+     "chance": 0.25,
+     "note": "The shrine gives great insight into life in these warrens.",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 0.5,
+       "raw": "warren_explorer",
+       "kind": "quirk",
+       "quirk": "warren_explorer"
+      },
+      {
+       "weight": 1,
+       "pct": 0.5,
+       "raw": "warren_scrounger",
+       "kind": "quirk",
+       "quirk": "warren_scrounger"
+      }
+     ]
+    },
+    {
+     "type": "effect",
+     "weight": 2,
+     "chance": 0.5,
+     "note": "The hero is deeply disturbed by the shrine.",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 1.0,
+       "raw": "Stress 4",
+       "kind": "stress",
+       "value": 4
+      }
+     ]
+    },
+    {
+     "type": "purge",
+     "weight": 1,
+     "chance": 0.25,
+     "note": "A sinful behaviour is vanquished.",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 1.0,
+       "raw": "negative",
+       "kind": "purge",
+       "purge": "negative"
+      }
+     ]
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {
+    "provision": [
+     {
+      "type": "purge",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "The offering purges the hero of a sinful behaviour.",
+      "results": [
+       {
+        "weight": 1,
+        "pct": 1.0,
+        "raw": "negative",
+        "kind": "purge",
+        "purge": "negative"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "skull_altar": {
+   "name": "Skull Altar",
+   "tier": "Good",
+   "region": "Warrens",
+   "full": true,
+   "tags": [
+    "Unholy",
+    "All"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "Any power the altar once had is now lost.",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 1,
+     "chance": 1.0,
+     "note": "The altar infuses the hero with great power.",
+     "results": [
+      {
+       "weight": 2,
+       "pct": 1.0,
+       "raw": "Skull Altar Adrenaline",
+       "kind": "scripted"
+      }
+     ]
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {}
+  },
+  "occult_scrawlings": {
+   "name": "Occult Scrawlings",
+   "tier": "Mixed",
+   "region": "Warrens",
+   "full": true,
+   "tags": [
+    "Unholy",
+    "All"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 1,
+     "chance": 0.25,
+     "note": "The scrawlings are dull and uninteresting.",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "quirk",
+     "weight": 2,
+     "chance": 0.5,
+     "note": "The scrawlings forever change the hero.",
+     "results": [
+      {
+       "weight": 2,
+       "pct": 0.6667000000000001,
+       "raw": "positive",
+       "kind": "quirk",
+       "quirk": "positive"
+      },
+      {
+       "weight": 1,
+       "pct": 0.3333,
+       "raw": "negative",
+       "kind": "quirk",
+       "quirk": "negative"
+      }
+     ]
+    },
+    {
+     "type": "effect",
+     "weight": 1,
+     "chance": 0.25,
+     "note": "The scrawlings are incredibly distressing.",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 1.0,
+       "raw": "Stress 3",
+       "kind": "stress",
+       "value": 3
+      }
+     ]
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {
+    "holy_water": [
+     {
+      "type": "effect",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "The holy water hisses...",
+      "results": [
+       {
+        "weight": 1,
+        "pct": 1.0,
+        "raw": "UnnamedCurse",
+        "kind": "scripted"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "moonshine_barrel": {
+   "name": "Moonshine Barrel",
+   "tier": "Mixed",
+   "region": "Warrens",
+   "full": true,
+   "tags": [
+    "Drink",
+    "All"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 2,
+     "chance": 0.22219999999999998,
+     "note": "The barrel is completely empty.",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 3,
+     "chance": 0.3333,
+     "note": "The rum barrel contains stashed treasures.",
+     "results": [
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "P",
+       "kind": "loot_table",
+       "table": "P",
+       "draws": 1
+      },
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "CS",
+       "kind": "loot_table",
+       "table": "CS",
+       "draws": 1
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 1,
+     "chance": 0.11109999999999999,
+     "note": "The hero becomes a slave of the sauce.",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 1.0,
+       "raw": "alcoholism",
+       "kind": "quirk",
+       "quirk": "alcoholism"
+      }
+     ]
+    },
+    {
+     "type": "effect",
+     "weight": 3,
+     "chance": 0.3333,
+     "note": "The rum within is spiked.",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 1.0,
+       "raw": "Blight 1",
+       "kind": "blight",
+       "value": 1
+      }
+     ]
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {
+    "medicinal_herbs": [
+     {
+      "type": "effect",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "The Antivenom ensures the rum is not spiked.",
+      "results": [
+       {
+        "weight": 1,
+        "pct": 1.0,
+        "raw": "Curio Damage BuffStrong",
+        "kind": "scripted"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "locked_sarcophagus": {
+   "name": "Locked Sarcophagus",
+   "tier": "Bad",
+   "region": "Ruins",
+   "full": true,
+   "tags": [
+    "Haunted",
+    "All"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 1,
+     "chance": 1.0,
+     "note": "The sarcophagus is a trap!",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 0.5,
+       "raw": "Blight 1",
+       "kind": "blight",
+       "value": 1
+      },
+      {
+       "weight": 1,
+       "pct": 0.5,
+       "raw": "Bleed 1",
+       "kind": "bleed",
+       "value": 1
+      }
+     ]
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {
+    "skeleton_key": [
+     {
+      "type": "loot",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "The Skeleton Key opens the sarcophagus to reveal its contents.",
+      "results": [
+       {
+        "weight": 2,
+        "pct": -1.0,
+        "raw": "CH",
+        "kind": "loot_table",
+        "table": "CH",
+        "draws": 2
+       },
+       {
+        "weight": 1,
+        "pct": -1.0,
+        "raw": "CT",
+        "kind": "loot_table",
+        "table": "CT",
+        "draws": 1
+       }
+      ]
+     }
+    ],
+    "shovel": [
+     {
+      "type": "loot",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "Broke into the sarcophagus...",
+      "results": [
+       {
+        "weight": 1,
+        "pct": -1.0,
+        "raw": "CH",
+        "kind": "loot_table",
+        "table": "CH",
+        "draws": 1
+       },
+       {
+        "weight": 1,
+        "pct": -1.0,
+        "raw": "CT",
+        "kind": "loot_table",
+        "table": "CT",
+        "draws": 1
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "makeshift_dining_table": {
+   "name": "Makeshift Dining Table",
+   "tier": "Mixed",
+   "region": "Warrens",
+   "full": true,
+   "tags": [
+    "Food",
+    "All"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 1,
+     "chance": 0.25,
+     "note": "Everything has been eaten already.",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 1,
+     "chance": 0.25,
+     "note": "The table contains leftovers from a previous dinner.",
+     "results": [
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "P",
+       "kind": "loot_table",
+       "table": "P",
+       "draws": 1
+      },
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "CS",
+       "kind": "loot_table",
+       "table": "CS",
+       "draws": 1
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 1,
+     "chance": 0.25,
+     "note": "The rotting food makes the hero ill.",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 1.0,
+       "raw": "Blight 1",
+       "kind": "blight",
+       "value": 1
+      }
+     ]
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 1,
+     "chance": 0.25,
+     "note": "",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 1.0,
+       "raw": "tapeworm",
+       "kind": "disease",
+       "disease": "tapeworm"
+      }
+     ]
+    }
+   ],
+   "items": {
+    "medicinal_herbs": [
+     {
+      "type": "loot",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "The herbs kill any diseases harboured in the food.",
+      "results": [
+       {
+        "weight": 2,
+        "pct": -1.0,
+        "raw": "P",
+        "kind": "loot_table",
+        "table": "P",
+        "draws": 2
+       },
+       {
+        "weight": 1,
+        "pct": -1.0,
+        "raw": "CS",
+        "kind": "loot_table",
+        "table": "CS",
+        "draws": 1
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "pile_of_scrolls": {
+   "name": "Pile of Scrolls",
+   "tier": "Mixed",
+   "region": "Warrens",
+   "full": true,
+   "tags": [
+    "Knowledge",
+    "All"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 2,
+     "chance": 0.2857,
+     "note": "The scrolls are dull and uninteresting.",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 1,
+     "chance": 0.1429,
+     "note": "",
+     "results": [
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "JOURNALONLY",
+       "kind": "loot_table",
+       "table": "JOURNALONLY",
+       "draws": 1
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 1,
+     "chance": 0.1429,
+     "note": "The scrolls forever change the hero.",
+     "results": [
+      {
+       "weight": 2,
+       "pct": 0.6667000000000001,
+       "raw": "positive",
+       "kind": "quirk",
+       "quirk": "positive"
+      },
+      {
+       "weight": 1,
+       "pct": 0.3333,
+       "raw": "negative",
+       "kind": "quirk",
+       "quirk": "negative"
+      }
+     ]
+    },
+    {
+     "type": "effect",
+     "weight": 1,
+     "chance": 0.1429,
+     "note": "The scrolls have a startling effect on the hero.",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 1.0,
+       "raw": "Stress 2",
+       "kind": "stress",
+       "value": 2
+      }
+     ]
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 2,
+     "chance": 0.2857,
+     "note": "The scrolls reveal much of the road ahead.",
+     "results": [
+      {
+       "weight": 2,
+       "pct": 0.4,
+       "raw": "0 - hall_battles",
+       "kind": "scout",
+       "hops": 0,
+       "target": "hall_battles"
+      },
+      {
+       "weight": 2,
+       "pct": 0.4,
+       "raw": "0 - room_battles",
+       "kind": "scout",
+       "hops": 0,
+       "target": "room_battles"
+      },
+      {
+       "weight": 1,
+       "pct": 0.2,
+       "raw": "2 - all",
+       "kind": "scout",
+       "hops": 2,
+       "target": "all"
+      }
+     ]
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {
+    "torch": [
+     {
+      "type": "purge",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "",
+      "results": [
+       {
+        "weight": 1,
+        "pct": 1.0,
+        "raw": "negative",
+        "kind": "purge",
+        "purge": "negative"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "ancient_coffin": {
+   "name": "Ancient Coffin",
+   "tier": "Good",
+   "region": "Weald",
+   "full": true,
+   "tags": [
+    "Haunted",
+    "All"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 2,
+     "chance": 0.3333,
+     "note": "The coffin is empty.",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 3,
+     "chance": 0.5,
+     "note": "The coffin contains hidden treasures.",
+     "results": [
+      {
+       "weight": 2,
+       "pct": -1.0,
+       "raw": "CH",
+       "kind": "loot_table",
+       "table": "CH",
+       "draws": 2
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 1,
+     "chance": 0.16670000000000001,
+     "note": "The coffin gives the hero insight into the nature of this world.",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 0.5,
+       "raw": "weald_explorer",
+       "kind": "quirk",
+       "quirk": "weald_explorer"
+      },
+      {
+       "weight": 1,
+       "pct": 0.5,
+       "raw": "weald_adventurer",
+       "kind": "quirk",
+       "quirk": "weald_adventurer"
+      }
+     ]
+    },
+    {
+     "type": "effect",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {}
+  },
+  "old_tree": {
+   "name": "Old Tree",
+   "tier": "Mixed",
+   "region": "Weald",
+   "full": true,
+   "tags": [
+    "Scrounging"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 1,
+     "chance": 0.25,
+     "note": "Nothing inside the tree.",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 2,
+     "chance": 0.5,
+     "note": "There are treasures stashed in the bark.",
+     "results": [
+      {
+       "weight": 2,
+       "pct": -1.0,
+       "raw": "A",
+       "kind": "loot_table",
+       "table": "A",
+       "draws": 2
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 1,
+     "chance": 0.25,
+     "note": "The tree is covered in poisoned sap.",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 1.0,
+       "raw": "Blight 1",
+       "kind": "blight",
+       "value": 1
+      }
+     ]
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {
+    "antivenom": [
+     {
+      "type": "loot",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "The Antivenom disinfects the tree, allowing for a thorough search.",
+      "results": [
+       {
+        "weight": 3,
+        "pct": -1.0,
+        "raw": "A",
+        "kind": "loot_table",
+        "table": "A",
+        "draws": 3
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "beast_carcass": {
+   "name": "Beast Carcass",
+   "tier": "Mixed",
+   "region": "Weald",
+   "full": true,
+   "tags": [
+    "Food",
+    "Body"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 1,
+     "chance": 0.1429,
+     "note": "The beast has nothing left to offer.",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 3,
+     "chance": 0.4286,
+     "note": "There is still some meat on these bones.",
+     "results": [
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "P",
+       "kind": "loot_table",
+       "table": "P",
+       "draws": 1
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 1,
+     "chance": 0.1429,
+     "note": "The hero is distraught by the sight of the carcass.",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 1.0,
+       "raw": "zoophobia",
+       "kind": "quirk",
+       "quirk": "zoophobia"
+      }
+     ]
+    },
+    {
+     "type": "effect",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 2,
+     "chance": 0.2857,
+     "note": "",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 0.3333,
+       "raw": "rabies",
+       "kind": "disease",
+       "disease": "rabies"
+      },
+      {
+       "weight": 2,
+       "pct": 0.6667000000000001,
+       "raw": "random",
+       "kind": "disease",
+       "disease": "random"
+      }
+     ]
+    }
+   ],
+   "items": {
+    "medicinal_herbs": [
+     {
+      "type": "loot",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "The Medicinal Herbs rid the carcass of any diseases.",
+      "results": [
+       {
+        "weight": 2,
+        "pct": -1.0,
+        "raw": "P",
+        "kind": "loot_table",
+        "table": "P",
+        "draws": 2
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "pristine_fountain": {
+   "name": "Pristine Fountain",
+   "tier": "Good",
+   "region": "Weald",
+   "full": true,
+   "tags": [
+    "Fountain"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "Any power this fountain once had is now lost.",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 1,
+     "chance": 1.0,
+     "note": "The fountain reinvigorates the hero.",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 1.0,
+       "raw": "PristineFountainHealStress",
+       "kind": "scripted"
+      }
+     ]
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {
+    "holy_water": [
+     {
+      "type": "effect",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "",
+      "results": [
+       {
+        "weight": 1,
+        "pct": 1.0,
+        "raw": "PristineFountainHealStress2",
+        "kind": "scripted"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "travellers_tent": {
+   "name": "Traveller's Tent",
+   "tier": "Mixed",
+   "region": "Weald",
+   "full": true,
+   "tags": [
+    "Scrounging",
+    "CCrave"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 1,
+     "chance": 0.125,
+     "note": "Nothing is left inside the tent.",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 3,
+     "chance": 0.375,
+     "note": "Someone left valuables inside the tent.",
+     "results": [
+      {
+       "weight": 4,
+       "pct": -1.0,
+       "raw": "SC",
+       "kind": "loot_table",
+       "table": "SC",
+       "draws": 4
+      },
+      {
+       "weight": 4,
+       "pct": -1.0,
+       "raw": "CH",
+       "kind": "loot_table",
+       "table": "CH",
+       "draws": 4
+      },
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "JOURNALONLY",
+       "kind": "loot_table",
+       "table": "JOURNALONLY",
+       "draws": 1
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 1,
+     "chance": 0.125,
+     "note": "The fate of the tent's occupant is found inside...",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 1.0,
+       "raw": "Stress 3",
+       "kind": "stress",
+       "value": 3
+      }
+     ]
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 3,
+     "chance": 0.375,
+     "note": "A map of the area is found inside the tent.",
+     "results": [
+      {
+       "weight": 2,
+       "pct": 0.4,
+       "raw": "3 - obstacles",
+       "kind": "scout",
+       "hops": 3,
+       "target": "obstacles"
+      },
+      {
+       "weight": 2,
+       "pct": 0.4,
+       "raw": "2 - traps",
+       "kind": "scout",
+       "hops": 2,
+       "target": "traps"
+      },
+      {
+       "weight": 1,
+       "pct": 0.2,
+       "raw": "2 - all",
+       "kind": "scout",
+       "hops": 2,
+       "target": "all"
+      }
+     ]
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {}
+  },
+  "cosmic_spiderweb": {
+   "name": "Cosmic Spiderweb",
+   "tier": "Mixed",
+   "region": "Weald",
+   "full": true,
+   "tags": [
+    "All"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 2,
+     "chance": 0.4,
+     "note": "There is nothing of interest.",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 2,
+     "chance": 0.4,
+     "note": "Treasures are hidden behind the web.",
+     "results": [
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "B",
+       "kind": "loot_table",
+       "table": "B",
+       "draws": 1
+      },
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "GT",
+       "kind": "loot_table",
+       "table": "GT",
+       "draws": 1
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 1,
+     "chance": 0.2,
+     "note": "The hero is covered in a sticky goo.",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 0.5,
+       "raw": "slow_reflexes",
+       "kind": "quirk",
+       "quirk": "slow_reflexes"
+      },
+      {
+       "weight": 1,
+       "pct": 0.5,
+       "raw": "slowdraw",
+       "kind": "quirk",
+       "quirk": "slowdraw"
+      }
+     ]
+    },
+    {
+     "type": "effect",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {
+    "bandage": [
+     {
+      "type": "loot",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "The Bandages protect the hero's hands during the search.",
+      "results": [
+       {
+        "weight": 2,
+        "pct": -1.0,
+        "raw": "B",
+        "kind": "loot_table",
+        "table": "B",
+        "draws": 2
+       },
+       {
+        "weight": 1,
+        "pct": -1.0,
+        "raw": "GT",
+        "kind": "loot_table",
+        "table": "GT",
+        "draws": 1
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "lost_luggage": {
+   "name": "Lost Luggage",
+   "tier": "Mixed",
+   "region": "Weald",
+   "full": true,
+   "tags": [
+    "Treasure",
+    "All"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 1,
+     "chance": 0.5,
+     "note": "",
+     "results": [
+      {
+       "weight": 4,
+       "pct": -1.0,
+       "raw": "A",
+       "kind": "loot_table",
+       "table": "A",
+       "draws": 4
+      },
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "JOURNALONLY",
+       "kind": "loot_table",
+       "table": "JOURNALONLY",
+       "draws": 1
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 1,
+     "chance": 0.5,
+     "note": "The lock box is a trap!",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 1.0,
+       "raw": "Blight 1",
+       "kind": "blight",
+       "value": 1
+      }
+     ]
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {
+    "skeleton_key": [
+     {
+      "type": "loot",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "Treasures are found inside the lockbox.",
+      "results": [
+       {
+        "weight": 3,
+        "pct": -1.0,
+        "raw": "A",
+        "kind": "loot_table",
+        "table": "A",
+        "draws": 3
+       }
+      ]
+     }
+    ],
+    "antivenom": [
+     {
+      "type": "loot",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "",
+      "results": [
+       {
+        "weight": 3,
+        "pct": -1.0,
+        "raw": "A",
+        "kind": "loot_table",
+        "table": "A",
+        "draws": 3
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "shallow_grave": {
+   "name": "Shallow Grave",
+   "tier": "Bad",
+   "region": "Weald",
+   "full": true,
+   "tags": [
+    "Scrounging",
+    "All"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 1,
+     "chance": 0.5,
+     "note": "The grave is a trap!",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 1.0,
+       "raw": "Blight 1",
+       "kind": "blight",
+       "value": 1
+      }
+     ]
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 1,
+     "chance": 0.5,
+     "note": "",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 1.0,
+       "raw": "random",
+       "kind": "disease",
+       "disease": "random"
+      }
+     ]
+    }
+   ],
+   "items": {
+    "shovel": [
+     {
+      "type": "loot",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "There is treasure hidden inside the grave.",
+      "results": [
+       {
+        "weight": 3,
+        "pct": -1.0,
+        "raw": "GH",
+        "kind": "loot_table",
+        "table": "GH",
+        "draws": 3
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "troubling_effigy": {
+   "name": "Troubling Effigy",
+   "tier": "Mixed",
+   "region": "Weald",
+   "full": true,
+   "tags": [
+    "Unholy",
+    "All"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 2,
+     "chance": 0.25,
+     "note": "Any power the altar once had is now lost.",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "quirk",
+     "weight": 3,
+     "chance": 0.375,
+     "note": "The altar bestows a virtue on the hero.",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 0.5,
+       "raw": "positive",
+       "kind": "quirk",
+       "quirk": "positive"
+      },
+      {
+       "weight": 1,
+       "pct": 0.5,
+       "raw": "negative",
+       "kind": "quirk",
+       "quirk": "negative"
+      }
+     ]
+    },
+    {
+     "type": "effect",
+     "weight": 3,
+     "chance": 0.375,
+     "note": "The altar lashes out as it rejects the hero.",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 0.25,
+       "raw": "Blight 1",
+       "kind": "blight",
+       "value": 1
+      },
+      {
+       "weight": 1,
+       "pct": 0.25,
+       "raw": "Stress 2",
+       "kind": "stress",
+       "value": 2
+      },
+      {
+       "weight": 2,
+       "pct": 0.5,
+       "raw": "Bleed 1",
+       "kind": "bleed",
+       "value": 1
+      }
+     ]
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {
+    "holy_water": [
+     {
+      "type": "quirk",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "The altar radiates in reaction to the Holy Water.",
+      "results": [
+       {
+        "weight": 1,
+        "pct": 1.0,
+        "raw": "positive",
+        "kind": "quirk",
+        "quirk": "positive"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "barnacle_crusted_chest": {
+   "name": "Barnacle Crusted Chest",
+   "tier": "Good",
+   "region": "Cove",
+   "full": true,
+   "tags": [
+    "Treasure"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 1,
+     "chance": 0.25,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 2,
+     "chance": 0.5,
+     "note": "",
+     "results": [
+      {
+       "weight": 2,
+       "pct": -1.0,
+       "raw": "A",
+       "kind": "loot_table",
+       "table": "A",
+       "draws": 2
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 1,
+     "chance": 0.25,
+     "note": "",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 1.0,
+       "raw": "Bleed 1",
+       "kind": "bleed",
+       "value": 1
+      }
+     ]
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {
+    "shovel": [
+     {
+      "type": "loot",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "",
+      "results": [
+       {
+        "weight": 3,
+        "pct": -1.0,
+        "raw": "A",
+        "kind": "loot_table",
+        "table": "A",
+        "draws": 3
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "brackish_tidepool": {
+   "name": "Brackish Tidepool",
+   "tier": "Bad",
+   "region": "Cove",
+   "full": true,
+   "tags": [
+    "All",
+    "Drink"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 3,
+     "chance": 0.75,
+     "note": "",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 1.0,
+       "raw": "brackish_tidepool",
+       "kind": "scripted"
+      }
+     ]
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 1,
+     "chance": 0.25,
+     "note": "",
+     "results": [
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "random",
+       "kind": "disease",
+       "disease": "random"
+      }
+     ]
+    }
+   ],
+   "items": {
+    "antivenom": [
+     {
+      "type": "effect",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "",
+      "results": [
+       {
+        "weight": 1,
+        "pct": 0.5,
+        "raw": "HealSelf 3",
+        "kind": "heal_hp",
+        "value": 3
+       },
+       {
+        "weight": 1,
+        "pct": 0.5,
+        "raw": "Heal Stress 3",
+        "kind": "heal_stress",
+        "value": 3
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "fish_idol": {
+   "name": "Fish Idol",
+   "tier": "Mixed",
+   "region": "Cove",
+   "full": true,
+   "tags": [
+    "Worship",
+    "All"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 1,
+     "chance": 1.0,
+     "note": "",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 0.5,
+       "raw": "fish_idol_curse_1",
+       "kind": "scripted"
+      },
+      {
+       "weight": 1,
+       "pct": 0.5,
+       "raw": "fish_idol_curse_2",
+       "kind": "scripted"
+      }
+     ]
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {
+    "holy_water": [
+     {
+      "type": "effect",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "",
+      "results": [
+       {
+        "weight": 1,
+        "pct": 1.0,
+        "raw": "Fish Idol Damage Buff Small",
+        "kind": "scripted"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "giant_oyster": {
+   "name": "Giant Oyster",
+   "tier": "Mixed",
+   "region": "Cove",
+   "full": true,
+   "tags": [
+    "Scrounging",
+    "All"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 1,
+     "chance": 0.2,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 2,
+     "chance": 0.4,
+     "note": "",
+     "results": [
+      {
+       "weight": 2,
+       "pct": -1.0,
+       "raw": "CT",
+       "kind": "loot_table",
+       "table": "CT",
+       "draws": 2
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 2,
+     "chance": 0.4,
+     "note": "",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 1.0,
+       "raw": "Bleed 2",
+       "kind": "bleed",
+       "value": 2
+      }
+     ]
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {
+    "shovel": [
+     {
+      "type": "loot",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "",
+      "results": [
+       {
+        "weight": 3,
+        "pct": 1.0,
+        "raw": "CT",
+        "kind": "loot_table",
+        "table": "CT",
+        "draws": 3
+       }
+      ]
+     }
+    ],
+    "dog_treats": [
+     {
+      "type": "effect",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "",
+      "results": [
+       {
+        "weight": 1,
+        "pct": 1.0,
+        "raw": "Oyster Dodge Buff",
+        "kind": "scripted"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "giant_fish_carcass": {
+   "name": "Giant Fish Carcass",
+   "tier": "Mixed",
+   "region": "Cove",
+   "full": true,
+   "tags": [
+    "All",
+    "CCrave"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 3,
+     "chance": 0.5,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 1,
+     "chance": 0.16670000000000001,
+     "note": "",
+     "results": [
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "GT",
+       "kind": "loot_table",
+       "table": "GT",
+       "draws": 1
+      },
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "B",
+       "kind": "loot_table",
+       "table": "B",
+       "draws": 1
+      },
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "S",
+       "kind": "loot_table",
+       "table": "S",
+       "draws": 1
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 1,
+     "chance": 0.16670000000000001,
+     "note": "",
+     "results": [
+      {
+       "weight": 2,
+       "pct": 0.6667000000000001,
+       "raw": "Bleed 1",
+       "kind": "bleed",
+       "value": 1
+      },
+      {
+       "weight": 1,
+       "pct": 0.3333,
+       "raw": "Blight 1",
+       "kind": "blight",
+       "value": 1
+      }
+     ]
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 1,
+     "chance": 0.16670000000000001,
+     "note": "",
+     "results": [
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "the_red_plague",
+       "kind": "disease",
+       "disease": "the_red_plague"
+      }
+     ]
+    }
+   ],
+   "items": {
+    "medicinal_herbs": [
+     {
+      "type": "loot",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "",
+      "results": [
+       {
+        "weight": 2,
+        "pct": -1.0,
+        "raw": "GT",
+        "kind": "loot_table",
+        "table": "GT",
+        "draws": 2
+       },
+       {
+        "weight": 1,
+        "pct": -1.0,
+        "raw": "B",
+        "kind": "loot_table",
+        "table": "B",
+        "draws": 1
+       },
+       {
+        "weight": 2,
+        "pct": -1.0,
+        "raw": "S",
+        "kind": "loot_table",
+        "table": "S",
+        "draws": 2
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "ships_figurehead": {
+   "name": "Ship's Figurehead",
+   "tier": "Good",
+   "region": "Cove",
+   "full": true,
+   "tags": [
+    "All"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "The tablets are too difficult to read.",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "The tablets have a profound effect on the hero.",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 1,
+     "chance": 1.0,
+     "note": "The hero carefully reads the tablets.",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 0.3333,
+       "raw": "Figurehead Buff",
+       "kind": "scripted"
+      },
+      {
+       "weight": 2,
+       "pct": 0.6667000000000001,
+       "raw": "Figurehead Heal Stress",
+       "kind": "scripted"
+      }
+     ]
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "A map of the area reveals what is ahead.",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {}
+  },
+  "eerie_coral": {
+   "name": "Eerie Coral",
+   "tier": "Mixed",
+   "region": "Cove",
+   "full": true,
+   "tags": [
+    "All"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 1,
+     "chance": 0.25,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 3,
+     "chance": 0.75,
+     "note": "",
+     "results": [
+      {
+       "weight": 2,
+       "pct": 0.6667000000000001,
+       "raw": "eerie_coral_healstress",
+       "kind": "scripted"
+      },
+      {
+       "weight": 1,
+       "pct": 0.3333,
+       "raw": "eerie_coral_stress",
+       "kind": "scripted"
+      }
+     ]
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {
+    "medicinal_herbs": [
+     {
+      "type": "purge",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "The Medicinal Herbs strengthen the effect of the coral.",
+      "results": [
+       {
+        "weight": 1,
+        "pct": 1.0,
+        "raw": "negative",
+        "kind": "purge",
+        "purge": "negative"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "travellers_tent_tutorial": {
+   "name": "Traveller's Tent (tutorial)",
+   "tier": "Good",
+   "region": "Weald",
+   "full": true,
+   "tags": [
+    "Scrounging"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 1,
+     "chance": 1.0,
+     "note": "Someone left valuables inside the tent.",
+     "results": [
+      {
+       "weight": 2,
+       "pct": -1.0,
+       "raw": "B",
+       "kind": "loot_table",
+       "table": "B",
+       "draws": 2
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {}
+  },
+  "bandits_trapped_chest": {
+   "name": "Bandit's Trapped Chest (tutorial)",
+   "tier": "Bad",
+   "region": "Weald",
+   "full": true,
+   "tags": [
+    "All"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 1,
+     "chance": 1.0,
+     "note": "",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 1.0,
+       "raw": "Blight 1",
+       "kind": "blight",
+       "value": 1
+      }
+     ]
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {
+    "skeleton_key": [
+     {
+      "type": "loot",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "",
+      "results": [
+       {
+        "weight": 2,
+        "pct": 1.0,
+        "raw": "T",
+        "kind": "loot_table",
+        "table": "T",
+        "draws": 2
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "shamblers_altar": {
+   "name": "Shambler's Altar",
+   "tier": "Mixed",
+   "region": "ALL",
+   "full": true,
+   "tags": [
+    "All"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 1,
+     "chance": 1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {
+    "torch": [
+     {
+      "type": "summon",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "",
+      "results": [
+       {
+        "weight": 1,
+        "pct": 1.0,
+        "raw": "summon_mash_shambler",
+        "kind": "unknown"
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "bas_relief": {
+   "name": "Bas-Relief",
+   "tier": "Mixed",
+   "region": "Cove",
+   "full": true,
+   "tags": [
+    "All",
+    "Worship"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "quirk",
+     "weight": 1,
+     "chance": 1.0,
+     "note": "",
+     "results": [
+      {
+       "weight": 2,
+       "pct": 0.6667000000000001,
+       "raw": "positive",
+       "kind": "quirk",
+       "quirk": "positive"
+      },
+      {
+       "weight": 1,
+       "pct": 0.3333,
+       "raw": "negative",
+       "kind": "quirk",
+       "quirk": "negative"
+      }
+     ]
+    },
+    {
+     "type": "effect",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {
+    "shovel": [
+     {
+      "type": "effect",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "",
+      "results": [
+       {
+        "weight": 1,
+        "pct": -1.0,
+        "raw": "Stress 5",
+        "kind": "stress",
+        "value": 5
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "secret_stash": {
+   "name": "Secret Stash",
+   "tier": "Good",
+   "region": "ALL",
+   "full": true,
+   "tags": [
+    "All"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 1,
+     "chance": 1.0,
+     "note": "",
+     "results": [
+      {
+       "weight": 3,
+       "pct": -1.0,
+       "raw": "B",
+       "kind": "loot_table",
+       "table": "B",
+       "draws": 3
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {
+    "skeleton_key": [
+     {
+      "type": "loot",
+      "weight": 1,
+      "chance": -1.0,
+      "note": "",
+      "results": [
+       {
+        "weight": 3,
+        "pct": -1.0,
+        "raw": "COLLECTOR",
+        "kind": "loot_table",
+        "table": "COLLECTOR",
+        "draws": 3
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "ancestors_knapsack": {
+   "name": "Ancestor's Knapsack",
+   "tier": "Good",
+   "region": "Darkest Dungeon",
+   "full": false,
+   "tags": [
+    "All",
+    "Scrounging"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 1,
+     "chance": 1.0,
+     "note": "",
+     "results": [
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "T_ANCESTOR",
+       "kind": "loot_table",
+       "table": "T_ANCESTOR",
+       "draws": 1
+      },
+      {
+       "weight": 5,
+       "pct": -1.0,
+       "raw": "B",
+       "kind": "loot_table",
+       "table": "B",
+       "draws": 5
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {}
+  },
+  "tutorial_shovel": {
+   "name": "Tutorial Shovel",
+   "tier": "Good",
+   "region": "Ruins",
+   "full": true,
+   "tags": [
+    "All"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 1,
+     "chance": 1.0,
+     "note": "",
+     "results": [
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "SHOVELONLY",
+       "kind": "loot_table",
+       "table": "SHOVELONLY",
+       "draws": 1
+      },
+      {
+       "weight": 2,
+       "pct": -1.0,
+       "raw": "A",
+       "kind": "loot_table",
+       "table": "A",
+       "draws": 2
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {}
+  },
+  "tutorial_key": {
+   "name": "Tutorial Key",
+   "tier": "Good",
+   "region": "Ruins",
+   "full": false,
+   "tags": [
+    "All"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 1,
+     "chance": 1.0,
+     "note": "",
+     "results": [
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "KEYONLY",
+       "kind": "loot_table",
+       "table": "KEYONLY",
+       "draws": 1
+      },
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "A",
+       "kind": "loot_table",
+       "table": "A",
+       "draws": 1
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {}
+  },
+  "tutorial_holy": {
+   "name": "Tutorial Holy",
+   "tier": "Good",
+   "region": "Ruins",
+   "full": false,
+   "tags": [
+    "All"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 1,
+     "chance": 1.0,
+     "note": "",
+     "results": [
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "HOLYONLY",
+       "kind": "loot_table",
+       "table": "HOLYONLY",
+       "draws": 1
+      },
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "A",
+       "kind": "loot_table",
+       "table": "A",
+       "draws": 1
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {}
+  },
+  "tutorial_food": {
+   "name": "Tutorial Food",
+   "tier": "Good",
+   "region": "Ruins",
+   "full": false,
+   "tags": [
+    "All"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 1,
+     "chance": 1.0,
+     "note": "",
+     "results": [
+      {
+       "weight": 2,
+       "pct": -1.0,
+       "raw": "P",
+       "kind": "loot_table",
+       "table": "P",
+       "draws": 2
+      },
+      {
+       "weight": 2,
+       "pct": -1.0,
+       "raw": "A",
+       "kind": "loot_table",
+       "table": "A",
+       "draws": 2
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {}
+  },
+  "thanks_chest": {
+   "name": "Thanks Chest",
+   "tier": "Good",
+   "region": "Darkest Dungeon",
+   "full": false,
+   "tags": [
+    "All"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 1,
+     "chance": 1.0,
+     "note": "",
+     "results": [
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "THANKS",
+       "kind": "loot_table",
+       "table": "THANKS",
+       "draws": 1
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {}
+  },
+  "open_grave": {
+   "name": "Open Grave",
+   "tier": "Bad",
+   "region": "ALL",
+   "full": true,
+   "tags": [
+    "All",
+    "Unholy"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 1,
+     "chance": 1.0,
+     "note": "",
+     "results": [
+      {
+       "weight": 1,
+       "pct": 1.0,
+       "raw": "Stress 5",
+       "kind": "stress",
+       "value": 5
+      }
+     ]
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {}
+  },
+  "incursion_knapsack": {
+   "name": "Incursion Knapsack",
+   "tier": "Good",
+   "region": "ALL",
+   "full": false,
+   "tags": [
+    "All",
+    "Scrounging"
+   ],
+   "outcomes": [
+    {
+     "type": "nothing",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "loot",
+     "weight": 1,
+     "chance": 1.0,
+     "note": "",
+     "results": [
+      {
+       "weight": 1,
+       "pct": -1.0,
+       "raw": "T_INCURSIONSACK",
+       "kind": "loot_table",
+       "table": "T_INCURSIONSACK",
+       "draws": 1
+      },
+      {
+       "weight": 3,
+       "pct": -1.0,
+       "raw": "CH",
+       "kind": "loot_table",
+       "table": "CH",
+       "draws": 3
+      }
+     ]
+    },
+    {
+     "type": "quirk",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "effect",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "purge",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "scouting",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "teleport",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    },
+    {
+     "type": "disease",
+     "weight": 0,
+     "chance": -1.0,
+     "note": "",
+     "results": []
+    }
+   ],
+   "items": {}
+  }
+ }
+}

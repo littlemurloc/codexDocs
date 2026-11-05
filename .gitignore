@@ -98,3 +98,19 @@ $RECYCLE.BIN/
 
 # Project process candidates and backups
 /project01/tmp/
+
+### 二进制产物（2026-11-05 推送事故后补）
+# 那次提交把 972 MB 塞进了同一个 commit，GitHub 直接拒收 114 MB 的 game.pak。
+# 规则按「派生 / 可重建」划，不按扩展名一刀切——文字类产物该进库还是要进。
+#
+# 解包出来的游戏数据（game.pak 及其 1547 个 fragment，共 623 MB）
+humanResourceLike/_hrm_analysis/
+# 构建产物（zip / apk 每次打包都会重新生成）
+humanResourceLike/sheep-counter-windows.zip
+humanResourceLike/sheep-counter-h5.zip
+humanResourceLike/sheep-counter.apk
+# 单个二进制超过 GitHub 建议上限（50 MB）的一律不进库
+*.pak
+*.apk
+# Godot 导入缓存（darkestDungeonLike 有自己的规则，这里兜住其它工程）
+.godot/

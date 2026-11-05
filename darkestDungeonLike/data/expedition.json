@@ -1,0 +1,206 @@
+{
+  "version": 1,
+  "note": "远征资源层策略。这里只放『DD1 数据里没有』的东西：补给品存量、补给策略、崩溃后的行为。光照档位修正、饥饿伤害、营地点数这些原始规则仍在 rules.json 里（darkness / hallway_hunger_* / camp_*），不在这里重复定义。",
+  "curio_rate": {
+    "note": "内容密度，不属于难度旋钮——所有 preset 共用同一份。hallway_curio 在 dungeons.json 里是百分比（short 9 / medium 14 / long 19），实测一趟短图只有 0.57 个走廊奇物，等于这个系统玩家看不见。这里给的是下限而不是硬覆盖：实际百分比 = max(数据值, hallway_pct_min)，所以数据将来调高了自己会生效，改小则听不懂。M17 依据：短图空走廊 5 条 × 60% ≈ 3 个，加房间守卫宝箱 0.6 个 = 3.6 个互动点。",
+    "hallway_pct_min": 60
+  },
+  "presets": {
+    "lenient": {
+      "desc": "宽松：资源不构成约束。用来验证『资源层不紧时，危险度仍然测不出来』——这是 M2 结论的对照。",
+      "light": {
+        "start": 100,
+        "loss_per_step": 6,
+        "torch_start": 6,
+        "torch_gain": 25,
+        "auto_torch_below": 40
+      },
+      "food": {
+        "start": 6,
+        "per_hunger": 1,
+        "starve_stress": 15,
+        "starve_dmg_ratio": 0.2
+      },
+      "camp": {
+        "max": 2,
+        "food_cost": 2,
+        "heal_ratio": 0.35,
+        "stress_relief": 45,
+        "light_gain": 70,
+        "ambush_chance": 0.15
+      },
+      "affliction": {
+        "refuse_chance": 0.05,
+        "aura_stress": 1.0,
+        "virtue_relief": 1.0
+      },
+      "heal_charges": 0,
+      "scouting": {
+        "reveal_on_start": 3,
+        "base_chance": 0.75,
+        "note": "补给充足时侦察也宽裕：出发就能看到前 3 个节点，之后每一步大概率再露一个。"
+      },
+      "supply": {
+        "shovel_start": 2
+      },
+      "trap": {
+        "damage_ratio": 0.144,
+        "stress": 8.5,
+        "min_avoid": 0.05,
+        "max_avoid": 0.85
+      },
+      "obstacle": {
+        "damage_ratio": 0.07,
+        "stress": 4.0,
+        "shovel_uses": 1
+      }
+    },
+    "standard": {
+      "desc": "标准：补给量按『短图一趟』配置。火把只够维持微光，口粮刚好够两次饥饿检定，休整一次。",
+      "light": {
+        "start": 100,
+        "loss_per_step": 10,
+        "torch_start": 4,
+        "torch_gain": 25,
+        "auto_torch_below": 50
+      },
+      "food": {
+        "start": 4,
+        "per_hunger": 1,
+        "starve_stress": 15,
+        "starve_dmg_ratio": 0.2
+      },
+      "camp": {
+        "max": 1,
+        "food_cost": 2,
+        "heal_ratio": 0.3,
+        "stress_relief": 40,
+        "light_gain": 60,
+        "ambush_chance": 0.25
+      },
+      "affliction": {
+        "refuse_chance": 0.15,
+        "aura_stress": 2.0,
+        "virtue_relief": 1.0
+      },
+      "heal_charges": 0,
+      "scouting": {
+        "reveal_on_start": 2,
+        "base_chance": 0.5,
+        "note": "出发看到前 2 个节点；之后每步掷一次，基础 50% + 光照加成。"
+      },
+      "supply": {
+        "shovel_start": 1
+      },
+      "trap": {
+        "damage_ratio": 0.18,
+        "stress": 11.9,
+        "min_avoid": 0.05,
+        "max_avoid": 0.85
+      },
+      "obstacle": {
+        "damage_ratio": 0.09,
+        "stress": 5.0,
+        "shovel_uses": 1
+      }
+    },
+    "tight": {
+      "desc": "紧张：火把不够、口粮不够、只能休整一次，且治疗次数有上限。治疗不再能完全抵消累积伤害。",
+      "light": {
+        "start": 100,
+        "loss_per_step": 14,
+        "torch_start": 2,
+        "torch_gain": 25,
+        "auto_torch_below": 50
+      },
+      "food": {
+        "start": 3,
+        "per_hunger": 1,
+        "starve_stress": 18,
+        "starve_dmg_ratio": 0.2
+      },
+      "camp": {
+        "max": 1,
+        "food_cost": 2,
+        "heal_ratio": 0.22,
+        "stress_relief": 30,
+        "light_gain": 50,
+        "ambush_chance": 0.3
+      },
+      "affliction": {
+        "refuse_chance": 0.18,
+        "aura_stress": 2.5,
+        "virtue_relief": 1.0
+      },
+      "heal_charges": 24,
+      "scouting": {
+        "reveal_on_start": 1,
+        "base_chance": 0.35,
+        "note": "只看得见脚下这一步，火把不够就等于摸黑。"
+      },
+      "supply": {
+        "shovel_start": 1
+      },
+      "trap": {
+        "damage_ratio": 0.234,
+        "stress": 15.3,
+        "min_avoid": 0.05,
+        "max_avoid": 0.85
+      },
+      "obstacle": {
+        "damage_ratio": 0.12,
+        "stress": 7.0,
+        "shovel_uses": 1
+      }
+    },
+    "brutal": {
+      "desc": "残酷：无休整、补给见底、治疗次数锁死。用来确认资源层能把危险度推到上限（团灭/撤退），即『测量器确实能测出危险』。",
+      "light": {
+        "start": 100,
+        "loss_per_step": 18,
+        "torch_start": 1,
+        "torch_gain": 25,
+        "auto_torch_below": 60
+      },
+      "food": {
+        "start": 2,
+        "per_hunger": 1,
+        "starve_stress": 20,
+        "starve_dmg_ratio": 0.25
+      },
+      "camp": {
+        "max": 0,
+        "food_cost": 2,
+        "heal_ratio": 0.0,
+        "stress_relief": 0,
+        "light_gain": 0,
+        "ambush_chance": 0.0
+      },
+      "affliction": {
+        "refuse_chance": 0.2,
+        "aura_stress": 3.0,
+        "virtue_relief": 1.0
+      },
+      "heal_charges": 12,
+      "scouting": {
+        "reveal_on_start": 0,
+        "base_chance": 0.25,
+        "note": "完全摸黑：每一步都是赌。"
+      },
+      "supply": {
+        "shovel_start": 0
+      },
+      "trap": {
+        "damage_ratio": 0.288,
+        "stress": 20.4,
+        "min_avoid": 0.05,
+        "max_avoid": 0.85
+      },
+      "obstacle": {
+        "damage_ratio": 0.15,
+        "stress": 9.0,
+        "shovel_uses": 1
+      }
+    }
+  }
+}

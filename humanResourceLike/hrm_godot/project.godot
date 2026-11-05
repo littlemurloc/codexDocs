@@ -1,0 +1,32 @@
+; Engine configuration file.
+; SHEEP COUNTER（数羊）—— 机制参考 Human Resource Machine，美术/文案/关卡数值全部自研
+
+config_version=5
+
+[application]
+
+config/name="Sheep Counter"
+run/main_scene="res://main.tscn"
+config/features=PackedStringArray("4.7", "GL Compatibility")
+config/icon="res://assets/icon_512.png"
+boot_splash/bg_color=Color(0.02, 0.133, 0.247, 1)
+boot_splash/image="res://assets/icon_512.png"
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=800
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+; 6 = SCREEN_SENSOR（跟随设备，竖着拿就竖屏、横着拿就横屏）。
+; 原来是 4 = SCREEN_SENSOR_LANDSCAPE，等于把应用钉死在横屏 ——
+; 手机上竖着拿，画面会被系统转 90° 贴在屏幕上，看起来就是「一直都是横屏模式」。
+window/handheld/orientation=6
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+; Android 导出强制要求 ETC2/ASTC（否则报 "ETC2/ASTC texture compression is required"）。
+; 打开它会让纹理多一份压缩副本，桌面/Web 那两份不受影响。
+textures/vram_compression/import_etc2_astc=true
+environment/defaults/default_clear_color=Color(0.07, 0.08, 0.1, 1)

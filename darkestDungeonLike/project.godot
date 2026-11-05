@@ -1,0 +1,23 @@
+; DarkestLike —— 机制等价的原创地牢回合制原型
+; 逻辑层为纯 GDScript 类，可脱离场景单测。
+; 主场景 = 可玩远征（M4）；M1 的战斗切片仍在 src/view/main.tscn，可单独跑。
+
+config_version=5
+
+[application]
+
+config/name="DarkestLike"
+config/description="Data-driven turn-based dungeon crawler prototype (M0-M4)"
+run/main_scene="res://src/view/expedition_scene.tscn"
+config/features=PackedStringArray("4.4", "GL Compatibility")
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=760
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+environment/defaults/default_clear_color=Color(0.078, 0.086, 0.102, 1)

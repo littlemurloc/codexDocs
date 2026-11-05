@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>F12 自测</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 24px;
+    font: 14px/1.7 -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+    background: #05223f; color: #eaf3fb;
+  }
+  h1 { font-size: 18px; margin: 0 0 4px; color: #ffd166; }
+  p.sub { margin: 0 0 18px; color: #8fb4d0; font-size: 13px; }
+  .card {
+    background: #0e5a96; border: 2px solid #1470b4; border-radius: 10px;
+    padding: 14px 16px; margin-bottom: 12px;
+  }
+  .key {
+    font-size: 40px; font-weight: 700; color: #6ee7a8;
+    letter-spacing: 2px; min-height: 52px;
+  }
+  .key.none { color: #5b7d99; font-size: 16px; font-weight: 400; }
+  table { width: 100%; border-collapse: collapse; }
+  td { padding: 4px 0; border-bottom: 1px solid #1a6ba8; font-size: 13px; }
+  td:first-child { color: #8fb4d0; width: 40%; }
+  td:last-child { color: #eaf3fb; font-family: Consolas, monospace; }
+  .hint { color: #ffd166; font-size: 13px; margin-top: 10px; }
+  .ok { color: #6ee7a8; }
+  .bad { color: #ff8a7a; }
+</style>
+</head>
+<body>
+<h1>F12 自测</h1>
+<p class="sub">按一下 F12，看下面那行有没有字。有字 = 键盘没坏，是 Chrome 不吃这个键；没字 = 按键根本没到网页。</p>
+
+<div class="card">
+  <div class="key none" id="key">（还没按）</div>
+  <div class="hint" id="verdict"></div>
+</div>
+
+<div class="card">
+  <table>
+    <tr><td>窗口尺寸</td><td id="size">—</td></tr>
+    <tr><td>每英寸像素比</td><td id="dpr">—</td></tr>
+    <tr><td>触摸支持</td><td id="touch">—</td></tr>
+    <tr><td>浏览器</td><td id="ua">—</td></tr>
+  </table>
+</div>
+
+<script>
+  var el = document.getElementById('key');
+  var vd = document.getElementById('verdict');
+  var seen = {};
+
+  function refresh() {
+    document.getElementById('size').textContent = innerWidth + ' × ' + innerHeight;
+    document.getElementById('dpr').textContent = devicePixelRatio;
+    document.getElementById('touch').textContent =
+      ('ontouchstart' in window) ? '是（真触屏或模拟）' : '否';
+    document.getElementById('ua').textContent = navigator.userAgent;
+  }
+  refresh();
+  addEventListener('resize', refresh);
+
+  addEventListener('keydown', function (e) {
+    // 键盘上真的按下去了
+    seen[e.code] = true;
+    el.className = 'key';
+    el.textContent = e.key + '   [' + e.code + ']';
+    if (e.code === 'F12' || e.key === 'F12') {
+      vd.className = 'hint ok';
+      vd.textContent = 'F12 到达了网页 —— 说明键盘没问题，是 Chrome 把开发者工具关掉了（策略或快捷键冲突）。';
+    } else if (e.ctrlKey && e.shiftKey && (e.code === 'KeyI' || e.code === 'KeyJ')) {
+      vd.className = 'hint ok';
+      vd.textContent = '这个组合键也能到网页。如果它反而打开了开发者工具，说明只有 F12 这个键被占用。';
+    }
+  });
+
+  // 8 秒后还没等到 F12，给个兜底判断
+  setTimeout(function () {
+    if (!seen['F12']) {
+      vd.className = 'hint bad';
+      vd.textContent = '还没收到 F12。依次试：① 按 Fn+F12；② Ctrl+Shift+I；③ 右键页面 → 检查；④ 若都不行，开发者工具被系统策略禁用。';
+    }
+  }, 8000);
+</script>
+</body>
+</html>

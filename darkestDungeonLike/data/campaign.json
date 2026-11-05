@@ -1,0 +1,116 @@
+{
+  "version": 1,
+  "note": "元层参数：战利品掉落与城镇开销。和 expedition.json 分开——那一个是『一趟路里发生什么』，这一份是『两趟之间发生什么』。",
+  "heirlooms": [
+    "bust",
+    "portrait",
+    "crest",
+    "deed"
+  ],
+  "loot": {
+    "note": "M13 起掉落走 data/loot.json 的真抽卡树（逐只怪按 monsters.json 的 loot 字段抽表），下面这组手写常数只在 loot_table_enabled=false 时用于复现历史基线。它们不是真相：真表一趟 short/Lv1 约 3498 金，旧常数每场 9–17 金。",
+    "battle_gold": [
+      9,
+      17
+    ],
+    "battle_heirloom_chance": 0.3,
+    "complete_gold": 45,
+    "complete_gold_per_battle": 22,
+    "complete_heirlooms": [
+      1,
+      3
+    ]
+  },
+  "costs": {
+    "note": "upgrade[i] 是『从第 i 阶升到第 i+1 阶』的价格；到 4 阶封顶。M13 按真表产出重标定：旧值（40/90/160/260、招募 60）是 M5 在没有解析抽卡树时拍的，而真表一趟 short/Lv1 就有 3498 金、Lv3 4903、Lv5 6364（见 bench/m13_yield_*.json），旧价相当于一趟升满全队。现值让『升满一件』约 10 趟新手图、全队约 20 趟。",
+    "recruit": {
+      "gold": 1000,
+      "heirlooms": {
+        "crest": 4
+      }
+    },
+    "upgrade": [
+      {
+        "gold": 1000,
+        "heirlooms": {
+          "bust": 3
+        }
+      },
+      {
+        "gold": 2200,
+        "heirlooms": {
+          "portrait": 4
+        }
+      },
+      {
+        "gold": 4800,
+        "heirlooms": {
+          "deed": 6
+        }
+      },
+      {
+        "gold": 10000,
+        "heirlooms": {
+          "crest": 10
+        }
+      }
+    ]
+  },
+  "roster_start": {
+    "note": "开局固定四职业各一名，装备 0 阶。阵亡后要花资源招募，招不起就只能少人出发。M10 把十字军换成战争老兵：守护与反击只长在 man_at_arms / houndmaster / antiquarian / highwayman 身上，而原开局队伍一个都没有——不换人的话，这两套机制在开局几十个小时里都不会出现一次。战争老兵同时带守护（defender）和反击（retribution），一个位置演示两件事。 M18 扩到 5 人：战争老兵伤害 [5,9] 对十字军 [6,12]（低 22%）、生命少 2，M10 把他塞进开局名册换来守护/反击的演示，代价是 medium Lv3 完成率从 0.600 掉到 0.367（bench 30 趟对照）。现在名册 5 人、出战 4 人由玩家选，两件事不再互斥。顺序有意让前 4 个正好等于 bench 的默认队伍（crusader/highwayman/vestal/plague_doctor），这样默认出战的数值与 M10 之前的历史基线可比；战争老兵排在第五位，想演示守护/反击时换他上场。",
+    "heroes": [
+      "crusader",
+      "highwayman",
+      "vestal",
+      "plague_doctor",
+      "man_at_arms"
+    ]
+  },
+  "town_cycle": {
+    "note": "M24：时间本身的规则。weekly_stress_relief 是「每过一周自然恢复多少压力」，缺省 0 会让「休整一周」变成纯亏（只推进建筑队列、压力一点不掉）。idle_cost 是休整一周的开销——**这个钱不是装饰**：不收的话「跳过一周」就是免费的商店刷新，玩家可以无限刷出货架；原版靠「不出发任务会越来越难」堵这个洞，我们没有难度爬升，只能用钱堵。10 点/周 对照回城那 40 点，约为四分之一，所以「多打一趟」仍然比「干等」划算。",
+    "weekly_stress_relief": 10,
+    "idle_cost": 50
+  },
+  "buildings": {
+    "note": "M22 城镇建筑的价格。原版靠「每周次数」限制，我们没有周次系统，只能用金币表达取舍：疗养院按条收费、减压分两档性价比（修道院便宜但少，酒馆贵但多）。数值对齐 M13 重标定后的经济——一趟 short Lv1 约 3498 金、装备一阶 1000，所以治病 600 约等于半件装备，清怪癖 350 约等于三次修道院。改这里就是改价格，不用碰代码。",
+    "disease_cost": 600,
+    "quirk_cost": 350,
+    "rest": [
+      { "id": "abbey", "name": "修道院", "relief": 40, "cost": 200 },
+      { "id": "tavern", "name": "酒馆", "relief": 70, "cost": 450 }
+    ]
+  },
+  "default_skills": {
+    "note": "M19：原版每个英雄从 7 个技能里带 4 个（heroes.json 的 skill_selection，max=4）。但『默认装哪 4 个』原版是硬编码的，从数据里抽不出来——所以下面这套是本项目补的，不是原版数值。补的原则：每个职业都要有可用的治疗或控制，并保留 M10 要演示的守护/反击（man_at_arms 的 defender / retribution）。改这里就是改默认 build，不用碰代码；没写到的英雄回退到『技能表前 4 个』。",
+    "crusader": [
+      "smite",
+      "stunning_blow",
+      "battle_heal",
+      "inspiring_cry"
+    ],
+    "highwayman": [
+      "wicked_slice",
+      "pistol_shot",
+      "point_blank_shot",
+      "grape_shot_blast"
+    ],
+    "vestal": [
+      "judgement",
+      "dazzling_light",
+      "divine_grace",
+      "gods_illumination"
+    ],
+    "plague_doctor": [
+      "noxious_blast",
+      "plague_grenade",
+      "blinding_gas",
+      "battlefield_medicine"
+    ],
+    "man_at_arms": [
+      "crush",
+      "defender",
+      "retribution",
+      "bolster"
+    ]
+  }
+}

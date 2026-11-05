@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>空腔 · 图志</title>
+<style>
+  :root{
+    --ink:#14161a;
+    --ink-2:#1b1e23;
+    --teal:#4a5a6a;
+    --teal-dim:#2c3743;
+    --bone:#d8d4c8;
+    --bone-dim:#9a978d;
+    --rust:#c08a2e;
+    --rust-dim:#7a5c22;
+    --paper:#171410;
+    --paper-bone:#cfc6b2;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--ink);
+    color:var(--bone);
+    font-family:"Songti SC","SimSun","Noto Serif CJK SC",Georgia,serif;
+    line-height:1.95;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ---------- 封面 ---------- */
+  .cover{
+    position:relative;
+    height:100vh;
+    min-height:620px;
+    overflow:hidden;
+    display:flex;
+    align-items:flex-end;
+  }
+  .cover img{
+    position:absolute;inset:0;
+    width:100%;height:100%;
+    object-fit:cover;
+    object-position:center 45%;
+    filter:brightness(.72) contrast(1.05);
+  }
+  .cover::after{
+    content:"";
+    position:absolute;inset:0;
+    background:
+      linear-gradient(to bottom, rgba(20,22,26,.85) 0%, rgba(20,22,26,.15) 30%, rgba(20,22,26,.72) 72%, rgba(20,22,26,1) 100%);
+  }
+  .cover-inner{
+    position:relative;
+    z-index:2;
+    padding:0 8vw 9vh;
+    max-width:1180px;
+  }
+  .eyebrow{
+    font-family:"Helvetica Neue",Arial,"PingFang SC",sans-serif;
+    font-size:11px;
+    letter-spacing:.42em;
+    text-transform:uppercase;
+    color:var(--rust);
+    margin-bottom:26px;
+  }
+  .cover h1{
+    font-size:clamp(46px,8.5vw,104px);
+    font-weight:400;
+    letter-spacing:.12em;
+    line-height:1.08;
+    color:#efece3;
+    text-shadow:0 2px 40px rgba(0,0,0,.8);
+  }
+  .cover h1 span{color:var(--bone-dim);}
+  .cover .sub{
+    margin-top:26px;
+    font-size:clamp(14px,1.5vw,18px);
+    color:#aeaaa0;
+    letter-spacing:.06em;
+    max-width:34em;
+  }
+  .cover .meta{
+    margin-top:36px;
+    padding-top:20px;
+    border-top:1px solid rgba(216,212,200,.18);
+    font-family:"Helvetica Neue",Arial,"PingFang SC",sans-serif;
+    font-size:11px;
+    letter-spacing:.28em;
+    color:#918d84;
+    display:flex;
+    gap:38px;
+    flex-wrap:wrap;
+  }
+
+  /* ---------- 序 ---------- */
+  .preface{
+    max-width:720px;
+    margin:0 auto;
+    padding:14vh 7vw 6vh;
+  }
+  .preface p{
+    font-size:16.5px;
+    color:#c2beb2;
+    margin-bottom:1.6em;
+    text-indent:2em;
+  }
+  .preface p:first-child{
+    text-indent:0;
+  }
+  .preface p:first-child::first-letter{
+    float:left;
+    font-size:3.4em;
+    line-height:.86;
+    padding:.06em .14em 0 0;
+    color:var(--rust);
+  }
+
+  /* ---------- 卷 ---------- */
+  .volume{
+    padding:11vh 7vw 3vh;
+    max-width:1180px;
+    margin:0 auto;
+    display:flex;
+    align-items:baseline;
+    gap:26px;
+    border-bottom:1px solid rgba(216,212,200,.1);
+  }
+  .volume .num{
+    font-family:"Helvetica Neue",Arial,sans-serif;
+    font-size:11px;
+    letter-spacing:.3em;
+    color:#a8813a;
+    white-space:nowrap;
+  }
+  .volume h2{
+    font-size:clamp(24px,3.4vw,38px);
+    font-weight:400;
+    letter-spacing:.14em;
+    color:#e2ded2;
+  }
+  .volume .note{
+    margin-left:auto;
+    font-size:13px;
+    color:#7c7f87;
+    letter-spacing:.08em;
+    text-align:right;
+  }
+
+  /* ---------- 图文块 ---------- */
+  figure{
+    max-width:1080px;
+    margin:0 auto;
+    padding:8vh 7vw 4vh;
+  }
+  .plate{
+    position:relative;
+    background:#0d0f12;
+    border:1px solid rgba(216,212,200,.09);
+    overflow:hidden;
+  }
+  .plate img{
+    display:block;
+    width:100%;
+    height:auto;
+  }
+  .plate .num{
+    position:absolute;
+    top:16px;left:18px;
+    font-family:"Helvetica Neue",Arial,sans-serif;
+    font-size:10px;
+    letter-spacing:.32em;
+    color:rgba(216,212,200,.5);
+    background:rgba(13,15,18,.55);
+    padding:4px 10px;
+    backdrop-filter:blur(3px);
+  }
+  figcaption{
+    margin-top:28px;
+    display:grid;
+    grid-template-columns:240px 1fr;
+    gap:0 44px;
+    align-items:start;
+  }
+  figcaption h3{
+    font-size:clamp(17px,1.9vw,22px);
+    font-weight:400;
+    letter-spacing:.06em;
+    color:#e6e1d4;
+    line-height:1.55;
+    word-break:keep-all;
+    overflow-wrap:break-word;
+  }
+  figcaption h3 .tag{
+    display:block;
+    margin-top:12px;
+    font-family:"Helvetica Neue",Arial,sans-serif;
+    font-size:10.5px;
+    letter-spacing:.24em;
+    color:#a8813a;
+    text-transform:uppercase;
+  }
+  .note-body p{
+    font-size:15.5px;
+    color:#b6b1a6;
+    margin-bottom:1.15em;
+    text-align:justify;
+  }
+  .note-body p:last-child{margin-bottom:0;}
+  .note-body em{
+    font-style:normal;
+    color:#d3cdbc;
+    border-bottom:1px solid rgba(192,138,46,.35);
+    padding-bottom:1px;
+  }
+
+  /* ---------- 附录 ---------- */
+  .appendix{
+    margin-top:12vh;
+    padding:10vh 7vw 12vh;
+    background:var(--paper);
+    border-top:2px solid rgba(192,138,46,.28);
+  }
+  .appendix-head{
+    max-width:1000px;
+    margin:0 auto 8vh;
+  }
+  .appendix-head .eyebrow{color:#8f7235;}
+  .appendix-head h2{
+    font-size:clamp(26px,3.6vw,40px);
+    font-weight:400;
+    letter-spacing:.16em;
+    color:#e3dccb;
+    margin-bottom:28px;
+  }
+  .appendix-head p{
+    font-size:15.5px;
+    color:#9b9382;
+    max-width:44em;
+    margin-bottom:1.2em;
+    text-align:justify;
+  }
+  .appendix-head p em{
+    font-style:normal;
+    color:#cfc6b2;
+  }
+  .appendix figure{max-width:1000px;padding:6vh 0 3vh;}
+  .appendix .plate{
+    background:#0e0c09;
+    border-color:rgba(192,138,46,.18);
+  }
+  .appendix figcaption h3{color:#e3dccb;}
+  .appendix .note-body p{color:#9b9382;}
+  .appendix .note-body em{color:#cfc6b2;border-bottom-color:rgba(192,138,46,.45);}
+
+  /* ---------- 版记 ---------- */
+  .colophon{
+    padding:12vh 7vw;
+    text-align:center;
+    border-top:1px solid rgba(216,212,200,.09);
+  }
+  .colophon p{
+    font-size:13px;
+    color:#5c5a54;
+    letter-spacing:.14em;
+    line-height:2.4;
+  }
+  .colophon .rule{
+    width:40px;height:1px;
+    background:rgba(192,138,46,.4);
+    margin:0 auto 34px;
+  }
+
+  @media (max-width:760px){
+    figcaption{grid-template-columns:1fr;gap:18px 0;}
+    .volume{flex-wrap:wrap;gap:10px;}
+    .volume .note{margin-left:0;text-align:left;}
+    .preface p{font-size:15.5px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ 封面 ============ -->
+<header class="cover">
+  <img src="shots/concept/41_dd_c1_winchford.png" alt="绞盘渡全景">
+  <div class="cover-inner">
+    <div class="eyebrow">An Atlas of the Hollow</div>
+    <h1>空腔<span>·</span>图志</h1>
+    <p class="sub">十二幅图，记一座围着洞长出来的城，和它下面那件事。</p>
+    <div class="meta">
+      <span>卷一 城</span><span>卷二 人</span><span>卷三 地下</span><span>卷四 物</span><span>附录 图鉴</span>
+    </div>
+  </div>
+</header>
+
+<!-- ============ 序 ============ -->
+<section class="preface">
+  <p>这本册子不解释这个世界，只记录它的样子。</p>
+  <p>图按从上到下排：先是地上的城，然后是墙外的人，然后是下去的队，最后是洞里的那几层。每一幅底下有一小段注记。注记不是说明——图上已经有的东西不必再写，写的是图上没有的。</p>
+  <p>十二幅图里，前八幅是一种画法，附录四幅是另一种。原因写在附录开头，简单说：前八幅是让人站进去看的，后四幅是让人凑近了认的。这两件事不能同时做。</p>
+</section>
+
+<!-- ============ 卷一 ============ -->
+<div class="volume">
+  <span class="num">卷一</span>
+  <h2>城</h2>
+  <span class="note">绞盘渡</span>
+</div>
+
+<figure id="p01">
+  <div class="plate">
+    <img src="shots/concept/41_dd_c1_winchford.png" alt="绞盘渡全景">
+    <span class="num">PLATE 01</span>
+  </div>
+  <figcaption>
+    <h3>绞盘渡<span class="tag">全景 · 自城东望楼</span></h3>
+    <div class="note-body">
+      <p>城不是建在洞旁边的，是<em>围着洞长</em>出来的。最早只有井口那几间棚子，后来才有外圈的房子。所以从高处往下看，越往里越破——不是因为里面住的人穷，是因为里面的东西一直在被吃掉。</p>
+      <p>官府拆过三次。每拆一次，棚子往外挪一圈，第二年又长回来。第三次之后就不再拆了。</p>
+      <p>洞没有护栏。掉下去的人不立案，只入账。</p>
+    </div>
+  </figcaption>
+</figure>
+
+<figure id="p02">
+  <div class="plate">
+    <img src="shots/concept/40_dd_c2_plaza_v2.png" alt="绞盘广场">
+    <span class="num">PLATE 02</span>
+  </div>
+  <figcaption>
+    <h3>绞盘广场<span class="tag">清晨 · 第一笼上来</span></h3>
+    <div class="note-body">
+      <p>井票、吊笼、账房、盐垛。四样东西，构成这座城全部的产业。</p>
+      <p>吊笼一天上来两次。上来的时候没人说话——所有人都在数笼子里还剩几个。</p>
+      <p>账房的窗口很小，只容一只手伸进去。这么设计不是为了防盗，是因为<em>递状纸的人不该看见里面坐着谁</em>。</p>
+    </div>
+  </figcaption>
+</figure>
+
+<figure id="p03">
+  <div class="plate">
+    <img src="shots/concept/42_dd_c3_shanty.png" alt="城外棚区">
+    <span class="num">PLATE 03</span>
+  </div>
+  <figcaption>
+    <h3>城外棚区<span class="tag">夜 · 自墙外</span></h3>
+    <div class="note-body">
+      <p>棚屋是用城里的废料搭的。城墙上有窗，窗里有灯；棚区一盏灯也没有——不是点不起，是<em>他们不再需要被看见了</em>。</p>
+      <p>那件外套的主人还住在这儿。他每天把靴子摆在门口，位置很正，鞋尖朝外。这件事他做了十一年。</p>
+      <p>墙上那些高窗，从外面看是暖的。住在里面的人不知道这一点。</p>
+    </div>
+  </figcaption>
+</figure>
+
+<!-- ============ 卷二 ============ -->
+<div class="volume">
+  <span class="num">卷二</span>
+  <h2>人</h2>
+  <span class="note">下井的与回来的</span>
+</div>
+
+<figure id="p04">
+  <div class="plate">
+    <img src="shots/concept/39_dd_p3_departure.png" alt="一个班出发">
+    <span class="num">PLATE 04</span>
+  </div>
+  <figcaption>
+    <h3>一个班出发<span class="tag">井口木台 · 天未亮</span></h3>
+    <div class="note-body">
+      <p>一个班四个岗位：壁障走最前，提灯的走第二，剩下两个跟在后头。</p>
+      <p>没有一个人回头看。这是规矩，不是勇气——<em>回头的人会开始算自己走了多远</em>。</p>
+      <p>他们背的东西比看上去重。炭、绳、钩、油、账。武器排在最后一件，因为大多数时候用不上，用上的时候也来不及。</p>
+    </div>
+  </figcaption>
+</figure>
+
+<figure id="p05">
+  <div class="plate">
+    <img src="shots/concept/48_dd_p2_tagwall_v2.png" alt="牌子墙">
+    <span class="num">PLATE 05</span>
+  </div>
+  <figcaption>
+    <h3>牌子墙<span class="tag">灶房后墙 · 里侧</span></h3>
+    <div class="note-body">
+      <p>死在下面的人带不回来。井太深，尸太重，抬一具上来要三个人两天的炭。</p>
+      <p>所以只带回一块牌子。挂在灶房后墙上，和他最后吃饭的那张桌子只隔一堵墙。</p>
+      <p>墙早就挂满了。新的挂在旧的上面，一层压一层。最上面那一排要踩着凳子才够得着——<em>可凳子已经不够高了</em>。</p>
+    </div>
+  </figcaption>
+</figure>
+
+<!-- ============ 卷三 ============ -->
+<div class="volume">
+  <span class="num">卷三</span>
+  <h2>地下</h2>
+  <span class="note">自上而下</span>
+</div>
+
+<figure id="p06">
+  <div class="plate">
+    <img src="shots/concept/45_dd_d1_rendering_v2.png" alt="灶层">
+    <span class="num">PLATE 06</span>
+  </div>
+  <figcaption>
+    <h3>第一层 · 灶层<span class="tag">压塌的旧城</span></h3>
+    <div class="note-body">
+      <p>往下三十丈，你会见到一条街。</p>
+      <p>铺石、台阶、店铺墙上挂货的铁架、招牌的框，全都在。只是这条街是折的——地基在某一刻一起往下塌，路面裂成一段一段，各落各的。</p>
+      <p>天花板压得很低。低到你会明白一件事：<em>上面那座城不是盖在它上面，是压在它上面</em>。</p>
+    </div>
+  </figcaption>
+</figure>
+
+<figure id="p07">
+  <div class="plate">
+    <img src="shots/concept/44_dd_d2_winchworks.png" alt="绞盘层">
+    <span class="num">PLATE 07</span>
+  </div>
+  <figcaption>
+    <h3>第二层 · 绞盘层<span class="tag">被整个收进来的镇</span></h3>
+    <div class="note-body">
+      <p>这一层原来是一个镇。有井架、有绞盘、有推车、有镇公所。</p>
+      <p>收进来的时候没有塌，是整块挪下来的——房子还是房子，路还是路，只是头顶多了一层石头。</p>
+      <p>最难受的是那几根绳。它们还挂在原来的滑轮上，绷得很紧，像是下面还吊着什么。<em>下面什么都没有。</em></p>
+    </div>
+  </figcaption>
+</figure>
+
+<!-- ============ 卷四 ============ -->
+<div class="volume">
+  <span class="num">卷四</span>
+  <h2>物</h2>
+  <span class="note">火</span>
+</div>
+
+<figure id="p08">
+  <div class="plate">
+    <img src="shots/concept/49_o2_kitchen.png" alt="灶房">
+    <span class="num">PLATE 08</span>
+  </div>
+  <figcaption>
+    <h3>灶房<span class="tag">公共厨房 · 地下</span></h3>
+    <div class="note-body">
+      <p>这座城里最贵的东西不是盐，是火。</p>
+      <p>一支炭只能做一件事：让你被看见。所以每个下井的人每天都要算——今天这点火，是拿来照路，还是拿来把东西煮熟。两件都是要紧事，但一日只有一个火。</p>
+      <p>灶房的火不断，因为这里必须被看见：谁吃了什么、几时回来、账目对不对，都要有光才作数。</p>
+      <p>画面右边那半个屋子是黑的。那不是画法，那是这里本来的样子。</p>
+    </div>
+  </figcaption>
+</figure>
+
+<!-- ============ 附录 ============ -->
+<section class="appendix">
+  <div class="appendix-head">
+    <div class="eyebrow">Appendix · Plates 09–12</div>
+    <h2>图鉴</h2>
+    <p>下面四幅用的是另一种画法：旧书铜版画，褐纸为底，线描为骨。</p>
+    <p>它不是用来感受的，是用来辨认的。这一册里所有“这东西到底长什么样”的问题，都在这里回答——因为铜版画必须把每一处都画清楚，而前面那八幅故意不画清楚的，恰恰是大部分地方。</p>
+    <p>还有一层是不得不：<em>第九幅只能这么画</em>。那一层的特征是“白得看不见”，而版画的底本来就是纸，留白就是“无”。换成黑底的画法，它会被画成一片雪原——之前试过，确实成了雪原。</p>
+  </div>
+
+  <figure id="p09">
+    <div class="plate">
+      <img src="shots/concept/32_dd_d3_saltmarch.png" alt="盐骨层">
+      <span class="num">PLATE 09</span>
+    </div>
+    <figcaption>
+      <h3>第三层 · 盐骨层<span class="tag">光无效</span></h3>
+      <div class="note-body">
+        <p>第三层的地面是骨头变的。踩上去会响，但不是脆响，是那种踩在干土上的闷响。</p>
+        <p>这一层最反常的地方是：<em>它不黑</em>。四面八方都是白的，你举着灯站在那儿，灯只照亮自己脚下一圈。</p>
+        <p>你什么都看得见，又什么都看不见。前面所有层教给你的那套——点火、看远、记住来路——在这里全部作废。</p>
+      </div>
+    </figcaption>
+  </figure>
+
+  <figure id="p10">
+    <div class="plate">
+      <img src="shots/concept/38_dd_p1_four.png" alt="族群">
+      <span class="num">PLATE 10</span>
+    </div>
+    <figcaption>
+      <h3>六种人<span class="tag">同一条街 · 夜</span></h3>
+      <div class="note-body">
+        <p>他们不是六个种族，是<em>同一种人的六种活法</em>。</p>
+        <p>岸民是普通人，只是常年不见太阳。石生宽得下不了井，却是全城唯一会做下井家伙的人。长账族活得久，皱纹比同龄人少，眼睛却老。嗅觉族靠鼻子吃饭。细民钻缝。</p>
+        <p>空者不在这张图里。他们已经不在任何一张图里了。</p>
+      </div>
+    </figcaption>
+  </figure>
+
+  <figure id="p11">
+    <div class="plate">
+      <img src="shots/concept/36_dd_o1_objects.png" alt="物件图鉴">
+      <span class="num">PLATE 11</span>
+    </div>
+    <figcaption>
+      <h3>八件<span class="tag">一个人的一生</span></h3>
+      <div class="note-body">
+        <p>脂灯、绞盘钩、下井状、账册、封条铁牌、剖刀、木牌、天平。</p>
+        <p>这八件东西正好构成一个人的一生：灯照路，钩吊人，状纸换井票，账册记他欠多少，铁牌封他下的那口井，刀是工具，木牌是终点，天平用来称他值多少。</p>
+        <p><em>没有一件是武器。</em></p>
+      </div>
+    </figcaption>
+  </figure>
+
+  <figure id="p12">
+    <div class="plate">
+      <img src="shots/concept/35_dd_p4_hollowing.png" alt="空蚀">
+      <span class="num">PLATE 12</span>
+    </div>
+    <figcaption>
+      <h3>空蚀<span class="tag">第四期</span></h3>
+      <div class="note-body">
+        <p>空蚀不是病，是账被一点一点收走。</p>
+        <p>先忘事，再尝不出味道，最后变淡。变淡不是比喻——<em>他真的开始不挡光了</em>。灯在他身后，地上没有他的影子。</p>
+        <p>他不疼。这是最坏的地方。</p>
+      </div>
+    </figcaption>
+  </figure>
+</section>
+
+<!-- ============ 版记 ============ -->
+<div class="colophon">
+  <div class="rule"></div>
+  <p>空腔 · 图志</p>
+  <p>十二幅 · 附注记<br>卷一至卷四为场景图，附录四幅为图鉴</p>
+  <p style="margin-top:22px;"><a href="CODEX.html" style="color:#8d7440;border-bottom:1px solid rgba(192,138,46,.3);">读完图看字 →《空腔 · 图鉴》</a></p>
+  <p style="margin-top:26px;color:#42403b;">与《WORLD.md》同源，图版见 shots/concept/</p>
+</div>
+
+</body>
+</html>

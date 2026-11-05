@@ -1,0 +1,3376 @@
+{
+ "generated_by": "tools/ref_impl.py",
+ "note": "Python 参考实现的输出，供 Godot 侧逐条比对；改动公式后必须重新生成本文件",
+ "count": 120,
+ "scenarios": [
+  {
+   "index": 0,
+   "seed": 1414128399,
+   "spec": {
+    "base_low": 20.0,
+    "base_high": 26.0,
+    "acc": 0.5431,
+    "dodge": 0.2048,
+    "crit": 0.0405,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.2218,
+    "mods": [],
+    "dmg_mult_buffs": 1.1091,
+    "dmg_taken_mod": 0.4948,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 31,
+    "raw": 23.721045990940183,
+    "mult": 1.0,
+    "hit_chance": 0.33830000000000005
+   }
+  },
+  {
+   "index": 1,
+   "seed": 1837356415,
+   "spec": {
+    "base_low": 5.0,
+    "base_high": 5.0,
+    "acc": 0.5491,
+    "dodge": 0.1878,
+    "crit": 0.0955,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.2969,
+    "mods": [
+     0.252,
+     0.338,
+     0.396
+    ],
+    "dmg_mult_buffs": 0.8083,
+    "dmg_taken_mod": 0.271,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 7,
+    "raw": 5.0,
+    "mult": 1.9860000000000002,
+    "hit_chance": 0.36130000000000007
+   }
+  },
+  {
+   "index": 2,
+   "seed": 603251693,
+   "spec": {
+    "base_low": 10.0,
+    "base_high": 16.0,
+    "acc": 0.4267,
+    "dodge": 0.1547,
+    "crit": 0.1787,
+    "crit_mult": 1.5,
+    "crit_valid": false,
+    "prot": 0.1863,
+    "mods": [
+     0.16
+    ],
+    "dmg_mult_buffs": 0.7135,
+    "dmg_taken_mod": 0.3993,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.272
+   }
+  },
+  {
+   "index": 3,
+   "seed": 590425748,
+   "spec": {
+    "base_low": 16.0,
+    "base_high": 26.0,
+    "acc": 0.4033,
+    "dodge": 0.1114,
+    "crit": 0.1983,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.0891,
+    "mods": [
+     0.055,
+     0.417
+    ],
+    "dmg_mult_buffs": 0.7743,
+    "dmg_taken_mod": 0.4794,
+    "ignore_prot": true
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.2919
+   }
+  },
+  {
+   "index": 4,
+   "seed": 1799826930,
+   "spec": {
+    "base_low": 3.0,
+    "base_high": 9.0,
+    "acc": 1.0795,
+    "dodge": 0.1384,
+    "crit": 0.2701,
+    "crit_mult": 1.5,
+    "crit_valid": false,
+    "prot": 0.3595,
+    "mods": [
+     0.528,
+     0.051
+    ],
+    "dmg_mult_buffs": 1.1481,
+    "dmg_taken_mod": 0.0245,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 9,
+    "raw": 7.601331828162074,
+    "mult": 1.5790000000000002,
+    "hit_chance": 0.9410999999999999
+   }
+  },
+  {
+   "index": 5,
+   "seed": 223101936,
+   "spec": {
+    "base_low": 7.0,
+    "base_high": 15.0,
+    "acc": 1.1802,
+    "dodge": 0.0707,
+    "crit": 0.0468,
+    "crit_mult": 1.5,
+    "crit_valid": false,
+    "prot": 0.046,
+    "mods": [
+     0.221,
+     0.242,
+     0.248
+    ],
+    "dmg_mult_buffs": 0.737,
+    "dmg_taken_mod": 0.2997,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 15,
+    "raw": 9.688061453402042,
+    "mult": 1.7109999999999999,
+    "hit_chance": 0.95
+   }
+  },
+  {
+   "index": 6,
+   "seed": 866887829,
+   "spec": {
+    "base_low": 8.0,
+    "base_high": 17.0,
+    "acc": 1.189,
+    "dodge": 0.0284,
+    "crit": 0.1214,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.3187,
+    "mods": [],
+    "dmg_mult_buffs": 1.0745,
+    "dmg_taken_mod": 0.1907,
+    "ignore_prot": true
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 20,
+    "raw": 15.578943661414087,
+    "mult": 1.0,
+    "hit_chance": 0.95
+   }
+  },
+  {
+   "index": 7,
+   "seed": 49326654,
+   "spec": {
+    "base_low": 20.0,
+    "base_high": 28.0,
+    "acc": 0.6275,
+    "dodge": 0.0226,
+    "crit": 0.2736,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.0485,
+    "mods": [
+     0.374
+    ],
+    "dmg_mult_buffs": 0.9104,
+    "dmg_taken_mod": 0.1378,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.6049
+   }
+  },
+  {
+   "index": 8,
+   "seed": 1382297585,
+   "spec": {
+    "base_low": 15.0,
+    "base_high": 19.0,
+    "acc": 1.1649,
+    "dodge": 0.1061,
+    "crit": 0.0109,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.2482,
+    "mods": [
+     0.121,
+     0.435
+    ],
+    "dmg_mult_buffs": 0.9058,
+    "dmg_taken_mod": 0.2154,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.95
+   }
+  },
+  {
+   "index": 9,
+   "seed": 430648324,
+   "spec": {
+    "base_low": 12.0,
+    "base_high": 17.0,
+    "acc": 0.9358,
+    "dodge": 0.0698,
+    "crit": 0.0644,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.2484,
+    "mods": [],
+    "dmg_mult_buffs": 1.462,
+    "dmg_taken_mod": 0.1552,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 19,
+    "raw": 14.87194236763753,
+    "mult": 1.0,
+    "hit_chance": 0.866
+   }
+  },
+  {
+   "index": 10,
+   "seed": 1684542452,
+   "spec": {
+    "base_low": 8.0,
+    "base_high": 10.0,
+    "acc": 0.4464,
+    "dodge": 0.0339,
+    "crit": 0.328,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.0511,
+    "mods": [
+     0.028,
+     0.572
+    ],
+    "dmg_mult_buffs": 0.9947,
+    "dmg_taken_mod": 0.1878,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 16,
+    "raw": 9.015922611113638,
+    "mult": 1.6,
+    "hit_chance": 0.41250000000000003
+   }
+  },
+  {
+   "index": 11,
+   "seed": 666279713,
+   "spec": {
+    "base_low": 3.0,
+    "base_high": 10.0,
+    "acc": 0.49,
+    "dodge": 0.0924,
+    "crit": 0.3431,
+    "crit_mult": 1.5,
+    "crit_valid": false,
+    "prot": 0.0221,
+    "mods": [],
+    "dmg_mult_buffs": 1.3008,
+    "dmg_taken_mod": 0.4847,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.3976
+   }
+  },
+  {
+   "index": 12,
+   "seed": 247453634,
+   "spec": {
+    "base_low": 10.0,
+    "base_high": 20.0,
+    "acc": 0.4267,
+    "dodge": 0.207,
+    "crit": 0.211,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.3407,
+    "mods": [
+     0.302,
+     0.294
+    ],
+    "dmg_mult_buffs": 0.9466,
+    "dmg_taken_mod": 0.1829,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.21970000000000003
+   }
+  },
+  {
+   "index": 13,
+   "seed": 1466391791,
+   "spec": {
+    "base_low": 8.0,
+    "base_high": 10.0,
+    "acc": 0.9027,
+    "dodge": 0.2203,
+    "crit": 0.068,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.2062,
+    "mods": [],
+    "dmg_mult_buffs": 0.7354,
+    "dmg_taken_mod": 0.0641,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 5,
+    "raw": 8.398434610106051,
+    "mult": 1.0,
+    "hit_chance": 0.6823999999999999
+   }
+  },
+  {
+   "index": 14,
+   "seed": 676970577,
+   "spec": {
+    "base_low": 16.0,
+    "base_high": 17.0,
+    "acc": 0.5329,
+    "dodge": 0.2299,
+    "crit": 0.2126,
+    "crit_mult": 1.5,
+    "crit_valid": false,
+    "prot": 0.3977,
+    "mods": [
+     0.094,
+     0.302
+    ],
+    "dmg_mult_buffs": 0.8752,
+    "dmg_taken_mod": 0.1466,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 14,
+    "raw": 16.65295789204538,
+    "mult": 1.396,
+    "hit_chance": 0.30300000000000005
+   }
+  },
+  {
+   "index": 15,
+   "seed": 1994667565,
+   "spec": {
+    "base_low": 17.0,
+    "base_high": 23.0,
+    "acc": 1.074,
+    "dodge": 0.0079,
+    "crit": 0.0095,
+    "crit_mult": 1.5,
+    "crit_valid": false,
+    "prot": 0.0968,
+    "mods": [
+     0.162
+    ],
+    "dmg_mult_buffs": 0.8694,
+    "dmg_taken_mod": 0.4369,
+    "ignore_prot": true
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 26,
+    "raw": 18.020056664012372,
+    "mult": 1.162,
+    "hit_chance": 0.95
+   }
+  },
+  {
+   "index": 16,
+   "seed": 749004984,
+   "spec": {
+    "base_low": 14.0,
+    "base_high": 16.0,
+    "acc": 0.8988,
+    "dodge": 0.2305,
+    "crit": 0.3489,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.122,
+    "mods": [],
+    "dmg_mult_buffs": 1.0636,
+    "dmg_taken_mod": 0.4974,
+    "ignore_prot": true
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.6683
+   }
+  },
+  {
+   "index": 17,
+   "seed": 1847900416,
+   "spec": {
+    "base_low": 2.0,
+    "base_high": 2.0,
+    "acc": 0.5489,
+    "dodge": 0.096,
+    "crit": 0.0663,
+    "crit_mult": 1.5,
+    "crit_valid": false,
+    "prot": 0.2577,
+    "mods": [
+     0.168,
+     0.126,
+     0.091
+    ],
+    "dmg_mult_buffs": 0.8937,
+    "dmg_taken_mod": 0.4544,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 3,
+    "raw": 2.0,
+    "mult": 1.385,
+    "hit_chance": 0.4529000000000001
+   }
+  },
+  {
+   "index": 18,
+   "seed": 420139428,
+   "spec": {
+    "base_low": 5.0,
+    "base_high": 7.0,
+    "acc": 1.063,
+    "dodge": 0.1708,
+    "crit": 0.2661,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.1335,
+    "mods": [
+     0.41
+    ],
+    "dmg_mult_buffs": 1.0966,
+    "dmg_taken_mod": 0.1332,
+    "ignore_prot": true
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 10,
+    "raw": 5.601357729174197,
+    "mult": 1.41,
+    "hit_chance": 0.8921999999999999
+   }
+  },
+  {
+   "index": 19,
+   "seed": 1083643615,
+   "spec": {
+    "base_low": 2.0,
+    "base_high": 3.0,
+    "acc": 0.8634,
+    "dodge": 0.2104,
+    "crit": 0.3239,
+    "crit_mult": 1.5,
+    "crit_valid": false,
+    "prot": 0.2964,
+    "mods": [
+     0.429
+    ],
+    "dmg_mult_buffs": 1.0616,
+    "dmg_taken_mod": 0.4138,
+    "ignore_prot": true
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 6,
+    "raw": 2.912565601989627,
+    "mult": 1.429,
+    "hit_chance": 0.6529999999999999
+   }
+  },
+  {
+   "index": 20,
+   "seed": 549201548,
+   "spec": {
+    "base_low": 4.0,
+    "base_high": 6.0,
+    "acc": 1.1894,
+    "dodge": 0.1982,
+    "crit": 0.306,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.1582,
+    "mods": [
+     0.446,
+     0.577
+    ],
+    "dmg_mult_buffs": 1.2999,
+    "dmg_taken_mod": 0.4585,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 18,
+    "raw": 5.490977041423321,
+    "mult": 2.0229999999999997,
+    "hit_chance": 0.95
+   }
+  },
+  {
+   "index": 21,
+   "seed": 439680913,
+   "spec": {
+    "base_low": 8.0,
+    "base_high": 14.0,
+    "acc": 1.118,
+    "dodge": 0.0628,
+    "crit": 0.0906,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.1059,
+    "mods": [],
+    "dmg_mult_buffs": 1.4301,
+    "dmg_taken_mod": 0.2507,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 15,
+    "raw": 9.52541976282373,
+    "mult": 1.0,
+    "hit_chance": 0.95
+   }
+  },
+  {
+   "index": 22,
+   "seed": 417326471,
+   "spec": {
+    "base_low": 17.0,
+    "base_high": 24.0,
+    "acc": 0.9614,
+    "dodge": 0.0238,
+    "crit": 0.1461,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.0129,
+    "mods": [
+     0.193,
+     0.074,
+     0.041
+    ],
+    "dmg_mult_buffs": 0.9285,
+    "dmg_taken_mod": 0.0453,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 28,
+    "raw": 22.403607399668545,
+    "mult": 1.308,
+    "hit_chance": 0.9376
+   }
+  },
+  {
+   "index": 23,
+   "seed": 134430480,
+   "spec": {
+    "base_low": 3.0,
+    "base_high": 6.0,
+    "acc": 0.9346,
+    "dodge": 0.044,
+    "crit": 0.13,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.2112,
+    "mods": [
+     0.565
+    ],
+    "dmg_mult_buffs": 1.4184,
+    "dmg_taken_mod": 0.0792,
+    "ignore_prot": true
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 12,
+    "raw": 5.094207832356915,
+    "mult": 1.565,
+    "hit_chance": 0.8906
+   }
+  },
+  {
+   "index": 24,
+   "seed": 297983341,
+   "spec": {
+    "base_low": 16.0,
+    "base_high": 16.0,
+    "acc": 0.5969,
+    "dodge": 0.0231,
+    "crit": 0.0039,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.2399,
+    "mods": [],
+    "dmg_mult_buffs": 0.9025,
+    "dmg_taken_mod": 0.3639,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.5738
+   }
+  },
+  {
+   "index": 25,
+   "seed": 540129522,
+   "spec": {
+    "base_low": 20.0,
+    "base_high": 23.0,
+    "acc": 0.9861,
+    "dodge": 0.1338,
+    "crit": 0.004,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.0538,
+    "mods": [
+     0.252
+    ],
+    "dmg_mult_buffs": 1.4272,
+    "dmg_taken_mod": 0.0028,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.8523
+   }
+  },
+  {
+   "index": 26,
+   "seed": 577569331,
+   "spec": {
+    "base_low": 18.0,
+    "base_high": 22.0,
+    "acc": 0.4956,
+    "dodge": 0.1143,
+    "crit": 0.0571,
+    "crit_mult": 1.5,
+    "crit_valid": false,
+    "prot": 0.1116,
+    "mods": [],
+    "dmg_mult_buffs": 1.1238,
+    "dmg_taken_mod": 0.0719,
+    "ignore_prot": true
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.3813
+   }
+  },
+  {
+   "index": 27,
+   "seed": 255899471,
+   "spec": {
+    "base_low": 16.0,
+    "base_high": 20.0,
+    "acc": 1.0923,
+    "dodge": 0.0038,
+    "crit": 0.0594,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.2085,
+    "mods": [],
+    "dmg_mult_buffs": 0.7543,
+    "dmg_taken_mod": 0.2545,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 15,
+    "raw": 19.3833515541628,
+    "mult": 1.0,
+    "hit_chance": 0.95
+   }
+  },
+  {
+   "index": 28,
+   "seed": 117936025,
+   "spec": {
+    "base_low": 15.0,
+    "base_high": 25.0,
+    "acc": 1.0519,
+    "dodge": 0.2286,
+    "crit": 0.2171,
+    "crit_mult": 1.5,
+    "crit_valid": false,
+    "prot": 0.3055,
+    "mods": [],
+    "dmg_mult_buffs": 1.2435,
+    "dmg_taken_mod": 0.009,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 15,
+    "raw": 17.46262370608747,
+    "mult": 1.0,
+    "hit_chance": 0.8233
+   }
+  },
+  {
+   "index": 29,
+   "seed": 500673051,
+   "spec": {
+    "base_low": 6.0,
+    "base_high": 6.0,
+    "acc": 1.0833,
+    "dodge": 0.1034,
+    "crit": 0.3371,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.1252,
+    "mods": [
+     0.136,
+     0.376,
+     0.223
+    ],
+    "dmg_mult_buffs": 1.4255,
+    "dmg_taken_mod": 0.0599,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": true,
+    "damage": 21,
+    "raw": 6.0,
+    "mult": 1.7349999999999999,
+    "hit_chance": 0.95
+   }
+  },
+  {
+   "index": 30,
+   "seed": 1837522685,
+   "spec": {
+    "base_low": 5.0,
+    "base_high": 8.0,
+    "acc": 0.9775,
+    "dodge": 0.2495,
+    "crit": 0.3411,
+    "crit_mult": 1.5,
+    "crit_valid": false,
+    "prot": 0.3482,
+    "mods": [
+     0.32
+    ],
+    "dmg_mult_buffs": 1.1761,
+    "dmg_taken_mod": 0.1192,
+    "ignore_prot": true
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 12,
+    "raw": 7.022798607125878,
+    "mult": 1.32,
+    "hit_chance": 0.728
+   }
+  },
+  {
+   "index": 31,
+   "seed": 1052014547,
+   "spec": {
+    "base_low": 16.0,
+    "base_high": 26.0,
+    "acc": 0.7577,
+    "dodge": 0.159,
+    "crit": 0.314,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.0511,
+    "mods": [
+     0.162,
+     0.56,
+     0.435
+    ],
+    "dmg_mult_buffs": 1.1478,
+    "dmg_taken_mod": 0.3993,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 69,
+    "raw": 21.138407645281404,
+    "mult": 2.157,
+    "hit_chance": 0.5987
+   }
+  },
+  {
+   "index": 32,
+   "seed": 1904217644,
+   "spec": {
+    "base_low": 16.0,
+    "base_high": 18.0,
+    "acc": 0.9299,
+    "dodge": 0.1394,
+    "crit": 0.0194,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.1786,
+    "mods": [
+     0.141,
+     0.264
+    ],
+    "dmg_mult_buffs": 1.3822,
+    "dmg_taken_mod": 0.0032,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 26,
+    "raw": 16.113420731853694,
+    "mult": 1.405,
+    "hit_chance": 0.7905
+   }
+  },
+  {
+   "index": 33,
+   "seed": 459330209,
+   "spec": {
+    "base_low": 14.0,
+    "base_high": 17.0,
+    "acc": 1.0387,
+    "dodge": 0.2168,
+    "crit": 0.2549,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.2416,
+    "mods": [],
+    "dmg_mult_buffs": 0.8001,
+    "dmg_taken_mod": 0.4003,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 12,
+    "raw": 14.644992264453322,
+    "mult": 1.0,
+    "hit_chance": 0.8219
+   }
+  },
+  {
+   "index": 34,
+   "seed": 929611966,
+   "spec": {
+    "base_low": 14.0,
+    "base_high": 15.0,
+    "acc": 0.4406,
+    "dodge": 0.0434,
+    "crit": 0.1393,
+    "crit_mult": 1.5,
+    "crit_valid": false,
+    "prot": 0.2374,
+    "mods": [
+     0.19,
+     0.161,
+     0.526
+    ],
+    "dmg_mult_buffs": 1.4634,
+    "dmg_taken_mod": 0.2621,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 38,
+    "raw": 14.436253707157448,
+    "mult": 1.877,
+    "hit_chance": 0.3972
+   }
+  },
+  {
+   "index": 35,
+   "seed": 733754643,
+   "spec": {
+    "base_low": 3.0,
+    "base_high": 4.0,
+    "acc": 1.0632,
+    "dodge": 0.1242,
+    "crit": 0.0322,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.0357,
+    "mods": [
+     0.416
+    ],
+    "dmg_mult_buffs": 1.4198,
+    "dmg_taken_mod": 0.1675,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 7,
+    "raw": 3.258721278514713,
+    "mult": 1.416,
+    "hit_chance": 0.939
+   }
+  },
+  {
+   "index": 36,
+   "seed": 317313968,
+   "spec": {
+    "base_low": 7.0,
+    "base_high": 16.0,
+    "acc": 0.7211,
+    "dodge": 0.1198,
+    "crit": 0.1319,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.0897,
+    "mods": [
+     0.48,
+     0.429,
+     0.577
+    ],
+    "dmg_mult_buffs": 1.3054,
+    "dmg_taken_mod": 0.4415,
+    "ignore_prot": true
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 43,
+    "raw": 9.170463676564395,
+    "mult": 2.4859999999999998,
+    "hit_chance": 0.6013
+   }
+  },
+  {
+   "index": 37,
+   "seed": 4638251,
+   "spec": {
+    "base_low": 7.0,
+    "base_high": 12.0,
+    "acc": 0.5528,
+    "dodge": 0.2276,
+    "crit": 0.2607,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.137,
+    "mods": [
+     0.245,
+     0.499
+    ],
+    "dmg_mult_buffs": 1.2284,
+    "dmg_taken_mod": 0.3648,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.32519999999999993
+   }
+  },
+  {
+   "index": 38,
+   "seed": 456366196,
+   "spec": {
+    "base_low": 20.0,
+    "base_high": 29.0,
+    "acc": 0.6018,
+    "dodge": 0.0113,
+    "crit": 0.1262,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.3914,
+    "mods": [
+     0.188,
+     0.176
+    ],
+    "dmg_mult_buffs": 1.0248,
+    "dmg_taken_mod": 0.179,
+    "ignore_prot": true
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.5905
+   }
+  },
+  {
+   "index": 39,
+   "seed": 418785809,
+   "spec": {
+    "base_low": 15.0,
+    "base_high": 25.0,
+    "acc": 0.5739,
+    "dodge": 0.2458,
+    "crit": 0.3095,
+    "crit_mult": 1.5,
+    "crit_valid": false,
+    "prot": 0.3532,
+    "mods": [
+     0.155
+    ],
+    "dmg_mult_buffs": 1.1486,
+    "dmg_taken_mod": 0.1414,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 20,
+    "raw": 20.190556191373616,
+    "mult": 1.155,
+    "hit_chance": 0.32809999999999995
+   }
+  },
+  {
+   "index": 40,
+   "seed": 466071119,
+   "spec": {
+    "base_low": 11.0,
+    "base_high": 14.0,
+    "acc": 0.5621,
+    "dodge": 0.1786,
+    "crit": 0.101,
+    "crit_mult": 1.5,
+    "crit_valid": false,
+    "prot": 0.1487,
+    "mods": [
+     0.548,
+     0.281,
+     0.2
+    ],
+    "dmg_mult_buffs": 0.9438,
+    "dmg_taken_mod": 0.3143,
+    "ignore_prot": true
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 31,
+    "raw": 12.350388376042247,
+    "mult": 2.029,
+    "hit_chance": 0.38350000000000006
+   }
+  },
+  {
+   "index": 41,
+   "seed": 1692924755,
+   "spec": {
+    "base_low": 15.0,
+    "base_high": 22.0,
+    "acc": 0.6357,
+    "dodge": 0.0973,
+    "crit": 0.1333,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.3496,
+    "mods": [],
+    "dmg_mult_buffs": 1.2589,
+    "dmg_taken_mod": 0.3592,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.5384
+   }
+  },
+  {
+   "index": 42,
+   "seed": 1603533062,
+   "spec": {
+    "base_low": 16.0,
+    "base_high": 18.0,
+    "acc": 0.7212,
+    "dodge": 0.2338,
+    "crit": 0.1593,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.3692,
+    "mods": [
+     0.211
+    ],
+    "dmg_mult_buffs": 1.4866,
+    "dmg_taken_mod": 0.4758,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.48739999999999994
+   }
+  },
+  {
+   "index": 43,
+   "seed": 738842496,
+   "spec": {
+    "base_low": 16.0,
+    "base_high": 24.0,
+    "acc": 0.9642,
+    "dodge": 0.0386,
+    "crit": 0.1588,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.0329,
+    "mods": [
+     0.373
+    ],
+    "dmg_mult_buffs": 1.1117,
+    "dmg_taken_mod": 0.2309,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 33,
+    "raw": 18.436054069548845,
+    "mult": 1.373,
+    "hit_chance": 0.9256
+   }
+  },
+  {
+   "index": 44,
+   "seed": 1330638454,
+   "spec": {
+    "base_low": 17.0,
+    "base_high": 18.0,
+    "acc": 0.5808,
+    "dodge": 0.1512,
+    "crit": 0.0598,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.3655,
+    "mods": [],
+    "dmg_mult_buffs": 1.2347,
+    "dmg_taken_mod": 0.2713,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.4296
+   }
+  },
+  {
+   "index": 45,
+   "seed": 1466036982,
+   "spec": {
+    "base_low": 11.0,
+    "base_high": 14.0,
+    "acc": 1.1046,
+    "dodge": 0.128,
+    "crit": 0.1963,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.1439,
+    "mods": [
+     0.33
+    ],
+    "dmg_mult_buffs": 1.4297,
+    "dmg_taken_mod": 0.3732,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 27,
+    "raw": 12.079481302993372,
+    "mult": 1.33,
+    "hit_chance": 0.95
+   }
+  },
+  {
+   "index": 46,
+   "seed": 973762160,
+   "spec": {
+    "base_low": 11.0,
+    "base_high": 11.0,
+    "acc": 0.8803,
+    "dodge": 0.22,
+    "crit": 0.1581,
+    "crit_mult": 1.5,
+    "crit_valid": false,
+    "prot": 0.2983,
+    "mods": [
+     0.242,
+     0.276,
+     0.2
+    ],
+    "dmg_mult_buffs": 0.9374,
+    "dmg_taken_mod": 0.2894,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.6603
+   }
+  },
+  {
+   "index": 47,
+   "seed": 1846617891,
+   "spec": {
+    "base_low": 8.0,
+    "base_high": 18.0,
+    "acc": 0.9184,
+    "dodge": 0.2207,
+    "crit": 0.1117,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.1689,
+    "mods": [],
+    "dmg_mult_buffs": 1.3755,
+    "dmg_taken_mod": 0.192,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.6977
+   }
+  },
+  {
+   "index": 48,
+   "seed": 1419437466,
+   "spec": {
+    "base_low": 15.0,
+    "base_high": 21.0,
+    "acc": 0.7272,
+    "dodge": 0.1949,
+    "crit": 0.0717,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.0416,
+    "mods": [
+     0.265
+    ],
+    "dmg_mult_buffs": 1.1156,
+    "dmg_taken_mod": 0.1111,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 30,
+    "raw": 19.97483382280916,
+    "mult": 1.2650000000000001,
+    "hit_chance": 0.5323
+   }
+  },
+  {
+   "index": 49,
+   "seed": 1627955075,
+   "spec": {
+    "base_low": 12.0,
+    "base_high": 17.0,
+    "acc": 0.4175,
+    "dodge": 0.0463,
+    "crit": 0.2068,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.1752,
+    "mods": [
+     0.386,
+     0.168
+    ],
+    "dmg_mult_buffs": 1.0361,
+    "dmg_taken_mod": 0.0578,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 24,
+    "raw": 16.88183069275692,
+    "mult": 1.554,
+    "hit_chance": 0.3712
+   }
+  },
+  {
+   "index": 50,
+   "seed": 1177976948,
+   "spec": {
+    "base_low": 8.0,
+    "base_high": 14.0,
+    "acc": 0.7872,
+    "dodge": 0.1648,
+    "crit": 0.2412,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.1524,
+    "mods": [],
+    "dmg_mult_buffs": 1.0937,
+    "dmg_taken_mod": 0.4301,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.6224000000000001
+   }
+  },
+  {
+   "index": 51,
+   "seed": 851667443,
+   "spec": {
+    "base_low": 12.0,
+    "base_high": 14.0,
+    "acc": 0.5197,
+    "dodge": 0.1932,
+    "crit": 0.2187,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.139,
+    "mods": [],
+    "dmg_mult_buffs": 0.8209,
+    "dmg_taken_mod": 0.0615,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.3265
+   }
+  },
+  {
+   "index": 52,
+   "seed": 1257942320,
+   "spec": {
+    "base_low": 12.0,
+    "base_high": 17.0,
+    "acc": 0.8701,
+    "dodge": 0.0444,
+    "crit": 0.0672,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.3163,
+    "mods": [
+     0.505,
+     0.591,
+     0.459
+    ],
+    "dmg_mult_buffs": 0.8774,
+    "dmg_taken_mod": 0.4853,
+    "ignore_prot": true
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 51,
+    "raw": 15.278137880843133,
+    "mult": 2.555,
+    "hit_chance": 0.8257
+   }
+  },
+  {
+   "index": 53,
+   "seed": 1918983095,
+   "spec": {
+    "base_low": 9.0,
+    "base_high": 12.0,
+    "acc": 0.9812,
+    "dodge": 0.208,
+    "crit": 0.0704,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.0785,
+    "mods": [
+     0.597,
+     0.405
+    ],
+    "dmg_mult_buffs": 0.8027,
+    "dmg_taken_mod": 0.2361,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 19,
+    "raw": 10.113269992405549,
+    "mult": 2.002,
+    "hit_chance": 0.7732
+   }
+  },
+  {
+   "index": 54,
+   "seed": 1765170417,
+   "spec": {
+    "base_low": 12.0,
+    "base_high": 16.0,
+    "acc": 0.8972,
+    "dodge": 0.1631,
+    "crit": 0.2435,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.1187,
+    "mods": [
+     0.261
+    ],
+    "dmg_mult_buffs": 1.3426,
+    "dmg_taken_mod": 0.3278,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 24,
+    "raw": 12.004925822839141,
+    "mult": 1.2610000000000001,
+    "hit_chance": 0.7341
+   }
+  },
+  {
+   "index": 55,
+   "seed": 169549748,
+   "spec": {
+    "base_low": 17.0,
+    "base_high": 22.0,
+    "acc": 0.9064,
+    "dodge": 0.1514,
+    "crit": 0.2455,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.2977,
+    "mods": [
+     0.527
+    ],
+    "dmg_mult_buffs": 1.1433,
+    "dmg_taken_mod": 0.3579,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 31,
+    "raw": 18.632809626171365,
+    "mult": 1.5270000000000001,
+    "hit_chance": 0.755
+   }
+  },
+  {
+   "index": 56,
+   "seed": 1344794213,
+   "spec": {
+    "base_low": 3.0,
+    "base_high": 11.0,
+    "acc": 1.1829,
+    "dodge": 0.2246,
+    "crit": 0.2233,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.255,
+    "mods": [],
+    "dmg_mult_buffs": 0.701,
+    "dmg_taken_mod": 0.4784,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 3,
+    "raw": 3.741873675957322,
+    "mult": 1.0,
+    "hit_chance": 0.95
+   }
+  },
+  {
+   "index": 57,
+   "seed": 466715612,
+   "spec": {
+    "base_low": 5.0,
+    "base_high": 11.0,
+    "acc": 0.4709,
+    "dodge": 0.166,
+    "crit": 0.077,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.2749,
+    "mods": [
+     0.105,
+     0.552,
+     0.199
+    ],
+    "dmg_mult_buffs": 0.9168,
+    "dmg_taken_mod": 0.1289,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 15,
+    "raw": 10.727693054825068,
+    "mult": 1.856,
+    "hit_chance": 0.30489999999999995
+   }
+  },
+  {
+   "index": 58,
+   "seed": 708965113,
+   "spec": {
+    "base_low": 11.0,
+    "base_high": 15.0,
+    "acc": 0.525,
+    "dodge": 0.1349,
+    "crit": 0.0949,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.2765,
+    "mods": [],
+    "dmg_mult_buffs": 1.253,
+    "dmg_taken_mod": 0.2595,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 13,
+    "raw": 11.279888914898038,
+    "mult": 1.0,
+    "hit_chance": 0.3901
+   }
+  },
+  {
+   "index": 59,
+   "seed": 212588740,
+   "spec": {
+    "base_low": 10.0,
+    "base_high": 12.0,
+    "acc": 0.9979,
+    "dodge": 0.0752,
+    "crit": 0.0076,
+    "crit_mult": 1.5,
+    "crit_valid": false,
+    "prot": 0.041,
+    "mods": [],
+    "dmg_mult_buffs": 0.7625,
+    "dmg_taken_mod": 0.1385,
+    "ignore_prot": true
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 10,
+    "raw": 11.684591252822429,
+    "mult": 1.0,
+    "hit_chance": 0.9227
+   }
+  },
+  {
+   "index": 60,
+   "seed": 1099905378,
+   "spec": {
+    "base_low": 5.0,
+    "base_high": 9.0,
+    "acc": 1.0801,
+    "dodge": 0.1072,
+    "crit": 0.06,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.084,
+    "mods": [],
+    "dmg_mult_buffs": 1.458,
+    "dmg_taken_mod": 0.0637,
+    "ignore_prot": true
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 12,
+    "raw": 7.545661347918212,
+    "mult": 1.0,
+    "hit_chance": 0.95
+   }
+  },
+  {
+   "index": 61,
+   "seed": 896839652,
+   "spec": {
+    "base_low": 9.0,
+    "base_high": 9.0,
+    "acc": 0.5204,
+    "dodge": 0.1536,
+    "crit": 0.2596,
+    "crit_mult": 1.5,
+    "crit_valid": false,
+    "prot": 0.0599,
+    "mods": [
+     0.188,
+     0.553
+    ],
+    "dmg_mult_buffs": 0.7693,
+    "dmg_taken_mod": 0.4627,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.3668
+   }
+  },
+  {
+   "index": 62,
+   "seed": 1976262714,
+   "spec": {
+    "base_low": 2.0,
+    "base_high": 2.0,
+    "acc": 0.4687,
+    "dodge": 0.0075,
+    "crit": 0.0146,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.0771,
+    "mods": [
+     0.14
+    ],
+    "dmg_mult_buffs": 1.3303,
+    "dmg_taken_mod": 0.1229,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 3,
+    "raw": 2.0,
+    "mult": 1.1400000000000001,
+    "hit_chance": 0.4612
+   }
+  },
+  {
+   "index": 63,
+   "seed": 22713536,
+   "spec": {
+    "base_low": 16.0,
+    "base_high": 21.0,
+    "acc": 1.0122,
+    "dodge": 0.2469,
+    "crit": 0.1598,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.0194,
+    "mods": [
+     0.302,
+     0.214
+    ],
+    "dmg_mult_buffs": 0.8884,
+    "dmg_taken_mod": 0.1616,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 28,
+    "raw": 18.167774556437507,
+    "mult": 1.516,
+    "hit_chance": 0.7653
+   }
+  },
+  {
+   "index": 64,
+   "seed": 249922887,
+   "spec": {
+    "base_low": 4.0,
+    "base_high": 8.0,
+    "acc": 0.9797,
+    "dodge": 0.2068,
+    "crit": 0.0442,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.0711,
+    "mods": [
+     0.479
+    ],
+    "dmg_mult_buffs": 1.4991,
+    "dmg_taken_mod": 0.1659,
+    "ignore_prot": true
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 16,
+    "raw": 5.997410275042057,
+    "mult": 1.479,
+    "hit_chance": 0.7729
+   }
+  },
+  {
+   "index": 65,
+   "seed": 642187763,
+   "spec": {
+    "base_low": 16.0,
+    "base_high": 25.0,
+    "acc": 0.8956,
+    "dodge": 0.1677,
+    "crit": 0.1793,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.222,
+    "mods": [
+     0.123,
+     0.505
+    ],
+    "dmg_mult_buffs": 1.362,
+    "dmg_taken_mod": 0.138,
+    "ignore_prot": true
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 58,
+    "raw": 23.004418932832778,
+    "mult": 1.6280000000000001,
+    "hit_chance": 0.7279
+   }
+  },
+  {
+   "index": 66,
+   "seed": 324273483,
+   "spec": {
+    "base_low": 6.0,
+    "base_high": 6.0,
+    "acc": 0.5151,
+    "dodge": 0.1425,
+    "crit": 0.1162,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.3719,
+    "mods": [
+     0.471,
+     0.279
+    ],
+    "dmg_mult_buffs": 0.8405,
+    "dmg_taken_mod": 0.1974,
+    "ignore_prot": true
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 11,
+    "raw": 6.0,
+    "mult": 1.75,
+    "hit_chance": 0.37260000000000004
+   }
+  },
+  {
+   "index": 67,
+   "seed": 1360776738,
+   "spec": {
+    "base_low": 16.0,
+    "base_high": 25.0,
+    "acc": 1.1295,
+    "dodge": 0.1442,
+    "crit": 0.016,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.334,
+    "mods": [
+     0.398,
+     0.34,
+     0.448
+    ],
+    "dmg_mult_buffs": 0.7687,
+    "dmg_taken_mod": 0.4073,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 30,
+    "raw": 18.934941871324554,
+    "mult": 2.186,
+    "hit_chance": 0.95
+   }
+  },
+  {
+   "index": 68,
+   "seed": 1110620687,
+   "spec": {
+    "base_low": 16.0,
+    "base_high": 16.0,
+    "acc": 1.0466,
+    "dodge": 0.1355,
+    "crit": 0.3476,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.022,
+    "mods": [],
+    "dmg_mult_buffs": 1.4108,
+    "dmg_taken_mod": 0.4511,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 32,
+    "raw": 16.0,
+    "mult": 1.0,
+    "hit_chance": 0.9111
+   }
+  },
+  {
+   "index": 69,
+   "seed": 639440420,
+   "spec": {
+    "base_low": 3.0,
+    "base_high": 9.0,
+    "acc": 0.615,
+    "dodge": 0.2112,
+    "crit": 0.0127,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.3444,
+    "mods": [
+     0.095,
+     0.363,
+     0.082
+    ],
+    "dmg_mult_buffs": 1.2197,
+    "dmg_taken_mod": 0.049,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.4038
+   }
+  },
+  {
+   "index": 70,
+   "seed": 777576526,
+   "spec": {
+    "base_low": 3.0,
+    "base_high": 13.0,
+    "acc": 0.9466,
+    "dodge": 0.0551,
+    "crit": 0.2915,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.2677,
+    "mods": [
+     0.28
+    ],
+    "dmg_mult_buffs": 0.8366,
+    "dmg_taken_mod": 0.1677,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 7,
+    "raw": 7.639561278745532,
+    "mult": 1.28,
+    "hit_chance": 0.8915
+   }
+  },
+  {
+   "index": 71,
+   "seed": 300390593,
+   "spec": {
+    "base_low": 19.0,
+    "base_high": 19.0,
+    "acc": 0.8267,
+    "dodge": 0.1389,
+    "crit": 0.1544,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.2717,
+    "mods": [
+     0.026,
+     0.316,
+     0.141
+    ],
+    "dmg_mult_buffs": 0.8398,
+    "dmg_taken_mod": 0.3468,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 23,
+    "raw": 19.0,
+    "mult": 1.483,
+    "hit_chance": 0.6878
+   }
+  },
+  {
+   "index": 72,
+   "seed": 1286652292,
+   "spec": {
+    "base_low": 3.0,
+    "base_high": 10.0,
+    "acc": 0.9606,
+    "dodge": 0.1576,
+    "crit": 0.0246,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.0753,
+    "mods": [
+     0.317,
+     0.145,
+     0.494
+    ],
+    "dmg_mult_buffs": 1.4674,
+    "dmg_taken_mod": 0.3479,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 14,
+    "raw": 4.020886288722977,
+    "mult": 1.956,
+    "hit_chance": 0.803
+   }
+  },
+  {
+   "index": 73,
+   "seed": 1306487626,
+   "spec": {
+    "base_low": 13.0,
+    "base_high": 15.0,
+    "acc": 0.7482,
+    "dodge": 0.0981,
+    "crit": 0.1098,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.0195,
+    "mods": [
+     0.241,
+     0.267,
+     0.341
+    ],
+    "dmg_mult_buffs": 1.1182,
+    "dmg_taken_mod": 0.1456,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": true,
+    "damage": 47,
+    "raw": 13.498002821113914,
+    "mult": 1.849,
+    "hit_chance": 0.6501
+   }
+  },
+  {
+   "index": 74,
+   "seed": 772915685,
+   "spec": {
+    "base_low": 7.0,
+    "base_high": 7.0,
+    "acc": 1.0765,
+    "dodge": 0.1984,
+    "crit": 0.0988,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.0252,
+    "mods": [
+     0.347,
+     0.266,
+     0.123
+    ],
+    "dmg_mult_buffs": 1.2222,
+    "dmg_taken_mod": 0.2491,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 18,
+    "raw": 7.0,
+    "mult": 1.736,
+    "hit_chance": 0.8781
+   }
+  },
+  {
+   "index": 75,
+   "seed": 523374146,
+   "spec": {
+    "base_low": 8.0,
+    "base_high": 16.0,
+    "acc": 1.0666,
+    "dodge": 0.0419,
+    "crit": 0.1431,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.1263,
+    "mods": [
+     0.591,
+     0.371,
+     0.324
+    ],
+    "dmg_mult_buffs": 1.0157,
+    "dmg_taken_mod": 0.3883,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 26,
+    "raw": 9.22099388204515,
+    "mult": 2.286,
+    "hit_chance": 0.95
+   }
+  },
+  {
+   "index": 76,
+   "seed": 1622002956,
+   "spec": {
+    "base_low": 11.0,
+    "base_high": 21.0,
+    "acc": 1.0426,
+    "dodge": 0.2371,
+    "crit": 0.2382,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.2627,
+    "mods": [
+     0.58,
+     0.058,
+     0.075
+    ],
+    "dmg_mult_buffs": 1.2458,
+    "dmg_taken_mod": 0.4933,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 27,
+    "raw": 11.541908452287316,
+    "mult": 1.713,
+    "hit_chance": 0.8055
+   }
+  },
+  {
+   "index": 77,
+   "seed": 707819518,
+   "spec": {
+    "base_low": 5.0,
+    "base_high": 7.0,
+    "acc": 0.4676,
+    "dodge": 0.2046,
+    "crit": 0.1073,
+    "crit_mult": 1.5,
+    "crit_valid": false,
+    "prot": 0.0541,
+    "mods": [],
+    "dmg_mult_buffs": 0.7017,
+    "dmg_taken_mod": 0.1351,
+    "ignore_prot": true
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.263
+   }
+  },
+  {
+   "index": 78,
+   "seed": 1227086794,
+   "spec": {
+    "base_low": 10.0,
+    "base_high": 19.0,
+    "acc": 1.1382,
+    "dodge": 0.1866,
+    "crit": 0.1097,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.1769,
+    "mods": [
+     0.4
+    ],
+    "dmg_mult_buffs": 0.939,
+    "dmg_taken_mod": 0.4961,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 22,
+    "raw": 13.82533486164175,
+    "mult": 1.4,
+    "hit_chance": 0.95
+   }
+  },
+  {
+   "index": 79,
+   "seed": 1119373296,
+   "spec": {
+    "base_low": 19.0,
+    "base_high": 21.0,
+    "acc": 0.8839,
+    "dodge": 0.1084,
+    "crit": 0.1379,
+    "crit_mult": 1.5,
+    "crit_valid": false,
+    "prot": 0.2759,
+    "mods": [
+     0.434
+    ],
+    "dmg_mult_buffs": 1.3269,
+    "dmg_taken_mod": 0.4639,
+    "ignore_prot": true
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 54,
+    "raw": 19.376730299089104,
+    "mult": 1.434,
+    "hit_chance": 0.7755000000000001
+   }
+  },
+  {
+   "index": 80,
+   "seed": 460778987,
+   "spec": {
+    "base_low": 14.0,
+    "base_high": 15.0,
+    "acc": 0.8782,
+    "dodge": 0.0904,
+    "crit": 0.031,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.1992,
+    "mods": [
+     0.293,
+     0.142
+    ],
+    "dmg_mult_buffs": 1.2097,
+    "dmg_taken_mod": 0.0777,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.7878
+   }
+  },
+  {
+   "index": 81,
+   "seed": 1286335451,
+   "spec": {
+    "base_low": 15.0,
+    "base_high": 17.0,
+    "acc": 0.8294,
+    "dodge": 0.2139,
+    "crit": 0.0573,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.3891,
+    "mods": [
+     0.286,
+     0.44,
+     0.533
+    ],
+    "dmg_mult_buffs": 1.3528,
+    "dmg_taken_mod": 0.4759,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 42,
+    "raw": 15.176131192594767,
+    "mult": 2.259,
+    "hit_chance": 0.6155
+   }
+  },
+  {
+   "index": 82,
+   "seed": 76905992,
+   "spec": {
+    "base_low": 17.0,
+    "base_high": 22.0,
+    "acc": 0.985,
+    "dodge": 0.1285,
+    "crit": 0.1567,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.1553,
+    "mods": [
+     0.31,
+     0.11
+    ],
+    "dmg_mult_buffs": 1.2709,
+    "dmg_taken_mod": 0.3275,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 42,
+    "raw": 20.745917867636308,
+    "mult": 1.42,
+    "hit_chance": 0.8565
+   }
+  },
+  {
+   "index": 83,
+   "seed": 1360062325,
+   "spec": {
+    "base_low": 5.0,
+    "base_high": 10.0,
+    "acc": 0.69,
+    "dodge": 0.1234,
+    "crit": 0.0597,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.2186,
+    "mods": [
+     0.262,
+     0.281
+    ],
+    "dmg_mult_buffs": 1.0026,
+    "dmg_taken_mod": 0.3336,
+    "ignore_prot": true
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 20,
+    "raw": 9.645052921259776,
+    "mult": 1.5430000000000001,
+    "hit_chance": 0.5666
+   }
+  },
+  {
+   "index": 84,
+   "seed": 343291426,
+   "spec": {
+    "base_low": 4.0,
+    "base_high": 6.0,
+    "acc": 0.6425,
+    "dodge": 0.2113,
+    "crit": 0.0194,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.3129,
+    "mods": [],
+    "dmg_mult_buffs": 0.759,
+    "dmg_taken_mod": 0.1359,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.43119999999999997
+   }
+  },
+  {
+   "index": 85,
+   "seed": 1675986378,
+   "spec": {
+    "base_low": 5.0,
+    "base_high": 11.0,
+    "acc": 0.5678,
+    "dodge": 0.2349,
+    "crit": 0.137,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.2126,
+    "mods": [
+     0.561,
+     0.245,
+     0.51
+    ],
+    "dmg_mult_buffs": 0.8046,
+    "dmg_taken_mod": 0.0522,
+    "ignore_prot": true
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.3329
+   }
+  },
+  {
+   "index": 86,
+   "seed": 1051918829,
+   "spec": {
+    "base_low": 17.0,
+    "base_high": 25.0,
+    "acc": 0.6726,
+    "dodge": 0.2049,
+    "crit": 0.2594,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.0266,
+    "mods": [
+     0.134,
+     0.523
+    ],
+    "dmg_mult_buffs": 1.3933,
+    "dmg_taken_mod": 0.2821,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 65,
+    "raw": 22.557351859286427,
+    "mult": 1.657,
+    "hit_chance": 0.4677
+   }
+  },
+  {
+   "index": 87,
+   "seed": 795453946,
+   "spec": {
+    "base_low": 4.0,
+    "base_high": 12.0,
+    "acc": 0.7892,
+    "dodge": 0.0547,
+    "crit": 0.1933,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.2602,
+    "mods": [
+     0.168,
+     0.186,
+     0.586
+    ],
+    "dmg_mult_buffs": 1.4953,
+    "dmg_taken_mod": 0.2466,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 18,
+    "raw": 6.824691964313388,
+    "mult": 1.94,
+    "hit_chance": 0.7345
+   }
+  },
+  {
+   "index": 88,
+   "seed": 688069592,
+   "spec": {
+    "base_low": 6.0,
+    "base_high": 14.0,
+    "acc": 0.4567,
+    "dodge": 0.1585,
+    "crit": 0.2466,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.1645,
+    "mods": [
+     0.228,
+     0.358
+    ],
+    "dmg_mult_buffs": 0.7503,
+    "dmg_taken_mod": 0.1246,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.2982
+   }
+  },
+  {
+   "index": 89,
+   "seed": 1489431125,
+   "spec": {
+    "base_low": 12.0,
+    "base_high": 17.0,
+    "acc": 0.69,
+    "dodge": 0.1685,
+    "crit": 0.1498,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.1171,
+    "mods": [],
+    "dmg_mult_buffs": 1.0217,
+    "dmg_taken_mod": 0.3878,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.5215
+   }
+  },
+  {
+   "index": 90,
+   "seed": 138928847,
+   "spec": {
+    "base_low": 11.0,
+    "base_high": 19.0,
+    "acc": 0.5524,
+    "dodge": 0.1266,
+    "crit": 0.1691,
+    "crit_mult": 1.5,
+    "crit_valid": false,
+    "prot": 0.2794,
+    "mods": [
+     0.322
+    ],
+    "dmg_mult_buffs": 0.9783,
+    "dmg_taken_mod": 0.427,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 24,
+    "raw": 17.69287795573473,
+    "mult": 1.322,
+    "hit_chance": 0.4258
+   }
+  },
+  {
+   "index": 91,
+   "seed": 1634081792,
+   "spec": {
+    "base_low": 13.0,
+    "base_high": 23.0,
+    "acc": 1.1454,
+    "dodge": 0.0035,
+    "crit": 0.1902,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.3794,
+    "mods": [],
+    "dmg_mult_buffs": 0.9099,
+    "dmg_taken_mod": 0.2211,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 12,
+    "raw": 17.49119493830949,
+    "mult": 1.0,
+    "hit_chance": 0.95
+   }
+  },
+  {
+   "index": 92,
+   "seed": 71881737,
+   "spec": {
+    "base_low": 9.0,
+    "base_high": 19.0,
+    "acc": 0.635,
+    "dodge": 0.2429,
+    "crit": 0.0493,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.1309,
+    "mods": [
+     0.202,
+     0.303,
+     0.584
+    ],
+    "dmg_mult_buffs": 0.8045,
+    "dmg_taken_mod": 0.35,
+    "ignore_prot": true
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.3921
+   }
+  },
+  {
+   "index": 93,
+   "seed": 923296208,
+   "spec": {
+    "base_low": 2.0,
+    "base_high": 9.0,
+    "acc": 0.4231,
+    "dodge": 0.1083,
+    "crit": 0.2566,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.0319,
+    "mods": [
+     0.512,
+     0.536,
+     0.438
+    ],
+    "dmg_mult_buffs": 1.2571,
+    "dmg_taken_mod": 0.1765,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.31479999999999997
+   }
+  },
+  {
+   "index": 94,
+   "seed": 146482806,
+   "spec": {
+    "base_low": 7.0,
+    "base_high": 8.0,
+    "acc": 0.7567,
+    "dodge": 0.2148,
+    "crit": 0.0473,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.0976,
+    "mods": [
+     0.565
+    ],
+    "dmg_mult_buffs": 1.4605,
+    "dmg_taken_mod": 0.4358,
+    "ignore_prot": true
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.5419
+   }
+  },
+  {
+   "index": 95,
+   "seed": 588414438,
+   "spec": {
+    "base_low": 19.0,
+    "base_high": 29.0,
+    "acc": 0.8108,
+    "dodge": 0.0273,
+    "crit": 0.0491,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.0886,
+    "mods": [
+     0.295
+    ],
+    "dmg_mult_buffs": 1.3095,
+    "dmg_taken_mod": 0.0567,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.7835
+   }
+  },
+  {
+   "index": 96,
+   "seed": 1116211225,
+   "spec": {
+    "base_low": 8.0,
+    "base_high": 18.0,
+    "acc": 0.5617,
+    "dodge": 0.1171,
+    "crit": 0.3401,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.3992,
+    "mods": [],
+    "dmg_mult_buffs": 1.1504,
+    "dmg_taken_mod": 0.0114,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.4446
+   }
+  },
+  {
+   "index": 97,
+   "seed": 1500366155,
+   "spec": {
+    "base_low": 10.0,
+    "base_high": 18.0,
+    "acc": 0.6717,
+    "dodge": 0.0174,
+    "crit": 0.1988,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.2885,
+    "mods": [],
+    "dmg_mult_buffs": 1.0948,
+    "dmg_taken_mod": 0.3903,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 13,
+    "raw": 11.634969806298614,
+    "mult": 1.0,
+    "hit_chance": 0.6543
+   }
+  },
+  {
+   "index": 98,
+   "seed": 925138285,
+   "spec": {
+    "base_low": 2.0,
+    "base_high": 6.0,
+    "acc": 0.4742,
+    "dodge": 0.2169,
+    "crit": 0.1161,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.2615,
+    "mods": [],
+    "dmg_mult_buffs": 1.4501,
+    "dmg_taken_mod": 0.3182,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.2573
+   }
+  },
+  {
+   "index": 99,
+   "seed": 1084412843,
+   "spec": {
+    "base_low": 5.0,
+    "base_high": 5.0,
+    "acc": 0.9908,
+    "dodge": 0.1307,
+    "crit": 0.1575,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.1928,
+    "mods": [
+     0.324
+    ],
+    "dmg_mult_buffs": 0.7812,
+    "dmg_taken_mod": 0.222,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 5,
+    "raw": 5.0,
+    "mult": 1.324,
+    "hit_chance": 0.8601
+   }
+  },
+  {
+   "index": 100,
+   "seed": 655075361,
+   "spec": {
+    "base_low": 3.0,
+    "base_high": 11.0,
+    "acc": 0.4884,
+    "dodge": 0.2356,
+    "crit": 0.113,
+    "crit_mult": 1.5,
+    "crit_valid": false,
+    "prot": 0.0903,
+    "mods": [],
+    "dmg_mult_buffs": 1.1722,
+    "dmg_taken_mod": 0.1453,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.2528
+   }
+  },
+  {
+   "index": 101,
+   "seed": 518330625,
+   "spec": {
+    "base_low": 10.0,
+    "base_high": 17.0,
+    "acc": 0.5076,
+    "dodge": 0.0015,
+    "crit": 0.2363,
+    "crit_mult": 1.5,
+    "crit_valid": false,
+    "prot": 0.2814,
+    "mods": [],
+    "dmg_mult_buffs": 0.7503,
+    "dmg_taken_mod": 0.2764,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.5061000000000001
+   }
+  },
+  {
+   "index": 102,
+   "seed": 468447518,
+   "spec": {
+    "base_low": 17.0,
+    "base_high": 25.0,
+    "acc": 0.4062,
+    "dodge": 0.0888,
+    "crit": 0.0402,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.3315,
+    "mods": [
+     0.352
+    ],
+    "dmg_mult_buffs": 1.0537,
+    "dmg_taken_mod": 0.4619,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 26,
+    "raw": 18.493823923170567,
+    "mult": 1.3519999999999999,
+    "hit_chance": 0.3174
+   }
+  },
+  {
+   "index": 103,
+   "seed": 1710556348,
+   "spec": {
+    "base_low": 3.0,
+    "base_high": 13.0,
+    "acc": 0.9188,
+    "dodge": 0.0769,
+    "crit": 0.15,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.0512,
+    "mods": [
+     0.578,
+     0.323,
+     0.575
+    ],
+    "dmg_mult_buffs": 1.2014,
+    "dmg_taken_mod": 0.1742,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 43,
+    "raw": 12.905272023752332,
+    "mult": 2.476,
+    "hit_chance": 0.8419
+   }
+  },
+  {
+   "index": 104,
+   "seed": 1725590152,
+   "spec": {
+    "base_low": 2.0,
+    "base_high": 6.0,
+    "acc": 0.5979,
+    "dodge": 0.0421,
+    "crit": 0.1683,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.1892,
+    "mods": [
+     0.433
+    ],
+    "dmg_mult_buffs": 1.4359,
+    "dmg_taken_mod": 0.2824,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.5558
+   }
+  },
+  {
+   "index": 105,
+   "seed": 914134882,
+   "spec": {
+    "base_low": 19.0,
+    "base_high": 23.0,
+    "acc": 0.6543,
+    "dodge": 0.196,
+    "crit": 0.2039,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.2254,
+    "mods": [
+     0.499
+    ],
+    "dmg_mult_buffs": 1.4067,
+    "dmg_taken_mod": 0.1951,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.4583
+   }
+  },
+  {
+   "index": 106,
+   "seed": 1516812224,
+   "spec": {
+    "base_low": 5.0,
+    "base_high": 5.0,
+    "acc": 1.0155,
+    "dodge": 0.2118,
+    "crit": 0.2881,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.2475,
+    "mods": [],
+    "dmg_mult_buffs": 1.4256,
+    "dmg_taken_mod": 0.0534,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": true,
+    "damage": 8,
+    "raw": 5.0,
+    "mult": 1.0,
+    "hit_chance": 0.8037000000000001
+   }
+  },
+  {
+   "index": 107,
+   "seed": 1410556763,
+   "spec": {
+    "base_low": 9.0,
+    "base_high": 9.0,
+    "acc": 0.4537,
+    "dodge": 0.0963,
+    "crit": 0.3268,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.2671,
+    "mods": [
+     0.544,
+     0.294
+    ],
+    "dmg_mult_buffs": 1.3712,
+    "dmg_taken_mod": 0.3882,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.3574
+   }
+  },
+  {
+   "index": 108,
+   "seed": 730116516,
+   "spec": {
+    "base_low": 17.0,
+    "base_high": 21.0,
+    "acc": 1.1442,
+    "dodge": 0.1744,
+    "crit": 0.187,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.2345,
+    "mods": [],
+    "dmg_mult_buffs": 0.7449,
+    "dmg_taken_mod": 0.4602,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 16,
+    "raw": 19.562452198006213,
+    "mult": 1.0,
+    "hit_chance": 0.95
+   }
+  },
+  {
+   "index": 109,
+   "seed": 1778904125,
+   "spec": {
+    "base_low": 18.0,
+    "base_high": 25.0,
+    "acc": 0.7736,
+    "dodge": 0.0407,
+    "crit": 0.1582,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.3842,
+    "mods": [],
+    "dmg_mult_buffs": 1.3619,
+    "dmg_taken_mod": 0.3236,
+    "ignore_prot": true
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 43,
+    "raw": 23.626122897025198,
+    "mult": 1.0,
+    "hit_chance": 0.7329
+   }
+  },
+  {
+   "index": 110,
+   "seed": 1633051985,
+   "spec": {
+    "base_low": 13.0,
+    "base_high": 15.0,
+    "acc": 1.1649,
+    "dodge": 0.0647,
+    "crit": 0.1695,
+    "crit_mult": 1.5,
+    "crit_valid": false,
+    "prot": 0.2947,
+    "mods": [
+     0.592,
+     0.233,
+     0.366
+    ],
+    "dmg_mult_buffs": 0.7989,
+    "dmg_taken_mod": 0.3359,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 22,
+    "raw": 13.333853403106332,
+    "mult": 2.191,
+    "hit_chance": 0.95
+   }
+  },
+  {
+   "index": 111,
+   "seed": 284598832,
+   "spec": {
+    "base_low": 10.0,
+    "base_high": 19.0,
+    "acc": 0.6609,
+    "dodge": 0.2185,
+    "crit": 0.3375,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.3769,
+    "mods": [
+     0.027,
+     0.401,
+     0.045
+    ],
+    "dmg_mult_buffs": 1.4021,
+    "dmg_taken_mod": 0.2868,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 19,
+    "raw": 11.183629292063415,
+    "mult": 1.473,
+    "hit_chance": 0.4424
+   }
+  },
+  {
+   "index": 112,
+   "seed": 1060236645,
+   "spec": {
+    "base_low": 11.0,
+    "base_high": 16.0,
+    "acc": 0.9854,
+    "dodge": 0.0326,
+    "crit": 0.1577,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.3395,
+    "mods": [
+     0.434,
+     0.588,
+     0.499
+    ],
+    "dmg_mult_buffs": 1.3618,
+    "dmg_taken_mod": 0.1511,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 38,
+    "raw": 14.63330318708904,
+    "mult": 2.521,
+    "hit_chance": 0.95
+   }
+  },
+  {
+   "index": 113,
+   "seed": 708514001,
+   "spec": {
+    "base_low": 10.0,
+    "base_high": 15.0,
+    "acc": 0.4386,
+    "dodge": 0.0823,
+    "crit": 0.182,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.2723,
+    "mods": [],
+    "dmg_mult_buffs": 1.3898,
+    "dmg_taken_mod": 0.1307,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.3563
+   }
+  },
+  {
+   "index": 114,
+   "seed": 1047178150,
+   "spec": {
+    "base_low": 4.0,
+    "base_high": 4.0,
+    "acc": 0.6924,
+    "dodge": 0.1729,
+    "crit": 0.0259,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.3397,
+    "mods": [
+     0.251,
+     0.054
+    ],
+    "dmg_mult_buffs": 1.1218,
+    "dmg_taken_mod": 0.3298,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.5195000000000001
+   }
+  },
+  {
+   "index": 115,
+   "seed": 76932001,
+   "spec": {
+    "base_low": 2.0,
+    "base_high": 9.0,
+    "acc": 0.9742,
+    "dodge": 0.055,
+    "crit": 0.1526,
+    "crit_mult": 1.5,
+    "crit_valid": false,
+    "prot": 0.3172,
+    "mods": [
+     0.486
+    ],
+    "dmg_mult_buffs": 1.2866,
+    "dmg_taken_mod": 0.4407,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 12,
+    "raw": 6.334492966765538,
+    "mult": 1.486,
+    "hit_chance": 0.9191999999999999
+   }
+  },
+  {
+   "index": 116,
+   "seed": 1949289030,
+   "spec": {
+    "base_low": 3.0,
+    "base_high": 12.0,
+    "acc": 0.9324,
+    "dodge": 0.1345,
+    "crit": 0.1108,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.2026,
+    "mods": [],
+    "dmg_mult_buffs": 0.9237,
+    "dmg_taken_mod": 0.1226,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": true,
+    "damage": 11,
+    "raw": 8.497849009931087,
+    "mult": 1.0,
+    "hit_chance": 0.7979
+   }
+  },
+  {
+   "index": 117,
+   "seed": 677020269,
+   "spec": {
+    "base_low": 20.0,
+    "base_high": 26.0,
+    "acc": 0.8705,
+    "dodge": 0.1465,
+    "crit": 0.3198,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.183,
+    "mods": [
+     0.36,
+     0.015
+    ],
+    "dmg_mult_buffs": 0.9226,
+    "dmg_taken_mod": 0.3081,
+    "ignore_prot": true
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 37,
+    "raw": 22.432631548959762,
+    "mult": 1.375,
+    "hit_chance": 0.7240000000000001
+   }
+  },
+  {
+   "index": 118,
+   "seed": 309344595,
+   "spec": {
+    "base_low": 19.0,
+    "base_high": 20.0,
+    "acc": 1.0056,
+    "dodge": 0.0193,
+    "crit": 0.314,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.2517,
+    "mods": [
+     0.104,
+     0.57
+    ],
+    "dmg_mult_buffs": 1.1918,
+    "dmg_taken_mod": 0.0769,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": true,
+    "crit": false,
+    "damage": 31,
+    "raw": 19.55986762419343,
+    "mult": 1.674,
+    "hit_chance": 0.95
+   }
+  },
+  {
+   "index": 119,
+   "seed": 728211010,
+   "spec": {
+    "base_low": 19.0,
+    "base_high": 19.0,
+    "acc": 0.7766,
+    "dodge": 0.0919,
+    "crit": 0.1202,
+    "crit_mult": 1.5,
+    "crit_valid": true,
+    "prot": 0.2233,
+    "mods": [],
+    "dmg_mult_buffs": 0.8042,
+    "dmg_taken_mod": 0.3284,
+    "ignore_prot": false
+   },
+   "expected": {
+    "hit": false,
+    "crit": false,
+    "damage": 0,
+    "raw": 0.0,
+    "mult": 1.0,
+    "hit_chance": 0.6847
+   }
+  }
+ ]
+}
