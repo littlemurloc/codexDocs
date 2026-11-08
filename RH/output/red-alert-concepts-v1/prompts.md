@@ -1,0 +1,43 @@
+# Red Alert Mini-game Concept Prompts
+
+Generated with the built-in image generation tool. Image 1 is the visual reference for Images 2 and 3.
+
+## Image 1
+
+Use case: ui-mockup
+Asset type: ONE portrait 9:16 WeChat mini-game in-game screenshot for a licensed Command & Conquer Red Alert merge + 4X strategy game pitch. Chinese interface, full-screen game screenshot, no phone frame, no presentation slide.
+Primary request: show the BASE MERGE preparation gameplay, faithful to Red Alert 2's recognizable industrial military isometric art direction, crisp pre-rendered-looking 2D sprites and terrain, detailed small-scale buildings and vehicles. Not generic medieval fantasy and not photorealistic cinematic military poster.
+Environment: a neat isometric Allied military base on concrete build tiles surrounded by grass and a perimeter fence. Recognizable Allied construction yard with deployment crane, power plant, barracks with training yard, war factory, ore refinery with an ore truck and yellow ore patch. Blue faction accents, a few parked Prism tanks, a large distinct red Soviet Apocalypse tank and a distant Kirov airship as collectible preview. Do not clutter or overshadow merge interaction.
+Composition: top 12% safe HUD with title "红色警戒", currency "军费 128,500", energy lightning icon "68/100" and small WeChat ellipsis/circle capsule upper right. Upper-middle 30% base buildings in isometric view. Lower-middle 40% a VERY CLEAR isometric 4x4 concrete merge grid seamlessly part of the base, with two identical blue-gray Allied Grizzly tanks each labeled "Lv.1" in adjacent cells. A short curved drag path from one into the other and a single small hand cursor makes merging clear. At their destination a slightly bigger "Lv.2" Grizzly tank emerges with restrained golden upgrade sparks. Other cells contain same tank type with Lv.1 and Lv.2 labels, a few empty tiles. NO random different tank models as simple level upgrades. A selected building has small level badge, newly unlockable land shows faint boundary stakes.
+Bottom compact command strip: tank spawn icon button "招募坦克" with coin cost "500", red main command button "出征", small expand-grid icon "扩建". Navigation icons "基地", "指挥官", "世界", "军团".
+Visual hierarchy: actual playable base screenshot with highly legible units, identical small perspective and lighting throughout, daylight and moderate contrast. Red Alert green radar/scanner accent, Allied blue concrete base, Soviet red UI trim, amber gold resources. Tanks are gameplay-sized not foreground poster objects. Labels readable simplified Chinese.
+Constraints: portrait 9:16, exactly 4x4 merge grid, iconic Red Alert military industrial design, no generic dragons, no third-person soldier camera, no modern first-person shooter HUD, no promotional slogans, no text explanations about gameplay, no watermark.
+
+## Image 2
+
+Use case: ui-mockup
+Asset type: ONE 9:16 portrait WeChat mini-game commander recruitment AND army formation screenshot for Red Alert merge + 4X pitch, Chinese.
+Input image: supplied base screenshot is the art and UI reference for the same game. Match exact metallic red/blue/green radar UI, rich pre-rendered 2D military assets, readable Chinese font, restrained classic Red Alert 2 style. This is a separate screen within same app.
+Primary request: premium COMMANDER CARDS screen showing Tanya, Boris, Yuri as recruitable army commanders, and clearly showing their aura affects army formation. They remain portraits on military personnel cards, not gigantic human combat units on map.
+Scene/backdrop: military command bunker with green radar terminal, radio, tactical war table and softly dimmed equipment. UI takes priority and background stays uncluttered.
+Layout portrait: top 10% compact header "传奇指挥官", back arrow left, coin "128,500", gem "1,280" and WeChat ellipsis/circle capsule upper right with enough space. Top-middle three large cards side by side occupying ~38% screen height, detailed illustrated Red Alert portraits with distinct costume and recognizable faces: left TANYA, athletic blonde woman in black tank top holding paired pistols, Allied blue trim; center BORIS, bearded Soviet commando with red beret and green fatigues, gold mythic border and selected checkmark; right YURI, bald psychic commander with goatee and forehead implant, purple trim. All dignified stylized Red Alert command art, not toy/chibi.
+Card titles Chinese exact: "谭雅", "鲍里斯", "尤里". Small rarity tag "神话", gold five-star tracks, selected Boris has three stars lit two dark.
+Directly below center portrait a linked military skill strip with tank icon: "天启坦克伤害 +50%". Subtle connector line leads to lower formation area titled "出征编队": a miniature isometric battlefield deployment zone holding four gameplay-sized Soviet Apocalypse tanks with red twin cannons, two anti-air vehicles, several infantry squads. Allied tanks can appear as reserve thumbnails only. Upper corner of formation has small Boris card portrait showing army leadership. Do NOT show Boris as huge full-body person in formation. A power chip reads "部队战力 186,500".
+Bottom ~20% clear recruitment commands: modest blue button "招募一次" with one ticket icon, larger gold-red button "招募十次" with ten ticket stack icon, and thin red "编入部队" button associated with selected Boris. Existing bottom app tab bar "基地", "指挥官", "世界", "军团", commander tab highlighted.
+Palette classic industrial steel with Allied blue/Soviet red/Yuri violet card differences, green bunker screens, gold for mythic. Clear practical mobile UI, same visual production as reference.
+Constraints: one coherent in-game screenshot, no slide collage, no giant marketing taglines, no medieval fantasy card ornaments, no false real-money prices, no random unrelated superheroes, no photorealistic actors, no watermark.
+
+## Image 3
+
+Use case: ui-mockup
+Asset type: ONE portrait 9:16 WeChat mini-game world-map screenshot for licensed Red Alert merge + 4X SLG pitch, Chinese.
+Input image: supplied base image establishes exact SAME game art style and UI, detailed classic Red Alert 2 pre-rendered 2D isometric military assets, green radar, metallic steel bevels, red command buttons, same bottom app tabs and WeChat capsule. Keep visual consistency.
+Primary request: WORLD MAP military GVG rally screenshot. Strategic camera zoomed out to show multiple player bases, territorial borders, resource nodes, convoy paths and shared strategic objective. Not a huge cinematic tank closeup.
+Environment: expansive coherent isometric battlefield with grassland, roads, river and a single bridge chokepoint, ore fields, small hills and military outposts. Three contiguous territory zones with subtle BLUE Allied border on left, RED Soviet border lower-right, PURPLE Yuri border upper-right. Each zone holds faction-specific player base icons: Allied construction yard and Prism towers, Soviet heavy industrial buildings and Tesla coils, Yuri psychic towers. Labels short, not on every object.
+Center objective is a recognizable Soviet-style neutral nuclear missile silo facility with a closed bunker and red hazard lights, label "中立核弹井". Multiple visually distinct friendly blue dotted convoy routes converge at a STAGING ring outside silo, while a red route shows enemy reinforcement. Small tanks and transport trucks at true world-map scale travel along routes; maintain map terrain visibility. Nearby Kirov airship squad as small aerial unit markers.
+Top compact HUD: title "世界战场", war clock "集结倒计时 01:28" and WeChat capsule upper-right. Directly below one thin three-faction score strip "盟军 32%" / "苏军 41%" / "尤里 27%" with appropriate faction crests. Small top-right portal access icon labeled "时空裂缝" with small "跨服战" tag, not giant portal taking over map.
+One selected friendly base with generic commander avatar and tag "[红星] 你的基地"; another enemy "[铁幕] 前哨基地". A few mine nodes with ore icon. Keep labels readable.
+Bottom 25% is a practical selected objective/rally panel titled "军团集结 · 核弹井", compact contributor avatars (4 members plus + slot), troop count "已集结 128,500", progress "4/5". Large red button "加入集结", adjacent military crest button "军团战报". Bottom nav exactly "基地", "指挥官", "世界", "军团", World highlighted.
+Palette: balanced daylight greens/earth terrain, blue-red-purple territory coding, classic red and green radar military UI, yellow ore and amber objective accents. Same crisp 2D isometric vehicle and building design as reference. Main visible map is 65% screen.
+Constraints: portrait actual mini-game screenshot with Chinese UI, one continuous strategic map, no medieval castle, no zombies or fantasy dragons, no giant human commander standing in terrain, no cinematic marketing slogans, no explanatory gameplay paragraphs, no watermark.
+

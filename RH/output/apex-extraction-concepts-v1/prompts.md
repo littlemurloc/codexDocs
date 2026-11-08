@@ -1,0 +1,38 @@
+# APEX Extraction Concepts
+
+Generated using the built-in image generation tool. Model selection is controlled by the tool; the caller does not specify a model ID.
+
+## Image 1
+
+Use case: ui-mockup
+Asset type: ONE portrait 9:16 WeChat mini-game in-game screenshot for an APEX Legends extraction game pitch. Full screen screenshot, no phone frame, no slide collage.
+Primary request: Show readable top-down 2D tactical extraction gameplay with auto-fire and line-of-sight fog, grounded in APEX Legends art direction. Visually polished painted 2D environment and skeletal character sprites with sci-fi effects, mobile game detail, not realistic cinematic photography. Recognizable Bloodhound with goggles, gas mask, raven-themed helmet and red armor accents, small gameplay-scale character.
+Scene: an Outlands industrial compound with metal floor panels, red-white supply bins, yellow railings, rock edges, low walls and cargo cover. Nearly overhead camera with shallow 2.5D depth. Bloodhound near lower center auto-fires a clean straight yellow bullet ray at one hostile visible in a forward translucent cyan cone. A solid cargo wall MUST clip the cone and create a dark occlusion shadow behind it: no seeing or shooting through walls. Outside view stays dark fog, do not show hidden enemy bodies. A subtle orange scanning pulse reveals only scanned terrain.
+An open red-white APEX supply bin and glowing purple salvage sit inside visible terrain. At upper right of actual playfield a green extraction landing pad beacon and dotted navigation route make the evacuation objective obvious.
+UI: top safe area with WeChat ellipsis/circle capsule, compact Chinese title "APEX 撤离行动", timer "02:18". HUD chip "携带价值 128,500"; small extraction chip "撤离点 86m". Bottom left single movement joystick; bottom right one orange scan ability icon and one green extraction beacon icon. Small health and shield strip above bottom. No aim joystick or manual firing button. Optional small R-301 weapon/ammo icon. Camera zoomed out enough to see meaningful cover routes, character about 7% screen height, 75% screen for gameplay.
+Text verbatim only: "APEX 撤离行动", "02:18", "携带价值", "128,500", "撤离点 86m". Crisp simplified Chinese, restrained angular APEX red, off-white and graphite interface, cyan visibility and green extraction accents. Moderate brightness so terrain and occlusion clearly readable.
+Constraints: mobile gameplay screenshot, clear top-down view, no first-person view, no runner gates, no zombies, no gore, no huge foreground character portrait, no promotional slogans, no annotations explaining features, no watermark.
+
+## Image 2
+
+Use case: ui-mockup
+Asset type: ONE 9:16 portrait WeChat mini-game screenshot, APEX extraction prototype.
+Input image: the supplied gameplay screenshot is the strict art direction and UI reference. Preserve its APEX red/off-white/graphite angular interface, painted top-down sci-fi industrial environment, character sprite scale, crisp simplified Chinese and WeChat capsule placement. This is the SAME game at a supply-bin interaction.
+Primary request: an in-run supply crate Roguelite CHOOSE ONE screen, rich game asset detail but practical mobile UI. Keep the top-down Outlands battlefield visible behind a dim overlay, open red-white supply bin glowing at lower middle, Bloodhound beside it. No cinematic character closeups.
+Top compact HUD "APEX 撤离行动", clock "01:46", smaller carried value "携带价值 128,500". Below top safe area a clean modal heading "补给箱 · 三选一" with small supply-bin pictogram. Center of screen three clearly separated vertical equipment choice cards side-by-side, all fully visible, with large actual item renders and short descriptions: left PURPLE BODY SHIELD, recognizably futuristic wearable chest armor, purple panel title "紫色护甲", line "护盾 +75"; middle TURBOCHARGER as a compact mechanical gold weapon attachment, gold panel title "涡轮增压器", line "蓄能时间缩短"; right MED KIT as a red-white sci-fi medical case, blue-green panel title "医疗箱", line "恢复全部生命". Each has a rarity strip and obvious selection state; middle card outlined selected with a tick, but all choices remain equally legible. Under cards one practical red command button "确认选择". Beneath modal retain faint game health/shield strip, movement joystick and scan icon so it reads as in-game pause. Clear screen spacing, moderate card corners, angular geometric cuts, no dense long text.
+APEX identity through bins and gear, red and white UI trim, purple loot quality, cyan tech accents; no fantasy ornamental card frames, no skull decorations. Battle lighting and rendering identical to reference.
+Constraints: exactly three choices, Chinese labels, portrait phone screenshot without physical frame, keep widgets inside safe margins, no marketing slogan, no explanatory annotation, no invented monetary paywall, no huge foreground hero art, no gore, no watermark.
+
+## Image 3
+
+Use case: ui-mockup
+Asset type: ONE portrait 9:16 WeChat mini-game main-menu screenshot, APEX Legends extraction pitch, Chinese interface.
+Input image: supplied screenshot establishes the SAME game's art and UI: sharply rendered painted 2D sci-fi assets with shallow 2.5D depth, recognizable APEX red/off-white angular panels, accurate simplified Chinese, crisp industrial detail. Match this production quality exactly.
+Primary request: show a refuge upgrade home screen after successful extraction, integrating banked loot, permanent progression and a WeChat friend BLACK MARKET NET WORTH leaderboard.
+Scene: cutaway top-down shelter inside a compact Outlands industrial hangar, red steel beams and practical work lights, distinct visible upgrade modules in a coherent base floor plan. Bloodhound, at small gameplay sprite scale, stands at a weapon workbench next to their raven and a red-white supply bin. A purple body shield and gold heirloom kunai displayed as collected items in a secure trophy rack; red medical station, blue shield generator and gun workshop in fixed room areas with small level tags. A cargo crate unloading effect shows salvage pieces entering storage, subtle not overwhelming.
+Composition portrait screenshot: upper 15% safe HUD title "APEX 避难所" and WeChat ellipsis/circle capsule; clear amber value counter "黑市身价 8,520,000". Central left 60% width contains shelter rooms and Bloodhound; central right 35% has a tidy five-row leaderboard titled "好友身价榜", using illustrated generic avatars. Rows exactly descending: "#1 北境 9.80M", "#2 你 8.52M", "#3 阿岚 7.65M", "#4 小白 5.20M", "#5 阿哲 4.10M". Highlight second row in cyan; no first-place crown on player.
+Across lower-middle show compact payout toast "撤离成功" and "物资入库 +128,500", a small row of salvage/armor item icons, not a giant victory poster.
+Below show THREE compact upgrade modules across screen, distinct gun/heart/shield icons and labels: "武器工坊 Lv.6" with "基础伤害 +5%", "医疗站 Lv.4" with "初始生命 +20", "护盾站 Lv.3" with "开局护甲 +15". Realistic small upgrade arrow icons, no complex tech tree.
+Bottom dominant red button "开始搜刮"; bottom nav four concise icon labels "避难所", "传奇", "仓库", "好友". Secondary share symbol near rank panel with tiny label "炫耀". Keep all content legible, uncluttered, no card inside card nesting, read like actual mobile game. No long promotional copy. APEX gunmetal, off-white, red palette; warm work lights, cyan screen glow, purple and gold collectible highlights.
+Constraints: portrait WeChat miniature game screenshot, same UI and rendering style as reference, refuge growth and friend wealth comparison BOTH legible, one coherent base scene, no photorealistic hero closeup, no battle royale winner screen, no first-person view, no runner, no gore, no watermark.
+
