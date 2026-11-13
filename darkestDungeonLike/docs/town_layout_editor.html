@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>城镇布局编辑器 · 750×1334</title>
+<style>
+  :root{
+    --bg:#0b0c0e; --panel:#14161a; --panel2:#1b1e24; --edge:#2c313a;
+    --text:#d9d4c7; --dim:#8b8a84; --faint:#5d5f5c; --gold:#e0b24a; --red:#c8695f;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
+    font:13px/1.6 "Microsoft YaHei","PingFang SC",sans-serif;overflow:hidden}
+  #app{display:flex;height:100%}
+
+  /* 左：画布 */
+  #stagewrap{flex:1;display:flex;align-items:flex-start;justify-content:center;
+    overflow:auto;padding:12px;background:
+      repeating-conic-gradient(#0e1013 0 25%, #111317 0 50%) 0 0/24px 24px}
+  #stagebox{position:relative;flex:none;box-shadow:0 0 0 1px var(--edge),0 18px 50px #000a}
+  #stage{position:relative;width:750px;height:1334px;transform-origin:0 0;
+    background:#000;overflow:hidden;touch-action:none}
+  #stage img.bg{position:absolute;inset:0;width:750px;height:1334px;z-index:0;
+    user-select:none;-webkit-user-drag:none}
+
+  .item{position:absolute;z-index:10;user-select:none;-webkit-user-drag:none;cursor:grab}
+  .item>img{width:100%;height:100%;display:block;
+    filter:drop-shadow(0 6px 10px #000a);pointer-events:none}
+  .item.sel{outline:1px dashed var(--gold);outline-offset:-1px}
+  .item .tag{position:absolute;left:50%;bottom:2px;transform:translateX(-50%);
+    background:#0b0c0ecc;border:1px solid #6b5a3a;border-radius:4px;
+    padding:0 6px;font-size:12px;color:var(--text);white-space:nowrap;pointer-events:none}
+
+  .handle{position:absolute;right:-8px;bottom:-8px;width:16px;height:16px;border-radius:50%;
+    background:var(--gold);border:2px solid #2a2114;cursor:nwse-resize;display:none}
+  .item.sel .handle{display:block}
+
+  /* 叠层参考 */
+  .ui{position:absolute;z-index:2;background:#000000b0;border:1px dashed #4b5563;
+    font-size:11px;color:#6b7280;padding:2px 6px;pointer-events:none;display:none}
+  body.showui .ui{display:block}
+
+  /* 右：工具栏 */
+  #side{width:268px;flex:none;background:var(--panel);border-left:1px solid var(--edge);
+    display:flex;flex-direction:column;overflow:hidden}
+  #sidehead{padding:12px 14px 10px;border-bottom:1px solid var(--edge)}
+  #sidehead h1{margin:0 0 2px;font-size:14px;font-weight:500}
+  #sidehead p{margin:0;font-size:11px;color:var(--faint)}
+  .sec{padding:10px 14px;border-bottom:1px solid var(--edge)}
+  .sec h2{margin:0 0 8px;font-size:12px;font-weight:500;color:var(--dim)}
+  #palette{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .card{background:var(--panel2);border:1px solid var(--edge);border-radius:8px;
+    padding:4px;text-align:center;cursor:grab;user-select:none;-webkit-user-drag:none;
+    transition:border-color .12s,transform .12s}
+  .card:hover{border-color:#4b5563}
+  .card:active{transform:scale(.96)}
+  .card img{width:100%;height:46px;object-fit:contain;display:block;pointer-events:none}
+  .card span{font-size:11px;color:var(--dim);display:block;margin-top:2px}
+  .card.used{opacity:.45}
+
+  #inspector{flex:1;overflow:auto}
+  .row{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+  .row label{width:52px;color:var(--faint);font-size:11px;flex:none}
+  input[type=number]{width:64px;background:#0e1013;border:1px solid var(--edge);
+    color:var(--text);border-radius:5px;padding:3px 6px;font:inherit;font-size:12px}
+  button{background:var(--panel2);border:1px solid var(--edge);color:var(--text);
+    border-radius:6px;padding:5px 9px;font:inherit;font-size:12px;cursor:pointer}
+  button:hover{border-color:#4b5563}
+  button.on{background:#3a2f14;border-color:var(--gold);color:var(--gold)}
+  button.primary{background:#2a2114;border-color:var(--gold);color:var(--gold);font-weight:500}
+  button.danger{color:var(--red);border-color:#4a2a26}
+  .empty{color:var(--faint);font-size:12px;padding:6px 0}
+
+  #foot{padding:10px 14px;border-top:1px solid var(--edge);display:flex;gap:8px}
+  #foot button{flex:1}
+
+  /* 导出弹层 */
+  .safe{position:absolute;left:0;width:750px;background:#000;z-index:20;pointer-events:none}
+  #modal{position:fixed;inset:0;background:#000b;display:none;
+    align-items:center;justify-content:center;padding:40px;z-index:50}
+  #modal.on{display:flex}
+  #modalbox{width:min(760px,100%);max-height:80vh;background:var(--panel);
+    border:1px solid var(--edge);border-radius:12px;display:flex;flex-direction:column}
+  #modalbox header{padding:12px 16px;border-bottom:1px solid var(--edge);
+    display:flex;justify-content:space-between;align-items:center}
+  #modalbox header b{font-size:14px;font-weight:500}
+  #modalbox textarea{flex:1;min-height:320px;margin:0;border:0;background:#0e1013;
+    color:var(--text);font:12px/1.7 Consolas,monospace;padding:14px 16px;resize:none;outline:none}
+  #modalbox footer{padding:10px 16px;border-top:1px solid var(--edge);
+    display:flex;gap:8px;justify-content:flex-end}
+  .hint{font-size:11px;color:var(--faint);padding:0 14px 10px}
+  kbd{background:#0e1013;border:1px solid var(--edge);border-radius:4px;
+    padding:0 4px;font:11px Consolas,monospace;color:var(--dim)}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="stagewrap"><div id="stagebox"><div id="stage"></div></div></div>
+
+  <aside id="side">
+    <div id="sidehead">
+      <h1>城镇布局编辑器</h1>
+      <p>拖图标进画面 · 滚轮缩放 · 确认后把 JSON 给我</p>
+    </div>
+
+    <div class="sec">
+      <h2>建筑（拖进画面）</h2>
+      <div id="palette"></div>
+    </div>
+
+    <div class="sec" id="inspector">
+      <h2>选中项</h2>
+      <div id="insp"></div>
+    </div>
+
+    <div class="sec">
+      <h2>视图</h2>
+      <div class="row">
+        <label>缩放</label>
+        <input type="range" id="zoom" min="30" max="100" value="60" style="flex:1">
+        <span id="zoomv" style="width:34px;text-align:right;color:var(--faint);font-size:11px">60%</span>
+      </div>
+      <div class="row">
+        <button id="togUI" style="flex:1">显示 UI 参考</button>
+        <button id="togName" class="on" style="flex:1">显示名牌</button>
+      </div>
+      <div class="row">
+        <button id="togNear" class="on" style="flex:1">前景遮挡（关掉看整体）</button>
+      </div>
+    </div>
+
+    <div class="hint">
+      <kbd>Del</kbd> 删除 · <kbd>[</kbd><kbd>]</kbd> 缩放 · <kbd>H</kbd>/<kbd>V</kbd> 镜像 ·
+      <kbd>↑↓←→</kbd> 微调（按住 <kbd>Shift</kbd> 十像素）<br>
+      选中后点「在前景层前面 / 后面」切换它会不会被树挡住
+    </div>
+
+    <div id="foot">
+      <button id="reset">恢复初始</button>
+      <button id="confirm" class="primary">确认布局</button>
+    </div>
+  </aside>
+</div>
+
+<div id="modal">
+  <div id="modalbox">
+    <header><b>布局 JSON（复制给我即可）</b><button id="close">关闭</button></header>
+    <textarea id="out" spellcheck="false"></textarea>
+    <footer>
+      <button id="copy">复制</button>
+      <button id="download">下载 .json</button>
+    </footer>
+  </div>
+</div>
+
+<script src="town_layout_editor_assets.js"></script>
+<script>
+const CW = 750, CH = 1334;
+
+// 八个建筑：id、名字、默认显示高度（初始布局用）
+const BUILDINGS = [
+  {id:'abbey',      name:'修道院', h:118},
+  {id:'tavern',     name:'酒馆',   h:200},
+  {id:'guild',      name:'公会',   h:124},
+  {id:'smith',      name:'铁匠铺', h:230},
+  {id:'sanitarium', name:'疗养院', h:170},
+  {id:'coach',      name:'马车',   h:230},
+  {id:'wagon',      name:'商队',   h:132},
+  {id:'graveyard',  name:'墓园',   h:130},
+];
+
+// 初始布局 = 上一版预览的坐标（x 左边界、y 底边、h 显示高度）
+const DEFAULT_LAYOUT = [
+  // 新底图：石板路从地平线（y≈630）铺到画面底部，两侧才放得下建筑。
+  // 地平线一带压着前景的灌木/杂物，所以靠上的两座标 front，否则会被整片吞掉。
+  {id:'smith',      x: -50, y:1210, h:250},
+  {id:'coach',      x: 546, y:1210, h:250},
+  {id:'tavern',     x:   0, y:1030, h:225},
+  {id:'guild',      x: 596, y:1010, h:210},
+  {id:'sanitarium', x: 574, y: 880, h:190},
+  {id:'graveyard',  x:  14, y: 900, h:155},
+  {id:'abbey',      x: 168, y: 760, h:180, front:true},
+  {id:'wagon',      x: 404, y: 800, h:165, front:true},
+];
+
+const stage = document.getElementById('stage');
+const box = document.getElementById('stagebox');
+const pal = document.getElementById('palette');
+const insp = document.getElementById('insp');
+const zoomEl = document.getElementById('zoom');
+
+let items = [];      // {uid,id,x,y,h,flipH,flipV}
+let selUid = null;
+let uidSeq = 1;
+let drag = null;     // 拖动状态
+let scaleDrag = null;
+
+const A = window.ASSETS || {};
+const src = id => A[id] || ('../assets/art/ui/town/bld_' + id + '.png');
+const meta = id => BUILDINGS.find(b => b.id === id) || {name:id};
+
+/* ---------------- 渲染 ---------------- */
+
+function buildBg(){
+  // 三层背景：far / mid 在建筑下面；near（前景物件）在建筑**上面**，
+  // 这样拖动的时候就能直接看到遮挡对不对 —— 所见即游戏内所得。
+  ["bg_far", "bg_mid"].forEach(k => {
+    const img = document.createElement('img');
+    img.className = 'bg';
+    img.src = A[k] || '';
+    img.style.zIndex = '0';
+    stage.appendChild(img);
+  });
+  const near = document.createElement('img');
+  near.className = 'bg';
+  near.id = 'bgnear';
+  near.src = A.bg_near || '';
+  near.style.zIndex = '11';          // 高于 .item(10)
+  near.style.pointerEvents = 'none';
+  stage.appendChild(near);
+
+  // UI 参考带：真实界面里这几块是盖在场景上的，摆建筑时要避开
+  const bands = [
+    {t:80,  h:92,   label:'顶部信息带 80–172'},
+    {t:930, h:118,  label:'名册 930–1048'},
+    {t:1122,h:160,  label:'底部 dock 1122–1282'},
+  ];
+  bands.forEach(b => {
+    const d = document.createElement('div');
+    d.className = 'ui';
+    d.style.cssText = `left:0;top:${b.t}px;width:750px;height:${b.h}px;line-height:${b.h}px`;
+    d.textContent = b.label;
+    stage.appendChild(d);
+  });
+  const rail = document.createElement('div');
+  rail.className = 'ui';
+  rail.style.cssText = 'left:14px;top:196px;width:48px;height:200px;padding:0';
+  stage.appendChild(rail);
+
+  const safeT = document.createElement('div');
+  safeT.className = 'safe';
+  safeT.style.cssText = 'top:0;height:80px';
+  stage.appendChild(safeT);
+  const safeB = document.createElement('div');
+  safeB.className = 'safe';
+  safeB.style.cssText = 'bottom:0;height:52px';
+  stage.appendChild(safeB);
+}
+
+const RATIO = {};   // id -> 宽高比，用来按高度反推宽度
+
+function render(){
+  stage.querySelectorAll('.item').forEach(n => n.remove());
+  const sorted = [...items].sort((a,b) => a.y - b.y);   // 底边越靠下 = 越近 = 越上层
+  sorted.forEach(it => {
+    const r = RATIO[it.id] || 1;
+    const w = Math.max(10, Math.round(it.h * r));
+    const wrap = document.createElement('div');
+    wrap.className = 'item' + (it.uid === selUid ? ' sel' : '');
+    wrap.dataset.uid = it.uid;
+    wrap.style.cssText = `left:${it.x}px;top:${it.y - it.h}px;width:${w}px;height:${it.h}px`;
+    // front = 摆在前景层**前面**（不会被树/栅栏挡住）。前景层是 z-index 11。
+    wrap.style.zIndex = it.front ? 12 : 10;
+
+    const img = document.createElement('img');
+    img.src = src(it.id);
+    img.style.transform = it.flipH ? 'scaleX(-1)' : (it.flipV ? 'scaleY(-1)' : '');
+    if (it.flipH && it.flipV) img.style.transform = 'scale(-1,-1)';
+    wrap.appendChild(img);
+
+    const tag = document.createElement('div');
+    tag.className = 'tag';
+    tag.textContent = meta(it.id).name;
+    wrap.appendChild(tag);
+
+    if (it.uid === selUid){
+      const h = document.createElement('div');
+      h.className = 'handle';
+      h.dataset.handle = it.uid;
+      wrap.appendChild(h);
+    }
+    stage.appendChild(wrap);
+  });
+  syncPalette();
+  renderInspector();
+  saveDraft();
+}
+
+function saveDraft(){
+  try { localStorage.setItem('townLayoutDraft', JSON.stringify(items)); } catch(_) {}
+}
+
+function loadDraft(){
+  try {
+    const raw = localStorage.getItem('townLayoutDraft');
+    if (!raw) return null;
+    const arr = JSON.parse(raw);
+    if (!Array.isArray(arr) || !arr.length) return null;
+    return arr;
+  } catch(_) { return null; }
+}
+
+function syncPalette(){
+  pal.querySelectorAll('.card').forEach(c => {
+    c.classList.toggle('used', items.some(i => i.id === c.dataset.id));
+  });
+}
+
+/* ---------------- 工具栏 ---------------- */
+
+function buildPalette(){
+  BUILDINGS.forEach(b => {
+    const c = document.createElement('div');
+    c.className = 'card';
+    c.dataset.id = b.id;
+    c.innerHTML = `<img src="${src(b.id)}"><span>${b.name}</span>`;
+    pal.appendChild(c);
+  });
+}
+
+/* ---------------- 坐标换算 ---------------- */
+
+function toCanvas(e){
+  const r = stage.getBoundingClientRect();
+  const k = r.width / CW;          // 受 zoom 影响，用实际矩形算最稳
+  return {x:(e.clientX - r.left)/k, y:(e.clientY - r.top)/k};
+}
+
+function applyZoom(){
+  const z = +zoomEl.value / 100;
+  stage.style.transform = `scale(${z})`;
+  box.style.width = (CW * z) + 'px';
+  box.style.height = (CH * z) + 'px';
+  document.getElementById('zoomv').textContent = zoomEl.value + '%';
+}
+
+/* ---------------- 交互：从工具栏拖进来 ---------------- */
+
+let ghost = null;
+
+pal.addEventListener('pointerdown', e => {
+  const card = e.target.closest('.card');
+  if (!card) return;
+  e.preventDefault();
+  const id = card.dataset.id;
+  ghost = document.createElement('div');
+  ghost.style.cssText = 'position:fixed;pointer-events:none;z-index:99;opacity:.85;' +
+    'transform:translate(-50%,-100%)';
+  const g = document.createElement('img');
+  g.src = src(id);
+  g.style.height = '120px';
+  ghost.appendChild(g);
+  document.body.appendChild(ghost);
+  ghost.dataset.id = id;
+  moveGhost(e);
+});
+
+function moveGhost(e){
+  if (!ghost) return;
+  ghost.style.left = e.clientX + 'px';
+  ghost.style.top = e.clientY + 'px';
+}
+
+window.addEventListener('pointermove', e => {
+  if (ghost) moveGhost(e);
+});
+
+window.addEventListener('pointerup', e => {
+  if (ghost){
+    const r = stage.getBoundingClientRect();
+    const inside = e.clientX >= r.left && e.clientX <= r.right &&
+                   e.clientY >= r.top && e.clientY <= r.bottom;
+    if (inside){
+      const p = toCanvas(e);
+      const b = BUILDINGS.find(x => x.id === ghost.dataset.id);
+      addItem(ghost.dataset.id, p.x, p.y, b ? b.h : 160);
+    }
+    ghost.remove();
+    ghost = null;
+  }
+});
+
+function addItem(id, cx, baseY, h){
+  // 先按高度算出宽度，才能以鼠标为中心水平居中
+  const w = h * (RATIO[id] || 1);
+  const it = {uid: uidSeq++, id, x: Math.round(cx - w/2), y: Math.round(baseY), h,
+              flipH:false, flipV:false, front:false};
+  items.push(it);
+  selUid = it.uid;
+  render();
+}
+
+/* ---------------- 交互：选中 / 拖动 / 缩放 ---------------- */
+
+stage.addEventListener('pointerdown', e => {
+  const handle = e.target.closest('.handle');
+  if (handle){
+    scaleDrag = {uid:+handle.dataset.handle, y0:e.clientY, h0:items.find(i=>i.uid===+handle.dataset.handle).h};
+    e.preventDefault();
+    return;
+  }
+  const node = e.target.closest('.item');
+  if (!node){ selUid = null; render(); return; }
+  const uid = +node.dataset.uid;
+  selUid = uid;
+  const it = items.find(i => i.uid === uid);
+  const p = toCanvas(e);
+  drag = {uid, dx: p.x - it.x, dy: p.y - it.y};
+  render();
+  e.preventDefault();
+});
+
+window.addEventListener('pointermove', e => {
+  if (scaleDrag){
+    const it = items.find(i => i.uid === scaleDrag.uid);
+    const k = stage.getBoundingClientRect().width / CW;
+    const dy = (e.clientY - scaleDrag.y0) / k;
+    it.h = Math.max(40, Math.min(420, Math.round(scaleDrag.h0 + dy * 1.6)));
+    render();
+    return;
+  }
+  if (drag){
+    const p = toCanvas(e);
+    const it = items.find(i => i.uid === drag.uid);
+    it.x = Math.round(p.x - drag.dx);
+    it.y = Math.round(p.y - drag.dy);
+    render();
+  }
+});
+
+window.addEventListener('pointerup', () => { drag = null; scaleDrag = null; });
+
+stage.addEventListener('wheel', e => {
+  if (!selUid) return;
+  e.preventDefault();
+  const it = items.find(i => i.uid === selUid);
+  const step = e.deltaY > 0 ? -6 : 6;
+  it.h = Math.max(40, Math.min(420, it.h + step));
+  render();
+}, {passive:false});
+
+/* ---------------- 选中面板 ---------------- */
+
+function renderInspector(){
+  const it = items.find(i => i.uid === selUid);
+  if (!it){
+    insp.innerHTML = '<div class="empty">画面里点一个建筑，或者从上面拖一个进来。</div>';
+    return;
+  }
+  insp.innerHTML = `
+    <div class="row"><label>建筑</label><b style="font-weight:500">${meta(it.id).name}</b></div>
+    <div class="row"><label>x</label><input type="number" id="ix" value="${it.x}">
+      <label style="width:auto">y</label><input type="number" id="iy" value="${it.y}"></div>
+    <div class="row"><label>高度</label><input type="number" id="ih" value="${it.h}">
+      <button id="ih-">－</button><button id="ih+">＋</button></div>
+    <div class="row"><label>镜像</label>
+      <button id="fh" class="${it.flipH?'on':''}">水平</button>
+      <button id="fv" class="${it.flipV?'on':''}">垂直</button></div>
+    <div class="row"><label>前后</label>
+      <button id="fz" class="${it.front?'on':''}" style="flex:1">${it.front?'在前景层前面':'在前景层后面'}</button></div>
+    <div class="row"><label>层次</label>
+      <button id="back">下移一层</button><button id="front">上移一层</button></div>
+    <div class="row"><button id="del" class="danger" style="flex:1">删除这个</button></div>`;
+
+  const num = (id, key) => {
+    const el = document.getElementById(id);
+    el.onchange = () => { it[key] = Math.round(+el.value || 0); render(); };
+  };
+  num('ix','x'); num('iy','y'); num('ih','h');
+  document.getElementById('ih-').onclick = () => { it.h = Math.max(40, it.h-6); render(); };
+  document.getElementById('ih+').onclick = () => { it.h = Math.min(420, it.h+6); render(); };
+  document.getElementById('fh').onclick = () => { it.flipH = !it.flipH; render(); };
+  document.getElementById('fv').onclick = () => { it.flipV = !it.flipV; render(); };
+  document.getElementById('fz').onclick = () => { it.front = !it.front; render(); };
+  // 层次其实就是底边 y：游戏里按 y 排序，越靠下越压在上面
+  document.getElementById('back').onclick = () => { it.y -= 10; render(); };
+  document.getElementById('front').onclick = () => { it.y += 10; render(); };
+  document.getElementById('del').onclick = () => { items = items.filter(i => i.uid !== it.uid); selUid = null; render(); };
+}
+
+/* ---------------- 键盘 ---------------- */
+
+window.addEventListener('keydown', e => {
+  const it = items.find(i => i.uid === selUid);
+  if (!it) return;
+  const step = e.shiftKey ? 10 : 1;
+  const k = e.key;
+  if (k === 'Delete' || k === 'Backspace'){ items = items.filter(i => i.uid !== it.uid); selUid = null; }
+  else if (k === '['){ it.h = Math.max(40, it.h - 6); }
+  else if (k === ']'){ it.h = Math.min(420, it.h + 6); }
+  else if (k === 'h' || k === 'H'){ it.flipH = !it.flipH; }
+  else if (k === 'v' || k === 'V'){ it.flipV = !it.flipV; }
+  else if (k === 'ArrowLeft'){ it.x -= step; }
+  else if (k === 'ArrowRight'){ it.x += step; }
+  else if (k === 'ArrowUp'){ it.y -= step; }
+  else if (k === 'ArrowDown'){ it.y += step; }
+  else return;
+  e.preventDefault();
+  render();
+});
+
+/* ---------------- 导出 ---------------- */
+
+function toJSON(){
+  return JSON.stringify({
+    canvas: {w: CW, h: CH},
+    items: items.slice().sort((a,b) => a.y - b.y).map(i => ({
+      id: i.id, x: i.x, y: i.y, h: i.h,
+      flipH: !!i.flipH, flipV: !!i.flipV, front: !!i.front
+    }))
+  }, null, 2);
+}
+
+document.getElementById('confirm').onclick = () => {
+  document.getElementById('out').value = toJSON();
+  document.getElementById('modal').classList.add('on');
+};
+document.getElementById('close').onclick = () =>
+  document.getElementById('modal').classList.remove('on');
+document.getElementById('copy').onclick = async () => {
+  const t = document.getElementById('out');
+  t.select();
+  try { await navigator.clipboard.writeText(t.value); }
+  catch(_){ document.execCommand('copy'); }
+  document.getElementById('copy').textContent = '已复制';
+  setTimeout(() => document.getElementById('copy').textContent = '复制', 1200);
+};
+document.getElementById('download').onclick = () => {
+  const blob = new Blob([document.getElementById('out').value], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'town_layout.json';
+  a.click();
+};
+
+/* ---------------- 启动 ---------------- */
+
+document.getElementById('reset').onclick = () => {
+  if (!confirm('恢复成上一版布局？当前改动会丢。')) return;
+  items = DEFAULT_LAYOUT.map(d => ({uid: uidSeq++, flipH:false, flipV:false, front:false, ...d}));
+  selUid = null;
+  render();
+};
+
+document.getElementById('togUI').onclick = e => {
+  document.body.classList.toggle('showui');
+  e.currentTarget.classList.toggle('on', document.body.classList.contains('showui'));
+};
+document.getElementById('togNear').onclick = e => {
+  const on = e.currentTarget.classList.toggle('on');
+  const n = document.getElementById('bgnear');
+  if (n) n.style.display = on ? '' : 'none';
+};
+document.getElementById('togName').onclick = e => {
+  const on = e.currentTarget.classList.toggle('on');
+  stage.querySelectorAll('.tag').forEach(t => t.style.display = on ? '' : 'none');
+};
+
+let userZoomed = false;
+zoomEl.oninput = () => { userZoomed = true; applyZoom(); };
+
+function preload(){
+  return Promise.all(BUILDINGS.map(b => new Promise(res => {
+    const im = new Image();
+    im.onload = () => { RATIO[b.id] = im.naturalWidth / im.naturalHeight; res(); };
+    im.onerror = () => { RATIO[b.id] = 1; res(); };
+    im.src = src(b.id);
+  })));
+}
+
+buildBg();
+buildPalette();
+items = DEFAULT_LAYOUT.map(d => ({uid: uidSeq++, flipH:false, flipV:false, ...d}));
+// 按左栏的**实际可用高度**算初始缩放：用 window 的高度会算大，底部会被切掉
+function fitZoom(){
+  const w = document.getElementById('stagewrap');
+  const r = w.getBoundingClientRect();
+  const h = (r.height || window.innerHeight) - 32;
+  return Math.max(30, Math.min(100, Math.floor(h / CH * 100)));
+}
+zoomEl.value = fitZoom();
+applyZoom();
+if (window.ResizeObserver){
+  new ResizeObserver(() => {
+    if (userZoomed) return;
+    const z = fitZoom();
+    if (+zoomEl.value !== z){ zoomEl.value = z; applyZoom(); }
+  }).observe(document.getElementById('stagewrap'));
+}
+applyZoom();
+preload().then(render);
+</script>
+</body>
+</html>

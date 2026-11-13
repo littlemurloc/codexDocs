@@ -75,6 +75,14 @@ var trinket_enabled: bool = true
 ## 后果按「脱离接触」处理——没掉落、全队加压（同撤退），
 ## 否则玩家可以靠拖回合白跑一场。
 var stalemate: bool = false
+## 玩家在战斗中途撤退（M65）。
+##
+## 这个标记只解决一件事：**撤退要保住队伍在这一场里受到的伤害与压力**。
+## 原来界面直接从 `exp.retreat()` 退出，`_battle` 被丢掉，
+## 那场里掉的血、涨的压力全部回滚成「进战斗前」——等于撤退是免费的。
+## 有了它，界面可以照常调 `finish_battle()` 落盘状态，
+## 而清剿计数、战利品这些「打赢才成立」的账不会跟着结算。
+var aborted: bool = false
 var dungeon_name: String = ""
 var light_value: float = 100.0
 
@@ -914,7 +922,40 @@ func player_options(actor: Combatant) -> Array:
 	return out
 
 
+## 全部技能，包括「站在这个位置用不了」的那些（M65）。
+##
+## `player_options` 只返回能用的，界面照它画 —— 于是换到 1 号位之后，
+## 原本 3-4 号位的招会**直接从面板上消失**。玩家第一反应是「少画了一个」，
+## 而不是「我的站位不对」。这里额外给出 `usable` 和 `why`，
+## 让界面能把它们灰着留在原位，顺便写清原因。
+func all_options(actor: Combatant) -> Array:
+	var out: Array = []
+	for action in actor.actions:
+		var usable: bool = _can_use(actor, action)
+		var targets: Array = _legal_targets(actor, action) if usable else []
+		if usable and targets.is_empty():
+			usable = false
+		var why: String = ""
+		if not usable:
+			if int(action.launch_mask) > 0 \
+					and (int(action.launch_mask) & (1 << actor.rank)) == 0:
+				var rs: Array = []
+				for rk in MAX_SLOTS:
+					if (int(action.launch_mask) & (1 << rk)) != 0:
+						rs.append(str(rk + 1))
+				why = "需 %s 号位" % "/".join(rs)
+			elif int(action.per_battle_limit) > 0 \
+					and int(actor.per_battle_uses.get(action.id, 0)) \
+						>= int(action.per_battle_limit):
+				why = "本场已用完"
+			else:
+				why = "没有目标"
+		out.append({"action": action, "targets": targets, "usable": usable, "why": why})
+	return out
+
+
 ## 跑一整轮，返回本轮事件（同时累加到 self.events 供外部读取）。
+##
 ## 没有 decision_provider 时行为与 M1 完全一致——bench 就是靠这一点保持可比的。
 func run_round() -> Array:
 	begin_round()
@@ -985,8 +1026,68 @@ func _apply_choice(actor: Combatant, choice: Dictionary) -> void:
 
 	for t in targets:
 		if t.dead:
+			# 打尸体（M73）：不打伤害，只扣「耐久」，掉光就从队列里清掉。
+			# 上面已经把尸体过滤掉了，能走到这里说明玩家/界面明确选了它。
+			_strike_corpse(actor, t)
 			continue
 		_resolve_action(actor, action, t)
+
+	# 技能自带的位移（M53）：放在**目标循环之外**。
+	# 放进 `_resolve_action` 会让 AOE 技能按目标个数挪好几次。
+	_apply_caster_move(actor, action)
+
+
+## 攻击尸体（M73）。
+##
+## 不做命中判定（尸体不会躲），也不走伤害公式：每一下扣 1 点耐久。
+## 耐久归零 → **从队列里移除并重排**，后面的单位整体前移一格。
+## 这就是「清掉尸体把后排拉进近战范围」的全部机制。
+func _strike_corpse(actor: Combatant, corpse: Combatant) -> void:
+	corpse.corpse_hp = maxi(0, corpse.corpse_hp - 1)
+	var arr: Array = enemies if corpse.side == Combatant.SIDE_ENEMY else party
+	var idx: int = arr.find(corpse)
+	if corpse.corpse_hp <= 0 and idx >= 0:
+		arr.remove_at(idx)
+		_relayout()
+		_emit({"t": "corpse_destroyed", "actor": actor.uid,
+			"target": corpse.uid, "rank": idx})
+	else:
+		_emit({"t": "corpse_hit", "actor": actor.uid, "target": corpse.uid,
+			"left": corpse.corpse_hp})
+
+
+## 放技能的人自己挪位置（M53）。
+##
+## 数据里 `move` 是 `[后退上限, 前进上限]`，12 个带位移的技能里总有一边是 0：
+##   point_blank_shot [1,0] → 开完枪退 1（原版就是这么演的）
+##   holy_lance       [0,1] → 圣枪突进，向前挪 1
+##   heroic_end       [3,0] → 收场后退到队尾
+##   lunge            [0,2] → 突刺最多前挪 2
+##
+## 这个字段从 M0 就解析进了动作字典（`combatant.gd` 的 `build_actions`），
+## 但**一直没人读**——所以「攻击时人物位移」在原版是招牌，在我们这儿一次都没发生过。
+## 卡片上的 rank 变化倒是有（被推/拉），可惜那是**挨打**，不是出手。
+##
+## 方向：`rank 0` 是最前排，所以「前进」= 减 rank。
+## 落点由 `move_unit` 夹在合法范围内；已经在最前/最后就挪不动，不算错误。
+func _apply_caster_move(actor: Combatant, action: Dictionary) -> void:
+	if actor == null or not actor.is_alive():
+		return   # 被反击打死了就不挪——尸体不排队
+	var mv: Variant = action.get("move", [])
+	if not (mv is Array) or (mv as Array).size() < 2:
+		return
+	var back: int = maxi(0, int((mv as Array)[0]))
+	var fwd: int = maxi(0, int((mv as Array)[1]))
+	var delta: int = -fwd if fwd > 0 else back
+	if delta == 0:
+		return
+	var moved: Dictionary = move_unit(actor, delta)
+	if moved.is_empty():
+		return
+	# `self: true` 是给界面的：它要区分「我自己冲上去」和「我被推过去」，
+	# 否则日志会把突进写成「被推到 1 号位」。
+	_emit({"t": "move", "actor": actor.uid, "from": int(moved["from"]),
+		"to": int(moved["to"]), "skill": action.id, "self": true})
 
 
 func _end_of_round() -> void:
@@ -1178,6 +1279,15 @@ func _legal_targets(actor: Combatant, action: Dictionary) -> Array:
 	var own: Array = party if actor.side == Combatant.SIDE_PARTY else enemies
 	var foe: Array = enemies if actor.side == Combatant.SIDE_PARTY else party
 	var pool: Array = living(own if friendly else foe)
+	# 尸体也进目标池（M73）。不加这一条，占位的尸体就永远清不掉：
+	# 后排被它挡着换不到前排，近战又够不到后面活着的人 —— 一具尸体能把整场拖成僵持。
+	# 判据用「不是友方技能」而不是「有伤害」：英雄技能的 `dmg` 是百分比修正，
+	# 十字军惩击的 dmg_mod 就是 0，按伤害字段判断会把一半攻击技漏掉。
+	if not friendly:
+		for c in foe:
+			var cc := c as Combatant
+			if not cc.is_alive() and cc.corpse_hp > 0:
+				pool.append(cc)
 
 	var mask: int = int(action.target_mask)
 	var is_guard: bool = bool(action.get("is_guard", false))
@@ -1195,6 +1305,14 @@ func _legal_targets(actor: Combatant, action: Dictionary) -> Array:
 
 
 func _pick_target(actor: Combatant, action: Dictionary, targets: Array) -> Combatant:
+	# 尸体只在「没有活人可打」时才轮到（M73）。AI 拿一回合去清残骸是浪费；
+	# 但被残骸挡住、前面又没活人时，它得能自己解决，否则会一直空过。
+	var alive_only: Array = []
+	for t in targets:
+		if (t as Combatant).is_alive():
+			alive_only.append(t)
+	if not alive_only.is_empty():
+		targets = alive_only
 	var best: Combatant = targets[0]
 	var best_score: float = -INF
 	for t in targets:

@@ -456,6 +456,17 @@ func has_pending() -> bool:
 	return not _pending.is_empty()
 
 
+## 看一眼下一步是什么，但**不取走**（M74）。
+##
+## 房间叙事要在结算之前停一下：界面得先知道「这一步是奇物还是陷阱」，
+## 才能决定要不要先放那张房间卡。取走再放回去的顺序很脆
+## （`take_step` 里还带着光照消耗和走廊压力），所以单独给一个只读的。
+func peek_step() -> Dictionary:
+	if ended or _pending.is_empty():
+		return {}
+	return _pending[0]
+
+
 # ============================================================
 # 房间图（M7）
 # ============================================================
@@ -1585,10 +1596,13 @@ func finish_battle(b: Battle) -> void:
 	# 清剿进度（M32）：只数**房间**战斗，而且**打赢或脱战都算清过**。
 	# 打输就没机会继续走，所以那条路不需要在这里处理；
 	# 僵持（回合上限）算「没清掉」——那正是清剿任务要罚的情形。
+	# 中途撤退（M65）同样不算清掉：清剿的判据是「房间被清空」，
+	# 跑掉一半就记功会让任务白送。
 	if map_mode and (active_source == "room" or active_source == "boss") \
-			and not b.stalemate:
+			and not b.stalemate and not b.aborted:
 		stats["quest_battles_cleared"] = int(stats.get("quest_battles_cleared", 0)) + 1
-	_emit({"t": "battle_end", "index": active_index, "winner": b.winner(),
+	_emit({"t": "battle_end", "index": active_index,
+		"winner": "retreat" if b.aborted else b.winner(),
 		"rounds": b.round_index})
 	# 只有打赢才有战利品。撤退/团灭的路上捡到的东西照样算——
 	# 不然「打不过就跑」会变成零收益，撤退按钮永远没人点。

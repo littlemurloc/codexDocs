@@ -40,6 +40,12 @@ var base_dmg_high: float = 0.0
 var hp: int = 1
 var stress: float = 0.0
 var dead: bool = false
+## 尸体的「耐久」（M73）。`-1` = 还没死，`0` = 已经清掉。
+##
+## 尸体占着它那一格（原版就是这样：不清掉，后排永远换不到前排），
+## 但它是**可以被打掉的**。耐久按基础血量给，大体型要多打两下。
+## 只对怪物有意义 —— 英雄倒下了不能被自己人鞭尸。
+var corpse_hp: int = -1
 var at_deaths_door: bool = false
 var stun_turns: int = 0
 var consecutive_misses: int = 0
@@ -548,6 +554,9 @@ func take_damage(amount: int, deathblow_roll: float = 1.0) -> Dictionary:
 			entered_dd = true
 		else:
 			dead = true
+			# 留下可摧毁的尸体（M73）。耐久按基础血量给：
+			# 小怪一下清掉，大体型要打两三下。
+			corpse_hp = maxi(1, int(ceil(float(base_hp) / 12.0)))
 	return {"damage": applied, "died": dead, "deaths_door": entered_dd}
 
 

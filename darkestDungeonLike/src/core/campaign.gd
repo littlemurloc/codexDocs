@@ -129,6 +129,27 @@ var best_steps: int = 0
 ## 所以旧档读进来直接清零重记，而不是留着让它永远压住新纪录。
 var steps_metric: int = 2
 var free_recruits: int = 0   # 破产保护额度：全员阵亡后赠送的免费征召次数
+## 阵亡记录（M48）。
+##
+## 之前名册里只有一个 `deaths` 计数——「谁死在哪一趟、什么原因」全丢了。
+## 而墓园这个建筑存在的意义就是让人回看这些，光有数字它就成了计数器。
+##
+## 每条：{hero, week, region, size, level, reason, 无名英雄的 id 也带着}
+## 上限 240 条（15 个职业 × 16 条），够长档用；不设上限的话一趟全灭能加 4 条，
+## 打 200 趟就是 800 条，存档会慢慢变肥。
+var death_log: Array = []
+## 已讨伐首领的区域（M46）：region -> true。
+##
+## 四个区域各打赢一次首领任务 = 战役结束。这是本作的「终局」——
+## 原版靠 4 个 DD 副本，但 `dungeons.json` 里**没有 darkestdungeon 的地图**
+## （maps 只有 weald/crypts/warrens/cove 各 11 张），所以不做新区域，
+## 把「四大区域全清」当胜利条件。零新数据，规则上也说得通。
+var boss_cleared: Dictionary = {}
+## 「刚打完最后一场首领」的一次性标记（M46）。
+##
+## 不在 settle 里直接切界面：settle 是规则层，不该知道有结算屏还是胜利屏。
+## 由界面读它、显示完再清掉。
+var victory_pending: bool = false
 
 ## 本周任务板（M26）：4 个 `{size, level, quest}`。
 ##
@@ -211,6 +232,19 @@ var store_slots: int = 16
 var equip_slots: int = 2
 ## 掉进仓库时的失败计数。静默丢弃最难查，所以失败要留痕。
 var trinket_refused: Dictionary = {}    # reason -> 次数
+
+## —— 城镇买下的补给（M66）——
+##
+## `id -> 份数`，**已经付过钱、还没带走**的那部分。
+##
+## 原来补给只能在出发准备屏配，配完统一结账、直接进背包，回城不结余（M16）。
+## 商店要卖补给，就得先有个「钱已经付了、东西还没带下去」的地方，就是它。
+## 出发时**先从库存扣，不够的现场按价买** —— 既不会让玩家白花钱，
+## 也没有绕开「每趟都要配补给」这件事：上限仍是 inventory 的 base_stack_limit。
+##
+## 和 `trinket_store` 的区别：饰品是资产（可卖、可换），补给是消耗品，
+## 带下去就用完，所以它只有「买」和「扣」，没有卖回。
+var supplies: Dictionary = {}
 
 ## —— 商店（M16）——
 ##
@@ -351,6 +385,7 @@ func new_game() -> void:
 			"skills": _default_loadout(hid_s), "busy": 0}
 	trinket_store = []
 	trinket_refused = {}
+	supplies = {}
 	shop_stock = []
 	shop_refused = {}
 	# 新档的货架种子：有 start_rng_seed 就用它（测试可复现），
@@ -362,6 +397,9 @@ func new_game() -> void:
 	best_steps = 0
 	steps_metric = 2
 	free_recruits = 0
+	boss_cleared = {}
+	victory_pending = false
+	death_log = []
 
 
 ## 有档就读，没档就开新档。返回 true 表示读到了旧档。
@@ -389,6 +427,7 @@ func to_dict() -> Dictionary:
 		"steps_metric": steps_metric,
 		"free_recruits": free_recruits,
 		"trinket_store": trinket_store.duplicate(),
+		"supplies": supplies.duplicate(),
 		"shop_stock": shop_stock.duplicate(),
 		"shop_seed": shop_seed,
 		# 任务板（M26）：存进档里，读档时不能重抽——
@@ -402,6 +441,11 @@ func to_dict() -> Dictionary:
 		# order 必须存：读档时靠它还原「谁在第几个」，配置只是新档的起点。
 		"order": _order.duplicate(),
 		"recruit_candidates": recruit_candidates.duplicate(),
+		# 终局进度（M46）：已讨伐的区域。不存的话读档会「忘了自己打过谁」，
+		# 玩家会以为进度被吞了。
+		"boss_cleared": boss_cleared.duplicate(),
+		# 阵亡记录（M48）：不存的话墓园只剩次数，回看这件事就做不到。
+		"death_log": death_log.duplicate(true),
 	}
 
 
@@ -412,6 +456,14 @@ func from_dict(d: Dictionary) -> void:
 		heirlooms[str(k)] = 0
 	for k in (d.get("heirlooms", {}) as Dictionary).keys():
 		heirlooms[str(k)] = int(d["heirlooms"][k])
+	death_log = []
+	for ent in (d.get("death_log", []) as Array):
+		if ent is Dictionary:
+			death_log.append((ent as Dictionary).duplicate(true))
+	boss_cleared = {}
+	for k in (d.get("boss_cleared", {}) as Dictionary).keys():
+		if bool(d["boss_cleared"][k]):
+			boss_cleared[str(k)] = true
 	roster = {}
 	var src: Dictionary = d.get("roster", {})
 	# 名册组成（M27）：先读存档里记的顺序。
@@ -498,6 +550,11 @@ func from_dict(d: Dictionary) -> void:
 		var tid: String = str(t)
 		if not tid.is_empty():
 			trinket_store.append(tid)
+	# 补给库存（M66）：旧档没有这个字段，读成空 —— 空的语义就是
+	# 「一件预买的都没有」，和 M66 之前的行为完全一致。
+	supplies = {}
+	for sk in (d.get("supplies", {}) as Dictionary).keys():
+		supplies[str(sk)] = maxi(0, int(d["supplies"][sk]))
 	# 货架：有存档就照搬（含空格位——玩家买走哪一格要保留），
 	# 旧档没有这个字段就现场掷一批，而不是留一个空商店。
 	shop_stock = []
@@ -1341,6 +1398,101 @@ func sell_trinket(store_idx: int) -> String:
 	return ""
 
 
+## 商店里已经买下的补给份数（M66）。
+func supply_stock(id: String) -> int:
+	return maxi(0, int(supplies.get(str(id), 0)))
+
+
+## 在商店买 N 份补给：**当场扣钱**，进库存。
+##
+## 和出发准备屏不同：那边是「配好清单，出发时统一结账」；
+## 这边是「买下来就归你，出发时优先用库存」。两边共用同一份 `supplies`，
+## 所以不会有「两处各存一份、数量对不上」的问题。
+##
+## 上限用 `base_stack_limit`，它约束的是**这一趟能带多少**；
+## 库存也按同一个上限卡，避免囤到 99 根火把。
+func buy_supply(id: String, n: int = 1) -> Dictionary:
+	var out: Dictionary = {"ok": false, "reason": "", "cost": 0}
+	if shop == null or n <= 0:
+		out["reason"] = "no_shop"
+		return out
+	var lim: int = shop.supply_limit(id)
+	var cur: int = supply_stock(id)
+	if lim > 0 and cur + n > lim:
+		out["reason"] = "over_limit"
+		return out
+	var cost: int = shop.supply_buy(id) * n
+	if cost > gold:
+		out["reason"] = "no_gold"
+		out["cost"] = cost
+		return out
+	gold -= cost
+	supplies[str(id)] = cur + n
+	out["ok"] = true
+	out["cost"] = cost
+	return out
+
+
+## 只报价、不结算（M66）。
+##
+## 出发屏的「合计」和按钮上的数字必须和实际扣款一致：库存能抵掉的部分不算钱。
+## 不这么做的话，玩家在商店预买了 2 根火把，出发屏写着 1925 金、
+## 实际只扣 1700——界面看起来像算错了。
+func pack_cost_with_stock(pack: Dictionary) -> int:
+	if shop == null:
+		return 0
+	var buy_n: Dictionary = {}
+	for k in pack.keys():
+		var n: int = maxi(0, int(pack[k]))
+		if n <= 0:
+			continue
+		var s: int = mini(n, supply_stock(str(k)))
+		if n - s > 0:
+			buy_n[str(k)] = n - s
+	return shop.pack_cost(buy_n)
+
+
+## 出发结算（M66）：**先扣库存，不够的现场按价买**。
+##
+## 返回 `{ok, cost, reason, from_stock}`。`ok` 为 true 时金币和库存都已经变动。
+## 为什么要分两段：玩家可能在商店预买了 3 根火把，出发时想带 5 根——
+## 库存那 3 根不该再收一次钱，否则「预买」就没有意义。
+func buy_pack_with_stock(pack: Dictionary) -> Dictionary:
+	var out: Dictionary = {"ok": false, "cost": 0, "reason": "", "from_stock": {}}
+	if shop == null:
+		out["reason"] = "no_shop"
+		return out
+	# 上限只约束「这一趟带多少」
+	for k in pack.keys():
+		var lim: int = shop.supply_limit(str(k))
+		if lim > 0 and int(pack[k]) > lim:
+			out["reason"] = "over_limit"
+			out["item"] = str(k)
+			return out
+	var stock_use: Dictionary = {}
+	var buy_n: Dictionary = {}
+	for k2 in pack.keys():
+		var n: int = maxi(0, int(pack[k2]))
+		if n <= 0:
+			continue
+		var s: int = mini(n, supply_stock(str(k2)))
+		if s > 0:
+			stock_use[str(k2)] = s
+		if n - s > 0:
+			buy_n[str(k2)] = n - s
+	var cost: int = shop.pack_cost(buy_n)
+	out["cost"] = cost
+	if cost > gold:
+		out["reason"] = "no_gold"
+		return out
+	gold -= cost
+	for k3 in stock_use.keys():
+		supplies[str(k3)] = maxi(0, supply_stock(str(k3)) - int(stock_use[k3]))
+	out["ok"] = true
+	out["from_stock"] = stock_use
+	return out
+
+
 ## 一套补给的报价与结账。补给**不进元层仓库**——买完直接进这一趟的背包。
 ##
 ## 返回 `{ok, cost, reason}`；`ok` 为 true 时金币已扣。
@@ -1930,14 +2082,89 @@ func graveyard() -> Array:
 		if deaths <= 0:
 			continue
 		out.append({"hero": str(hid), "deaths": deaths, "alive": bool(r.get("alive", false)),
-			"runs": int(r.get("runs", 0)), "gear": int(r.get("gear", 0))})
+			"runs": int(r.get("runs", 0)), "gear": int(r.get("gear", 0)),
+			"last": last_death_of(str(hid))})
 	out.sort_custom(func(a, b): return int(a["deaths"]) > int(b["deaths"]))
 	return out
+
+
+## 某个人最近一次阵亡的记录（M48）。没有就返回空字典。
+func last_death_of(hid: String) -> Dictionary:
+	for i in range(death_log.size() - 1, -1, -1):
+		var e: Dictionary = death_log[i]
+		if str(e.get("hero", "")) == hid:
+			return e
+	return {}
 
 
 # ============================================================
 # 结算：把一趟远征的结果落到档里
 # ============================================================
+
+## 已讨伐的区域数（M46）。
+func bosses_cleared() -> int:
+	var n: int = 0
+	for r in BOARD_REGIONS:
+		if bool(boss_cleared.get(str(r), false)):
+			n += 1
+	return n
+
+
+## 战役是否已经打完（四个区域首领全清）。
+func campaign_won() -> bool:
+	return bosses_cleared() >= BOARD_REGIONS.size()
+
+
+## 还没讨伐的区域（给城镇屏提示「还差哪个」）。
+func regions_left() -> Array:
+	var out: Array = []
+	for r in BOARD_REGIONS:
+		if not bool(boss_cleared.get(str(r), false)):
+			out.append(str(r))
+	return out
+
+
+## 任务完成的固定报酬（M46）：金币 + 传家宝。
+##
+## 数据一直在 `quests.json` 的 `quest.generation.generation.rewards` 里，
+## 但从来没被读过——任务完成只发远征途中捡到的东西，交差不给钱。
+##
+## 表是「行 = 难度，列 = 长度」，和 `QUEST_XP` 同一套映射：
+##   行：1 / 3 / 5（用 `_xp_tier` 归一，其余行在数据里是空的）
+##   列：0 是空列，1=short 2=medium 3=long
+## 首领任务的 `size` 名义上是 medium，所以落在第 2 列。
+func quest_reward(qd: Dictionary, level: int, size_name: String) -> Dictionary:
+	var rw: Dictionary = ((qd.get("quest.generation", {}) as Dictionary)
+		.get("generation", {}) as Dictionary).get("rewards", {})
+	if rw.is_empty():
+		return {"gold": 0, "heirlooms": {}}
+	var row: int = _xp_tier(level)
+	var col: int = {"short": 1, "medium": 2, "long": 3, "boss": 2}.get(size_name, 2)
+
+	var gold: int = 0
+	var items: Array = rw.get("item_table", [])
+	if row < items.size():
+		var row_arr: Array = items[row]
+		if col < row_arr.size():
+			# 每一项本身是「一堆 item 字典」，不是单个字典。
+			for it in (row_arr[col] as Array):
+				if str((it as Dictionary).get("type", "")) == "gold":
+					gold += int((it as Dictionary).get("amount", 0))
+
+	var heirlooms: Dictionary = {}
+	for ent in (rw.get("heirloom_amount_table", []) as Array):
+		var e: Dictionary = ent
+		var amounts: Array = e.get("amounts", [])
+		if row >= amounts.size():
+			continue
+		var r2: Array = amounts[row]
+		if col >= r2.size():
+			continue
+		var n: int = int(r2[col])
+		if n > 0:
+			heirlooms[str(e.get("type", ""))] = n
+	return {"gold": gold, "heirlooms": heirlooms}
+
 
 ## 返回本次结算摘要，给结算屏显示用。
 func settle(exp: Expedition) -> Dictionary:
@@ -1952,6 +2179,21 @@ func settle(exp: Expedition) -> Dictionary:
 	out["gold"] = int(exp.loot_gold)
 	for k in (exp.loot_heirlooms as Dictionary).keys():
 		out["heirlooms"][str(k)] = int(exp.loot_heirlooms[k])
+
+	# —— 任务完成报酬（M46）——
+	# 和远征战利品是两笔账：战利品是「路上捡的」，任务奖励是「交差拿的」。
+	# **只有 complete 才发**，和 `xp_for` 同一条判据——
+	# 否则「进去打两间房、撤退重来」又能刷钱，和刷经验是同一个漏洞。
+	out["quest_gold"] = 0
+	out["quest_heirlooms"] = {}
+	if exp.end_reason == "complete":
+		var qd: Dictionary = exp.db.quests if exp.db != null else {}
+		var rw: Dictionary = quest_reward(qd, exp.dungeon_level, exp.size_name)
+		out["quest_gold"] = int(rw.get("gold", 0))
+		out["quest_heirlooms"] = (rw.get("heirlooms", {}) as Dictionary).duplicate()
+		out["gold"] = int(out["gold"]) + int(out["quest_gold"])
+		for k in (out["quest_heirlooms"] as Dictionary).keys():
+			out["heirlooms"][str(k)] = int(out["heirlooms"].get(str(k), 0)) + int(out["quest_heirlooms"][k])
 	# 宝石的钱已经折算进 loot_gold（见 Expedition._apply_loot_result），
 	# 这里只把「件数」带出来给结算屏展示。
 	out["gems"] = (exp.loot_gems as Dictionary).duplicate()
@@ -1990,6 +2232,18 @@ func settle(exp: Expedition) -> Dictionary:
 			r["deaths"] = int(r.get("deaths", 0)) + 1
 			r["stress"] = 0.0
 			out["deaths"].append(hid_s)
+			# 阵亡记录（M48）：这一条是墓园能「回看」的全部依据。
+			# 周数取 advance_week **之前**的值——人是在这一周死的。
+			death_log.append({
+				"hero": hid_s,
+				"week": week,
+				"region": str(exp.dungeon),
+				"size": str(exp.size_name),
+				"level": int(exp.dungeon_level),
+				"reason": str(exp.end_reason),
+			})
+			if death_log.size() > 240:
+				death_log = death_log.slice(death_log.size() - 240, death_log.size())
 		else:
 			# 回城只减一部分：压力跨远征累积，是「再打一趟要不要换人」的决策依据
 			var relief: float = float(out["relief"])
@@ -1999,6 +2253,20 @@ func settle(exp: Expedition) -> Dictionary:
 			var ups: int = gain_xp(hid_s, gained_xp)
 			if ups > 0:
 				out["levelups"][hid_s] = ups
+
+	# —— 首领讨伐（M46）——
+	# 只认「完成了首领任务」，不是「打过首领」：打输了 / 半路撤退不算。
+	var newly_cleared: String = ""
+	if exp.end_reason == "complete" and str(exp.quest_type) == "kill_boss":
+		var reg: String = str(exp.dungeon)
+		if BOARD_REGIONS.has(reg) and not bool(boss_cleared.get(reg, false)):
+			boss_cleared[reg] = true
+			newly_cleared = reg
+	out["boss_cleared"] = newly_cleared
+	out["bosses_total"] = bosses_cleared()
+	out["campaign_won"] = campaign_won()
+	if newly_cleared != "" and campaign_won():
+		victory_pending = true
 
 	expeditions += 1
 	# 一趟 = 一周（M23）。忙的人在这里少忙一周，商店也在这里换货——

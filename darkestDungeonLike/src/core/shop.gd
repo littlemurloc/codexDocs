@@ -168,14 +168,32 @@ func _compute_stats() -> Dictionary:
 # ============================================================
 
 ## 可买补给列表（含食物），顺序固定，便于界面与复现。
+##
+## 顺序（M66）按**实际会用到的频率**排，不再按 id 字母序 ——
+## 字母序排出来的中文名是「解毒剂、绷带、圣水、鸦片酊、药草、铲子、骷髅钥匙、火把」，
+## 每趟都要用的火把和口粮反而在最后。
+##
+## 没写进 `SUPPLY_ORDER` 的 id（换数值包时会新增）追加在末尾，不会消失。
+const SUPPLY_ORDER: Array = [
+	"torch", "food", "shovel", "bandage", "antivenom",
+	"medicinal_herbs", "holy_water", "skeleton_key", "laudanum",
+]
+
+
 func supply_ids() -> Array:
-	var out: Array = []
+	var pool: Array = []
 	for id in supply_defs.keys():
 		if bool((supply_defs[id] as Dictionary).get("tradable", true)):
-			out.append(str(id))
-	out.sort()
+			pool.append(str(id))
 	if not food_def.is_empty():
-		out.push_front(FOOD_KEY)
+		pool.push_front(FOOD_KEY)
+	var out: Array = []
+	for k in SUPPLY_ORDER:
+		if pool.has(str(k)):
+			out.append(str(k))
+	for id2 in pool:
+		if not out.has(str(id2)):
+			out.append(str(id2))
 	return out
 
 

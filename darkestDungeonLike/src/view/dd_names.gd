@@ -369,6 +369,9 @@ const CURIO_NAMES: Dictionary = {
 
 ## 补给道具中文名。奇物交互与拾取提示都用它。
 const SUPPLY_NAMES: Dictionary = {
+	# `food` 不是数据里的 id（食物那条的 id 是空串），是 Shop.FOOD_KEY。
+	# 不写在这里，商店和准备屏都会把「口粮」显示成英文 "Food"。
+	"food": "口粮",
 	"shovel": "铲子", "torch": "火把", "bandage": "绷带",
 	"antivenom": "解毒剂", "medicinal_herbs": "药草",
 	"skeleton_key": "骷髅钥匙", "holy_water": "圣水",

@@ -184,7 +184,22 @@ var _press_on: bool = false          # 鼠标按下中（还没判定是点击�
 ## 用位置分区而不是长按计时：等待是不可见的，玩家永远要试两次才知道要等多久；
 ## 而「手指在左还是在右」是能看出来的，也能在界面上画出来。
 const ROW_HANDLE_W := 58.0
+## 指令条上「横滑」与「点一下」的分界。比行卡的 5px 宽很多 ——
+## 手指按下去本来就会晃，5px 会把每一次正常的点按都判成滑动；
+## 而滑动的判定晚 14px 几乎感觉不到（牌子有 145 宽）。
+const PAL_SWIPE_PX := 14.0
 var _pal_drag: bool = false          # 手指/鼠标正按在指令条上
+var _pal_from: Vector2 = Vector2.ZERO # 这次手势的起点：判「横向滑」还是「纵向拿牌」
+var _pal_swipe: bool = false         # 这次手势已经判成滑动/拖牌 —— 不再是点选
+var _pal_mouse: bool = false         # 鼠标这次拖动判成了「横滑条子」（和触摸是两条通道）
+## 竖屏两步确认：第一下只选中（高亮），第二下或拖出去才真的动程序。
+## 理由：触屏上「横滑看更多牌」和「点一下放牌」共用同一块矩形，
+## 按下那一刻两者一模一样，只有位移能分开；分开之后剩下的歧义用一次确认消掉。
+var _pal_sel: String = ""            # 当前被选中的指令牌（"" = 没有）
+## 新手引导的描边此刻该不该显示。**不能每次现算** `_is_new_hand()` ——
+## 引导和选中是同一块牌上的两种状态，必须有先后（选中 > 引导），
+## 而「现算」会让取消选中时把引导重新点亮，看上去就像点了个寂寞。
+var _guide_on: bool = false
 var _press_kind: String = ""         # "row" 拖已有行 / "new" 拖新指令 / "scroll" 拖空白滚列表
 var _press_op: String = ""
 var _press_from: int = -1
@@ -364,14 +379,20 @@ func _input(event: InputEvent) -> void:
 	# 也不接子控件的信号：牌子是 MOUSE_FILTER_STOP，ScreenDrag 冒不上来。
 	# 按坐标判断「手指在不在指令条矩形里」最稳，代价只是几行几何。
 	if _tall and scroll_pal != null:
-		if event is InputEventScreenTouch:
-			var st := event as InputEventScreenTouch
-			_pal_drag = st.pressed and scroll_pal.get_global_rect().has_point(st.position)
-		elif event is InputEventScreenDrag:
-			if _pal_drag:
-				scroll_pal.scroll_horizontal -= int(round((event as InputEventScreenDrag).relative.x))
-				get_viewport().set_input_as_handled()
-				return
+		if event is InputEventMouseButton and not event.pressed:
+			_pal_mouse = false          # 松手：这次「横滑条子」结束
+		if _pal_gesture(event):
+			return
+	if event is InputEventMouseMotion and _tall and _pal_mouse_scroll(event):
+		return
+	# 兜底：手指抬起来的时候拖牌态还挂着，就一定要清掉幽灵卡。
+	# 不指望「这一下先经过牌条判定」—— 横屏、或按下点没算进牌条矩形时，
+	# 松手就没有任何一路去收尾，屏幕上会一直留着一张半透明卡片。
+	if event is InputEventScreenTouch and not (event as InputEventScreenTouch).pressed \
+			and (event as InputEventScreenTouch).index == 0 and _drag_on:
+		_end_drag(false)
+		get_viewport().set_input_as_handled()
+		return
 
 	# 程序行的悬停状态由「鼠标位置」统一裁决，不依赖各行的 mouse_entered/exited。
 	# 原因见 _update_row_hover 的注释 —— 那个信号在这件事上是靠不住的。
@@ -387,7 +408,7 @@ func _input(event: InputEvent) -> void:
 			scroll_rows.scroll_vertical = _scroll_keep
 			get_viewport().set_input_as_handled()
 			return
-		if not _drag_on and _drag_pos.distance_to(_press_pos) > DRAG_START_PX:
+		if not _drag_on and _drag_pos.distance_to(_press_pos) > _drag_threshold():
 			_start_drag()
 		if _drag_on:
 			_refresh_drag_target()
@@ -402,16 +423,211 @@ func _input(event: InputEvent) -> void:
 			_end_drag(true)
 			get_viewport().set_input_as_handled()
 		else:
-			# 没挪动 = 点击：新指令点一下就追加（拖拽成功时走上面那条）
+			# 没挪动 = 点击。点指令牌走「两步确认」（见 _on_palette_tap）：
+			# 竖屏第一下只是选中，第二下才真的追加。
 			var was_new: bool = _press_kind == "new"
 			var op: String = _press_op
 			_press_on = false
 			if was_new:
-				_append(op)
+				_on_palette_tap(op)
 	elif event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
 		if _drag_on:
 			_end_drag(false)
 			get_viewport().set_input_as_handled()
+
+
+## 起手多远才算「开始拖」。默认 5px（立刻跟手）。
+##
+## 但牌条上是例外：横向位移可能只是想「看更多的牌」，而真正的横滑要等
+## `PAL_SWIPE_PX`(14) 才定性。如果这时还用 5px 起拖，鼠标拖到 6px 就已经变成
+## 「幽灵卡跟着走」了，`_pal_mouse_scroll` 永远等不到 14px —— 表现就是
+## **牌条左右滑不动了**（2026-11-09 达叔就是这么发现的）。所以横向为主时抬到 14，
+## 纵向为主仍用 5（往上提 = 立刻把这张牌拿起来）。
+func _drag_threshold() -> float:
+	if not (_tall and _press_kind == "new"):
+		return DRAG_START_PX
+	var d: Vector2 = _drag_pos - _press_pos
+	return PAL_SWIPE_PX if absf(d.x) >= absf(d.y) else DRAG_START_PX
+
+
+## 指令条手势的总闸：一份几何判定，三个出口（横滑滚条 / 纵向拿牌 / 松手点选）。
+##
+## 为什么不能交给 ScrollContainer 自己滚：它的触摸滚动绑在 `is_touchscreen_available()`
+## 上，Web 导出拿不到真值（表现是「手指划过去，条子一动不动」，不报错）；
+## 接牌子的 `gui_input` 也收不到 —— 牌子是 MOUSE_FILTER_STOP，ScreenDrag 冒不上来。
+##
+## 为什么必须在这里「作废」这次按下：手指落在牌子上时，卡片已经先收到一次按下
+## （`_begin_press("new")`），而横滑和点选在那一刻长得完全一样。只有位移能分开它们，
+## 所以一旦判成滑动，就要把这次按下彻底作废 —— 否则松手会被当成「点了这张牌」，
+## 也就是玩家滑一下条子就白多出一行代码。
+func _pal_gesture(e: InputEvent) -> bool:
+	# 只认第一根手指。第二根手指（手掌边缘、另一只手）碰上来会把 `_pal_drag` 改成
+	# 它自己的位置判定 —— 第一根手指抬起时就不再有谁去收尾，幽灵卡留在屏幕上。
+	if e is InputEventScreenTouch and (e as InputEventScreenTouch).index != 0:
+		return false
+	if e is InputEventScreenDrag and (e as InputEventScreenDrag).index != 0:
+		return false
+	if e is InputEventScreenTouch:
+		var st := e as InputEventScreenTouch
+		if st.pressed:
+			_pal_drag = scroll_pal.get_global_rect().has_point(st.position)
+			_pal_from = st.position
+			_pal_swipe = false
+			_pal_mouse = false
+			return _pal_drag
+		if not _pal_drag:
+			# 这次手势不是从指令条上开始的，不归这里管 ——
+			# 但如果拖牌态还挂着（按下那一下没被判成「在牌条里」，拖拽是由鼠标
+			# motion 那一路起的），手指抬起就是唯一的收尾机会，必须在这里清干净，
+			# 否则幽灵卡会一直留在屏幕上（手机上真出现过）。
+			if _drag_on:
+				_end_drag(false)
+				get_viewport().set_input_as_handled()
+				return true
+			return false
+		# 松手：拖牌与点选都在这里收尾，不等 Web 上的鼠标模拟 ——
+		# 模拟事件时有时无，等它就等于把一个必现的路径交给运气。
+		var swiped: bool = _pal_swipe
+		var was_drag: bool = _drag_on
+		var op: String = _pal_op_at(st.position) if not swiped else ""
+		_pal_drag = false
+		_pal_swipe = false
+		_press_on = false              # 拦住随后可能到来的模拟鼠标抬起，避免同一下被算两次
+		if was_drag:
+			_end_drag(true)
+		elif op != "":
+			_on_palette_tap(op)
+		elif not swiped:
+			_set_pal_sel("")           # 点在条子的空白处 = 收回选中
+		get_viewport().set_input_as_handled()
+		return true
+	if not (e is InputEventScreenDrag) or not _pal_drag:
+		return false
+	var d := e as InputEventScreenDrag
+	if not _pal_swipe:
+		var dx: float = d.position.x - _pal_from.x
+		var dy: float = d.position.y - _pal_from.y
+		var dist: float = Vector2(dx, dy).length()
+		# 手指落在这块牌上吗？按坐标自己认：模拟鼠标不一定送到牌子的 gui_input。
+		var lifted: String = _pal_op_at(_pal_from)
+		# 纵向为主 = 想把它拿起来：这里只等 5px，和列表里拖行同一个门槛。
+		# 等 14px 才动手的话，手指已经往上一寸了牌子还没跟上来，像拖不动。
+		if absf(dy) > absf(dx) * 1.5 and dist > DRAG_START_PX and lifted != "":
+			if _press_kind != "new":
+				_begin_press("new", lifted, -1, _pal_from)
+			_pal_swipe = true
+			_drag_pos = d.position
+			_start_drag()
+			get_viewport().set_input_as_handled()
+			return true
+		if dist <= PAL_SWIPE_PX:
+			return false
+		_pal_swipe = true
+		# 横向为主 = 看更多的牌。这次按下作废：不许点选，也不许留下幽灵卡。
+		# 手指按下去时常常先往上抖一下（已经进了拖牌态、建了幽灵卡），再横着走；
+		# 不清掉的话那张卡就钉在屏幕上一动不动 —— 玩家看到的就是「图片残留」。
+		if _drag_on:
+			_end_drag(false)
+		_press_on = false
+		# 把判定阈值吃掉的那段位移一起补上，手感才是「一开始就跟手」。
+		scroll_pal.scroll_horizontal -= int(round(dx))
+		get_viewport().set_input_as_handled()
+		return true
+	if _drag_on:
+		_drag_pos = d.position
+		_refresh_drag_target()
+	else:
+		scroll_pal.scroll_horizontal -= int(round(d.relative.x))
+	get_viewport().set_input_as_handled()
+	return true
+
+
+## 鼠标（桌面 / 竖屏调试窗）在牌条上横向拖动 = 滚条子。
+##
+## 为什么必须单独给鼠标开一条路：触摸有 ScreenDrag，鼠标只有 MouseMotion，
+## 而 MouseMotion 那条老路是「超过 5px 就开始拖牌」—— 于是在电脑上左右拖一下牌条，
+## 看到的是一张幽灵卡跟着走（或者松手插进列表），而不是「这条能滚」。
+## 判据只能是**方向**：横向为主 → 滚条子；纵向为主 → 拿起这张牌（留给老路）。
+## 阈值用 PAL_SWIPE_PX 而不是 DRAG_START_PX：点牌时手抖 5px 很常见，
+## 用 5px 会把「点一下」判成「滑了一下」，玩家只觉得点了没反应。
+func _pal_mouse_scroll(e: InputEvent) -> bool:
+	if scroll_pal == null or not _tall:
+		return false
+	if _pal_mouse:
+		scroll_pal.scroll_horizontal -= int(round(e.relative.x))
+		get_viewport().set_input_as_handled()
+		return true
+	if not _press_on or _drag_on or _press_kind != "new":
+		return false
+	var d: Vector2 = e.global_position - _press_pos
+	if absf(d.x) <= PAL_SWIPE_PX or absf(d.x) <= absf(d.y) * 1.5:
+		return false
+	_pal_mouse = true
+	_press_on = false                  # 这次按下作废：既不算点选，也不算拖牌
+	scroll_pal.scroll_horizontal -= int(round(d.x))
+	get_viewport().set_input_as_handled()
+	return true
+
+
+## 这个点落在哪张牌上（"" = 没落在任何牌上）。按坐标找，不信事件里带的 position：
+## 事件可能是牌子的子控件转上来的，那时它是相对那个子控件的。
+func _pal_op_at(gpos: Vector2) -> String:
+	for k in palette_nodes.keys():
+		var c: Control = palette_nodes[k]
+		if c != null and is_instance_valid(c) and c.get_global_rect().has_point(gpos):
+			return String(k)
+	return ""
+
+
+## 点一下指令牌。横屏一下就是一下（鼠标精准、没有横滑冲突）；
+## 竖屏两步：第一下选中，第二下（同一张）才追加。多这一步换的是「手滑不会白放一张牌」。
+func _on_palette_tap(op: String) -> void:
+	if op == "":
+		return
+	if not _tall:
+		_append(op)
+		return
+	if _pal_sel == op:
+		_set_pal_sel("")
+		_append(op)
+		return
+	_set_pal_sel(op)
+
+
+func _set_pal_sel(op: String) -> void:
+	if _pal_sel == op:
+		return
+	_pal_sel = op
+	for k in palette_nodes.keys():
+		_paint_palette_card(String(k), palette_nodes[k])
+	_refresh_guide()               # 选中时先收起新手呼吸：两个动画抢同一块牌，只会互相打折
+	if op != "" and sfx != null:
+		sfx.play("click", 3.0)
+	_update_insert_hint()
+
+
+## 一块牌只有三种样子，全在这一个函数里画：**选中 > 新手引导 > 普通**。
+## 分三处各改各的，一定会出现「选中了但还在呼吸」「引导描边把选中盖掉」这类互相打脸的状态。
+func _paint_palette_card(op: String, card: Control) -> void:
+	if card == null or not is_instance_valid(card):
+		return
+	var sb: StyleBoxFlat = card.get_meta("sb", null)
+	if sb == null:
+		return
+	var sel: bool = op == _pal_sel
+	var guide: bool = card == _guide_btn and _guide_on and not sel
+	# 选中：换底色 + 白描边 + 字反过来（亮底深字）。只描边不换底，
+	# 2px 的线压在 145×44 的面上，眼睛先看到的是面 —— 静态截图里指不出哪张被选中。
+	sb.bg_color = Kit.WOOD_4 if sel else Kit.WOOD_3
+	sb.border_color = Kit.TEXT if sel else (Kit.AMBER if guide else Kit.EDGE_HI)
+	sb.set_border_width_all(2 if (sel or guide) else 1)
+	sb.shadow_size = 6 if sel else 3
+	var top: Label = card.get_meta("title", null)
+	if top != null:
+		top.add_theme_color_override("font_color", Kit.INK if sel else C_ACCENT)
+	var bot: Label = card.get_meta("sub", null)
+	if bot != null:
+		bot.add_theme_color_override("font_color", Kit.INK if sel else Color(C_MUTED, 0.92))
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -1117,8 +1333,17 @@ func _begin_press(kind: String, op: String, from: int, gpos: Vector2) -> void:
 	# 行已经认领了这次按下，容器就别再抢，否则每一次点行都会被当成「拖空白」。
 	if kind == "scroll" and _press_on and _press_kind != "scroll":
 		return
+	# 正在拖一张牌的时候，别的手势不许插队。手机上多一根手指（握持、换手）
+	# 就会重设 `_press_kind`，第一根手指抬起时就没有正确的那一路去收尾了。
+	if _drag_on:
+		return
+	# 手落在别处 = 放弃那张牌。选中态不能是一个「只能靠再点一次才收得回去」的状态：
+	# 玩家去点行、去拖空白，心里想的已经是别的事了，牌子还亮着只会让人以为还要确认一次。
+	if kind != "new" and _pal_sel != "":
+		_set_pal_sel("")
 	if vm != null and playing:
 		playing = false
+	_pal_mouse = false             # 新手势从零开始判「横滑还是拖牌」
 	_press_on = true
 	_press_kind = kind
 	_press_op = op
@@ -1153,6 +1378,9 @@ func _start_drag() -> void:
 		return
 	_drag_on = true
 	_drag_idx = -1
+	# 先把上一次的幽灵卡/空隙清干净：`_ghost` 只有一个引用，重复建一张就会
+	# 把上一张丢在屏幕上没人释放（表现是「拖完松手，一张半透明卡片留在原地」）。
+	_clear_drag_nodes()
 	_ghost = _make_ghost()
 	if _ghost != null:
 		add_child(_ghost)
@@ -1187,6 +1415,11 @@ func _make_ghost() -> Control:
 ## 这样空隙动画把行挤下去的过程中，判定点不会跟着跳，手感才稳。
 func _index_at(gpos: Vector2) -> int:
 	if panel_prog == null:
+		return -1
+	# 落在底部牌条上 = 没拖到列表里。必须先排除：
+	# panel_prog 的判定框 grow(40) 会盖到牌条上沿，手指停在牌条里松手时
+	# 会被算成「插到最后一行的下面」—— 玩家根本没往列表里放，程序却多了一行。
+	if _tall and scroll_pal != null and scroll_pal.get_global_rect().grow(8.0).has_point(gpos):
 		return -1
 	if not panel_prog.get_global_rect().grow(40.0).has_point(gpos):
 		return -1
@@ -1248,9 +1481,13 @@ func _end_drag(commit: bool) -> void:
 	_press_on = false
 	_drag_on = false
 	if commit and idx >= 0:
+		# 拖到行间就已经是「确认」了，牌不该还亮着。
+		if _pal_sel != "":
+			_set_pal_sel("")
 		on_row_drop(data, clampi(idx, 0, program.size()))
-	else:
-		_update_insert_hint()
+	# 无论放没放下，那行字都要回到「现在该干什么」——
+	# 只在失败分支里恢复的话，成功放下之后屏幕上会一直挂着「松手 → 插到第 N 行」。
+	_update_insert_hint()
 
 
 func _clear_drag_nodes() -> void:
@@ -3528,6 +3765,7 @@ func _rebuild_palette() -> void:
 		c.queue_free()
 	palette_nodes.clear()
 	_guide_btn = null
+	_pal_sel = ""                  # 牌都换了一批，上一批的选中没有意义
 	var allowed: Array = level.get("allowed", [])
 	for op in HrmVM.ALL_OPS:
 		if not allowed.has(op):
@@ -3555,7 +3793,8 @@ func _refresh_guide() -> void:
 	if _guide_tween != null and _guide_tween.is_valid():
 		_guide_tween.kill()
 	_guide_tween = null
-	var on: bool = _is_new_hand()
+	# 有牌被选中时先不呼吸：同一块牌上两个动画抢着变亮，读起来就是「抖」。
+	var on: bool = _is_new_hand() and _pal_sel == ""
 	_mark_guide(on)
 	if not on or _guide_btn == null:
 		return
@@ -3572,12 +3811,12 @@ func _refresh_guide() -> void:
 func _mark_guide(on: bool) -> void:
 	if _guide_btn == null:
 		return
+	_guide_on = on
 	_guide_btn.modulate = Color(1, 1, 1, 1)
-	var sb: StyleBoxFlat = _guide_btn.get_meta("sb", null)
-	if sb == null:
-		return
-	sb.border_color = Kit.AMBER if on else Kit.EDGE_HI
-	sb.set_border_width_all(2 if on else 1)
+	# 整排重新上一次色，而不是只改第一块：取消引导时，别的牌可能正被选中，
+	# 只改一块会把「选中」留在旧配色上。
+	for k in palette_nodes.keys():
+		_paint_palette_card(String(k), palette_nodes[k])
 
 
 ## 一张「指令牌」：上面是英文指令名，下面一行白话。
@@ -3619,21 +3858,24 @@ func _make_palette_card(op: String) -> Control:
 	bot.autowrap_mode = TextServer.AUTOWRAP_OFF
 	bot.clip_text = true
 	v.add_child(bot)
+	# 两个字的引用存给 _paint_palette_card：选中态要把字也反过来（亮底深字），
+	# 只改描边的话，选中和没选中在一张静止截图里几乎一样。
+	card.set_meta("title", top)
+	card.set_meta("sub", bot)
 
 	card.gui_input.connect(func(e: InputEvent) -> void:
 		if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
 			_begin_press("new", op, -1, e.global_position)
 	)
 	card.mouse_entered.connect(func() -> void:
-		sb.bg_color = Kit.WOOD_4
-		sb.border_color = C_ACCENT
-		sb.shadow_size = 6             # 悬停时「抬起来一点」，鼠标才有反馈
+		if _pal_sel != op:
+			sb.bg_color = Kit.WOOD_4
+			sb.border_color = C_ACCENT
+			sb.shadow_size = 6             # 悬停时「抬起来一点」，鼠标才有反馈
 		_show_op_help(op)
 	)
 	card.mouse_exited.connect(func() -> void:
-		sb.bg_color = Kit.WOOD_3
-		sb.border_color = Kit.EDGE_HI
-		sb.shadow_size = 3
+		_paint_palette_card(op, card)   # 收回去也要走同一套配色，否则会把选中态一起抹掉
 		_refresh_op_help_default()
 	)
 	return card
@@ -3869,6 +4111,16 @@ func _on_lanes_changed(n: int) -> void:
 ## 明确告诉玩家"下一笔会插到哪"，这是原来最含糊的地方
 func _update_insert_hint() -> void:
 	if lbl_insert_hint == null:
+		return
+	# 两步确认的第一步：牌已经点亮，就必须有一行字说「下一步做什么」。
+	# 只把牌点亮不说怎么办，玩家会以为已经放下了 —— 那这一版就白做了。
+	if _tall and _pal_sel != "":
+		var at: int = program.size()
+		if sel >= 0:
+			at = sel + 1
+		at = clampi(at, 0, program.size())
+		lbl_insert_hint.text = I18n.tf("已选 %s · 再点一次放到第 %d 行", [_pal_sel, at + 1])
+		lbl_insert_hint.add_theme_color_override("font_color", C_ACCENT)
 		return
 	# 第一次进来：这行字是全屏唯一在说「接下来该干什么」的地方，
 	# 所以先说这一步，别急着讲「插到第几行」—— 那是第二步的事。

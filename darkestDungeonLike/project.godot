@@ -13,11 +13,16 @@ config/features=PackedStringArray("4.4", "GL Compatibility")
 
 [display]
 
-window/size/viewport_width=1280
-window/size/viewport_height=760
+window/size/viewport_width=750
+window/size/viewport_height=1334
+; 1 = portrait。M58 起转竖屏：750×1334，按高度适配。
+window/handheld/orientation=1
 
 [rendering]
 
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
+; Android 导出强制要求 ETC2/ASTC（M54）。开启后所有 PNG 会重新导入一次，
+; 桌面端的显示不变，只是 .godot 缓存变大
+textures/vram_compression/import_etc2_astc=true
 environment/defaults/default_clear_color=Color(0.078, 0.086, 0.102, 1)

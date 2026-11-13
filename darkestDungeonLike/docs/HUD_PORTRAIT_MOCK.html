@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>竖屏改版示意图 · 空腔</title>
+<style>
+  :root{
+    --bg:#14161a; --panel:#1b1e24; --deep:#161920; --edge:#2c313a; --hi:#23272f;
+    --text:#d9d4c7; --dim:#8b8a84; --faint:#5d5f5c;
+    --party:#3e5c76; --enemy:#7a3b34; --hp:#a8322d; --stress:#c08a2e;
+    --light:#e0b24a; --hot-bg:#2a2118; --hot-edge:#7a5a24;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:28px 32px 60px;background:#0e1013;color:var(--text);
+       font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;font-size:13px;line-height:1.6}
+  h1{font-size:20px;font-weight:500;margin:0 0 6px}
+  .sub{color:var(--dim);font-size:12px;margin-bottom:4px}
+  .rule{height:1px;background:var(--edge);margin:22px 0 26px}
+  .grid{display:grid;grid-template-columns:375px 1fr;gap:26px;margin-bottom:42px;align-items:start}
+  .cap{font-size:12px;color:var(--dim);margin-bottom:8px}
+  .cap b{color:var(--text);font-weight:500;font-size:13px}
+
+  .phone{position:relative;width:375px;height:667px;background:var(--bg);
+         border:1px solid var(--edge);border-radius:14px;overflow:hidden}
+  .phone::after{content:'';position:absolute;left:6px;right:6px;bottom:16px;
+         border-top:1px dashed #2c313a}
+  .safe{position:absolute;left:6px;right:6px;bottom:4px;text-align:center;
+        font-size:7px;color:#3f4240}
+  .hd{position:absolute;left:0;top:0;right:0;height:25px;background:var(--panel);
+      border-bottom:1px solid var(--edge);display:flex;align-items:center;
+      justify-content:space-between;padding:0 8px;font-size:8px;color:var(--dim)}
+  .capsule{width:32px;height:13px;border-radius:7px;background:#0a0c0f;border:1px solid var(--edge)}
+
+  .z{position:absolute;border:1px solid var(--edge);background:var(--panel);border-radius:5px}
+  .z.deep{background:var(--deep)}
+  .z.hot{background:var(--hot-bg);border-color:var(--hot-edge)}
+  .lbl{position:absolute;font-size:7px;color:var(--faint);letter-spacing:.4px}
+  .txt{font-size:8px;color:var(--text)}
+  .txt.dim{color:var(--dim)}
+  .btn{position:absolute;border:1px solid var(--edge);background:var(--hi);border-radius:4px;
+       display:flex;align-items:center;justify-content:center;font-size:8px;color:var(--text)}
+  .btn.on{background:#3a4453;border-color:#4a566a}
+  .btn.hot{background:#3a2c18;border-color:#8a6a2a;color:var(--light)}
+
+  .slot{position:absolute;border:1px solid var(--edge);background:var(--deep);border-radius:4px;overflow:hidden}
+  .slot.e{border-color:#4a2b26}
+  .slot.p{border-color:#2b3f52}
+  .fig{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);
+       width:22px;height:34px;background:linear-gradient(180deg,#4a4a46,#2e2e2b);border-radius:3px 3px 5px 5px}
+  .fig.e{background:linear-gradient(180deg,#5c3a33,#33211d)}
+  .fig.p{background:linear-gradient(180deg,#44607a,#263645)}
+  .bar{position:absolute;left:3px;right:3px;height:3px;background:#241c1c;border-radius:2px;overflow:hidden}
+  .bar i{display:block;height:100%;background:var(--hp)}
+
+  .note{color:var(--dim)}
+  .note h3{font-size:13px;font-weight:500;color:var(--text);margin:0 0 8px}
+  .note ul{margin:0 0 14px;padding-left:18px}
+  .note li{margin-bottom:5px}
+  .key{color:var(--light)}
+  .ok{color:#6fbf73}
+  .cut{color:#c8695f}
+  table{border-collapse:collapse;font-size:12px;margin:6px 0 14px}
+  td,th{border:1px solid var(--edge);padding:4px 9px;text-align:left}
+  th{color:var(--dim);font-weight:400;background:var(--deep)}
+</style>
+</head>
+<body>
+
+<h1>竖屏改版示意图 · 空腔</h1>
+<div class="sub">基准 750 × 1334（按高度适配）。下面每张图按 <b>0.5 倍</b> 绘制：图上 1px = 750 坐标系 2px。</div>
+<div class="sub">色块含义：<span style="color:#8a6a2a">金色虚框</span> = 一级拇指热区；深色面板 = 信息展示；横线 = 战场。</div>
+
+<div class="rule"></div>
+
+<!-- M1 战斗 -->
+<div class="grid">
+  <div>
+    <div class="cap"><b>M1 · 战斗</b> —— 改动最大的一屏</div>
+    <div class="phone">
+      <div class="hd"><span>第 3 轮 · 光照 100（明亮）　点技能 → 点目标</span><span class="capsule"></span></div>
+
+      <div class="z deep" style="left:6px;top:32px;right:6px;height:132px">
+        <div class="lbl" style="left:5px;top:3px">敌方 · 4 列</div>
+        <div class="slot e" style="left:8px;top:15px;width:80px;height:110px"><div class="fig e"></div><div class="bar" style="bottom:4px"><i style="width:78%"></i></div></div>
+        <div class="slot e" style="left:94px;top:15px;width:80px;height:110px"><div class="fig e"></div><div class="bar" style="bottom:4px"><i style="width:52%"></i></div></div>
+        <div class="slot e" style="left:180px;top:15px;width:80px;height:110px"><div class="fig e"></div><div class="bar" style="bottom:4px"><i style="width:100%"></i></div></div>
+        <div class="slot e" style="left:266px;top:15px;width:80px;height:110px"><div class="fig e"></div><div class="bar" style="bottom:4px"><i style="width:64%"></i></div></div>
+      </div>
+
+      <div class="lbl" style="left:12px;top:170px">战场中缝 · 技能光效、伤害数字、屏幕溅血都发生在这 70px 里</div>
+
+      <div class="z deep" style="left:6px;top:190px;right:6px;height:132px">
+        <div class="lbl" style="left:5px;top:3px">我方 · 4 列</div>
+        <div class="slot p" style="left:8px;top:15px;width:80px;height:110px"><div class="fig p"></div><div class="bar" style="bottom:4px"><i style="width:88%"></i></div></div>
+        <div class="slot p" style="left:94px;top:15px;width:80px;height:110px"><div class="fig p"></div><div class="bar" style="bottom:4px"><i style="width:70%"></i></div></div>
+        <div class="slot p" style="left:180px;top:15px;width:80px;height:110px"><div class="fig p"></div><div class="bar" style="bottom:4px"><i style="width:100%"></i></div></div>
+        <div class="slot p" style="left:266px;top:15px;width:80px;height:110px"><div class="fig p"></div><div class="bar" style="bottom:4px"><i style="width:45%"></i></div></div>
+      </div>
+
+      <div class="z deep" style="left:6px;top:332px;right:6px;height:18px">
+        <span class="txt dim" style="position:absolute;left:7px;top:3px">▸ 第 3 轮 · 十字军 12 伤害 · 骷髅−6</span>
+      </div>
+
+      <div class="z" style="left:6px;top:360px;right:6px;height:46px">
+        <div class="lbl" style="left:5px;top:3px">次级操作 · 每回合最多用一次</div>
+        <div class="btn" style="left:8px;top:16px;width:172px;height:24px">调整站位</div>
+        <div class="btn" style="left:188px;top:16px;width:172px;height:24px">撤退</div>
+      </div>
+
+      <div class="z hot" style="left:6px;top:418px;right:6px;height:168px">
+        <div class="lbl" style="left:5px;top:3px;color:#8a6a2a">一级拇指热区 · 十字军 的行动 · 武器 6-11 · 暴击 5%</div>
+        <div class="btn hot" style="left:8px;top:22px;width:82px;height:36px">制裁</div>
+        <div class="btn hot" style="left:96px;top:22px;width:82px;height:36px">狂热点名</div>
+        <div class="btn hot" style="left:184px;top:22px;width:82px;height:36px">眩晕击</div>
+        <div class="btn hot" style="left:272px;top:22px;width:82px;height:36px">信仰壁垒</div>
+        <div class="btn hot" style="left:8px;top:66px;width:82px;height:36px">战地治疗</div>
+        <div class="btn hot" style="left:96px;top:66px;width:82px;height:36px">圣枪</div>
+        <div class="btn hot" style="left:184px;top:66px;width:82px;height:36px">鼓舞</div>
+        <div class="btn" style="left:272px;top:66px;width:82px;height:36px;background:#191c21;border-color:#242832;color:#5d5f5c">空位</div>
+        <div class="lbl" style="left:8px;top:112px">4 列 × 2 行 = 8 格 · 每格 72 高（≥48）· 7 技能全放得下</div>
+        <div class="lbl" style="left:8px;top:128px">超过 8 个才需要横向滑动（目前没有这种职业）</div>
+        <div class="lbl" style="left:8px;top:146px;color:#8a6a2a">拇指落点在这里：技能是全场最高频的动作</div>
+      </div>
+
+      <div class="lbl" style="left:12px;top:594px">日志只留一行摘要，点它展开成半透明浮层看完整记录</div>
+      <div class="safe">底部安全区 1300 – 1334</div>
+    </div>
+  </div>
+  <div class="note">
+    <h3>元素去向</h3>
+    <table>
+      <tr><th>原位置</th><th>新位置</th></tr>
+      <tr><td>顶部状态条（全宽）</td><td>顶部安全区，缩到一行，右侧避让胶囊</td></tr>
+      <tr><td>左 4 格 / 右 4 格</td><td>敌方在上、我方在下，各 4 列（4×175=700 放得下）</td></tr>
+      <tr><td>日志面板 660×206</td><td>折叠成 18 高摘要条，夹在我方与次级按钮之间，点开浮层</td></tr>
+      <tr><td>技能面板 564×206，卡 34 高</td><td>4 列 × 2 行 = 8 格，卡 72 高，压在最底部</td></tr>
+      <tr><td>底部·调整站位 / 撤退</td><td>上移一层（次级操作），让出最底部的拇指落点</td></tr>
+      <tr><td>底部提示文字</td><td>并入状态条右侧，不单独占行</td></tr>
+    </table>
+    <h3>为什么这么改</h3>
+    <ul>
+      <li>上下对置之后，<span class="key">敌方 4 列宽 700</span>，750 宽刚好；横屏的 8 格并排要 1360，塞不下。</li>
+      <li>日志是纯信息展示，按规范不能占一级热区，所以只留一行摘要，<span class="ok">完整记录仍在，点开就有</span>。</li>
+      <li>技能卡 34 → 48 之后反而更宽：竖屏 4 列 × 2 行有 8 格，横屏 3 列 × 3 行是 9 格，7 个技能两边都放得下，<span class="ok">没有取舍</span>。</li>
+      <li><span class="key">技能压在屏幕最底</span>，因为它是全场最高频的动作；「调整站位 / 撤退」一回合最多用一次，退到上一层，<span class="ok">不再抢拇指落点</span>。</li>
+    </ul>
+  </div>
+</div>
+
+<!-- M2 地图 -->
+<div class="grid">
+  <div>
+    <div class="cap"><b>M2 · 远征地图</b></div>
+    <div class="phone">
+      <div class="hd"><span>远征 · 荒野 · 3 级</span><span class="capsule"></span></div>
+
+      <div class="z" style="left:6px;top:32px;right:6px;height:34px">
+        <div class="lbl" style="left:5px;top:3px">资源条 · 五格等宽</div>
+        <div class="txt" style="position:absolute;left:8px;top:15px">光照 100</div>
+        <div class="txt" style="position:absolute;left:78px;top:15px">口粮 3</div>
+        <div class="txt" style="position:absolute;left:143px;top:15px">火把 2</div>
+        <div class="txt" style="position:absolute;left:208px;top:15px">铁锹 1</div>
+        <div class="txt" style="position:absolute;left:273px;top:15px">休整 1</div>
+      </div>
+
+      <div class="z deep" style="left:6px;top:72px;right:6px;height:300px">
+        <div class="lbl" style="left:5px;top:3px">地图网格 · 12 × 12</div>
+        <div style="position:absolute;left:10px;top:18px;right:10px;bottom:10px;
+             background-image:linear-gradient(#232830 1px,transparent 1px),linear-gradient(90deg,#232830 1px,transparent 1px);
+             background-size:24px 24px"></div>
+        <div class="slot" style="left:34px;top:44px;width:22px;height:22px;border-color:#6fbf73"></div>
+        <div class="slot" style="left:82px;top:92px;width:22px;height:22px"></div>
+        <div class="slot" style="left:130px;top:140px;width:22px;height:22px"></div>
+        <div class="slot" style="left:178px;top:188px;width:22px;height:22px;border-color:#8a6a2a"></div>
+        <div class="slot" style="left:226px;top:236px;width:22px;height:22px"></div>
+      </div>
+
+      <div class="z" style="left:6px;top:380px;right:6px;height:46px">
+        <div class="lbl" style="left:5px;top:3px">队伍条 · 4 人横排</div>
+        <div class="slot p" style="left:8px;top:14px;width:76px;height:26px"><div class="txt" style="position:absolute;left:4px;top:2px">十字军</div><div class="bar" style="bottom:3px"><i style="width:88%"></i></div></div>
+        <div class="slot p" style="left:92px;top:14px;width:76px;height:26px"><div class="txt" style="position:absolute;left:4px;top:2px">修女</div><div class="bar" style="bottom:3px"><i style="width:70%"></i></div></div>
+        <div class="slot p" style="left:176px;top:14px;width:76px;height:26px"><div class="txt" style="position:absolute;left:4px;top:2px">强盗</div><div class="bar" style="bottom:3px"><i style="width:100%"></i></div></div>
+        <div class="slot p" style="left:260px;top:14px;width:76px;height:26px"><div class="txt" style="position:absolute;left:4px;top:2px">瘟疫医生</div><div class="bar" style="bottom:3px"><i style="width:45%"></i></div></div>
+      </div>
+
+      <div class="z" style="left:6px;top:432px;right:6px;height:30px">
+        <span class="txt" style="position:absolute;left:7px;top:4px">任务 探索 · 已探明 5/12 间 · 侦察 40%</span>
+        <span class="txt dim" style="position:absolute;right:8px;top:4px">▴ 详情</span>
+      </div>
+
+      <div class="z deep" style="left:6px;top:468px;right:6px;height:14px">
+        <span class="txt dim" style="position:absolute;left:7px;top:1px">▸ 走廊里传来脚步声</span>
+      </div>
+
+      <div class="z hot" style="left:6px;top:556px;right:6px;height:34px">
+        <div class="btn hot" style="left:8px;top:8px;width:110px;height:18px">火把</div>
+        <div class="btn hot" style="left:126px;top:8px;width:110px;height:18px">休整</div>
+        <div class="btn hot" style="left:244px;top:8px;width:110px;height:18px">离开</div>
+      </div>
+    </div>
+  </div>
+  <div class="note">
+    <h3>元素去向</h3>
+    <table>
+      <tr><th>原位置</th><th>新位置</th></tr>
+      <tr><td>地图网格 470×350（左侧）</td><td>占满宽 730×730，竖着排</td></tr>
+      <tr><td>房间详情 350 竖栏（右侧）</td><td>任务条常驻一行，点「▴ 详情」从底部升起抽屉</td></tr>
+      <tr><td>队伍条 全宽×100</td><td>保持横排，压到 92 高</td></tr>
+      <tr><td>日志 全宽×146</td><td>折叠条 28 高 + 浮层</td></tr>
+      <tr><td>火把 / 休整 / 离开（原来在房间面板里）</td><td>移到一级热区，三个大按钮</td></tr>
+    </table>
+    <h3>为什么这么改</h3>
+    <ul>
+      <li>竖屏最不缺纵向空间，地图从 470×350 变成 730×730，<span class="ok">格子大半倍，看得更清楚</span>。</li>
+      <li>房间详情本来"点房间才看"，改成抽屉只是换了个方向，<span class="ok">信息完全一致</span>。</li>
+      <li>火把/休整/离开原来是面板里的小按钮，现在进了拇指区——<span class="key">操作变顺手了</span>。</li>
+    </ul>
+  </div>
+</div>
+
+<!-- M3 城镇 -->
+<div class="grid">
+  <div>
+    <div class="cap"><b>M3 · 城镇</b></div>
+    <div class="phone">
+      <div class="hd"><span>城镇 · 第 12 周</span><span class="capsule"></span></div>
+
+      <div class="z" style="left:6px;top:32px;right:6px;height:34px">
+        <div class="txt" style="position:absolute;left:8px;top:4px">金币 837</div>
+        <div class="txt" style="position:absolute;left:88px;top:4px">传家宝 12</div>
+        <div class="txt dim" style="position:absolute;left:8px;top:18px">名册 4 人 · 存活 4 · 每次出战最多 4 人</div>
+      </div>
+
+      <div class="lbl" style="left:12px;top:74px">建筑入口 · 2 列 × 3 行，每格 340×190（远大于 48）</div>
+      <div class="z" style="left:6px;top:84px;width:178px;height:76px"><div class="txt" style="position:absolute;left:7px;top:5px">公会</div><div class="txt dim" style="position:absolute;left:7px;top:20px">技能组 · 够格 2 人</div></div>
+      <div class="z" style="left:190px;top:84px;width:178px;height:76px"><div class="txt" style="position:absolute;left:7px;top:5px">商店</div><div class="txt dim" style="position:absolute;left:7px;top:20px">补给与饰品</div></div>
+      <div class="z" style="left:6px;top:166px;width:178px;height:76px"><div class="txt" style="position:absolute;left:7px;top:5px">饰品仓库</div><div class="txt dim" style="position:absolute;left:7px;top:20px">9 件</div></div>
+      <div class="z" style="left:190px;top:166px;width:178px;height:76px"><div class="txt" style="position:absolute;left:7px;top:5px">马车</div><div class="txt dim" style="position:absolute;left:7px;top:20px">免费征召</div></div>
+      <div class="z" style="left:6px;top:248px;width:178px;height:76px"><div class="txt" style="position:absolute;left:7px;top:5px">疗养院</div><div class="txt dim" style="position:absolute;left:7px;top:20px">治疗怪癖与病</div></div>
+      <div class="z" style="left:190px;top:248px;width:178px;height:76px"><div class="txt" style="position:absolute;left:7px;top:5px">铁匠</div><div class="txt dim" style="position:absolute;left:7px;top:20px">升级武器护甲</div></div>
+
+      <div class="z deep" style="left:6px;top:334px;right:6px;height:80px">
+        <div class="lbl" style="left:5px;top:3px">名册 · 4 张卡横排</div>
+        <div class="slot p" style="left:8px;top:16px;width:80px;height:58px"><div class="txt" style="position:absolute;left:4px;top:2px">十字军</div><div class="txt dim" style="position:absolute;left:4px;top:44px">压力 12</div></div>
+        <div class="slot p" style="left:94px;top:16px;width:80px;height:58px"><div class="txt" style="position:absolute;left:4px;top:2px">修女</div><div class="txt dim" style="position:absolute;left:4px;top:44px">压力 40</div></div>
+        <div class="slot p" style="left:180px;top:16px;width:80px;height:58px"><div class="txt" style="position:absolute;left:4px;top:2px">强盗</div><div class="txt dim" style="position:absolute;left:4px;top:44px">压力 8</div></div>
+        <div class="slot p" style="left:266px;top:16px;width:80px;height:58px"><div class="txt" style="position:absolute;left:4px;top:2px">瘟疫医生</div><div class="txt dim" style="position:absolute;left:4px;top:44px">压力 66</div></div>
+      </div>
+
+      <div class="z hot" style="left:6px;top:512px;right:6px;height:56px">
+        <div class="lbl" style="left:5px;top:3px;color:#8a6a2a">一级热区</div>
+        <div class="btn hot" style="left:8px;top:16px;width:352px;height:32px">出发 · 荒野 3 级</div>
+      </div>
+      <div class="z hot" style="left:6px;top:576px;right:6px;height:36px">
+        <div class="btn hot" style="left:8px;top:7px;width:352px;height:22px">闲置一周</div>
+      </div>
+      <div class="lbl" style="left:12px;top:624px">存档：user://save1.json</div>
+    </div>
+  </div>
+  <div class="note">
+    <h3>元素去向</h3>
+    <table>
+      <tr><th>原位置</th><th>新位置</th></tr>
+      <tr><td>英雄格横向铺开（每格约 173 宽）</td><td>建筑改成 2 列网格，每格 340×190</td></tr>
+      <tr><td><code>Rect2(880, …)</code> 硬编码的「闲置一周」</td><td>改成 <code>size.x - 24</code>，与左边界等距</td></tr>
+      <tr><td>底部「出发」按钮</td><td>占满宽的一级热区（352×32，远大于 48 的触控下限）</td></tr>
+    </table>
+    <h3>为什么这么改</h3>
+    <ul>
+      <li>城镇是"点建筑"的场景，2 列大格子比横排小卡更好点，<span class="ok">触控尺寸一次到位</span>。</li>
+      <li>硬编码 x=880 的按钮在 750 宽下会直接飞到屏幕外，必须改成按 <code>size.x</code> 算。</li>
+    </ul>
+  </div>
+</div>
+
+<!-- M4 准备 -->
+<div class="grid">
+  <div>
+    <div class="cap"><b>M4 · 出发准备</b></div>
+    <div class="phone">
+      <div class="hd"><span>出发准备 · 荒野 · 3 级</span><span class="capsule"></span></div>
+      <div class="btn" style="left:6px;top:34px;width:44px;height:22px">返回</div>
+
+      <div class="lbl" style="left:12px;top:64px">出战（已选 4 / 4 人）· 点一下切换</div>
+      <div class="z" style="left:6px;top:74px;width:178px;height:80px"><div class="txt" style="position:absolute;left:7px;top:5px">✓ 十字军</div><div class="txt dim" style="position:absolute;left:7px;top:22px">1 号位 · 制裁</div></div>
+      <div class="z" style="left:190px;top:74px;width:178px;height:80px"><div class="txt" style="position:absolute;left:7px;top:5px">✓ 修女</div><div class="txt dim" style="position:absolute;left:7px;top:22px">3 号位</div></div>
+      <div class="z" style="left:6px;top:160px;width:178px;height:80px"><div class="txt" style="position:absolute;left:7px;top:5px">✓ 强盗</div><div class="txt dim" style="position:absolute;left:7px;top:22px">2 号位</div></div>
+      <div class="z" style="left:190px;top:160px;width:178px;height:80px"><div class="txt" style="position:absolute;left:7px;top:5px">✓ 瘟疫医生</div><div class="txt dim" style="position:absolute;left:7px;top:22px">4 号位</div></div>
+
+      <div class="z deep" style="left:6px;top:252px;right:6px;height:150px">
+        <div class="lbl" style="left:5px;top:3px">补给 · 只在出发前买</div>
+        <div class="txt" style="position:absolute;left:8px;top:18px">口粮</div>
+        <div class="btn" style="left:250px;top:14px;width:26px;height:22px">−</div>
+        <div class="txt" style="position:absolute;left:285px;top:18px">3</div>
+        <div class="btn" style="left:302px;top:14px;width:26px;height:22px">＋</div>
+        <div class="txt" style="position:absolute;left:8px;top:48px">火把</div>
+        <div class="btn" style="left:250px;top:44px;width:26px;height:22px">−</div>
+        <div class="txt" style="position:absolute;left:285px;top:48px">2</div>
+        <div class="btn" style="left:302px;top:44px;width:26px;height:22px">＋</div>
+        <div class="txt" style="position:absolute;left:8px;top:78px">铁锹</div>
+        <div class="btn" style="left:250px;top:74px;width:26px;height:22px">−</div>
+        <div class="txt" style="position:absolute;left:285px;top:78px">1</div>
+        <div class="btn" style="left:302px;top:74px;width:26px;height:22px">＋</div>
+        <div class="txt dim" style="position:absolute;left:8px;top:112px">补给合计 240 金</div>
+      </div>
+
+      <div class="z hot" style="left:6px;top:540px;right:6px;height:56px">
+        <div class="btn hot" style="left:8px;top:12px;width:352px;height:32px">出发</div>
+      </div>
+      <div class="lbl" style="left:12px;top:610px">回城不结余——多买的那部分就是这趟的赌注</div>
+    </div>
+  </div>
+  <div class="note">
+    <h3>元素去向</h3>
+    <ul>
+      <li>队伍四槽从横排改成 <span class="key">2×2</span>，每张 340×80，名字、位次、技能一眼看清。</li>
+      <li>补给买卖的 <code>−/＋</code> 从 28 宽涨到 26×22 —— 仍偏小，实施时按 48 做，行高随之到 56。</li>
+      <li>「出发」进一级热区，占满宽；「返回」留在顶部安全区，全局返回键位置统一。</li>
+    </ul>
+  </div>
+</div>
+
+<!-- M5 列表类 -->
+<div class="grid">
+  <div>
+    <div class="cap"><b>M5 · 建筑内页（公会 / 商店 / 饰品共用一套骨架）</b></div>
+    <div class="phone">
+      <div class="hd"><span>公会 · 技能组</span><span class="capsule"></span></div>
+      <div class="btn" style="left:6px;top:34px;width:44px;height:22px">返回</div>
+
+      <div class="z deep" style="left:6px;top:64px;right:6px;height:120px">
+        <div class="lbl" style="left:5px;top:3px">名册 · 竖排，点一行选中</div>
+        <div class="z" style="left:6px;top:15px;right:6px;height:24px"><span class="txt" style="position:absolute;left:6px;top:3px">十字军 · 已装备 4</span></div>
+        <div class="z" style="left:6px;top:43px;right:6px;height:24px"><span class="txt" style="position:absolute;left:6px;top:3px">修女 · 已装备 4</span></div>
+        <div class="z" style="left:6px;top:71px;right:6px;height:24px"><span class="txt" style="position:absolute;left:6px;top:3px">强盗 · 已装备 4</span></div>
+        <div class="z" style="left:6px;top:99px;right:6px;height:24px"><span class="txt" style="position:absolute;left:6px;top:3px">瘟疫医生 · 已装备 4</span></div>
+      </div>
+
+      <div class="z" style="left:6px;top:192px;right:6px;height:160px">
+        <div class="lbl" style="left:5px;top:3px">选中：十字军 · 技能全开 7 个</div>
+        <div class="btn on" style="left:8px;top:16px;width:110px;height:24px">制裁</div>
+        <div class="btn" style="left:126px;top:16px;width:110px;height:24px">狂热点名</div>
+        <div class="btn" style="left:244px;top:16px;width:110px;height:24px">眩晕击</div>
+        <div class="btn" style="left:8px;top:44px;width:110px;height:24px">信仰壁垒</div>
+        <div class="btn" style="left:126px;top:44px;width:110px;height:24px">战地治疗</div>
+        <div class="btn" style="left:244px;top:44px;width:110px;height:24px">圣枪</div>
+        <div class="btn" style="left:8px;top:72px;width:110px;height:24px">鼓舞</div>
+        <div class="txt dim" style="position:absolute;left:8px;top:108px">一行 3 个 · 每个 48 高 · 最多 3 行</div>
+      </div>
+
+      <div class="z hot" style="left:6px;top:600px;right:6px;height:34px">
+        <div class="btn hot" style="left:8px;top:6px;width:352px;height:22px">返回城镇</div>
+      </div>
+    </div>
+  </div>
+  <div class="note">
+    <h3>骨架</h3>
+    <ul>
+      <li><span class="key">上：名册竖列表</span>（原来横向铺一排，竖屏改成一行一人，滚动）。</li>
+      <li><span class="key">中：选中对象的操作区</span>（技能 / 商品 / 饰品槽），3 列网格。</li>
+      <li><span class="key">底部：返回</span>，与全局返回键同一位置（顶部左上 + 底部各一个）。</li>
+    </ul>
+    <h3>为什么这么改</h3>
+    <ul>
+      <li>这三页现在是「左列表 + 右详情」的横版结构，竖屏只能改成上下两段。</li>
+      <li>商店的「在售 / 仓库」两栏 → 变成两个分区上下排，仍是同一页面，<span class="ok">不用跳转</span>。</li>
+    </ul>
+  </div>
+</div>
+
+<!-- M6 结算 -->
+<div class="grid">
+  <div>
+    <div class="cap"><b>M6 · 结算</b></div>
+    <div class="phone">
+      <div class="hd"><span>结算</span><span class="capsule"></span></div>
+
+      <div class="lbl" style="left:12px;top:44px">本趟所得</div>
+      <div class="z" style="left:6px;top:56px;right:6px;height:120px">
+        <div class="txt" style="position:absolute;left:8px;top:10px">金币</div><div class="txt" style="position:absolute;right:8px;top:10px">+412</div>
+        <div class="txt" style="position:absolute;left:8px;top:34px">传家宝</div><div class="txt" style="position:absolute;right:8px;top:34px">+3</div>
+        <div class="txt" style="position:absolute;left:8px;top:58px">战利品</div><div class="txt" style="position:absolute;right:8px;top:58px">2 件</div>
+        <div class="txt" style="position:absolute;left:8px;top:82px">经验（全队）</div><div class="txt" style="position:absolute;right:8px;top:82px">+120</div>
+      </div>
+
+      <div class="z" style="left:6px;top:188px;right:6px;height:70px">
+        <div class="lbl" style="left:5px;top:3px">永久损失</div>
+        <div class="txt dim" style="position:absolute;left:8px;top:24px">无</div>
+      </div>
+
+      <div class="lbl" style="left:12px;top:276px">金币与传家宝已入账并存档。回城镇可以升级装备、</div>
+      <div class="lbl" style="left:12px;top:288px">招募阵亡英雄，或者再来一趟。</div>
+
+      <div class="z hot" style="left:6px;top:556px;right:6px;height:44px">
+        <div class="btn hot" style="left:8px;top:8px;width:352px;height:28px">回城镇</div>
+      </div>
+    </div>
+  </div>
+  <div class="note">
+    <h3>元素去向</h3>
+    <ul>
+      <li>纯列表型界面，横屏时也是竖排，<span class="ok">几乎不用改结构</span>，只需把按钮从底部 40 高改到 48 并进热区。</li>
+      <li>中间的说明文字缩短到两行，避免在 750 宽下折成四行。</li>
+    </ul>
+  </div>
+</div>
+
+<!-- M7 主菜单 -->
+<div class="grid">
+  <div>
+    <div class="cap"><b>M7 · 主菜单</b></div>
+    <div class="phone">
+      <div class="hd"><span></span><span class="capsule"></span></div>
+
+      <div style="position:absolute;left:0;top:120px;right:0;text-align:center;font-size:22px;letter-spacing:8px;color:#d9d4c7">空 腔</div>
+      <div style="position:absolute;left:0;top:156px;right:0;text-align:center;font-size:9px;color:#8b8a84">带四个人下去，把能带的都带回来</div>
+
+      <div class="lbl" style="left:12px;top:210px">存档 1 · 第 12 周 · 金币 837</div>
+      <div class="z" style="left:6px;top:220px;right:6px;height:70px">
+        <div class="txt" style="position:absolute;left:8px;top:8px">存档 1</div>
+        <div class="txt dim" style="position:absolute;left:8px;top:26px">第 12 周 · 金币 837 · 名册 4 人</div>
+      </div>
+      <div class="z" style="left:6px;top:298px;right:6px;height:70px">
+        <div class="txt" style="position:absolute;left:8px;top:8px">存档 2</div>
+        <div class="txt dim" style="position:absolute;left:8px;top:26px">空 —— 点这里开始新的一档</div>
+      </div>
+      <div class="z" style="left:6px;top:376px;right:6px;height:70px">
+        <div class="txt" style="position:absolute;left:8px;top:8px">存档 3</div>
+        <div class="txt dim" style="position:absolute;left:8px;top:26px">空 —— 点这里开始新的一档</div>
+      </div>
+
+      <div class="z" style="left:6px;top:566px;width:172px;height:34px"><div class="txt" style="position:absolute;left:0;right:0;top:9px;text-align:center">设置</div></div>
+      <div class="z" style="left:190px;top:566px;width:172px;height:34px"><div class="txt" style="position:absolute;left:0;right:0;top:9px;text-align:center">退出</div></div>
+    </div>
+  </div>
+  <div class="note">
+    <h3>元素去向</h3>
+    <ul>
+      <li>三个存档槽从横排卡片改成 <span class="key">竖排三行</span>，每行 140 高（图上 70），点整行进入。</li>
+      <li>设置与退出留在界面下部但<span class="cut">不算高频</span>，按钮 48 高、宽 344，避免误触。</li>
+      <li>标题下移，命中拇指上方视线区；顶部整块让给胶囊。</li>
+    </ul>
+  </div>
+</div>
+
+<!-- M8 胜利 -->
+<div class="grid">
+  <div>
+    <div class="cap"><b>M8 · 战役完成</b></div>
+    <div class="phone">
+      <div class="hd"><span></span><span class="capsule"></span></div>
+      <div style="position:absolute;left:0;top:170px;right:0;text-align:center;font-size:18px;color:#e0b24a">战役完成</div>
+      <div style="position:absolute;left:0;top:206px;right:0;text-align:center;font-size:20px;letter-spacing:4px;color:#d9d4c7">四境皆平</div>
+      <div style="position:absolute;left:24px;top:250px;right:24px;text-align:center;font-size:9px;color:#8b8a84;line-height:1.7">
+        荒野、墓穴、巢穴、海湾的首领全部被讨伐</div>
+
+      <div class="z hot" style="left:6px;top:520px;right:6px;height:44px">
+        <div class="btn hot" style="left:8px;top:8px;width:352px;height:28px">继续经营城镇</div>
+      </div>
+      <div class="z" style="left:6px;top:574px;right:6px;height:44px">
+        <div class="btn" style="left:8px;top:8px;width:352px;height:28px">开始新战役</div>
+      </div>
+      <div class="lbl" style="left:12px;top:634px">战役已完成，但城镇还开着 —— 剩下的时间是你的</div>
+    </div>
+  </div>
+  <div class="note">
+    <h3>元素去向</h3>
+    <ul>
+      <li>纯展示 + 两个选择，结构不变，只是按钮进热区、间距按竖屏拉开。</li>
+      <li>主按钮（继续经营）在上，次按钮（新战役）在下，<span class="key">不与主按钮并排</span>——竖屏并排会各只有 170 宽。</li>
+    </ul>
+  </div>
+</div>
+
+<div class="rule"></div>
+<div class="sub" style="margin-bottom:8px"><b>全局约定（所有屏共用）</b></div>
+<ul class="note" style="margin:0 0 18px">
+  <li>顶部 100 为胶囊安全区，所有常驻条从 y=100 起；可点控件一律不低于 y=100、不高于 y=1300。</li>
+  <li>全局返回键固定在 <b>左上 (24,108)</b>，尺寸 96×56；同一位置的元素在任何页都不放别的东西。</li>
+  <li>触控下限 48：现有 34（技能卡）、32（动作条）、28（休整/按钮）、42（建筑格）全部上调。</li>
+  <li>日志类信息全部改为「28 高摘要条 + 点开浮层」，浮层半透明、点空白关闭。</li>
+  <li>战斗背景是 1280×422 横图，竖屏需二选一：<span class="cut">裁中间竖条</span>（丢两侧）或<span class="key">上下模糊延展</span>（补高）。这一项要单独定，代码改不了。</li>
+</ul>
+
+</body>
+</html>

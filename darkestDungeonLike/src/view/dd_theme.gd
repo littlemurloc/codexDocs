@@ -13,8 +13,17 @@ const PANEL_EDGE := Color("#2c313a")
 const PANEL_HI := Color("#23272f")
 
 const TEXT := Color("#d9d4c7")
-const DIM := Color("#8b8a84")
-const FAINT := Color("#5d5f5c")
+# M90：两个次级色阶整体提亮。
+#
+# 原来 DIM #8b8a84 在面板 #1b1e24 上的对比度约 4.4:1（勉强），
+# FAINT #5d5f5c 只有 2.4:1 —— 那个亮度只适合「边框线」，不适合任何要读的字。
+# 全项目 FAINT 用了 108 处，其中 58 处是「小字 + 最暗」，等于把一堆
+# 本该能读的信息画成了灰雾（公会技能描述就是这么被反馈的）。
+#
+# 提亮之后仍然保持三级：TEXT(11:1) > DIM(5.9:1) > FAINT(3.9:1)。
+# FAINT 依旧明显更暗，只是从「看不见」变成「次要但能读」。
+const DIM := Color("#a8a59c")
+const FAINT := Color("#7d7b74")
 
 const PARTY := Color("#3e5c76")
 const ENEMY := Color("#7a3b34")
@@ -64,20 +73,25 @@ static func pct(v: float, digits: int = 0) -> String:
 # 没有统一的层级，所以「次要信息」在有些屏比「主要信息」还大。
 # 现在固定六档，新代码只准用这些名字：
 #
-#   FONT_TAG   9   角标、状态小字（不该抢注意力）
-#   FONT_SM    10  辅助说明、行内单位
-#   FONT_MD    11  正文默认
-#   FONT_BD    13  强调（按钮文字、条目名）
-#   FONT_LG    15  段落标题
-#   FONT_H1    16  屏幕内的大标题
-#   FONT_HERO  20  战斗中唯一的超大数字（伤害飘字）
-const FONT_TAG: int = 9
-const FONT_SM: int = 10
-const FONT_MD: int = 11
-const FONT_BD: int = 13
-const FONT_LG: int = 15
-const FONT_H1: int = 16
-const FONT_HERO: int = 20
+#   FONT_TAG   11  角标、状态小字（不该抢注意力）
+#   FONT_SM    12  辅助说明、行内单位
+#   FONT_MD    13  正文默认
+#   FONT_BD    15  强调（按钮文字、条目名）
+#   FONT_LG    17  段落标题
+#   FONT_H1    18  屏幕内的大标题
+#   FONT_HERO  22  战斗中唯一的超大数字（伤害飘字）
+#
+# M72：整体 +2。750 宽是按手机 2x 密度设计的，9~13 这一档在手机上等于
+# 4.5~6.5 逻辑点；桌面上窗口按 1334 高等比缩到 0.74 之后，
+# 9px 只剩 6.7 个物理像素 —— 玩家反馈「字小、糊」就是这个。
+# 提两档是最小可感知的幅度（+22% / +15%），再大就要动布局间距了。
+const FONT_TAG: int = 11
+const FONT_SM: int = 12
+const FONT_MD: int = 13
+const FONT_BD: int = 15
+const FONT_LG: int = 17
+const FONT_H1: int = 18
+const FONT_HERO: int = 22
 ## 结算屏那种「一屏只有一个」的大标题
 const FONT_DISPLAY: int = 30
 

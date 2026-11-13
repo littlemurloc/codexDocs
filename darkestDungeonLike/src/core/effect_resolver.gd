@@ -300,6 +300,9 @@ static func _apply_one(db: DdDb, e: Dictionary, attacker: Combatant, t: Combatan
 	if e.has("kill"):
 		t.dead = true
 		t.hp = 0
+		# 尸体可摧毁（M73），和 `take_damage` 里那条保持一致
+		if not t.is_hero:
+			t.corpse_hp = maxi(1, int(ceil(float(t.base_hp) / 12.0)))
 		out["killed"] = true
 		return out
 

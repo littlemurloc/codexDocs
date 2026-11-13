@@ -23,6 +23,7 @@ static func run(t: TestLib, db: DdDb) -> void:
 	_test_shuffle(t, db)
 	_test_score(t, db)
 	_test_pick(t, db)
+	_test_self_move(t, db)
 
 
 ## 位移抗性：res 高的人推不动，res 为 0 的人一定推得动。
@@ -226,13 +227,98 @@ static func _test_pick(t: TestLib, db: DdDb) -> void:
 			for e in b.run_round():
 				log.append(e)
 		for e in log:
-			if str(e.get("t", "")) == "move" and str(e.get("skill", "")) != "move":
+			# `self` 要排除：那是出手的人自己挪（M53），不是被别人推。
+			# 不排除的话这条断言会被自己的位移喂饱，测不出「怪物会不会推人」。
+			if str(e.get("t", "")) == "move" and str(e.get("skill", "")) != "move" \
+					and not bool(e.get("self", false)):
 				moved_any += 1
 		# 4 号位的人（瘟疫医生）如果被顶到更前面，就是被暴露了
 		if pd.rank < pd_start:
 			exposed += 1
 	t.ok(moved_any > 0, "20 场里发生了 %d 次被技能推动" % moved_any)
 	t.ok(exposed > 0, "有 %d 场里末位的人被顶到了前面" % exposed)
+
+
+## 技能自带的位移（M53）。
+##
+## 数据里每个技能都有 `move: [后退上限, 前进上限]`，12 个技能非 0，但这个字段
+## 从 M0 解析进动作字典之后**一直没人读**——所以原版招牌的「攻击时人物位移」
+## 在我们这儿一次都没发生过。这一组守住三件事：
+##   a) 真的会挪（方向对）
+##   b) 多目标只挪一次（放进逐目标循环里会按人数挪）
+##   c) 顶到边不算错误（不该报错、也不该卡住回合）
+static func _test_self_move(t: TestLib, db: DdDb) -> void:
+	t.section("位移：技能自带的挪位")
+	var b := Battle.new()
+	b.setup(HEROES, MONSTERS, 909)
+	var cr: Combatant = b.party[0]
+	var hl: Dictionary = _skill(cr, "holy_lance")
+	t.eq(hl.is_empty(), false, "十字军装载了 holy_lance")
+	var hl_mv: Array = hl.get("move", [])
+	t.eq("%d,%d" % [int(hl_mv[0]), int(hl_mv[1])], "0,1",
+		"holy_lance 的 move 是 [后退0, 前进1]（数据里是浮点，比之前先转 int）")
+
+	# 站到队尾，才挪得动
+	b.move_unit(cr, 3)
+	t.eq(cr.rank, 3, "先把十字军挪到 4 号位")
+	# 一次给两个目标：验证「只挪一次」，而不是按目标个数挪
+	b._apply_choice(cr, {"action": hl, "targets": [b.enemies[0], b.enemies[1]]})
+	t.eq(cr.rank, 2, "圣枪突进后 4 号位 -> 3 号位（两个目标也只挪一格）")
+	var mv: Dictionary = _first_of(b.events, "move")
+	t.eq(bool(mv.get("self", false)), true, "位移事件带 self 标记")
+	t.eq(str(mv.get("skill", "")), "holy_lance", "事件记着是哪个技能挪的")
+
+	# 反方向：开枪之后后退
+	var b2 := Battle.new()
+	b2.setup(HEROES, MONSTERS, 910)
+	var hm: Combatant = b2.party[1]
+	var pbs: Dictionary = _skill(hm, "point_blank_shot")
+	t.eq(pbs.is_empty(), false, "强盗装载了 point_blank_shot")
+	t.eq(hm.rank, 1, "强盗开局在 2 号位")
+	b2._apply_choice(hm, {"action": pbs, "targets": [b2.enemies[0]]})
+	t.eq(hm.rank, 2, "零距离开枪后 2 号位 -> 3 号位（后退一格）")
+
+	# 没打中也要挪：原版位移是动作的一部分，不是命中奖励。
+	#
+	# 造「必空」不能靠压 atk：`_resolve_action` 里 `atk <= 0` 会被判成功能技，
+	# 连命中判定都不走（第一版就是这么写错的，压根没产生 miss 事件）。
+	# 正确做法是把目标的闪避顶到上限 0.95，命中率必然被夹到 0。
+	var b4 := Battle.new()
+	b4.setup(HEROES, MONSTERS, 912)
+	var cr4: Combatant = b4.party[0]
+	var hl4: Dictionary = _skill(cr4, "holy_lance")
+	b4.enemies[0].base_dodge = 5.0
+	b4.move_unit(cr4, 3)
+	var n4: int = b4.events.size()
+	b4._apply_choice(cr4, {"action": hl4, "targets": [b4.enemies[0]]})
+	var saw_miss: bool = false
+	for i in range(n4, b4.events.size()):
+		if str(b4.events[i].get("t", "")) == "miss":
+			saw_miss = true
+	t.eq(saw_miss, true, "闪避顶满后这一下确实没打中（产生 miss 事件）")
+	t.eq(cr4.rank, 2, "没打中也照样突进（4 号位 -> 3 号位）")
+
+	# 顶到边：在最前排再突进，挪不动也不算错
+	var b3 := Battle.new()
+	b3.setup(HEROES, MONSTERS, 911)
+	var cr3: Combatant = b3.party[0]
+	t.eq(cr3.rank, 0, "十字军开局在 1 号位")
+	var n_before: int = b3.events.size()
+	b3._apply_choice(cr3, {"action": _skill(cr3, "holy_lance"),
+		"targets": [b3.enemies[0]]})
+	t.eq(cr3.rank, 0, "已在最前排，突进不动")
+	var got_move: bool = false
+	for i in range(n_before, b3.events.size()):
+		if str(b3.events[i].get("t", "")) == "move":
+			got_move = true
+	t.eq(got_move, false, "挪不动时不发 move 事件（否则日志会写一句空话）")
+
+
+static func _first_of(events: Array, type_name: String) -> Dictionary:
+	for e in events:
+		if str(e.get("t", "")) == type_name:
+			return e
+	return {}
 
 
 static func _skill(c: Combatant, id: String) -> Dictionary:

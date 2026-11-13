@@ -38,6 +38,8 @@ func _initialize() -> void:
 	TestM33.run(t, db)
 	TestM34.run(t, db)
 	TestM35.run(t, db)
+	TestM66.run(t, db)
+	TestM73.run(t, db)
 
 	# 与 Python 参考实现逐条对账
 	if FileAccess.file_exists("res://tests/fixtures/cross_validation.json"):

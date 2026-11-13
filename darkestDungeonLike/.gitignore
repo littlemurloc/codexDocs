@@ -12,3 +12,30 @@ battle_sample.log
 
 # 生成产物（可用 tools/gen_balance.py 重跑，体积大不进版本库）
 balance/
+
+# DD1 原始美术（Red Hook Studios 版权，只能本地原型用，不得随仓库分发）
+# 槽位约定见 assets/art/units/README.md —— 目录结构入库，图不入库。
+assets/art/units/*.png
+# M40 / M42 / M45 从 DD1 提取的界面与背景图（建筑 NPC 立绘、区域横幅、战斗背景）。
+# 这三处 M40/M42 当时漏了，M45 一并补上——否则 `git add .` 会把 10 MB 版权图带进仓库。
+assets/art/ui/**/*.png
+assets/art/battle/**/*.png
+# DD1 音频（M49 音乐 / M50 音效，同样不得分发）。
+# 注意 `assets/audio/*.wav` 是**原创占位音效**，那些要入库——
+# ogg 是原版、wav 是占位，两者是同一槽位的两级素材，不能混在一条规则里。
+assets/audio/music/*.ogg
+assets/audio/*.ogg
+# 敌人语音（M51）：353 个，都在子目录里。上面那条 `assets/audio/*.ogg`
+# **不会**往下匹配子目录（gitignore 的 `*` 不跨 `/`），所以必须单列。
+assets/audio/voice/*.ogg
+# 怪物攻击声（M52）：169 个，同样在子目录里
+assets/audio/atk/*.ogg
+# 原始素材包（197 MB，同样不得分发）
+assets/art/_src/
+# 战斗特效帧（M57）：3111 帧 / 17 MB，从 DD1 Spine 离线导出，同样不得分发。
+# manifest.json 要入库（描述帧数/锚点，不含美术本体），帧文件不入库。
+assets/art/fx/*/*.webp
+
+# 导出产物与本地 Android 工具链（M54）
+build/
+.tools/

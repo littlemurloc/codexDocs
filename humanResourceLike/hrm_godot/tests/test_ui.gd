@@ -536,6 +536,57 @@ func _run_checks() -> void:
 				_check(String(main.program[2].get("op", "")) == pop,
 					"应插到第 3 位，实际 %s（期望 %s）" % [main.program[2].get("op", ""), pop])
 
+		# 8b. 竖屏两步确认：第一下只选中，第二下（同一张）才追加。
+		#     触屏上「横滑看更多牌」和「点一下放牌」共用同一块矩形，按下那一刻两者一模一样 ——
+		#     只有位移能分开，剩下那点歧义用一次确认消掉。
+		#     原来没有这一步：手指横滑一下条子，松手就白多出一行代码。
+		var kit = preload("res://scripts/ui_kit.gd")
+		main.program = []
+		main._after_edit()
+		main._tall = true
+		main._set_pal_sel("")
+		var pal_op: String = String(main.palette_nodes.keys()[0])
+		var pal_card: Control = main.palette_nodes[pal_op]
+		var pc: Vector2 = pal_card.get_global_rect().get_center()
+		var n_before: int = main.program.size()
+		# 横滑：按下 → 横移 40px → 松手
+		main._pal_gesture(_touch(pc, true))
+		main._begin_press("new", pal_op, -1, pc)   # 牌子的 gui_input 在 _input 之后才收到
+		main._pal_gesture(_drag(pc + Vector2(40, 0), Vector2(40, 0)))
+		main._pal_gesture(_touch(pc + Vector2(40, 0), false))
+		_check(main._pal_sel == "", "横滑不该选中任何牌，实际「%s」" % main._pal_sel)
+		_check(main.program.size() == n_before, "横滑不该追加指令，实际 %d 行" % main.program.size())
+		_check(not main._press_on, "横滑之后这次按下必须作废，否则松手会被当成点击")
+		# 点一下：只选中，不动程序
+		main._pal_gesture(_touch(pc, true))
+		main._begin_press("new", pal_op, -1, pc)
+		main._pal_gesture(_touch(pc, false))
+		_check(main._pal_sel == pal_op, "点一下应选中 %s，实际「%s」" % [pal_op, main._pal_sel])
+		_check(main.program.size() == n_before, "第一下只选中，不该追加，实际 %d 行" % main.program.size())
+		_check(main.lbl_insert_hint.text.contains("再点一次"),
+			"选中之后那行字要说下一步怎么做，实际「%s」" % main.lbl_insert_hint.text)
+		var sel_sb: StyleBoxFlat = pal_card.get_meta("sb", null)
+		_check(sel_sb != null and sel_sb.bg_color == kit.WOOD_4 and sel_sb.border_color == kit.TEXT,
+			"选中的牌要换底色 + 白描边：只改描边的话，静止截图里指不出哪张被选中")
+		# 再点同一张：这才真的放下
+		main._pal_gesture(_touch(pc, true))
+		main._begin_press("new", pal_op, -1, pc)
+		main._pal_gesture(_touch(pc, false))
+		_check(main.program.size() == n_before + 1,
+			"第二次点同一张牌才追加，实际 %d 行" % main.program.size())
+		_check(main._pal_sel == "", "放下之后牌不该还亮着，实际「%s」" % main._pal_sel)
+		# 手落在别处 = 放弃这张牌
+		main._set_pal_sel(pal_op)
+		main._begin_press("row", "", 0, Vector2.ZERO)
+		_check(main._pal_sel == "", "手落到行上应收回选中，实际「%s」" % main._pal_sel)
+		main._press_on = false
+		# 横屏仍是一下就追加：鼠标精准，没有「横滑看牌」这回事，不该多一步
+		main._tall = false
+		var n_wide: int = main.program.size()
+		main._on_palette_tap(pal_op)
+		_check(main.program.size() == n_wide + 1,
+			"横屏点一下就该追加，实际 %d 行" % main.program.size())
+
 		# 9. 全链路：按住第 1 行把它拖到最后
 		main.program = [VM.make_ins("INBOX"), VM.make_ins("OUTBOX"), VM.make_ins("COMMENT")]
 		main._after_edit()
@@ -981,6 +1032,24 @@ func _mouse_move(pos: Vector2) -> void:
 	e.global_position = pos
 	e.relative = pos
 	root.push_input(e)
+
+
+## 触摸事件：Web/手机上真正走的是这一条，鼠标事件只是它的模拟。
+## 测「滑一下会不会误放牌」必须用触摸，用鼠标测出来的结论不成立。
+func _touch(pos: Vector2, pressed: bool) -> InputEventScreenTouch:
+	var e := InputEventScreenTouch.new()
+	e.index = 0
+	e.position = pos
+	e.pressed = pressed
+	return e
+
+
+func _drag(pos: Vector2, rel: Vector2) -> InputEventScreenDrag:
+	var e := InputEventScreenDrag.new()
+	e.index = 0
+	e.position = pos
+	e.relative = rel
+	return e
 
 
 func _finish() -> void:
