@@ -4,6 +4,8 @@
 
 | 文档 | 说明 |
 | --- | --- |
+| [安全区界面更新总清单与编辑器定位](../../../deliverables/安全区界面更新总清单与编辑器定位-2026-11-19.md) | 本轮27个正式路径、ECA/UI/存档及配表入口。 |
+| [安全区界面实装复盘与清理](../../../deliverables/安全区界面实装复盘与清理-2026-11-19.md) | 设计还原、原生保存／引用、网格、日志与测试夹具／过程清理。 |
 | [lineup-formation-v01.md](lineup-formation-v01.md) | 阵容与 3x3 站位配置。 |
 | [hero-config-v01.md](hero-config-v01.md) | 英雄详情、技能解锁与小队信息参考。 |
 | [battle-prep-choice-v04.md](battle-prep-choice-v04.md) | 备战状态历史视觉参考；V1 将在此阶段展示军令市场三报价，具体 UI 待主策划补充交互规则后重做。 |

@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>绿皮兽人狂战士 · 角色资源查看器</title>
+  <link rel="stylesheet" href="viewer.css">
+  <script defer src="viewer-data.js"></script>
+  <script defer src="viewer.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="shell topbar-inner">
+      <span class="brand"><span class="brand-mark" aria-hidden="true"></span>角色资源查看器</span>
+      <div class="topbar-actions"><a class="character-link" href="../dark_elf_assassin_sample/viewer.html">暗精灵女刺客 →</a>
+      <a class="download" href="../basic_motion_rework/storyboard-walk-assets.zip" download>下载行进资源 <span aria-hidden="true">↓</span></a></div>
+    </div>
+  </header>
+
+  <main class="shell">
+    <div class="hero">
+      <div>
+        <h1>绿皮兽人狂战士</h1>
+        <p>双持短柄斧</p>
+      </div>
+    </div>
+
+    <nav class="tabs" aria-label="角色资源" role="tablist">
+      <button id="tab-motion" type="button" role="tab" aria-controls="motion" aria-selected="true">动作</button>
+      <button id="tab-art" type="button" role="tab" aria-controls="art" aria-selected="false" tabindex="-1">立绘与补绘</button>
+      <button id="tab-parts" type="button" role="tab" aria-controls="parts" aria-selected="false" tabindex="-1">部件</button>
+      <button id="tab-atlas" type="button" role="tab" aria-controls="atlas" aria-selected="false" tabindex="-1">图集</button>
+    </nav>
+
+    <div id="clip-bar" class="clip-bar">
+      <label for="clip-select">动作片段</label>
+      <select id="clip-select"></select>
+      <span id="clip-category"></span>
+      <button id="motion-revision" class="icon-toggle" type="button" aria-pressed="false" hidden>看旧版</button>
+    </div>
+
+    <section id="motion" role="tabpanel" aria-labelledby="tab-motion">
+      <div class="workspace">
+        <div class="panel player">
+          <div class="stage" id="stage">
+            <div class="stage-top">
+              <div class="status"><span aria-hidden="true"></span><strong id="stage-clip">战斗待机</strong></div>
+              <div class="stage-actions">
+                <button id="fx" type="button" class="icon-toggle" aria-pressed="true" hidden>特效</button>
+                <button id="bones" type="button" class="icon-toggle" aria-pressed="false">骨架</button>
+                <button id="background" type="button" class="icon-toggle" aria-pressed="false">透明格</button>
+              </div>
+            </div>
+            <div class="canvas-wrap">
+              <img id="clip-poster" class="clip-poster" alt="" hidden>
+              <canvas id="viewport" width="660" height="652" aria-label="绿皮兽人狂战士的角色动作动画"></canvas>
+            </div>
+            <p id="media-error" class="media-error" role="status" hidden>图集载入失败。请检查查看器是否和样件图集放在同一目录。</p>
+            <span class="origin-label" id="origin-label" hidden>菱形标记脚底锚点</span>
+          </div>
+
+          <div class="transport">
+            <div class="timeline-row">
+              <label for="scrubber" class="sr-only">动画帧</label>
+              <input id="scrubber" type="range" min="0" max="59" value="0">
+              <output id="timecode" for="scrubber" aria-live="off">0.00 / 2.50 秒</output>
+            </div>
+            <div class="transport-row">
+              <div class="transport-group">
+                <button id="play" class="transport-button play" type="button" title="播放或暂停（空格）" aria-label="播放"><span id="play-icon" class="play-icon" aria-hidden="true"></span></button>
+                <button id="previous" class="transport-button step" type="button" title="上一帧（←）" aria-label="上一帧">‹</button>
+                <button id="next" class="transport-button step" type="button" title="下一帧（→）" aria-label="下一帧">›</button>
+                <span class="frames" id="frame-label">01 / 60 帧</span>
+              </div>
+              <div class="transport-group">
+                <label for="speed" class="sr-only">播放速度</label>
+                <select id="speed" title="播放速度">
+                  <option value="0.25">0.25×</option>
+                  <option value="0.5">0.5×</option>
+                  <option value="1" selected>1×</option>
+                  <option value="1.5">1.5×</option>
+                  <option value="2">2×</option>
+                </select>
+                <button id="loop" class="loop" type="button" aria-pressed="true" title="循环播放"><span aria-hidden="true">↻</span> 循环</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <aside class="panel inspector">
+          <div class="inspector-head">
+            <h2 id="clip-title">战斗待机</h2>
+            <code id="clip-id">combat</code>
+          </div>
+          <dl class="stats">
+            <div><dt>时长</dt><dd id="stat-duration">1.42 <small>秒</small></dd></div>
+            <div><dt>帧率</dt><dd id="stat-fps">24 <small>fps</small></dd></div>
+            <div><dt>总帧数</dt><dd id="stat-frames">34</dd></div>
+          </dl>
+          <div class="markers">
+            <h3>动作节点</h3>
+            <div id="markers"></div>
+          </div>
+          <div class="inspector-files">
+            <a id="clip-webp" download>透明动画 <span>WEBP ↓</span></a>
+            <a id="clip-motion" download>动作源数据 <span>JSON ↓</span></a>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="art" role="tabpanel" aria-labelledby="tab-art" hidden>
+      <div class="art-layout">
+        <figure class="panel art-figure">
+          <figcaption><h2>完整立绘</h2><a href="orc-berserker.png" download>PNG ↓</a></figcaption>
+          <div class="art-matte checker"><img src="orc-berserker.png" alt="双持短柄斧的绿皮兽人完整立绘"></div>
+        </figure>
+        <figure class="panel art-figure">
+          <figcaption><h2>拆件与补绘对照</h2><a href="parts-and-underpaint.png" download>PNG ↓</a></figcaption>
+          <div class="sheet-matte"><a href="parts-and-underpaint.png" target="_blank" rel="noopener"><img src="parts-and-underpaint.png" alt="拆件、零位拼装和颈部、胸肩、腰线、腕口的补绘区域"></a></div>
+        </figure>
+      </div>
+      <div class="panel pose-gallery">
+        <div class="section-head"><h2>专用姿势</h2></div>
+        <div class="pose-grid">
+          <a href="storyboard-walk/profile-source.png" target="_blank" rel="noopener"><img src="storyboard-walk/profile-source.png" alt="侧面行进专用立绘"><span>分镜重绘 · 低斧沉步</span></a>
+          <a href="../../output/movement-storyboards-20261118/orc-warrior-walk.png" target="_blank" rel="noopener"><img src="../../output/movement-storyboards-20261118/orc-warrior-walk.png" alt="八格行进分镜"><span>参考 · 八格行进分镜</span></a>
+          <a href="motion-v2/travel.png" target="_blank" rel="noopener"><img src="motion-v2/travel.png" alt=""><span>探索专用立绘</span></a>
+          <a href="poses/cross_break.png" target="_blank" rel="noopener"><img src="poses/cross_break.png" alt=""><span>交叉破甲 · 出斧</span></a>
+          <a href="poses/falling_axes.png" target="_blank" rel="noopener"><img src="poses/falling_axes.png" alt=""><span>双斧坠劈 · 落斧</span></a>
+          <a href="poses/dead.png" target="_blank" rel="noopener"><img src="poses/dead.png" alt=""><span>阵亡 · 倒地</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section id="parts" role="tabpanel" aria-labelledby="tab-parts" hidden>
+      <div class="workspace">
+        <div class="panel">
+          <div class="section-head"><h2>透明部件</h2><span>按绘制顺序排列</span></div>
+          <div class="part-grid" id="part-grid"></div>
+        </div>
+        <aside class="panel part-inspector">
+          <div class="section-head"><h2 id="part-name"></h2><a id="part-download" download>PNG ↓</a></div>
+          <div class="part-detail checker"><img id="part-preview" alt=""></div>
+          <dl class="metadata" id="part-meta"></dl>
+        </aside>
+      </div>
+    </section>
+
+    <section id="atlas" role="tabpanel" aria-labelledby="tab-atlas" hidden>
+      <div class="workspace">
+        <figure class="panel atlas-panel">
+          <figcaption class="section-head"><h2>动作图集</h2><button id="grid-toggle" type="button" class="icon-toggle" aria-pressed="true">帧边界</button></figcaption>
+          <div class="atlas-wrap checker" id="atlas-wrap">
+            <img id="atlas-image" alt="当前动作的透明帧图集">
+            <div class="atlas-frames" id="atlas-frames"></div>
+          </div>
+        </figure>
+        <aside class="panel part-inspector">
+          <div class="section-head"><h2 id="atlas-title">第 01 帧</h2></div>
+          <label class="atlas-select-label">选择帧
+            <select id="atlas-select"></select>
+          </label>
+          <canvas id="atlas-preview" width="330" height="326" class="checker" aria-label="当前图集帧预览"></canvas>
+          <button id="open-frame" type="button" class="open-frame">在动作中查看 <span aria-hidden="true">→</span></button>
+          <dl class="metadata" id="atlas-meta"></dl>
+          <div class="inspector-files">
+            <a id="atlas-png" download>透明图集 <span>PNG ↓</span></a>
+            <a id="atlas-json" download>帧与事件数据 <span>JSON ↓</span></a>
+            <a id="atlas-fx" download hidden>独立特效图集 <span>PNG ↓</span></a>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <noscript><p class="panel noscript">开启 JavaScript 后可逐帧查看。<a href="poisoned-idle.gif">打开循环 GIF</a></p></noscript>
+  </main>
+</body>
+</html>
+
+
+

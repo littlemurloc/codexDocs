@@ -25,7 +25,8 @@ if (name === 'tools/list') {
   console.log(JSON.stringify(payload.result.tools.filter(tool =>
     ['get_editor_log', 'screenshot_ui', 'get_map_info',
       'get_object_editor_list', 'get_editor_item_custom_data',
-      'import_object_editor', 'import_eca'].includes(tool.name)), null, 2));
+      'import_object_editor', 'import_eca', 'hotfix_ui_editor', 'save_editor',
+      'restart_editor', 'import_ui', 'export_ui'].includes(tool.name)), null, 2));
 } else {
   for (const block of payload.result.content || []) {
     if (block.type === 'text') console.log(block.text);
