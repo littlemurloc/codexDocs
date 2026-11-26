@@ -206,11 +206,24 @@ static func _test_map_mode(t: TestLib, db: DdDb) -> void:
 		if int(r) == e.current_room:
 			continue
 		if e.travel(int(r)):
+			# M144 之后房间里的事件要玩家「点脚下这一格」才入队，
+			# 所以这里模拟那一下 —— 不然下一步 travel 会被门口拦住。
+			if e.has_pending_room():
+				e.enter_room()
 			while e.has_pending() and not e.ended:
 				var s3: Dictionary = e.take_step()
 				if str(s3.get("kind", "")) == "curio":
 					e.resolve_curio()
 	t.eq(e.at_goal(), true, "走到了目标房间")
+	# M145 回归：门口有内容时**不许继续走** —— 否则那间房会被永久跳过，
+	# 玩家还能在门口反复绕圈（表现就是「房间可以随便走」）。
+	if e.has_pending_room():
+		var any_next: int = -1
+		for nb2 in e.adjacent():
+			any_next = int(nb2.room)
+			break
+		if any_next >= 0:
+			t.eq(e.travel(any_next), false, "门口有内容时走不了下一间")
 	t.eq(e.ended, false, "到达目标不等于远征结束")
 
 	e.leave_dungeon()

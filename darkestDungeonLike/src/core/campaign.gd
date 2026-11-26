@@ -122,6 +122,22 @@ var gold: int = 0
 var heirlooms: Dictionary = {}      # name -> 数量
 var roster: Dictionary = {}         # hero_id -> {gear, skill, alive, stress, runs, deaths}
 var expeditions: int = 0
+## 真正**完成**的任务数（M123，走出地牢才算，撤退/全灭不算）。
+##
+## 和 `expeditions`（出发趟数）不是一个数：这是城镇建筑解锁的判据，
+## 原版就是这么算的（`requirements.number_of_queries_finished`）。
+## 用出发次数会让「进去两间房就撤退」刷开建筑。
+var quests_done: int = 0
+## 已通关的委托（M198）：键是 `区域|尺寸|任务|等级`。
+##
+## `quests_done` 只是一个计数，回答不了「这张卡我打过没有」——
+## 于是玩家会反复接同一张，以为没完成，而建筑解锁只看总数，就更看不出差在哪。
+## 键里带 level：同一个区域同一个尺寸，1 级和 3 级是两趟不同的活。
+var quests_cleared: Dictionary = {}
+## 各建筑的升级阶（M131）：0 = 未升级，最高 BUILDING_MAX_LEVEL。
+##
+## 原版每个建筑都有升级树，我们之前完全没做 —— 后期金币没有出口。
+var building_levels: Dictionary = {}
 var best_steps: int = 0
 ## 成绩口径版本。1 = 旧口径（step_index，含走廊内容结算的累计步数），
 ## 2 = 房间数（与结算屏「推进 X/Y 步」一致）。
@@ -182,6 +198,18 @@ var board_region: String = "weald"
 var week: int = 1
 
 var _order: Array = []              # 名册显示顺序（已入册的职业，按加入先后）
+## 玩家自己定的出战名单（M114）。空数组 = 还没定过，按「最强的四个」现算。
+##
+## 原来它只活在界面里（`_prep_party`），**不入档**：
+## 手机上把游戏切后台、进程被系统回收，回来时重新 `_ready`，
+## 名单就退回默认的「最强四个」—— 玩家改过的阵容凭空消失。
+var party_ids: Array = []
+## 出发准备屏里那份补给包（M116）。和 `party_ids` 一样原本只活在界面里，
+## 切后台被回收就退回保底包 —— 买好的八份口粮白买。
+var supply_pack: Dictionary = {}
+## 进行中的远征（M116）。空 = 没有在打的这一趟。
+## 存的是 `Expedition.to_save_dict()` 的整份快照，见那边的注释。
+var expedition_run: Dictionary = {}
 
 ## 全部已知职业（M27）。由场景从 `heroes.json` 灌进来。
 ##
@@ -382,7 +410,10 @@ func new_game() -> void:
 			else _roll_start_quirks(hid_s, rng)
 		roster[hid_s] = {"gear": 0, "skill": 0, "alive": true,
 			"stress": 0.0, "runs": 0, "deaths": 0, "quirks": qlist, "equipped": [],
-			"skills": _default_loadout(hid_s), "busy": 0}
+			"skills": _default_loadout(hid_s), "busy": 0,
+			# 每个技能各自的等级（M126）：原版就是 5 级 per-skill，
+			# 不是「整个英雄一个技能等级」。旧字段 `skill` 保留只为兼容存档。
+			"skill_levels": {}}
 	trinket_store = []
 	trinket_refused = {}
 	supplies = {}
@@ -393,6 +424,9 @@ func new_game() -> void:
 	shop_seed = start_rng_seed if start_rng_seed != 0 else randi()
 	refresh_shop()
 	expeditions = 0
+	quests_done = 0
+	quests_cleared = {}
+	building_levels = {}
 	week = 1
 	best_steps = 0
 	steps_metric = 2
@@ -422,6 +456,8 @@ func to_dict() -> Dictionary:
 		"heirlooms": heirlooms.duplicate(),
 		"roster": roster.duplicate(true),
 		"expeditions": expeditions,
+		"quests_done": quests_done,
+		"quests_cleared": quests_cleared.duplicate(),
 		"week": week,
 		"best_steps": best_steps,
 		"steps_metric": steps_metric,
@@ -446,6 +482,11 @@ func to_dict() -> Dictionary:
 		"boss_cleared": boss_cleared.duplicate(),
 		# 阵亡记录（M48）：不存的话墓园只剩次数，回看这件事就做不到。
 		"death_log": death_log.duplicate(true),
+		# 出战名单（M114）：不进档的话，切后台被回收就退回默认阵容。
+		"party_ids": party_ids.duplicate(),
+		"supply_pack": supply_pack.duplicate(),
+		"expedition_run": expedition_run.duplicate(true),
+		"building_levels": building_levels.duplicate(),
 	}
 
 
@@ -456,6 +497,17 @@ func from_dict(d: Dictionary) -> void:
 		heirlooms[str(k)] = 0
 	for k in (d.get("heirlooms", {}) as Dictionary).keys():
 		heirlooms[str(k)] = int(d["heirlooms"][k])
+	# 出战名单（M114）。旧档没有这个字段就是空数组 —— 保持「按最强四个现算」的旧行为。
+	party_ids = []
+	for hid_p in (d.get("party_ids", []) as Array):
+		party_ids.append(str(hid_p))
+	supply_pack = {}
+	for sp_k in (d.get("supply_pack", {}) as Dictionary).keys():
+		supply_pack[str(sp_k)] = int(d["supply_pack"][sp_k])
+	expedition_run = (d.get("expedition_run", {}) as Dictionary).duplicate(true)
+	building_levels = {}
+	for bk in (d.get("building_levels", {}) as Dictionary).keys():
+		building_levels[str(bk)] = clampi(int(d["building_levels"][bk]), 0, BUILDING_MAX_LEVEL)
 	death_log = []
 	for ent in (d.get("death_log", []) as Array):
 		if ent is Dictionary:
@@ -536,6 +588,12 @@ func from_dict(d: Dictionary) -> void:
 			"xp": maxi(0, int(row.get("xp", 0))),
 		}
 	expeditions = int(d.get("expeditions", 0))
+	# 旧档没有这个字段：用出发趟数兜底，免得一读档所有建筑全锁上
+	quests_done = int(d.get("quests_done", expeditions))
+	# 旧档没有这张表：留空，卡片上只是没有「已通关」角标，不影响任何判定。
+	quests_cleared = {}
+	for k in (d.get("quests_cleared", {}) as Dictionary).keys():
+		quests_cleared[str(k)] = true
 	# 旧档没有周次：按「趟数 + 1」补，而不是从 1 重来——
 	# 重来会让已经打了 10 趟的档显示「第 1 周」，比不显示还糟。
 	week = maxi(1, int(d.get("week", expeditions + 1)))
@@ -684,6 +742,26 @@ func hero_ids() -> Array:
 	return _order.duplicate()
 
 
+## 名册页的显示顺序（M149）：**上阵的排最前**，其余保持 _order。
+##
+## 名册一屏能看到的人是有限的，而玩家每次打开名册最想看的就是
+## 「这趟带谁下去」。原来纯按加入顺序排，上阵的四个人可能散在中间。
+func hero_ids_deployed_first() -> Array:
+	# 三层排序（M153）：上阵 → 活着的 → **阵亡的排最后**。
+	# 死人不该占着名册最上面的位置 —— 那里是「这趟带谁下去」。
+	var out: Array = []
+	for hid in _order:
+		if party_ids.has(str(hid)):
+			out.append(str(hid))
+	for hid2 in _order:
+		if not party_ids.has(str(hid2)) and bool((roster[str(hid2)] as Dictionary).get("alive", true)):
+			out.append(str(hid2))
+	for hid3 in _order:
+		if not bool((roster[str(hid3)] as Dictionary).get("alive", true)):
+			out.append(str(hid3))
+	return out
+
+
 func hero(hid: String) -> Dictionary:
 	return roster.get(hid, {})
 
@@ -790,7 +868,10 @@ func advance_week() -> void:
 		if b > 0:
 			r["busy"] = b - 1
 	var cyc: Dictionary = cfg.get("town_cycle", {})
-	var relief: float = float(cyc.get("weekly_stress_relief", 0.0))
+	# 疗养院每阶每周多恢复 5 点（M132）—— 它没有「治疗队列」那套系统，
+	# 所以效果落在全队减压上，作用面等价。
+	var relief: float = float(cyc.get("weekly_stress_relief", 0.0)) \
+		+ 5.0 * float(building_level("sanitarium"))
 	if relief > 0.0:
 		for hid2 in roster.keys():
 			var r2: Dictionary = roster[hid2]
@@ -825,6 +906,13 @@ func idle_week() -> String:
 ## 出战上限。战斗层只认 rank 0–3（目标掩码是 4 位），
 ## 所以这里必须硬夹住，不能靠调用方自觉。
 const PARTY_MAX: int = 4
+## 技能最高等级索引（原版 5 级：0~4）
+const SKILL_MAX_LEVEL: int = 4
+## 建筑最高能升到第几阶（和原版的 3 阶对齐：0 基 0~3）
+const BUILDING_MAX_LEVEL: int = 3
+## 建筑升级价（从第 i 阶到 i+1 阶）。后期金币的主要出口，
+## 所以曲线比装备陡一点 —— 装备是「每人一件」，建筑是「全队受益」。
+const BUILDING_COST: Array = [600, 1500, 3000]
 
 
 ## 默认出战名单：按名册顺序取前 4 个能出战的人（活着且不忙）。
@@ -1171,6 +1259,18 @@ func board_for(region: String) -> Array:
 	return boards.get(region, [])
 
 
+## 委托的唯一键（M198）：`区域|尺寸|任务|等级`。
+##
+## **界面和存档必须用同一个拼法**：两边各写一套，卡片上的「已通关」角标
+## 迟早会和记录对不上，而那种 bug 只表现为「明明打过却没标」。
+static func quest_key(region: String, size: String, quest: String, level: int) -> String:
+	return "%s|%s|%s|%d" % [region, size, quest, level]
+
+
+func is_quest_cleared(region: String, size: String, quest: String, level: int) -> bool:
+	return quests_cleared.has(quest_key(region, size, quest, level))
+
+
 ## 切换当前区域。城镇上那排区域按钮走这里。
 func select_board_region(region: String) -> void:
 	if not BOARD_REGIONS.has(region):
@@ -1289,6 +1389,71 @@ func gear_of(hid: String) -> int:
 	return int((roster.get(hid, {}) as Dictionary).get("gear", 0))
 
 
+## 某个技能的当前等级（0~4，M126）。
+##
+## 没有记录 = 0 级。**不要拿英雄的 `skill` 字段兜底**：那个字段是
+## 早期「整英雄一个等级」的遗留，一旦兜底，新加的技能会继承一个它没有的等级。
+func skill_level_of(hid: String, sid: String) -> int:
+	var lv: Dictionary = (roster.get(hid, {}) as Dictionary).get("skill_levels", {})
+	return clampi(int(lv.get(sid, 0)), 0, SKILL_MAX_LEVEL)
+
+
+## 技能等级上限，跟着**决心等级**走（原版规则）。
+##
+## 原版是「决心 1/2 级能让技能到 1 级，之后每 2 级再开 1 级」，
+## 也就是上限 = (resolve + 1) / 2。这里换算成 0 基索引。
+func skill_cap(hid: String) -> int:
+	# 线性映射：决心 1 → 1 级，决心上限 → 5 级。
+	#
+	# 原来抄的是原版「每 2 级放 1 级」的写法 `(resolve+1)/2-1`，
+	# 但我们的 MAX_RESOLVE 是 5，算出来最高只到索引 2 ——
+	# **5 级技能永远升不到**（测试 M131 抓到的：决心 9 被钳到 5，上限 2）。
+	var span: int = maxi(1, MAX_RESOLVE - 1)
+	return clampi(int(round(float(resolve_of(hid) - 1) * float(SKILL_MAX_LEVEL) / float(span))),
+		0, SKILL_MAX_LEVEL)
+
+
+## 升一级要花多少金币（M126）。曲线参考原版「越往上越贵」的节奏。
+func skill_upgrade_cost(hid: String, sid: String) -> int:
+	var cur: int = skill_level_of(hid, sid)
+	if cur >= SKILL_MAX_LEVEL:
+		return -1
+	# 公会每升一阶便宜 10%（M131）
+	return int(120.0 * pow(1.9, float(cur)) * skill_cost_multiplier())
+
+
+## 升一个技能。返回空字符串表示成功，否则是**给玩家看的**原因。
+##
+## 「为什么点不动」比「点了没反应」重要 —— 每一条拒绝都要说清是哪一条卡住。
+func upgrade_skill(hid: String, sid: String) -> String:
+	if not roster.has(hid):
+		return "名册里没有这个人"
+	var cur: int = skill_level_of(hid, sid)
+	if cur >= SKILL_MAX_LEVEL:
+		return "已经满级"
+	var cap: int = skill_cap(hid)
+	if cur >= cap:
+		return "决心等级 Lv%d 只支持技能到 %d 级 —— 先练级" % [
+			resolve_of(hid), cap + 1]
+	var cost: int = skill_upgrade_cost(hid, sid)
+	if gold < cost:
+		return "金币不够（要 %d，你有 %d）" % [cost, gold]
+	gold -= cost
+	var lv: Dictionary = (roster[hid] as Dictionary).get("skill_levels", {})
+	lv[sid] = cur + 1
+	(roster[hid] as Dictionary)["skill_levels"] = lv
+	return ""
+
+
+## 一趟出发时把每个人的技能等级表带进战斗（M126）。
+func skill_levels_map(ids: Array) -> Dictionary:
+	var out: Dictionary = {}
+	for hid in ids:
+		out[str(hid)] = (roster.get(str(hid), {}) as Dictionary).get(
+			"skill_levels", {}).duplicate()
+	return out
+
+
 func skill_of(hid: String) -> int:
 	return int((roster.get(hid, {}) as Dictionary).get("skill", 0))
 
@@ -1340,7 +1505,8 @@ func refresh_shop(seed_override: int = 0) -> void:
 		var tid: String = str(t)
 		if trinket_lib != null and trinket_lib.is_loaded() and trinket_lib.limit_of(tid) == 1:
 			owned.append(tid)
-	shop_stock = shop.roll_stock(rng, Shop.STOCK_SIZE, owned)
+	# 商队每升一阶多两格货架（M132）
+	shop_stock = shop.roll_stock(rng, Shop.STOCK_SIZE + building_level("wagon") * 2, owned)
 
 
 ## 换一批货架（花钱刷新）。DD1 里这是「下周再来看看」的等价物。
@@ -1592,6 +1758,25 @@ func add_trinket(id: String) -> String:
 	return reason
 
 
+## 批量入账，**带回被拒的明细**（M168）。
+##
+## 原来只返回「进去了哪些」，被拒的只知道个数 —— 于是结算屏只能说
+## 「另有 N 件没能带走」，玩家既看不到是哪几件，也没机会换。
+func add_trinkets_detail(ids: Array) -> Dictionary:
+	var got: Array = []
+	var refused: Array = []
+	for t in ids:
+		var tid: String = str(t)
+		if tid.is_empty():
+			continue
+		var why: String = add_trinket(tid)
+		if why.is_empty():
+			got.append(tid)
+		else:
+			refused.append({"id": tid, "why": why})
+	return {"got": got, "refused": refused}
+
+
 ## 一次掉落的批量入账。返回实际进仓库的 id 列表（结算屏要用）。
 func add_trinkets(ids: Array) -> Array:
 	var got: Array = []
@@ -1695,8 +1880,12 @@ func upgrade_cost(hid: String) -> Dictionary:
 		return {}
 	var row: Dictionary = (table[g] as Dictionary).duplicate(true)
 	var disc: float = quirk_upgrade_discount()
-	if disc > 0.0 and row.has("gold"):
-		row["gold"] = maxi(1, int(round(float(row["gold"]) * (1.0 - disc))))
+	# 铁匠铺每阶再 -10%（M132）。和怪癖折扣**相乘**而不是相加：
+	# 相加的话两个 10% 会变成 20%，铁匠升满再加个怪癖就快白送了。
+	var smith_disc: float = 1.0 - pow(0.9, float(building_level("smith")))
+	var total_disc: float = 1.0 - (1.0 - disc) * (1.0 - smith_disc)
+	if total_disc > 0.0 and row.has("gold"):
+		row["gold"] = maxi(1, int(round(float(row["gold"]) * (1.0 - total_disc))))
 	return row
 
 
@@ -1791,6 +1980,36 @@ func recruit(hid: String) -> bool:
 # M34 把 key 换成了实例 id（`crusader#2`），这条限制才解开——
 # 名册上限从此是**人头数**，不是职业数。
 
+## 某座建筑当前的阶（M131）。
+func building_level(bid: String) -> int:
+	return clampi(int(building_levels.get(bid, 0)), 0, BUILDING_MAX_LEVEL)
+
+
+func building_upgrade_cost(bid: String) -> int:
+	var lv: int = building_level(bid)
+	if lv >= BUILDING_MAX_LEVEL:
+		return -1
+	return int(BUILDING_COST[mini(lv, BUILDING_COST.size() - 1)])
+
+
+## 升一座建筑。返回空串表示成功，否则是给玩家看的原因。
+func upgrade_building(bid: String) -> String:
+	var lv: int = building_level(bid)
+	if lv >= BUILDING_MAX_LEVEL:
+		return "已经满级了"
+	var cost: int = building_upgrade_cost(bid)
+	if gold < cost:
+		return "金币不够（要 %d，你有 %d）" % [cost, gold]
+	gold -= cost
+	building_levels[bid] = lv + 1
+	return ""
+
+
+## 公会每升一阶，技能升级便宜 10%（和原版 `combat_skill_cost_discount_upgrades` 同向）。
+func skill_cost_multiplier() -> float:
+	return pow(0.9, float(building_level("guild")))
+
+
 func roster_max() -> int:
 	# 名册上限（M34）：原来是「职业总数」（因为 key 就是职业 id），
 	# 现在同职业能多人，所以它是一个**人头上限**，和职业数量无关。
@@ -1827,7 +2046,8 @@ func hireable_pool() -> Array:
 func roll_recruit_candidates() -> void:
 	var pool: Array = hireable_pool()
 	recruit_candidates = []
-	var n: int = mini(2, pool.size())
+	# 马车每升一阶多摆一个候选（M132）
+	var n: int = mini(2 + building_level("coach"), pool.size())
 	for i in n:
 		if pool.is_empty():
 			break
@@ -2167,7 +2387,13 @@ func quest_reward(qd: Dictionary, level: int, size_name: String) -> Dictionary:
 
 
 ## 返回本次结算摘要，给结算屏显示用。
+##
+## **先清掉远征快照**（M137）。不清的后果是刷奖励：
+## `expedition_run` 存的是「结束前那一帧的地图」，结算发完奖励它还在，
+## 回城一存档就写进档，再进就回到最后一间房 —— 再打一次、再结算一次。
+## 这个字段原来在 `campaign.gd` 里只出现在存读档两处，谁都没清过它。
 func settle(exp: Expedition) -> Dictionary:
+	expedition_run = {}
 	var out: Dictionary = {
 		"gold": 0, "heirlooms": {}, "deaths": [], "stress_left": 0.0,
 		"reason": exp.end_reason, "relief": int(cfg.get("town_stress_relief", 40)),
@@ -2187,6 +2413,11 @@ func settle(exp: Expedition) -> Dictionary:
 	out["quest_gold"] = 0
 	out["quest_heirlooms"] = {}
 	if exp.end_reason == "complete":
+		quests_done += 1
+		# 记下「这一张卡通关了」（M198）。判定用的是**出发时那张卡**的四元组，
+		# 不是完成时的板子——板子可能已经换过一轮了。
+		quests_cleared[quest_key(exp.dungeon, exp.size_name, exp.quest_type,
+			exp.dungeon_level)] = true
 		var qd: Dictionary = exp.db.quests if exp.db != null else {}
 		var rw: Dictionary = quest_reward(qd, exp.dungeon_level, exp.size_name)
 		out["quest_gold"] = int(rw.get("gold", 0))
@@ -2199,12 +2430,33 @@ func settle(exp: Expedition) -> Dictionary:
 	out["gems"] = (exp.loot_gems as Dictionary).duplicate()
 	# 饰品真正入仓库。之前只记件数——件数进了结算屏，东西没进游戏。
 	# 拒绝的（仓库满/超同名上限）不会静默消失，count 留在 trinket_refused 里。
-	out["trinket_ids"] = add_trinkets(exp.loot_trinket_ids)
+	var trep: Dictionary = add_trinkets_detail(exp.loot_trinket_ids)
+	out["trinket_ids"] = trep["got"]
+	out["trinket_refused"] = trep["refused"]   # [{id, why}]，给结算屏换下用
 	out["trinkets"] = (out["trinket_ids"] as Array).size()
 	# 被拒的不静默消失：件数对不上就记在这里。夹 0 是因为
 	# `loot_trinkets` 只统计「有 id 的」掉落，理论上不会小于进仓库数——
 	# 真小于了说明上游账错了，报负数只会让结算屏出现 -1 件这种鬼话。
 	out["trinkets_dropped"] = maxi(0, int(exp.loot_trinkets) - int(out["trinkets"]))
+	# 仓库塞不进去的**折成金币**（M156）。
+	#
+	# 原来它们就这么消失了，结算屏只写一句「另有 N 件没能带走」——
+	# 玩家打完一趟，东西没了、钱也没多。
+	# 完整做法是让玩家**选择替换**（丢旧的还是放弃新的），那要改结算流程；
+	# 这里先做到「至少不白丢」，按卖价折现。
+	if int(out["trinkets_dropped"]) > 0:
+		var ok_set: Dictionary = {}
+		for t in (out["trinket_ids"] as Array):
+			ok_set[str(t)] = true
+		var refund: int = 0
+		for t2 in exp.loot_trinket_ids:
+			if ok_set.has(str(t2)):
+				continue
+			if shop != null:
+				refund += int(shop.trinket_sell_price(str(t2)))
+		if refund > 0:
+			out["trinket_refund"] = refund
+			out["gold"] = int(out["gold"]) + refund
 	out["quirks"] = int(exp.stats.get("quirks_gained", 0))
 	out["diseases"] = int(exp.stats.get("diseases_contracted", 0))
 	add_loot(int(out["gold"]), out["heirlooms"])

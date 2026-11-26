@@ -150,6 +150,22 @@ const MAX_SUMMONED_PER_BATTLE: int = 4
 ## 有这个开关，才能把「轮数暴涨是数据缺口」和「是机制本意」分开。
 var summon_default_limit_enabled: bool = true
 
+## 召唤只填空位，不等尸体（M102，默认开）。
+##
+## 原来 `summon_slot()` 用 `not is_alive()` 判空位，而尸体 `is_alive()` 也是 false
+## —— 于是「打死一个」立刻被判定为空位，召唤把**残骸原地顶成新怪**。
+## 玩家的观感是「打死一个又冒出来一个」，而且根本猜不到那是召唤。
+##
+## 尸体的语义是「有残骸耐久、能被清掉的实体」（M73），它应该占位。
+## 想召唤，得先等残骸被清、阵型真的缩短。
+##
+## **默认关**（M102）：`tests/test_summon.gd` 里有一组断言专门钉住
+## 「尸体让位」，注释写着「这是本项目特有的规则」——它是主动设计，不是遗漏。
+## 关掉尸体让位会让大量召怪技能在残骸没清时彻底失效，M12 的平衡结论要重跑。
+## 所以规则不动，改成**表达**上说明（见界面里的「召」角标）。
+## 这个开关留着，是为了将来真要做对照实验时不用重新写逻辑。
+var summon_empty_slot_only: bool = false
+
 ## 已按「抽走即移除」消费掉的条目：action.id → {monster_id: true}。
 ## 对应数据字段 summon_erase_data_on_roll。
 var _summon_used: Dictionary = {}
@@ -182,9 +198,18 @@ func setup(hero_ids: Array, monster_ids: Array, seed_value: int = 1,
 		var key: String = str(hid)
 		var d: String = str(def_by_key.get(key, key))
 		var g: int = int(gear_by_id.get(key, gear_level))
-		var s: int = int(skill_by_id.get(key, skill_level))
+		# `skill_by_id` 有两种喂法（M126）：整英雄一个等级（旧），
+		# 或 {sid: 等级}（新，每技能独立）。两种都认，免得调用方全改一遍。
+		var sv: Variant = skill_by_id.get(key, skill_level)
+		var per: Dictionary = {}
+		var s: int = skill_level
+		if sv is Dictionary:
+			per = sv
+			s = 0
+		else:
+			s = int(sv)
 		var lo: Array = loadout_by_id.get(key, [])
-		if not c.setup_from_hero(db, d, g, s, lo):
+		if not c.setup_from_hero(db, d, g, s, lo, per):
 			return false
 		c.hero_key = key
 		c.side = Combatant.SIDE_PARTY
@@ -458,6 +483,14 @@ func shuffle_team(side: String) -> Array:
 ## rank 写成下标），不存在「给尸体换个位置」这回事。
 func summon_slot(side: String, rank_mask: int = 0) -> int:
 	var arr: Array = party if side == Combatant.SIDE_PARTY else enemies
+	# M102：只认真空位。尸体在数组里没被移除，`arr.size()` 不缩短，
+	# 所以「尸体位」天然被排除 —— 必须先清残骸才补得进来。
+	if summon_empty_slot_only:
+		if arr.size() < MAX_SLOTS:
+			var tail: int = arr.size()
+			if rank_mask <= 0 or (rank_mask & (1 << tail)) != 0:
+				return tail
+		return -1
 	if rank_mask > 0:
 		for i in arr.size():
 			if (rank_mask & (1 << i)) != 0 and not (arr[i] as Combatant).is_alive():
@@ -1028,7 +1061,9 @@ func _apply_choice(actor: Combatant, choice: Dictionary) -> void:
 		if t.dead:
 			# 打尸体（M73）：不打伤害，只扣「耐久」，掉光就从队列里清掉。
 			# 上面已经把尸体过滤掉了，能走到这里说明玩家/界面明确选了它。
-			_strike_corpse(actor, t)
+			# 带上技能 id（M193）：界面要靠它选出招帧和武器音，
+			# 不带的话「打残骸」那一支只有日志和飘字，人站着不动。
+			_strike_corpse(actor, t, str(action.get("id", "")))
 			continue
 		_resolve_action(actor, action, t)
 
@@ -1042,18 +1077,18 @@ func _apply_choice(actor: Combatant, choice: Dictionary) -> void:
 ## 不做命中判定（尸体不会躲），也不走伤害公式：每一下扣 1 点耐久。
 ## 耐久归零 → **从队列里移除并重排**，后面的单位整体前移一格。
 ## 这就是「清掉尸体把后排拉进近战范围」的全部机制。
-func _strike_corpse(actor: Combatant, corpse: Combatant) -> void:
+func _strike_corpse(actor: Combatant, corpse: Combatant, skill: String = "") -> void:
 	corpse.corpse_hp = maxi(0, corpse.corpse_hp - 1)
 	var arr: Array = enemies if corpse.side == Combatant.SIDE_ENEMY else party
 	var idx: int = arr.find(corpse)
 	if corpse.corpse_hp <= 0 and idx >= 0:
 		arr.remove_at(idx)
 		_relayout()
-		_emit({"t": "corpse_destroyed", "actor": actor.uid,
+		_emit({"t": "corpse_destroyed", "actor": actor.uid, "skill": skill,
 			"target": corpse.uid, "rank": idx})
 	else:
-		_emit({"t": "corpse_hit", "actor": actor.uid, "target": corpse.uid,
-			"left": corpse.corpse_hp})
+		_emit({"t": "corpse_hit", "actor": actor.uid, "skill": skill,
+			"target": corpse.uid, "left": corpse.corpse_hp})
 
 
 ## 放技能的人自己挪位置（M53）。

@@ -68,6 +68,10 @@ var camp_ambush_chance: float = 0.33
 
 # —— 撤退 ——
 var retreat_stress: float = 20.0
+## 战斗中撤退的成功率（DD1 `combat_retreat_chance` = 0.70）。
+## 每次失败 +5%（`combat_retreat_bonus_chance_per_attempt`），压力照扣。
+var retreat_chance: float = 0.70
+var retreat_chance_step: float = 0.05
 
 
 ## 某个地牢等级的陷阱难度（超出表长按最后一档算）。
@@ -175,6 +179,8 @@ func _apply() -> void:
 	camp_ambush_chance = _f("ambush_camping_base_chance", 0.33)
 
 	retreat_stress = _f("combat_retreat_stress", 20.0)
+	retreat_chance = _f("combat_retreat_chance", 0.70)
+	retreat_chance_step = _f("combat_retreat_bonus_chance_per_attempt", 0.05)
 
 	var hs: Variant = raw.get("hallway_stress")
 	if hs is Dictionary:

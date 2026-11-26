@@ -36,6 +36,12 @@ var step_index: int = 0
 # 有 hero_gear 时以英雄为准——不然「花钱升级」在下一趟里毫无体现。
 var hero_gear: Dictionary = {}
 var hero_skill: Dictionary = {}
+## 走到门口但**还没进去**的那个房间（M144）。
+##
+## 原来 `travel()` 把走廊事件和房间事件一次性都塞进 `_pending`，
+## 于是「走廊遭遇战 → 房间战斗」连着演完，玩家看到的是「打了两场」。
+## 现在房间事件先存在这里，等玩家**主动点当前房间**才入队。
+var room_pending_step: Dictionary = {}
 ## 这一趟每个人装备了哪 4 个战斗技能（hid -> Array[skill_id]，M19）。
 ## 缺省为空 = 全装，这是 M1~M18 的行为，bench 复现旧基线靠它。
 ## 和 `hero_skill`（技能**等级**）是两件事，别混。
@@ -65,6 +71,14 @@ var join_stress_mult: Dictionary = {}
 # —— 远征资源 ——
 var light: float = 100.0
 var food: int = 0
+## 本间房间里「随手吃口粮」用了几次（M188）。
+##
+## 补给面板能在任何时刻用 1 份口粮给全队 +12%，**且不限次数** ——
+## 而「休整」（2 份口粮、+30~35%、还带回 40 压力和光照）每趟只有 1 次，
+## 还有 33% 被偷袭的风险。于是「休整」被彻底架空：
+## 玩家只要一直点吃口粮，就能无风险地把血补满。
+## 现在限制成**每间房 1 次**，休整才是真正划算的那一档。
+var food_room_uses: int = 0
 var torch: int = 0
 var shovel: int = 0
 var camps_left: int = 0
@@ -124,6 +138,9 @@ var stats: Dictionary = {}
 # 界面不能一次跑完整场，只能「推一个单位、等一次点击」。
 # 这三个字段就是那段时间里「当前在打的是什么」。
 var active_battle: Battle = null
+## 这一场是用哪一步开起来的（M118）。战斗快照靠它重建 —— 重新走一遍
+## `start_battle()`，那些开关、环境、受压倍率的装配就都不用再抄一遍。
+var _active_step: Dictionary = {}
 var active_index: int = 0
 ## 当前这场是不是首领战（M20）。`finish_battle` 拿不到 step 局部变量，
 ## 所以在这里存一份，结算时用来区分「普通胜利」和「首领击杀」。
@@ -512,6 +529,13 @@ func adjacent() -> Array:
 func travel(room_id: int) -> bool:
 	if ended or not map_mode:
 		return false
+	# 门口还有没进的东西就不能走（M145）。
+	#
+	# M144 把房间内容延后到玩家「点脚下这一格」才触发，结果玩家可以站在门口
+	# 直接走下一间 —— 那间房的内容被永久跳过（`visited` 没标、step 也没跑），
+	# 表现就是「房间可以随便走、还能反复绕圈」。
+	if not room_pending_step.is_empty():
+		return false
 	var edge: int = -1
 	for nb in adjacent():
 		if int(nb.room) == room_id:
@@ -544,21 +568,48 @@ func travel(room_id: int) -> bool:
 	current_room = room_id
 	var r: Dictionary = map["rooms"][room_id]
 	r["spotted"] = true
+	# **不在这里标 visited、也不把房间事件入队**（M144）。
+	# 人走到了门口，但房间里有什么、要不要进去，交给玩家点一下决定 ——
+	# 否则走廊遭遇战和房间战斗会连成一串，看起来像打了两场。
 	if not bool(r.get("visited", false)):
-		r["visited"] = true
-		stats["rooms_visited"] = int(stats["rooms_visited"]) + 1
 		var st3: Dictionary = r.get("step", {})
 		if not st3.is_empty():
 			var step_copy: Dictionary = (st3 as Dictionary).duplicate()
 			# 标上「这一步属于哪个房间」（M33）：任务奇物的去重键是位置，
 			# 而清剿用不到它、其它内容也不受这个多余字段影响。
 			step_copy["room"] = room_id
-			_pending.append(step_copy)
+			room_pending_step = step_copy
+		else:
+			# 空房间：没有内容可触发的，直接算进去过
+			r["visited"] = true
+			stats["rooms_visited"] = int(stats["rooms_visited"]) + 1
+	else:
+		room_pending_step = {}
 
 	_spot_neighbors(room_id)
 	_try_scout_map()
 	_emit({"t": "travel", "from": int(e.a), "to": int(e.b), "room": room_id,
 		"kind": str(r["kind"])})
+	return true
+
+
+## 门口有内容，玩家点了「进去」才触发（M144）。
+func has_pending_room() -> bool:
+	return not room_pending_step.is_empty()
+
+
+func enter_room() -> bool:
+	if room_pending_step.is_empty():
+		return false
+	var rid: int = int(room_pending_step.get("room", current_room))
+	var rm: Dictionary = (map.get("rooms", {}) as Dictionary).get(rid, {})
+	if not bool(rm.get("visited", false)):
+		rm["visited"] = true
+		stats["rooms_visited"] = int(stats["rooms_visited"]) + 1
+	# 换房间就重置「随手吃」次数（M188）
+	food_room_uses = 0
+	_pending.append(room_pending_step)
+	room_pending_step = {}
 	return true
 
 
@@ -737,9 +788,12 @@ func _room_dist(a: int, b: int) -> int:
 ## 现在走真表：奇物由地图生成时按地牢权重挑好（step.curio），
 ## 有对应补给就自动用上，然后按奇物自己的分支给结果。
 ## 没给 step 时退回旧硬币，保证老调用方（含历史测试）仍然能跑。
-func resolve_curio(step: Dictionary = {}) -> Dictionary:
+## `force_item`（M161）：界面层问过玩家之后**指定**用哪件道具。
+## 空字符串 = 按老逻辑自动挑（自动挑是 M14 的口径，bench 都按它跑的）。
+## 传入 `"__none__"` = 玩家明确选了「空手翻」，这件奇物一律不吃道具。
+func resolve_curio(step: Dictionary = {}, force_item: String = "") -> Dictionary:
 	if curio_table_enabled and db != null and db.curio_lib != null and db.curio_lib.is_loaded():
-		return _resolve_curio_table(step)
+		return _resolve_curio_table(step, force_item)
 	return _resolve_curio_legacy()
 
 
@@ -792,7 +846,7 @@ func _note_quest_curio(cid: String, step: Dictionary = {}) -> void:
 		"now": int(stats[stat_key]), "need": int(quest_goal.get("amount", 1))})
 
 
-func _resolve_curio_table(step: Dictionary) -> Dictionary:
+func _resolve_curio_table(step: Dictionary, force_item: String = "") -> Dictionary:
 	stats["curios"] = int(stats.get("curios", 0)) + 1
 	var cl: CurioLib = db.curio_lib
 
@@ -824,7 +878,11 @@ func _resolve_curio_table(step: Dictionary) -> Dictionary:
 	var use_item: String = ""
 	if has_qitem and cl.items_for(cid).has(qitem):
 		use_item = qitem
-	if use_item.is_empty() and curio_auto_item_enabled:
+	elif force_item == "__none__":
+		pass    # 玩家选了空手翻，不自动挑
+	elif not force_item.is_empty():
+		use_item = force_item
+	elif curio_auto_item_enabled:
 		for it in cl.items_for(cid):
 			if supply_count(str(it)) > 0:
 				use_item = str(it)
@@ -1505,6 +1563,7 @@ func start_battle(step: Dictionary) -> Battle:
 		_end("wipe")
 		return null
 
+	_active_step = (step as Dictionary).duplicate(true)
 	var b := Battle.new()
 	var defs: Dictionary = {}
 	for key in alive:
@@ -1650,6 +1709,230 @@ func _play_out(b: Battle) -> void:
 		for e in b.run_round():
 			_ingest_active(e)
 	finish_battle(b)
+
+
+## 一个战斗单位的可变状态（M118）。基础值不存 —— 它们由 `start_battle()`
+## 按职业/怪物表重建，存了反而可能与数据表脱节。
+func _unit_snap(u: Combatant) -> Dictionary:
+	return {
+		"hp": u.hp, "stress": u.stress, "dead": u.dead, "corpse_hp": u.corpse_hp,
+		"at_deaths_door": u.at_deaths_door, "stun_turns": u.stun_turns,
+		"buffs": u.buffs.duplicate(true), "dots": u.dots.duplicate(true),
+		"statuses": u.statuses.duplicate(), "affliction": u.affliction,
+		"virtue": u.virtue, "rank": u.rank,
+	}
+
+
+func _unit_apply(u: Combatant, d: Dictionary) -> void:
+	u.hp = int(d.get("hp", u.hp))
+	u.stress = float(d.get("stress", u.stress))
+	u.dead = bool(d.get("dead", u.dead))
+	u.corpse_hp = int(d.get("corpse_hp", u.corpse_hp))
+	u.at_deaths_door = bool(d.get("at_deaths_door", u.at_deaths_door))
+	u.stun_turns = int(d.get("stun_turns", u.stun_turns))
+	u.buffs = (d.get("buffs", []) as Array).duplicate(true)
+	u.dots = (d.get("dots", []) as Array).duplicate(true)
+	u.statuses = (d.get("statuses", {}) as Dictionary).duplicate()
+	u.affliction = str(d.get("affliction", u.affliction))
+	u.virtue = str(d.get("virtue", u.virtue))
+	u.rank = int(d.get("rank", u.rank))
+
+
+## 当前这场战斗的快照（M118）。空 = 没在打。
+##
+## 只存**回合边界**能对上的东西：回合数、双方每个单位的血/压力/buff/dot。
+## 不存「轮到谁行动」「瞄准到一半」「飘字」—— 那些是瞬时状态，
+## 存了也没法还原，恢复时从这一回合开头重来就够。
+func battle_snapshot() -> Dictionary:
+	if active_battle == null or _active_step.is_empty():
+		return {}
+	var units: Array = []
+	for u in active_battle.party:
+		units.append(_unit_snap(u as Combatant))
+	for u in active_battle.enemies:
+		units.append(_unit_snap(u as Combatant))
+	return {
+		"step": _active_step.duplicate(true),
+		"round": active_battle.round_index,
+		"surprised": active_battle.surprised,
+		"units": units,
+	}
+
+
+## 从快照重建这一场（M118）。返回 null = 没得快照/装配失败。
+func resume_battle(snap: Dictionary) -> Battle:
+	if snap.is_empty():
+		return null
+	var st: Dictionary = (snap.get("step", {}) as Dictionary).duplicate(true)
+	if st.is_empty():
+		return null
+	# 走一遍正常的开战流程：开关、环境、受压倍率、技能/饰品装配全都自动做好
+	var b: Battle = start_battle(st)
+	if b == null:
+		return null
+	var units: Array = snap.get("units", [])
+	var i: int = 0
+	for u in b.party:
+		if i < units.size():
+			_unit_apply(u as Combatant, units[i])
+			i += 1
+	for u in b.enemies:
+		if i < units.size():
+			_unit_apply(u as Combatant, units[i])
+			i += 1
+	b.round_index = maxi(1, int(snap.get("round", 1)))
+	b.surprised = str(snap.get("surprised", ""))
+	active_battle = b
+	return b
+
+
+## 把整趟远征压成一个可存档的字典（M116）。
+##
+## 为什么要它：手机上切后台，系统随时会杀进程。原来 `exp` 只活在内存里，
+## 一被杀 = 整趟远征（地图、步数、血量、压力、补给）全部消失，只能重开。
+## 队伍的名单问题（M114）只是这个洞的一个小角。
+##
+## **战斗不存**：`active_battle` 序列化等于把整场战斗的每个 buff/dot/行动序
+## 都拆成 JSON，收益和复杂度完全不匹配。切后台时若正在打，恢复到「战斗开始前」，
+## 这一场重打 —— 玩家宁可重打一场，也不愿整趟消失。
+func to_save_dict() -> Dictionary:
+	return {
+		# 重建用（`from_save_dict` 不再调 setup，所以这些也得存）
+		"hero_ids": hero_ids.duplicate(),
+		"food_room_uses": food_room_uses,
+		"hero_defs": hero_defs.duplicate(true),
+		"hero_gear": hero_gear.duplicate(true),
+		"hero_loadout": hero_loadout.duplicate(true),
+		"hero_trinkets": hero_trinkets.duplicate(true),
+		"join_stress": join_stress.duplicate(),
+		"join_stress_mult": join_stress_mult.duplicate(),
+		"route": route.duplicate(true),
+		"preset_name": preset_name,
+		"dungeon": dungeon,
+		"size_name": size_name,
+		"dungeon_level": dungeon_level,
+		"loot_cfg": loot_cfg.duplicate(true),
+		# 进程
+		"map_mode": map_mode,
+		"map": map.duplicate(true),
+		"current_room": current_room,
+		"spotted": spotted.duplicate(),
+		"edges_known": edges_known.duplicate(),
+		"pending": _pending.duplicate(true),
+		"step_index": step_index,
+		"revealed": revealed,
+		"ended": ended,
+		"end_reason": end_reason,
+		# 队伍与资源
+		"state": state.duplicate(true),
+		"torch": torch, "food": food,
+		"shovel": shovel,
+		"supplies": supplies.duplicate(),
+		"light": light, "camps_left": camps_left, "food_debt": _food_debt,
+		# 战利品与统计
+		"loot_gold": loot_gold,
+		"loot_heirlooms": loot_heirlooms.duplicate(),
+		"loot_gems": loot_gems.duplicate(),
+		"loot_trinkets": loot_trinkets,
+		"loot_trinket_ids": loot_trinket_ids.duplicate(),
+		"stats": stats.duplicate(),
+		# 任务
+		"quest_type": quest_type,
+		"quest_goal": quest_goal.duplicate(true),
+		"quest_curios_used": quest_curios_used.duplicate(),
+		"quest_items": quest_items.duplicate(),
+		"battle": battle_snapshot(),
+	}
+
+
+## 从存档字典恢复（M116）。调用前必须已经设好 `db`。
+##
+## 不做任何校验性重置：这份字典是**自己写出来的**，格式不对说明存档坏了，
+## 那时候默默重置成一场新远征比报错更糟（玩家会以为进度被吞）。
+func from_save_dict(d: Dictionary) -> bool:
+	if d.is_empty():
+		return false
+	hero_ids = (d.get("hero_ids", []) as Array).duplicate()
+	food_room_uses = int(d.get("food_room_uses", 0))
+	hero_defs = (d.get("hero_defs", {}) as Dictionary).duplicate(true)
+	hero_gear = (d.get("hero_gear", {}) as Dictionary).duplicate(true)
+	hero_loadout = (d.get("hero_loadout", {}) as Dictionary).duplicate(true)
+	hero_trinkets = (d.get("hero_trinkets", {}) as Dictionary).duplicate(true)
+	join_stress = (d.get("join_stress", {}) as Dictionary).duplicate()
+	join_stress_mult = (d.get("join_stress_mult", {}) as Dictionary).duplicate()
+	route = (d.get("route", []) as Array).duplicate(true)
+	preset_name = str(d.get("preset_name", ""))
+	dungeon = str(d.get("dungeon", "weald"))
+	size_name = str(d.get("size_name", "short"))
+	dungeon_level = int(d.get("dungeon_level", 1))
+	loot_cfg = (d.get("loot_cfg", {}) as Dictionary).duplicate(true)
+	# cfg / rng 不进存档，恢复时重建：
+	#   cfg 由 `preset_name` 从数据表取回（同一个名字 = 同一份数值）；
+	#   rng 只能重新播种 —— 随机流会从头开始，这是中途存档的固有代价，
+	#   但「地图、步数、血量、补给都在」远比重放同一串随机数重要。
+	if db != null:
+		cfg = db.expedition_cfg.preset(preset_name)
+	var sd: int = randi()
+	rng = DdRng.new(sd)
+	_loot_rng = DdRng.new(sd * 31 + 17)
+	_curio_rng = DdRng.new(sd * 91 + 43)
+	_trap_rng = DdRng.new(sd * 57 + 11)
+	_scout_rng = DdRng.new(sd * 13 + 5)
+	map_mode = bool(d.get("map_mode", false))
+	map = (d.get("map", {}) as Dictionary).duplicate(true)
+	# **JSON 会把整数字典键变成字符串**：`map.rooms[3]` 过一趟存档就变成
+	# `map.rooms["3"]`，之后再按 int 取就是 null —— 表现是恢复后立刻
+	# `Invalid access to property or key '3'`。这些表的键全得转回来。
+	if map.has("rooms") and map["rooms"] is Dictionary:
+		var rooms_fixed: Dictionary = {}
+		for rk in (map["rooms"] as Dictionary).keys():
+			var rm: Dictionary = map["rooms"][rk]
+			# `pos` 是 Vector2i，JSON 会把它写成字符串 `"(3, 4)"` ——
+			# 不转回来，恢复后第一次画地图就炸
+			# `Trying to assign value of type 'String' to 'Vector2i'`。
+			var pv: Variant = rm.get("pos", null)
+			if pv is String:
+				# 手动拆 "(1, 1)"：`str_to_var` 对这种写法返回 null（它要
+				# `Vector2(1, 1)` 那种带类型名的格式），所以不能指望它。
+				var txt: String = str(pv).replace("(", "").replace(")", "")
+				var ps: PackedStringArray = txt.split(",")
+				if ps.size() == 2:
+					rm["pos"] = Vector2i(int(ps[0].strip_edges()),
+						int(ps[1].strip_edges()))
+			rooms_fixed[int(rk)] = rm
+		map["rooms"] = rooms_fixed
+	current_room = int(d.get("current_room", -1))
+	spotted = {}
+	for sk in (d.get("spotted", {}) as Dictionary).keys():
+		spotted[int(sk)] = d["spotted"][sk]
+	edges_known = {}
+	for ek in (d.get("edges_known", {}) as Dictionary).keys():
+		# 边的键是 "a-b" 字符串，转 int 会失败 —— 保持原样
+		edges_known[str(ek)] = d["edges_known"][ek]
+	_pending = (d.get("pending", []) as Array).duplicate(true)
+	step_index = int(d.get("step_index", 0))
+	revealed = int(d.get("revealed", 0))
+	ended = bool(d.get("ended", false))
+	end_reason = str(d.get("end_reason", ""))
+	state = (d.get("state", {}) as Dictionary).duplicate(true)
+	torch = int(d.get("torch", 0))
+	food = int(d.get("food", 0))
+	shovel = int(d.get("shovel", 0))
+	supplies = (d.get("supplies", {}) as Dictionary).duplicate()
+	light = float(d.get("light", 100.0))
+	camps_left = int(d.get("camps_left", 0))
+	_food_debt = float(d.get("food_debt", 0.0))
+	loot_gold = int(d.get("loot_gold", 0))
+	loot_heirlooms = (d.get("loot_heirlooms", {}) as Dictionary).duplicate()
+	loot_gems = (d.get("loot_gems", {}) as Dictionary).duplicate()
+	loot_trinkets = int(d.get("loot_trinkets", 0))
+	loot_trinket_ids = (d.get("loot_trinket_ids", []) as Array).duplicate()
+	stats = (d.get("stats", {}) as Dictionary).duplicate()
+	quest_type = str(d.get("quest_type", "explore"))
+	quest_goal = (d.get("quest_goal", {}) as Dictionary).duplicate(true)
+	quest_curios_used = (d.get("quest_curios_used", {}) as Dictionary).duplicate()
+	quest_items = (d.get("quest_items", {}) as Dictionary).duplicate()
+	return true
 
 
 func retreat() -> void:

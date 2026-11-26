@@ -20,7 +20,7 @@ extends Control
 ## 状态号只追加不插队（M46）：`S_VICTORY` 放在末尾而不是「逻辑上该在 S_RESULT 后面」的位置。
 ## 中间插入会让后面所有的编号 +1，而编号被写进了 `--dev` 的打印和若干自检断言里，
 ## 换一次状态就得跟着改一遍。追加是唯一不产生连带改动的改法。
-enum { S_TOWN, S_MAP, S_BATTLE, S_RESULT, S_TRINKET, S_PREP, S_SHOP, S_GUILD, S_BUILDING, S_VICTORY, S_MENU, S_SETTINGS, S_GATE, S_ROSTER, S_BATTLE_END, S_ROOM }
+enum { S_TOWN, S_MAP, S_BATTLE, S_RESULT, S_TRINKET, S_PREP, S_SHOP, S_GUILD, S_BUILDING, S_VICTORY, S_MENU, S_SETTINGS, S_GATE, S_ROSTER, S_BATTLE_END, S_ROOM, S_PARTY }
 
 ## 一步的间隔（M65：0.34 → 0.38）。
 ##
@@ -96,6 +96,21 @@ const TOWN_SLOTS: Array = [
 	["smith",      -46, 1064, 250, false, false],
 	["wagon",      429, 1183, 245, false, true],
 ]
+## 各建筑需要完成多少个任务才开放（M123）。
+##
+## 数值照抄原版 `campaign/town/buildings/*/*.building.json` 里的
+## `requirements.number_of_quests_finished`：
+##   马车/墓园/商队 0、修道院/酒馆 2、铁匠/公会 3、疗养院 4。
+##
+## 开局只开三个是原版的设计意图 —— 第一趟必须硬扛着打完，
+## 回来才有减压的地方。这不是「漏做」，是难度曲线的一部分。
+const BLD_UNLOCK: Dictionary = {
+	"coach": 0, "graveyard": 0, "wagon": 0,
+	"abbey": 2, "tavern": 2,
+	"smith": 3, "guild": 3,
+	"sanitarium": 4,
+}
+
 ## 布局画布的高度（编辑器导出的坐标都以它为准）
 const TOWN_CANVAS_H: float = 1334.0
 
@@ -109,7 +124,7 @@ const TOWN_CANVAS_H: float = 1334.0
 ## 教训：dock 是「导航」，不该和「内容」抢面积。上一轮放大按钮方向没错，
 ## 错在把它做成了通栏。
 const DOCK_H: float = 128.0
-const DOCK_W: float = 264.0
+const DOCK_W: float = 344.0
 
 ## 实际生效的布局（M64）。默认用上面的常量，`--layout=xxx.json` 会覆盖它。
 ##
@@ -167,6 +182,33 @@ var _map_banner_col: Color = Color("#8b8a84")
 ## 横幅的纵向位置（M76）。原来贴着网格顶，网格挪到下半屏之后会盖住第一行房间；
 ## 现在压在**日志条**的位置 —— 消息本来就该出现在那里，1.7 秒后日志自己回来。
 var _map_banner_y: float = 966.0
+## 事件弹窗（M194）。和横幅的区别是**要玩家点一下才走**。
+##
+## 用户原话：「类似这样的事件提示，能不能也做成一个弹窗的提示，
+## 需要玩家点击下【确定】按钮来表达知道这件事了。类似的遭遇战也一样，
+## 碰到了先给个弹窗描述提示，玩家点【确定】后才会进入战斗。」
+##
+## 分工：**有代价或有收获的**（奇物、陷阱、路障、遭遇）走弹窗 ——
+## 玩家必须真的看见，不然后面掉血、捡到东西都不知道为什么。
+## **纯叙事没后果的**（空房间）继续用横幅，1.7 秒自己淡出，不打断节奏。
+var _dlg_open: bool = false
+var _dlg_title: String = ""
+var _dlg_body: String = ""
+var _dlg_sub: String = ""
+var _dlg_col: Color = Color("#8b8a84")
+## 点完「确定」之后要做的事。空 = 什么都不做（纯提示）。
+## 用 Callable 而不是字符串动作名：遭遇战要带着已经建好的 `_battle` 往下走，
+## 字符串得再绕一圈存参数，容易存丢。
+var _dlg_next: Callable = Callable()
+var _dlg_btn: Rect2 = Rect2()
+## 截屏用（M194）：进地图后立刻弹一个事件框，用来验样式和位移。
+## 真实事件要走到奇物/陷阱才会触发，那一步的随机性太大，验收截图等不起。
+var _dlg_demo: bool = false
+var _dlg_demo_done: bool = false
+## 截屏用（M201）：直接把一张英雄卡的长按浮层钉在屏幕上。
+## 长按要按住 0.45 秒，命令行没法模拟"按住不动"，只能这样验样式。
+var _hold_demo: bool = false
+var _hold_demo_done: bool = false
 ## 地图平移（M78）。格子固定 120 之后内容会超出面板，靠拖拽看。
 var _map_pan: Vector2 = Vector2.ZERO
 ## true = 下次绘制时把当前房间居中（进新房间时重置）。
@@ -193,6 +235,9 @@ func _dci() -> CanvasItem:
 ## 行动序（M65）：规则层每轮 emit 一次 `order`，这里存本轮的 uid 顺序。
 ## `_order_cur` 是「轮到第几个」，由 `turn` 事件推进。
 var _order_ids: Array = []
+## 守护表现（M200）：守护者 uid → {toward: 被守护者 uid, t: 剩余秒}；
+## 被守护者 uid → {blocked: true, t}。只影响绘制，规则层不知道它的存在。
+var _guard_fx: Dictionary = {}
 var _order_cur: int = -1
 ## 战斗结算卡（M65）：打赢之后先停一屏，把这一场拿到了什么摆出来。
 ## 以前是 0.45 秒后直接切回地图，正反馈只剩日志里一行滚过去的字。
@@ -203,6 +248,11 @@ var _banner_t: float = 0.0
 var _move_mode: bool = false       # 技能面板切到「选落点」状态
 var _show_move_demo: bool = false  # 截屏用：一进战斗就展开落点列表
 var _show_guard_demo: bool = false # 截屏用：让守护者守一次后冻住画面
+## 截屏用（M192）：强制当前房间显示「互动」标签。
+## 呼吸缩放是**逐帧变化**的，静态截图看不出来，必须能稳定复现同一屏
+## 再按不同 `--shot-at` 各截一张对比。靠真实走位很难停在门口：
+## 地图每次出发都重新生成，房间号随机，`--click=room:N` 会直接进去。
+var _show_interact: bool = false
 var _guard_demo_done: bool = false
 var _move_checked: bool = false    # 自检：站位调整路径是否已跑过
 var moved_ok: bool = false         # 自检：那次调整是否真的改变了 rank
@@ -265,6 +315,10 @@ const GROUND_ENEMY: float = 348.0
 ## 一半给分隔，一半给战斗信息条（轮数 / 光照 / 操作提示）。
 ## 代价是战场纵向矮了 64px，但下方那块（我方脚底 ~ 日志条）本来就空着。
 const GROUND_PARTY: float = 716.0
+## **全局导航栏**高度（M163）。和城镇里那个 `DOCK_H`（建筑入口，128）
+## 是两回事：那个是「去酒馆/铁匠铺/商队」，这个是「去名册/队伍/商店」。
+## 导航栏贴屏幕最底，建筑 dock 整体上移 NAV_H 让出位置。
+const NAV_H: float = 64.0
 const SPRITE_H: float = 240.0     # 人物本体的显示高度（不含举起的武器）
 const BASE_H: float = 400.0       # 导出基准：人物本体高（脚底到头顶）
 const SLOT_W: float = 175.0       # 4 列 × 175 = 700，750 宽刚好
@@ -281,6 +335,9 @@ var _pose: Dictionary = {}
 ## 缩动作比拉长间隔好：0.34 秒仍然看得出「前冲—回位」两段，而拉长间隔
 ## 会让整场节奏变拖（每轮 7 个单位，多 0.08 秒就是每轮多半秒）。
 const POSE_TIME: float = 0.34
+## 守护探身的时长（M200）。0.5 秒和一次出招（0.34）差不多长，
+## 但比 `STEP_DELAY` 短 —— 探身要在下一次结算前收回来，否则会叠在别人的动作上。
+const GUARD_FX_TIME: float = 0.5
 
 # —— 技能特效（M57）——
 #
@@ -342,6 +399,29 @@ var _want_safe_bottom: float = 0.0
 ## 竖屏底部是拇指热区，日志这种纯信息展示不能常驻占位，只留一行摘要；
 ## 完整记录点摘要条展开成半透明浮层，位置与技能区重叠但可以随时关。
 var _log_open: bool = false
+## 地牢内补给面板（M154）。玩家买了 9 种补给，进地牢后原来只有
+## 「点火把 / 休整」两个动作会自己扣，其余的在背包里躺着看不到也用不了。
+var _supply_open: bool = false
+## 奇物「用哪件道具」的待确认项（M161）。
+## 有内容时说明正停在一个需要玩家决定的奇物前，
+## 形状：{"step": 房间步骤, "curio": 奇物 id, "item": 候选道具 id}
+var _curio_ask: Dictionary = {}
+## 结算屏「用仓库里哪一件换下这件」的待选状态（M168）。空 = 没在该模式。
+var _swap_ask: String = ""
+## 商店的「选中 → 确认」两步状态（M183）：{kind:"buy"/"sell", idx:int}
+var _shop_sel: Dictionary = {}
+## 商店确认弹窗：{kind, idx, name, price}，空 = 没弹
+var _shop_ask: Dictionary = {}
+## 队伍屏拖拽换位（M173）。形状：{id, from, pos, moved}
+var _drag_card: Dictionary = {}
+## 上一次鼠标位置命中的控件 id（M176）。用来判断「hover 有没有变、要不要重绘」。
+var _hover_key: String = ""
+## 队伍屏左侧卡片的位置（每帧重画时刷新），拖拽命中判定要用
+var _party_rects: Array = []
+## 地图底部队伍条的卡片位置（M176 拖拽换位用）
+var _strip_rects: Array = []
+## 同一次战斗里已经试过几次撤退（M155）：每次失败下一次成功率 +5%。
+var _retreat_tries: int = 0
 
 ## —— 横向滚动区（M58）——
 ##
@@ -379,6 +459,8 @@ var _sk_orn: Texture2D = null
 ## 名册卡原来只展示、不可点，但它和建筑卡是同一套外观，
 ## 玩家一定会去点。现在点开一块底部抽屉看这个人的完整状态。
 var _roster_open: String = ""
+## 待确认卖出的仓库下标（M141）：-1 表示没有。
+## 商店里点一下就卖太危险 —— 饰品是限定掉落，卖错了买不回来。
 ## 抽屉内的可点区域。抽屉打开时它接管全部点击：
 ## 命中这里 → 执行；命中别处 → 关闭（点遮罩关浮层）。
 var _sheet_hits: Array = []
@@ -389,6 +471,11 @@ var _sheet_hits: Array = []
 ## 手指落下去，界面已经切走了。现在改成按下只记录、抬手才触发，
 ## 中间这段时间用它把控件画成按下态，让玩家确认「我按到的是这个」。
 var _press_id: String = ""
+## 长按看详情（M183）：按下多久、按的是哪张卡、现在有没有弹出来。
+## 手机没有 hover，技能/饰品的完整数值只能靠长按看。
+var _hold_t: float = 0.0
+var _hold_id: String = ""
+var _hold_shown: String = ""
 ## `--press=<id>`：把某个控件钉在按下态（验收用）。
 ##
 ## 真机上「按住」这一帧没法用命令行模拟（`--shot` 只截一帧、不会保持按下），
@@ -446,7 +533,27 @@ func _battle_slot_x(u: Combatant, is_enemy: bool) -> float:
 ## 当前显示的 x（带插值）。第一次出现时直接落在目标位。
 func _anim_x(u: Combatant, is_enemy: bool) -> float:
 	var target: float = _battle_slot_x(u, is_enemy)
-	return float(_slot_anim.get(u.uid, target)) + float(_hit_shake(u.uid))
+	return float(_slot_anim.get(u.uid, target)) + float(_hit_shake(u.uid)) \
+		+ _guard_shift(u)
+
+
+## 守护探身（M200）：朝被守护者方向平移最多 16px，0.5 秒内去而复返。
+##
+## 为什么是「探身」而不是「站过去」：战场按 rank 槽位绘制，真的换位会和
+## `_slot_anim` 的位移补间、rank 重排打架，画面上也会读成「他换了位置」。
+## 探身只改绘制、不动 `rank`，规则层完全不受影响。
+func _guard_shift(u: Combatant) -> float:
+	var gd: Dictionary = _guard_fx.get(u.uid, {})
+	if gd.is_empty() or not gd.has("toward"):
+		return 0.0
+	var other: Combatant = _unit_by_uid(int(gd["toward"]))
+	if other == null:
+		return 0.0
+	var me_x: float = _battle_slot_x(u, not u.is_hero)
+	var ot_x: float = _battle_slot_x(other, not other.is_hero)
+	var dir: float = 1.0 if ot_x > me_x else -1.0
+	var prog: float = clampf(1.0 - float(gd.get("t", 0.0)) / GUARD_FX_TIME, 0.0, 1.0)
+	return dir * 16.0 * sin(prog * PI)
 
 
 func _hit_shake(uid: int) -> float:
@@ -480,6 +587,20 @@ var _shot_at: float = 3.0
 ## 截图/冒烟用：启动后直接停在出发准备屏（`--prep`）。
 ## 加它是因为「准备屏的布局与门槛」以前只能靠手点验证，改一次要人肉看一次。
 var _boot_prep: bool = false
+## `--resume-demo`（M117）：即使带了截图参数也走「自动继续远征」。
+## 正常情况下 `--shot` 会关掉自动恢复（否则所有城镇截图都会变成地图），
+## 这个参数专门用来验收恢复路径。
+var _boot_resume: bool = false
+## `--quests=N`（M123）：把「已完成任务数」设成 N，用来验收建筑解锁 ——
+## 否则新档只有三个建筑，截不到后面那些。
+var _boot_quests: int = -1
+## 技能图标缓存（M133）：hid|sid → Texture2D（取不到时存 null）
+var _skill_icon_cache: Dictionary = {}
+## `--skill-lv=N`（M126）：把全名册的技能等级都设成 N，用来验收
+## 「每技能等级」这条路走没走通 —— 看技能卡上的伤害/命中数字变没变。
+var _boot_skill_lv: int = -1
+## `--resolve=N`（M126）：把全名册的决心等级设成 N，用来验收技能等级上限。
+var _boot_resolve: int = -1
 ## 同上：启动后直接停在公会屏（`--guild`），用于截图验证技能组界面。
 var _boot_guild: bool = false
 ## 启动时的任务类型（`--quest=kill_boss`），给自检和截图用。
@@ -529,6 +650,31 @@ var _room_demo: int = -1
 var _banner_demo: bool = false
 ## `--pick-demo=N`（M89）：进玩家回合后自动选中第 N 个技能，用来截目标面板。
 var _pick_demo: int = -1
+## `--busy-demo=N`（M94）：把前 N 个活人标成「在建筑里，还剩 2 周」。
+## 名册的「忙 / 可出征」区分不造数据就截不到。
+var _busy_demo: int = 0
+## `--hire-demo`（M98）：强制摆两个招募候选，马车卡片不造数据截不到
+## （新存档第一周常常是空的）。
+var _hire_demo: bool = false
+## `--phone=482x1080`（M99）：桌面试跑按手机屏幕比例跑。
+## 0 表示不模拟（桌面正常窗口）。
+var _phone_size: Vector2i = Vector2i.ZERO
+## 本次远征打到第几场（M101）。召唤物补位和「新的一场」长得太像，
+## 标题里没有场次的话，玩家分不清刚才那一串是不是同一场。
+var _battle_no: int = 0
+## 这一场是从走廊打起来的吗（M102）。横幅要用它区分「走廊遭遇 / 房间遭遇」——
+## 两种在画面上长得一模一样，而玩家最困惑的正是「为什么突然又打起来」。
+var _battle_corridor: bool = false
+## 本场召唤出来的单位 uid（M102）。给它们挂「召」角标用。
+var _summoned_uids: Dictionary = {}
+## 这场战斗是从房间卡上点「探索」打起来的（M103）。
+## 决定打完回哪儿：回房间卡弹结果，而不是直接回地图。
+var _room_battle: bool = false
+## 队伍屏当前选中的人（M106）。
+var _party_hero: String = ""
+## `--store-demo`（M107）：往仓库塞 6 件饰品。
+## 干净存档里一件都没有，队伍屏的仓库列表根本截不到。
+var _store_demo: bool = false
 ## `--info=N`：进战斗后打开第 N 个单位的状态详情（M65 续，验收用）。
 ## 顺带塞几条典型状态（命中、伤害、流血、标记）——不然「有 buff 时长什么样」
 ## 只能靠打几轮撞运气，那种验收不可复现。
@@ -589,11 +735,15 @@ var _light_log_t: float = 0.0
 ## `--dev` 下「上次打印过的背景」标记，避免每帧刷屏（M45）。
 var _bg_log_key: String = ""
 ## `--mute`：全程静音（M43）。
-var _mute: bool = false
+var _mute: bool = true   # 默认静音（M138）：玩家明确要求，也不打扰别人
 
 ## 截图/回归用：启动后模拟点一次这个按钮 id（`--click=bld:coach`）。
 ## 和 `--bld=` 的区别是它走 `_activate`，能测出「状态没切换」这类断线。
 var _boot_click: String = ""
+## `--tap=x,y`（M140）：按**屏幕坐标**点一下，走真实命中层（`_on_click`）。
+## `--click=` 直接调 `_activate`，绕过了 `_hit_id_at` —— 遮挡/穿透这类
+## 「点哪儿算谁」的问题只有 `--tap` 测得到。
+var _boot_tap: Vector2 = Vector2(-1, -1)
 ## 截图用：指定建筑屏选中的人（`--bld-hero=<hid>`）。
 ## 默认选第一个活人，所以「墓园里的死人」那半屏永远截不到。
 var _boot_building_hero: String = ""
@@ -642,6 +792,22 @@ func _boot_campaign(save_path: String) -> void:
 ## 项目逻辑分辨率是竖屏 750×1334。桌面上 1:1 开窗时，1334 已经超过
 ## 大多数 1080 高屏幕的**可用高度** —— 窗口底部被显示器/任务栏截掉，
 ## 而「贴底」的那排按钮（准备屏的出发、地图屏的三颗、战斗的技能区）
+## 手机显示模式的缩放设置（M99）。
+##
+## Android 和桌面 `--phone=` 共用这一份，**模拟必须和真机走同一段代码**，
+## 否则桌面上看着没问题、装到手机上还是断层。
+##
+## `win_size == ZERO` 表示真机（窗口就是屏幕，不要改尺寸）。
+func _apply_mobile_scale(win_size: Vector2i) -> void:
+	var win: Window = get_window()
+	win.content_scale_mode = Window.CONTENT_SCALE_MODE_CANVAS_ITEMS
+	win.content_scale_aspect = Window.CONTENT_SCALE_ASPECT_KEEP
+	win.content_scale_size = Vector2i(750, 1334)
+	if win_size.x > 0:
+		win.size = win_size
+		win.position = Vector2i(40, 40)
+
+
 ## 正好全在那一块，看起来就像界面元素互相压在一起。
 ##
 ## 修法是锁逻辑尺寸、缩窗口：内容永远按 750×1334 排，玩家看到的是一整张
@@ -653,7 +819,7 @@ func _boot_campaign(save_path: String) -> void:
 ##   · headless / Android —— 各自已有处理
 func _fit_desktop_window() -> void:
 	if not _shot_path.is_empty() or OS.has_feature("headless") \
-			or OS.has_feature("android"):
+			or OS.has_feature("android") or _phone_size.x > 0:
 		return
 	var win: Window = get_window()
 	win.content_scale_mode = Window.CONTENT_SCALE_MODE_CANVAS_ITEMS
@@ -673,23 +839,94 @@ func _fit_desktop_window() -> void:
 		sz.x, sz.y, scr.size.x, scr.size.y, k])
 
 
+## 切后台 / 被系统回收前把该落的盘都落了（M114）。
+##
+## 手机上「按 Home 键」不是暂停，系统随时可能把进程杀掉。Godot 在
+## Android 上会先发 `NOTIFICATION_APPLICATION_PAUSED`，这是唯一的预警窗口。
+## 原来完全没处理：名单、补给包这些只活在内存里的东西，回来就没了。
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
+		# 安卓返回键（M134）。
+		#
+		# 这是「游戏自己退回桌面」的真凶：`SceneTree.quit_on_go_back`
+		# **默认是 true**，而我们从没关过它。全面屏手机的返回手势是从屏幕
+		# 边缘往里滑 —— 在战斗里点最边上的按钮、或者手指带一下，就会触发
+		# 「返回」，游戏直接退出，玩家看到的是「它自己跳回桌面了」。
+		#
+		# 而且 `NOTIFICATION_WM_GO_BACK_REQUEST` 到达时我们只写了存档、
+		# 没拦住退出，所以存档写完了人也出去了。
+		_on_back_pressed()
+		return
+	if what == NOTIFICATION_APPLICATION_PAUSED \
+			or what == NOTIFICATION_WM_CLOSE_REQUEST:
+		_party_persist()
+		_exp_persist()
+
+
+## 返回键：先关弹窗，再回上一屏，最后才退出（M134）。
+##
+## 一按就退的话，玩家在战斗里误触一下就丢了这一趟 —— 而这场仗可能打了五分钟。
+func _on_back_pressed() -> void:
+	# 任何浮层先关掉
+	if not _roster_open.is_empty():
+		_roster_open = ""
+		queue_redraw()
+		return
+	if _state == S_BATTLE and _info_uid >= 0:
+		_info_uid = -1
+		queue_redraw()
+		return
+	# 子屏回城镇
+	match _state:
+		S_BUILDING, S_GUILD, S_ROSTER, S_TRINKET, S_SHOP, S_GATE, S_PREP, S_PARTY, S_SETTINGS:
+			_party_persist()
+			_exp_persist()
+			_state = S_TOWN
+			queue_redraw()
+			return
+		S_MAP:
+			# 远征途中不退出：直接回城镇等于放弃这一趟，太狠
+			_flash_msg("在地牢里，退出请走「撤退」")
+			queue_redraw()
+			return
+		S_BATTLE:
+			_flash_msg("战斗中不能退出")
+			queue_redraw()
+			return
+	# 城镇再按一次才退出
+	_party_persist()
+	_exp_persist()
+	get_tree().quit()
+
+
 func _ready() -> void:
+	# **必须关**（M134）：默认 true 时安卓返回键会直接退出应用，
+	# 而全面屏手势的「返回」是从屏幕边缘往内滑 —— 点边上的按钮就会误触。
+	get_tree().quit_on_go_back = false
 	# Android 端把逻辑分辨率锁成 1280×760 再按屏幕缩放（M54）。
 	#
 	# 桌面端**故意不动**：`--w=1080` 那套排版验收依赖「窗口多宽、布局就多宽」。
 	# 一旦开了 canvas_items，1080 宽会被缩回 1280 逻辑宽，验收就测了个假的
 	# ——M41 已经在这一类「以为测到了」上栽过一次。
 	#
-	# expand 而不是 keep：手机屏幕普遍比 16:9 更高（20:9 很常见），
-	# keep 会留两条黑边，expand 则把多出来的高度真的给界面用。
+	# keep 而不是 expand（M96，真机反馈改回来）。
 	#
-	# M58 起竖屏 750×1334（按高度适配）：多出来的高度分给战场与技能区，
-	# 宽度不足的机型由内容自己按 size.x 收缩。
+	# 原先用 expand，注释里写的理由是「手机比 16:9 高，多出来的高度给界面用」。
+	# 实际效果是**断层**：视口变 750×1680，但
+	#   · 城镇画布 `_town_canvas_rect()` 按 `size.x * 1334/750` 算 → 只有 1334 高；
+	#   · 地图屏的网格/面板用的是写死的 156/716 等坐标 → 也停在 1334 附近；
+	#   · 而底部按钮用 `size.y - 44 - 204` → 跑到 1432。
+	# 上下两套坐标系，中间空出 346 逻辑像素（≈222 屏幕像素），
+	# 看起来就是「内容画到一半断了，按钮悬在下面」。
+	#
+	# expand 要能真的用起来，得让**所有**纵向布局都跟着 size.y 走
+	# （画布、建筑槽位、地图网格、每个面板的 y）。在做到那一步之前，
+	# keep 是唯一不会骗人的选择：内容按 750×1334 完整显示、居中，
+	# 比例不符的机型上下留一点边——边比断层好。
 	if OS.has_feature("android"):
-		var win := get_window()
-		win.content_scale_mode = Window.CONTENT_SCALE_MODE_CANVAS_ITEMS
-		win.content_scale_aspect = Window.CONTENT_SCALE_ASPECT_EXPAND
-		win.content_scale_size = Vector2i(750, 1334)
+		_apply_mobile_scale(Vector2i.ZERO)
+	elif _phone_size.x > 0:
+		_apply_mobile_scale(_phone_size)
 
 	_font = ThemeDB.fallback_font
 	# 地图层（M80）：单独一个 Control 子节点 + `clip_contents`。
@@ -751,6 +988,10 @@ func _ready() -> void:
 			_boot_pending_fire = true
 		elif a.begins_with("--bld-hero="):
 			_boot_building_hero = a.substr(11)
+		elif a.begins_with("--tap="):
+			var xy: PackedStringArray = a.substr(6).split(",")
+			if xy.size() == 2:
+				_boot_tap = Vector2(float(xy[0]), float(xy[1]))
 		elif a.begins_with("--click="):
 			_boot_click = a.substr(8)
 		elif a == "--dev":
@@ -786,8 +1027,29 @@ func _ready() -> void:
 			_room_demo = 0
 		elif a.begins_with("--room-demo="):
 			_room_demo = int(a.substr(12))
+		elif a.begins_with("--phone="):
+			# 两种写法：`--phone` 用 20:9 默认值，`--phone=482x1080` 指定尺寸
+			var pv3: PackedStringArray = a.substr(8).split("x")
+			if pv3.size() == 2 and pv3[0].is_valid_int() and pv3[1].is_valid_int():
+				_phone_size = Vector2i(int(pv3[0]), int(pv3[1]))
+			else:
+				_phone_size = Vector2i(482, 1080)
+		elif a.begins_with("--resolve="):
+			_boot_resolve = int(a.substr(10))
+		elif a.begins_with("--skill-lv="):
+			_boot_skill_lv = int(a.substr(11))
+		elif a.begins_with("--quests="):
+			_boot_quests = int(a.substr(9))
+		elif a == "--resume-demo":
+			_boot_resume = true
+		elif a == "--store-demo":
+			_store_demo = true
+		elif a == "--hire-demo":
+			_hire_demo = true
 		elif a == "--banner-demo":
 			_banner_demo = true
+		elif a.begins_with("--busy-demo="):
+			_busy_demo = int(a.substr(12))
 		elif a.begins_with("--pick-demo="):
 			_pick_demo = int(a.substr(12))
 		elif a.begins_with("--map-pan="):
@@ -825,6 +1087,12 @@ func _ready() -> void:
 			_auto_start = true
 		elif a == "--prep":
 			_boot_prep = true
+		elif a == "--show-interact":
+			_show_interact = true
+		elif a == "--dlg-demo":
+			_dlg_demo = true
+		elif a == "--hold-demo":
+			_hold_demo = true
 		elif a == "--guild":
 			_boot_guild = true
 		elif a.begins_with("--save="):
@@ -929,6 +1197,17 @@ func _ready() -> void:
 		return
 
 	_boot_campaign(_save_path)
+	if _boot_quests >= 0 and campaign != null:
+		campaign.quests_done = _boot_quests
+	if _boot_resolve >= 0 and campaign != null:
+		for hid in campaign.roster.keys():
+			(campaign.roster[str(hid)] as Dictionary)["resolve"] = _boot_resolve
+	if _boot_skill_lv >= 0 and campaign != null:
+		for hid in campaign.roster.keys():
+			var lv: Dictionary = {}
+			for sid in campaign.equipped_skills(str(hid)):
+				lv[str(sid)] = clampi(_boot_skill_lv, 0, Campaign.SKILL_MAX_LEVEL)
+			(campaign.roster[str(hid)] as Dictionary)["skill_levels"] = lv
 
 	set_process(true)
 	if _want_bosses >= 0 and campaign != null:
@@ -943,6 +1222,26 @@ func _ready() -> void:
 		campaign.save()
 		_state = S_VICTORY
 	# 截图/冒烟用：直接进地图，不必先点按钮
+	if _store_demo and campaign != null and campaign.trinket_lib != null \
+			and campaign.trinket_lib.is_loaded():
+		var tn: int = 0
+		for tid2 in (campaign.trinket_lib.entries as Dictionary).keys():
+			if tn >= 6:
+				break
+			campaign.trinket_store.append(str(tid2))
+			tn += 1
+		if not campaign.trinket_store.is_empty():
+			_sel_trinket = str(campaign.trinket_store[0])
+	if _hire_demo and campaign != null:
+		campaign.recruit_candidates = ["leper", "vestal"]
+		campaign.gold = 2500      # 让卡片处于「可招」状态，才看得出正常长什么样
+	if _busy_demo > 0 and campaign != null:
+		var bn: int = 0
+		for bhid in campaign.alive_ids():
+			if bn >= _busy_demo:
+				break
+			(campaign.roster[str(bhid)] as Dictionary)["busy"] = 2
+			bn += 1
 	if _boot_guild and not campaign.alive_ids().is_empty():
 		_guild_hero = str(campaign.alive_ids()[0])
 		_state = S_GUILD
@@ -959,8 +1258,8 @@ func _ready() -> void:
 		# 和点难度卡进准备屏走同一套初始化，否则截出来的不是玩家看到的那一屏
 		_prep_size = _size
 		_prep_level = _level
-		_prep_pack = _default_prep_pack()
-		_prep_party = _party_for(_prep_level)
+		_prep_pack = _restore_prep_pack()
+		_prep_party = _party_restore(_prep_level)
 		_state = S_PREP
 	elif _boot_trinkets and not campaign.alive_ids().is_empty():
 		_sel_trinket = ""
@@ -1013,6 +1312,10 @@ func _ready() -> void:
 			_activate(one)
 		print("点击后状态：%d（S_TOWN=%d S_BUILDING=%d S_GUILD=%d S_ROSTER=%d）" % [
 			_state, S_TOWN, S_BUILDING, S_GUILD, S_ROSTER])
+	if _boot_tap.x >= 0.0:
+		print("坐标点击：%s → 命中 %s" % [str(_boot_tap), _hit_id_at(_boot_tap)])
+		_on_click(_boot_tap)
+		print("坐标点击后浮层: '%s'" % _roster_open)
 	_sk_panel = _skin.texture("skin", "panel")
 	_sk_card = _skin.texture("skin", "card")
 	_sk_grain = _skin.texture("skin", "grain")
@@ -1028,6 +1331,23 @@ func _ready() -> void:
 	_apply_safe_area()
 	if not _want_town_layout.is_empty():
 		_load_town_layout(_want_town_layout)
+	# 有没打完的远征就直接接着打（M117）。
+	#
+	# 原来要玩家回城镇、再点一次右下角的「继续远征」——那不叫继续，那叫重新进入。
+	# 玩家按 Home 回个消息、回来应该站在原地，而不是被送回城门口。
+	# 验收参数（`--shot=` / `--click=` / `--bld=` 等）一律不自动恢复：
+	# 那些场景要的是可预测的初始状态，自动跳进远征会让截图全是地图。
+	if campaign != null and not campaign.expedition_run.is_empty() \
+			and (_boot_resume or (_shot_path.is_empty() and _boot_click.is_empty() \
+			and _boot_building.is_empty() and not _auto and not _selftest \
+			and not _boot_prep and _phone_size.x <= 0)):
+		_resume_expedition()
+	# 出征名单在**这里**统一初始化一次（M176）。
+	# 原来每个屏各初始化各自的（名册/队伍/出征屏各一处），
+	# 于是没进过那几屏就直接开公会的玩家，看到的全是「空闲」——
+	# 而实际上默认名单是有人的。
+	if campaign != null and _prep_party.is_empty():
+		_prep_party = _party_restore(_prep_level)
 	queue_redraw()
 
 
@@ -1121,6 +1441,8 @@ func _boot_into_battle() -> void:
 	_battle = exp.start_battle(step)
 	if _battle == null:
 		return
+	_battle_corridor = bool(step.get("corridor", false))
+	_summoned_uids.clear()
 	_battle.decision_provider = func(_b: Battle, _a: Combatant) -> Dictionary: return {}
 	_ev_pos = 0
 	_options = []
@@ -1638,11 +1960,14 @@ func _start_expedition(size_name: String, level: int, pack: Dictionary = {},
 
 	_size = size_name
 	_level = level
+	_battle_no = 0
 	match quest:
 		"kill_boss":
 			_flash_msg("首领任务：终点房间必有一战")
 		"cleanse":
-			_flash_msg("清剿任务：图上的战斗全打完，走到出口才算完成")
+			# 压到 16 字（M204）：原来 23 字，34 号要折两行，第二行会压住房间面板标题。
+			# 完整的判据在房间面板的「任务」那一行里（带进度），这里只说结论。
+			_flash_msg("清剿任务：全图战斗打完才算完成")
 		"inventory_activate":
 			_flash_msg("仪式任务：带着任务物品去激活，用完就没了")
 		_:
@@ -1657,7 +1982,8 @@ func _start_expedition(size_name: String, level: int, pack: Dictionary = {},
 	var skill: Dictionary = {}
 	for hid in party:
 		gear[hid] = campaign.gear_of(hid)
-		skill[hid] = campaign.skill_of(hid)
+		# 每个技能各自的等级（M126）
+		skill[hid] = campaign.skill_levels_map([hid]).get(str(hid), {})
 
 	exp = Expedition.new()
 	# 等级惩罚（M25 / M29）：低一级，进本 +20 压力，之后每次受压 +25%。
@@ -1697,6 +2023,9 @@ func _start_expedition(size_name: String, level: int, pack: Dictionary = {},
 	_sync_exp_events()
 	_battle = null
 	_state = S_MAP
+	# 出发就落一次盘（M116）：这样「只要出发过，就一定有得恢复」，
+	# 不必等到打完第一场才第一次写。切后台丢整趟的洞从这里堵上。
+	_exp_persist()
 	var goal_word: String = "首领" if quest == "kill_boss" else "出口"
 	_add_log("出发：%s %s · %d 间房 · 入口到%s约 %d 步 · 队伍 %d 人" % [
 		DdNames.dungeon_name(_dungeon), _size_name_of(_size),
@@ -1714,16 +2043,25 @@ func _loot_cfg() -> Dictionary:
 ## 进结算屏：把战利品入账、英雄状态落盘、存档。只做一次。
 ## 这一步要不要停下来放房间卡（M74）。
 ##
-## 只拦「房间里的奇物」：
+## 拦「房间里的战斗和奇物」（M103）。
+##
+## 原来只拦奇物：战斗房是**进房直接开打**，中间没有任何停顿，
+## 于是「走廊刚打完、画面一闪、又在打」——玩家分不清这是同一场还是新一场，
+## 也看不出自己刚进了房间。
+##
+## 现在战斗房也要先弹卡：卡上写「这里有什么动静」，点「探索」才开打。
+## 打完回到同一张卡上弹结果，再点「继续赶路」回地图。
+##
+## 仍然不拦：
 ##   · 走廊步骤带 `corridor: true`，一路走一路停会把节奏拖死；
-##   · 战斗房由遭遇横幅负责，不重复；
 ##   · 空房间没有 step，本来就不会进这里。
 func _room_should_pause(step: Dictionary) -> bool:
 	if _selftest or _auto or _skip_battles:
 		return false
 	if bool(step.get("corridor", false)):
 		return false
-	return str(step.get("kind", "")) == "curio"
+	var k: String = str(step.get("kind", ""))
+	return k == "curio" or k == "battle"
 
 
 func _room_open(step: Dictionary) -> void:
@@ -1744,20 +2082,51 @@ func _room_go() -> void:
 		# 另维护一套文案迟早会和日志对不上（日志说掉血、卡片说没事）。
 		var before: int = _log.size()
 		match _room_kind:
+			"battle":
+				# 从卡片上开战（M103）。这一段和地图步进里的开战逻辑必须一致
+				# （决策 provider、事件游标、行动序、瞄准态都要重置），
+				# 否则会带着上一场的残留进新战斗。
+				var nb: Battle = exp.start_battle(_room_step)
+				if nb == null:
+					_room_phase = 1
+					_room_lines = ["这里已经没有东西了。"]
+					queue_redraw()
+					return
+				_room_battle = true
+				_battle = nb
+				_battle_no += 1
+				_battle_corridor = false
+				_summoned_uids.clear()
+				_battle.decision_provider = func(_b: Battle, _a: Combatant) -> Dictionary: return {}
+				_ev_pos = 0
+				_options = []
+				_pending = {}
+				_order_ids = []
+				_order_cur = -1
+				_step_timer = 0.20
+				_state = S_BATTLE
+				queue_redraw()
+				return
 			"curio":
+				# 有可用道具就先问（M161）。原来 `curio_auto_item_enabled`
+				# 会**自动**挑背包里第一件能用的扣掉 —— 玩家买了一背包补给，
+				# 走着走着没了，完全不知道花在哪。现在停一下问一句。
+				var ask_id: String = str(_room_step.get("curio", ""))
+				var cand: String = _curio_candidate(ask_id)
+				if not cand.is_empty():
+					_curio_ask = {"step": _room_step.duplicate(true),
+						"curio": ask_id, "item": cand}
+					_room_step = {}
+					_room_phase = 2
+					queue_redraw()
+					return
 				exp.resolve_curio(_room_step)
 			"trap":
 				exp.resolve_trap(_room_step)
 			"obstacle":
 				exp.resolve_obstacle()
 		_room_step = {}
-		_sync_exp_events()
-		_room_lines = []
-		for i in range(mini(before, _log.size()), _log.size()):
-			_room_lines.append(str((_log[i] as Dictionary).get("text", "")))
-		if _room_lines.is_empty():
-			_room_lines.append("翻了一遍，没有值得带走的东西。")
-		queue_redraw()
+		_fill_room_lines(before)
 		return
 	_state = S_MAP
 	_room_step = {}
@@ -1796,8 +2165,113 @@ const ROOM_FLAVOR: Dictionary = {
 ## 玩家从没看见过自己走进的那间屋子长什么样，也没看见自己做了什么。
 ## 这张卡分两页：先描述屋子（类型 + 环境 + 里面那件东西叫什么），
 ## 再把结算结果摆出来。
+## 一行结果文字里最主要的那个资源，返回图标 key（M141）。
+##
+## 只认四种纹章 + 金币：饰品没有稳定的通用图标，
+## 与其上一张对不上的图，不如只上能认出来的。
+## 在 (x, y-18) 画奖励行的行首图标，返回**文字该从哪开始**（M147）。
+##
+## 房间卡片是整句、胜利屏是分栏，两边的排版没法合并，
+## 但「行首那个图标」是同一样东西 —— 抽出来之后，
+## 加新资源类型只要改 `_line_icon_name` 一处，两个界面同时生效。
+func _reward_icon_x(x: float, y: float, text: String) -> float:
+	var ic: String = _line_icon_name(text)
+	if ic.is_empty():
+		return x
+	var t: Texture2D = _ico(ic)
+	if t == null:
+		return x
+	draw_texture_rect(t, Rect2(x + 2.0, y - 18.0, 22.0, 22.0), false)
+	return x + 30.0
+
+
+func _line_icon_name(line: String) -> String:
+	if line.contains("金币") or line.contains("金 "):
+		return "icon_gold"
+	# 四种纹章共用「地契」那张图标 —— 图集里没有分种类，
+	# 上一张能认的比上一张错的好（M141）。
+	for k in ["地契", "纹章", "雕像", "头像", "徽记", "传家宝"]:
+		if line.contains(k):
+			return "icon_deed"
+	# 补给（M199）：药草/绷带/解毒剂这些原来**没有行首图标** ——
+	# 而它们在奖励里出现得比传家宝还频繁（奇物多半给补给）。
+	# 补给面板和准备屏早就有整套 `supply_*` 图标，这里只是没接上。
+	for sid in SUPPLY_ICONS.keys():
+		var nm: String = DdNames.supply_name(str(sid))
+		if not nm.is_empty() and line.contains(nm):
+			return str(SUPPLY_ICONS[sid])
+	return ""
+
+
+## 这件奇物有没有「背包里正好有」的可用道具（M161）。空 = 直接结算。
+func _curio_candidate(cid: String) -> String:
+	if cid.is_empty() or exp == null or exp.db == null:
+		return ""
+	var cl: CurioLib = exp.db.curio_lib
+	if cl == null or not cl.is_loaded():
+		return ""
+	for it in cl.items_for(cid):
+		if exp.supply_count(str(it)) > 0:
+			return str(it)
+	return ""
+
+
+## 奇物询问卡（M161）：把「要不要用这件道具」摆出来，等玩家点。
+func _draw_curio_ask() -> void:
+	if _curio_ask.is_empty():
+		return
+	draw_rect(Rect2(Vector2.ZERO, size), Color(0.0, 0.0, 0.0, 0.64))
+	var w: float = minf(520.0, size.x - 60.0)
+	var h: float = 350.0
+	var r := Rect2((size.x - w) * 0.5, (size.y - h) * 0.5, w, h)
+	_panel(r, DdTheme.PANEL_DEEP)
+	draw_rect(r, DdTheme.PANEL_EDGE, false, 2.0)
+	var cid: String = str(_curio_ask.get("curio", ""))
+	var it: String = str(_curio_ask.get("item", ""))
+	_text(Vector2(r.position.x + 20.0, r.position.y + 40.0), "你看见了：%s" % DdNames.curio_name(cid),
+		DdTheme.FONT_H1, DdTheme.TEXT, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 40.0)
+	_text(Vector2(r.position.x + 20.0, r.position.y + 76.0),
+		"背包里有「%s」× %d" % [DdNames.supply_name(it), exp.supply_count(it)],
+		DdTheme.FONT_BD, DdTheme.STAT, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 40.0)
+	_text(Vector2(r.position.x + 20.0, r.position.y + 112.0),
+		"用对应道具通常能开出更好的东西，但道具会被消耗掉。",
+		DdTheme.FONT_SM, DdTheme.DIM, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 40.0)
+	_text(Vector2(r.position.x + 20.0, r.position.y + 138.0),
+		"（空手翻也可能撞上坏结果）",
+		DdTheme.FONT_SM, DdTheme.FAINT, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 40.0)
+
+	var ico: Texture2D = _supply_icon(it)
+	if ico != null:
+		draw_texture_rect(ico, Rect2(r.position.x + 20.0, r.position.y + 160.0, 40.0, 40.0), false)
+
+	var bw: float = (r.size.x - 56.0) * 0.5
+	_add_button(Rect2(r.position.x + 20.0, r.end.y - 108.0, bw, 44.0),
+		"curio_use", "用「%s」" % DdNames.supply_name(it), true)
+	_add_button(Rect2(r.position.x + 36.0 + bw, r.end.y - 108.0, bw, 44.0),
+		"curio_skip", "空手翻", true)
+	_text(Vector2(r.position.x + 20.0, r.end.y - 24.0),
+		"点空白处 = 空手翻", DdTheme.FONT_TAG, DdTheme.FAINT,
+		HORIZONTAL_ALIGNMENT_CENTER, r.size.x - 40.0)
+
+
+## 结算完一件事之后，把「这一趟」列表重填（M161）。
+##
+## 原来这段在 `_drain_room` 和奇物询问两处各写一遍 —— 一处改了另一处就漏。
+func _fill_room_lines(before: int) -> void:
+	_sync_exp_events()
+	_room_lines = []
+	for i in range(mini(before, _log.size()), _log.size()):
+		_room_lines.append(str((_log[i] as Dictionary).get("text", "")))
+	if _room_lines.is_empty():
+		_room_lines.append("翻了一遍，没有值得带走的东西。")
+	queue_redraw()
+
+
 func _draw_room_card() -> void:
 	if exp == null:
+		return
+	if not _curio_ask.is_empty():
+		_draw_curio_ask()
 		return
 	# 先画地图垫底（M74）：卡背后一片纯黑的话，玩家会忘了自己在图上哪一间。
 	# 画完把地图的按钮清掉 —— 卡片是模态的，只该有它自己那颗按钮。
@@ -1850,8 +2324,13 @@ func _draw_room_card() -> void:
 		var ly: float = y + 28.0
 		var shown: int = mini(_room_lines.size(), 6)
 		for i in shown:
-			_text(Vector2(r.position.x + 40.0, ly), _strip_log_tag(str(_room_lines[i])),
-				DdTheme.FONT_BD, DdTheme.TEXT, HORIZONTAL_ALIGNMENT_CENTER, r.size.x - 80.0)
+			var line_txt: String = _strip_log_tag(str(_room_lines[i]))
+			# 行首图标（M141）：这一行里只要有金币/纹章，前面就盖一个对应图标。
+			# 光靠文字读「金币 750、地契 ×2」得逐字看，图标是扫一眼就认得的。
+			var tx3: float = _reward_icon_x(r.position.x + 40.0, ly, line_txt)
+			var wtxt: float = r.size.x - 80.0 - (tx3 - (r.position.x + 40.0))
+			_text(Vector2(tx3, ly), line_txt,
+				DdTheme.FONT_BD, DdTheme.TEXT, HORIZONTAL_ALIGNMENT_LEFT, wtxt)
 			ly += 30.0
 		if _room_lines.size() > shown:
 			_text(Vector2(r.position.x + 40.0, ly),
@@ -1862,6 +2341,374 @@ func _draw_room_card() -> void:
 		"room_go", "走进去" if _room_phase == 0 else "继续赶路")
 
 
+## 作弊：金币和四种纹章各 +10000（M104，数值 M125 上调）。
+##
+## 只为开发期少跑几趟远征。**不动名册**——加人不该是按钮，
+## 那会绕开「名册上限 / 忙 / 死亡」一整套规则，出事很难查。
+func _cheat_resources() -> void:
+	if campaign == null:
+		return
+	campaign.gold += 10000
+	for k in (campaign.cfg.get("heirlooms", []) as Array):
+		var key: String = str(k)
+		campaign.heirlooms[key] = int(campaign.heirlooms.get(key, 0)) + 10000
+	campaign.save()
+	_flash_msg("金币 +10000 · 纹章各 +10000")
+	queue_redraw()
+
+
+## 队伍屏左侧的名册卡（M106）。和名册页的卡同构，但多一个「上阵」状态。
+func _party_card(hid: String, r: Rect2) -> void:
+	var row: Dictionary = campaign.hero(hid)
+	var alive: bool = bool(row.get("alive", true))
+	var on: bool = _prep_party.has(hid)
+	var st: int = _hit_state(r, "party_sel:" + hid)
+	var base: int = TILE_ACTIVE if hid == _party_hero else st
+	_tile(r, base)
+	var pr := Rect2(r.position.x + 7.0, r.position.y + 8.0, 42.0, 42.0)
+	_draw_hero_badge(hid, pr, alive)
+	var tx: float = pr.end.x + 10.0
+	_text(Vector2(tx, r.position.y + 22.0), _hero_label(hid), DdTheme.FONT_BD,
+		DdTheme.TEXT if alive else DdTheme.FAINT)
+	_text(Vector2(tx, r.position.y + 40.0),
+		"Lv%d · 装备 %d 阶" % [campaign.resolve_of(hid), campaign.gear_of(hid)],
+		DdTheme.FONT_TAG, DdTheme.DIM)
+	# 右侧状态（M171）：名册屏合并进来之后，它那套「上阵/修养/病/阵亡」
+	# 的优先级也照搬 —— 一目了然「这人这周能不能用」。
+	# 原来这里只有「上阵 / — / 阵亡」三档，看不出「在建筑里躺着」和「病了」。
+	var ptag: String = "—"
+	var ptag_c: Color = DdTheme.DIM
+	if not alive:
+		ptag = "阵亡"
+		ptag_c = DdTheme.CRIT
+	elif on:
+		ptag = "上阵"
+		ptag_c = DdTheme.OK
+	elif campaign.busy_of(hid) > 0:
+		ptag = "修养 %d 周" % campaign.busy_of(hid)
+		ptag_c = DdTheme.PARTY
+	elif campaign.diseases_of(hid).size() > 0:
+		ptag = "病 %d" % campaign.diseases_of(hid).size()
+		ptag_c = DdTheme.WARN
+	else:
+		# 「空闲」这一档漏了（M174）：名册屏原来有，搬过来时只搬了
+		# 修养和病，剩下的人全掉进「—」，等于没状态。
+		ptag = "空闲"
+		ptag_c = DdTheme.DIM
+	_text(Vector2(r.end.x - 78.0, r.position.y + 22.0), ptag,
+		DdTheme.FONT_TAG, ptag_c, HORIZONTAL_ALIGNMENT_RIGHT, 70.0)
+	_add_hit(r, "party_sel:" + hid)
+
+
+## 这个技能在「第几号位」能不能放（M175）。
+##
+## 判据和战斗里 `Battle._can_use()` 同一条：`launch_mask` 的位掩码。
+## `mask == 0` 表示数据没限位次，任何位置都能放。
+func _skill_ok_at(hid: String, sid: String, rank: int) -> bool:
+	# 注意：是**视图层的 `db`**，不是 `campaign.db` ——
+	# Campaign 上没有 `db` 字段（M175 第一次就写错了，运行时报
+	# 「Invalid access to property or key 'db' on Campaign」）。
+	if rank < 0 or db == null:
+		return true
+	var h: Dictionary = (db.heroes.get(campaign.def_of(hid), {}) as Dictionary)
+	for s in (h.get("skills", []) as Array):
+		if not (s is Dictionary) or str((s as Dictionary).get("id", "")) != sid:
+			continue
+		var lv_list: Array = (s as Dictionary).get("levels", [])
+		if lv_list.is_empty():
+			return true
+		var m: Dictionary = Combatant._parse_rank_mask(
+			str((lv_list[0] as Dictionary).get("launch", "")))
+		var mask: int = int(m["mask"])
+		return mask == 0 or (mask & (1 << rank)) != 0
+	return true
+
+
+## 队伍屏右侧：选中角色的装备与技能（M106）。
+func _draw_party_detail(r: Rect2) -> void:
+	_panel(r, DdTheme.PANEL_DEEP)
+	var hid: String = _party_hero
+	var row: Dictionary = campaign.hero(hid)
+	var alive: bool = bool(row.get("alive", true))
+	var on: bool = _prep_party.has(hid)
+
+	_text(Vector2(r.position.x + 16.0, r.position.y + 32.0), _hero_label(hid),
+		DdTheme.FONT_H1, DdTheme.TEXT)
+	_text(Vector2(r.position.x + 16.0, r.position.y + 54.0),
+		"Lv%d · 装备 %d 阶 · 压力 %.0f" % [campaign.resolve_of(hid),
+			campaign.gear_of(hid), float(row.get("stress", 0.0))],
+		DdTheme.FONT_SM, DdTheme.DIM)
+	# 上阵开关 / 买活（M173）
+	#
+	# 阵亡的人原来这里的按钮是**灰的**，只在下面写一句「阵亡的人不能上阵」——
+	# 玩家知道不能上，但不知道**怎么才能再上**。
+	# 既然旁边已经有「改技能（去公会）」这种跳转键，这里也该有个动作键：
+	# 直接掏钱把人捞回来（和马车征召同一个价，走 `campaign.recruit`）。
+	var tog := Rect2(r.end.x - 156.0, r.position.y + 14.0, 140.0, 42.0)
+	if alive:
+		_add_button(tog, "party_toggle:" + hid, "下阵" if on else "上阵", true)
+	else:
+		var rcost: int = int((campaign.effective_recruit_cost(hid) as Dictionary).get("gold", 0))
+		var can_rv: bool = campaign.can_recruit(hid)
+		_add_button(tog, "party_revive:" + hid, "复活 %d 金" % rcost, can_rv)
+		# 说明再往下 14px（M173）：`tog.end.y + 4` 正好贴着按钮下沿，
+		# 视觉上挤成一行。也给位置不够时留出「金币不够」这档更长的文案。
+		_text(Vector2(tog.position.x - 96.0, tog.end.y + 18.0),
+			"复活后可直接上阵" if can_rv else "金币不够（要 %d）" % rcost,
+			DdTheme.FONT_TAG, DdTheme.FAINT if can_rv else DdTheme.CRIT,
+			HORIZONTAL_ALIGNMENT_RIGHT, 236.0)
+	# 站位（M166）：上阵顺序就是号位，1 号在最前面吃伤害。
+	# 原来这个顺序**没法调**，只能靠「先点谁」决定 —— 而玩家根本不知道这件事。
+	if on:
+		var idx: int = _prep_party.find(hid)
+		var last: int = _prep_party.size() - 1
+		# 文字和按钮要错开 24 以上（M166）：`_text` 的 y 是**基线**，
+		# 文字往上占 18px、往下占 4px；上一版只隔 6，直接叠上了。
+		# 放按钮**下面**、左对齐（M166 第二版）：右对齐到 140 宽的右端时，
+		# 文字正好压在「↓ 后移」那颗按钮的右半边上。
+		# 宽度只能给 140（= 两颗按钮的总宽）：面板右边界就在那儿，
+		# 上一版给 200 直接把「吃伤害」三个字画到面板外了（M166 第三版）。
+		_text(Vector2(tog.position.x, tog.end.y + 74.0), "第 %d 号位" % (idx + 1),
+			DdTheme.FONT_SM, DdTheme.PARTY, HORIZONTAL_ALIGNMENT_LEFT, 140.0)
+		# 不再给「前移/后移」按钮（M173）：两个小按钮点一次挪一格，
+		# 把 4 号位换到 1 号位要点三次。改成**拖左侧卡片**。
+		_text(Vector2(tog.position.x - 60.0, tog.end.y + 30.0),
+			"拖左侧卡片可换位", DdTheme.FONT_TAG, DdTheme.FAINT,
+			HORIZONTAL_ALIGNMENT_RIGHT, 200.0)
+		var _unused_last: int = last
+
+	# —— 装备 ——
+	var y: float = r.position.y + 144.0
+	_text(Vector2(r.position.x + 16.0, y), "饰品", DdTheme.FONT_MD, DdTheme.DIM)
+	y += 12.0
+	var eq: Array = campaign.equipped_of(hid)
+	for si in campaign.equip_slots:
+		var sr := Rect2(r.position.x + 16.0, y + 6.0 + float(si) * 66.0,
+			r.size.x - 32.0, 60.0)
+		var cur: String = str(eq[si]) if si < eq.size() else ""
+		_panel(sr, DdTheme.PANEL_DEEP if cur.is_empty() else DdTheme.PANEL_HI)
+		_hit_overlay(sr, "tk_slot:%s:%d" % [hid, si])
+		_add_hit(sr, "tk_slot:%s:%d" % [hid, si])
+		if cur.is_empty():
+			_text(Vector2(sr.position.x + 16.0, sr.position.y + 36.0),
+				"空槽 · 点下面仓库里的一件，再点这里", DdTheme.FONT_MD,
+				DdTheme.FAINT)
+		else:
+			var ico: Texture2D = _trinket_icon(cur)
+			var tx2: float = sr.position.x + 16.0
+			if ico != null:
+				draw_texture_rect(ico, Rect2(sr.position.x + 10.0,
+					sr.position.y + 13.0, 34.0, 34.0), false)
+				tx2 = sr.position.x + 52.0
+			# 名字用**品质色**、下面补一行效果（M139）。
+			# 原来只有灰白名字 —— 装了什么东西、这东西什么品质，
+			# 得点开别的地方才知道，而这一行右边全是空的。
+			var rar: String = ""
+			if campaign.trinket_lib != null:
+				rar = campaign.trinket_lib.rarity_of(cur)
+			_text(Vector2(tx2, sr.position.y + 24.0), DdNames.trinket_name(cur),
+				DdTheme.FONT_MD, _rarity_col(rar), HORIZONTAL_ALIGNMENT_LEFT,
+				sr.end.x - tx2 - 46.0)
+			_text(Vector2(tx2, sr.position.y + 46.0),
+				DdTheme.ellipsis(_trinket_summary(cur), _font,
+					sr.end.x - tx2 - 46.0, DdTheme.FONT_TAG),
+				DdTheme.FONT_TAG, DdTheme.DIM, HORIZONTAL_ALIGNMENT_LEFT,
+				sr.end.x - tx2 - 46.0)
+			_text(Vector2(sr.end.x - 46.0, sr.position.y + 26.0), "卸",
+				DdTheme.FONT_SM, DdTheme.WARN)
+
+	# —— 技能：这一版只读，改技能仍在公会 ——
+	var sy: float = y + 6.0 + float(campaign.equip_slots) * 66.0 + 20.0
+	_divider(r.position.x + 16.0, sy, r.size.x - 48.0)
+	var ski: Array = campaign.equipped_skills(hid)
+	# 站在几号位决定「这几个技能里哪几个真能放」（M175）。
+	# 用户看到的困惑：「技能 4/4，可战斗里只有 2 个」——
+	# 4/4 是**装备了几个**，战斗里只列**当前站位能放的**，
+	# 这个差别原来界面上一个字都没写。
+	var my_rank: int = _prep_party.find(hid)
+	var ok_n: int = 0
+	for sk_t in ski:
+		if _skill_ok_at(hid, str(sk_t), my_rank):
+			ok_n += 1
+	var sk_head: String = "技能　%d / %d" % [ski.size(), campaign.skill_slot_max(hid)]
+	if my_rank >= 0 and ok_n < ski.size():
+		sk_head += "　·　%d 位于可用 %d 个" % [my_rank + 1, ok_n]
+	_text(Vector2(r.position.x + 16.0, sy + 26.0), sk_head,
+		DdTheme.FONT_MD, DdTheme.DIM)
+	for i in ski.size():
+		var col: int = i % 2
+		var line: int = i / 2
+		var sid_s: String = str(ski[i])
+		var ok_here: bool = _skill_ok_at(hid, sid_s, my_rank)
+		# 行高 24 → 30（M143）：字号提到 18 之后 24 会上下叠，
+		# 「眩晕重击」和下一行的「鼓舞呐喊」压在一起。
+		_text(Vector2(r.position.x + 16.0 + float(col) * 300.0,
+			sy + 52.0 + float(line) * 30.0),
+			"· " + DdNames.skill_name(sid_s) + ("" if ok_here else "（此位不可用）"),
+			DdTheme.FONT_SM, DdTheme.TEXT if ok_here else DdTheme.FAINT)
+	# 公会没解锁就不给这个入口（M152）：原来它无条件可点，
+	# 点了会跳到一个本该锁着的界面 —— 解锁的前置任务白设计了。
+	var can_guild: bool = _bld_unlocked("guild")
+	_add_button(Rect2(r.position.x + 16.0, sy + 52.0 + float((ski.size() + 1) / 2) * 30.0 + 8.0,
+		r.size.x - 32.0, 44.0), "goto:guild",
+		"改技能（去公会）" if can_guild else "改技能（公会未解锁 · 还差 %d 次任务）" % _bld_need("guild"),
+		can_guild)
+
+	# —— 仓库（M107）——
+	#
+	# 空槽原来写着「去饰品仓库挑一件」，而队伍屏里根本没有那个地方 ——
+	# 玩家点空槽只会收到一句「先在左边挑一件饰品」，左边是名册，没饰品。
+	# 现在把仓库直接摆在这一屏：点一件选中，再点上面的空槽装上。
+	var wy: float = sy + 52.0 + float((ski.size() + 1) / 2) * 30.0 + 62.0
+	_divider(r.position.x + 16.0, wy, r.size.x - 48.0)
+	_text(Vector2(r.position.x + 16.0, wy + 24.0), "仓库饰品", DdTheme.FONT_MD,
+		DdTheme.DIM)
+	_text(Vector2(r.position.x + 120.0, wy + 24.0), "点一件选中 → 再点上面空槽",
+		DdTheme.FONT_TAG, DdTheme.FAINT)
+	# 选中后给**全量**效果（M111）：列表里只放得下两条摘要，
+	# 而判断一件饰品值不值得戴，往往就差第三条。
+	var sel_top: float = wy + 34.0
+	if not _sel_trinket.is_empty():
+		var all_bits: Array = _trinket_stat_bits(_sel_trinket, 0)
+		var rar2: String = campaign.trinket_lib.rarity_of(_sel_trinket)
+		_text(Vector2(r.position.x + 16.0, wy + 44.0),
+			"%s · %s" % [DdNames.trinket_name(_sel_trinket),
+				_trinket_rarity_name(rar2)], DdTheme.FONT_SM,
+			_rarity_col(rar2))
+		# 谁戴着：同一件不能给两个人，只说「已被占用」等于让玩家自己去找
+		var wearer: String = _who_wears(_sel_trinket)
+		_text(Vector2(r.position.x + 200.0, wy + 44.0),
+			("已装备于 " + _hero_label(wearer)) if not wearer.is_empty() else "未装备",
+			DdTheme.FONT_TAG, DdTheme.WARN if not wearer.is_empty() else DdTheme.FAINT,
+			HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 220.0)
+		_text(Vector2(r.position.x + 16.0, wy + 62.0),
+			DdTheme.ellipsis(" · ".join(all_bits) if not all_bits.is_empty()
+				else "无属性加成", _font, r.size.x - 56.0, DdTheme.FONT_TAG),
+			DdTheme.FONT_TAG, DdTheme.TEXT, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 56.0)
+		sel_top = wy + 74.0
+	var store: Array = campaign.trinket_store
+	var room: int = int((r.end.y - (wy + 46.0)) / 52.0) * 2
+	if store.is_empty():
+		_text(Vector2(r.position.x + 16.0, wy + 52.0), "仓库里没有饰品。",
+			DdTheme.FONT_SM, DdTheme.FAINT)
+	else:
+		# 每件两行（M108）：名字 + 效果摘要。
+		# 原来只有名字 —— 两条「乌鸦肩羽」摆在一起，玩家没有任何依据选哪个。
+		# 原版饰品界面至少给「图标 + 稀有度色 + 效果列表」，这里先补前两样加一条摘要。
+		var cw2: float = (r.size.x - 40.0) * 0.5
+		var row_h2: float = minf(52.0, maxf(34.0,
+			(r.end.y - (wy + 40.0) - 16.0) / maxf(1.0, ceil(float(store.size()) * 0.5))))
+		for i in mini(store.size(), maxi(2, room)):
+			var tid: String = str(store[i])
+			var col2: int = i % 2
+			var line2: int = i / 2
+			var rr := Rect2(r.position.x + 16.0 + float(col2) * cw2,
+				sel_top + 6.0 + float(line2) * row_h2, cw2 - 8.0, row_h2 - 4.0)
+			var sel: bool = _sel_trinket == tid
+			draw_rect(rr, DdTheme.PANEL_HI if sel else DdTheme.BTN)
+			draw_rect(rr, DdTheme.CRIT if sel else DdTheme.PANEL_EDGE, false, 1.0)
+			_add_hit(rr, "party_tk:" + tid)
+			# 图标 24：行高只有 40 出头，再大就把两行字挤掉了
+			var tico: Texture2D = _trinket_icon(tid)
+			var ntx: float = rr.position.x + 8.0
+			if tico != null:
+				draw_texture_rect(tico, Rect2(rr.position.x + 6.0,
+					rr.position.y + (rr.size.y - 26.0) * 0.5, 26.0, 26.0), false)
+				ntx = rr.position.x + 36.0
+			# 职业限制**在这里就标**（M143）：原来要点了才弹「这个职业戴不了」，
+			# 而玩家挑装备时正是要一眼看出「谁能用」。
+			# 判断用 `fits_class` 而不是 `can_equip` —— 后者还会把「槽满」也算成不能装，
+			# 而槽满跟这件饰品本身无关。
+			var fits: bool = true
+			if campaign.trinket_lib != null and not _party_hero.is_empty():
+				fits = campaign.trinket_lib.fits_class(tid, campaign.def_of(_party_hero))
+			if not fits:
+				draw_rect(rr, Color(0.0, 0.0, 0.0, 0.45))
+			_text(Vector2(ntx, rr.position.y + 18.0),
+				DdNames.trinket_name(tid), DdTheme.FONT_SM,
+				DdTheme.TEXT if sel else _rarity_col(
+					campaign.trinket_lib.rarity_of(tid)),
+				HORIZONTAL_ALIGNMENT_LEFT, rr.end.x - ntx - 6.0)
+			if not fits:
+				_text(Vector2(rr.end.x - 74.0, rr.position.y + 18.0), "戴不了",
+					DdTheme.FONT_TAG, DdTheme.WARN, HORIZONTAL_ALIGNMENT_RIGHT, 68.0)
+			_text(Vector2(ntx, rr.position.y + 36.0),
+				DdTheme.ellipsis(_trinket_summary(tid), _font,
+					rr.end.x - ntx - 6.0, DdTheme.FONT_TAG),
+				DdTheme.FONT_TAG, DdTheme.FAINT,
+				HORIZONTAL_ALIGNMENT_LEFT, rr.end.x - ntx - 6.0)
+		if store.size() > maxi(2, room):
+			_text(Vector2(r.position.x + 16.0, r.end.y - 10.0),
+				"……还有 %d 件（去饰品仓库看全部）" % (store.size() - maxi(2, room)),
+				DdTheme.FONT_TAG, DdTheme.FAINT)
+
+
+## 队伍（M106）：装备、技能、上阵。
+func _draw_party() -> void:
+	# 文案压到 20 字以内（M171）：`_header` 右栏只占 46% 宽（约 345px），
+	# 原来那句话 28 个字，末尾「决定谁跟你下去」直接被切在面板边上。
+	# 说清楚「这一屏改的是哪一趟」（M179）。
+	# 用户报过：「队伍里瘟疫医生明明是 4 号位，战斗里怎么变 1 号位了」——
+	# 因为他**这一趟已经出发了**，地牢里的站位存在 `exp.hero_ids`，
+	# 是出发那一刻定下的快照；这一屏改的是 `_prep_party`，只影响**下一趟**。
+	# 两个数字都对，只是作用于不同的趟。不写出来，看起来就是「系统搞错了」。
+	var _on_run: bool = exp != null and not exp.ended
+	_header("队伍", "改的是下一趟" + ("　·　这趟的站位请在地图上拖队伍条" if _on_run else ""))
+	if campaign == null:
+		return
+	# 进来第一件事是把出战名单初始化好（M114）。
+	#
+	# 这一屏原来直接用 `_prep_party`，而它只**准备屏**会初始化 ——
+	# 直接从城镇进队伍屏时它是空的，整列显示成「—」，
+	# 玩家点一下「上阵」就变成「一个人的出征队伍」，还会被存进档案。
+	if _prep_party.is_empty():
+		_prep_party = _party_restore(_prep_level)
+	# 用 `hero_ids_deployed_first()` 而不是 `hero_ids()`（M171）：
+	# 名册屏被合并进这一屏之后，它的「上阵优先、阵亡排末尾」也要带过来 ——
+	# 否则 15 个人里找一个阵亡的战友要往下翻。
+	# **列表顺序必须跟着站位走**（M174）：原来这里直接用 `hero_ids_deployed_first()`，
+	# 它是按名册 `_order` 排的，和 `_prep_party` 两套顺序互不相干 ——
+	# 拖完卡片，「第 N 号位」变了、列表纹丝不动，看起来像拖拽没生效。
+	var alive: Array = []
+	for h_on in _prep_party:
+		if campaign.hero_ids().has(str(h_on)):
+			alive.append(str(h_on))
+	for h_rest in campaign.hero_ids_deployed_first():
+		if not alive.has(str(h_rest)):
+			alive.append(str(h_rest))
+	if alive.is_empty():
+		_text(Vector2(28, 120), "名册是空的。", DdTheme.FONT_BD, DdTheme.WARN)
+		_add_button(Rect2(24.0, size.y - 100.0 - NAV_H, size.x - 48.0, 56.0), "party_back", "返回城镇")
+		return
+	if _party_hero.is_empty() or not alive.has(_party_hero):
+		_party_hero = str(alive[0])
+	# —— 左：名册 ——
+	var btn_y: float = size.y - 44.0 - 56.0 - NAV_H
+	var span: float = btn_y - 24.0 - 100.0
+	var step: float = minf(78.0, span / float(maxi(1, alive.size())))
+	_text(Vector2(24, 88), "名册 %d 人" % alive.size(), DdTheme.FONT_BD, DdTheme.TEXT)
+	_party_rects = []
+	for i in alive.size():
+		var cr := Rect2(24.0, 100.0 + float(i) * step, 212.0, step - 8.0)
+		_party_card(str(alive[i]), cr)
+		_party_rects.append({"id": str(alive[i]), "rect": cr})
+	# 拖拽中的浮动卡片（M173）：不给视觉反馈的话，手指底下的卡片
+	# 还是留在原位，玩家会以为「没抓住」。
+	if not _drag_card.is_empty() and bool(_drag_card.get("moved", false)):
+		var cp: Vector2 = _drag_card.get("cur", _mouse)
+		var dr := Rect2(cp.x - 106.0, cp.y - 30.0, 212.0, 60.0)
+		draw_rect(dr, Color(0.07, 0.07, 0.09, 0.94))
+		draw_rect(dr, DdTheme.CRIT, false, 2.0)
+		_text(Vector2(dr.position.x + 12.0, dr.position.y + 34.0),
+			_hero_label(str(_drag_card.get("id", ""))), DdTheme.FONT_BD,
+			DdTheme.TEXT, HORIZONTAL_ALIGNMENT_LEFT, 188.0)
+	# —— 右 ——
+	_draw_party_detail(Rect2(248.0, 88.0, size.x - 272.0, btn_y - 88.0 - 34.0))
+	_text(Vector2(DdTheme.MARGIN, btn_y - 16.0), _building_hint("guild"),
+		DdTheme.FONT_MD, DdTheme.FAINT)
+	_add_button(Rect2(24.0, btn_y, size.x - 48.0, 56.0), "party_back", "返回城镇")
+
+
 ## 弹一条地图横幅（M75）。
 func _map_banner(title: String, sub: String, col: Color) -> void:
 	if _selftest or _auto:
@@ -1870,6 +2717,68 @@ func _map_banner(title: String, sub: String, col: Color) -> void:
 	_map_banner_sub = sub
 	_map_banner_col = col
 	_map_banner_t = 1.7
+
+
+## 弹一个事件框（M194）：玩家点「确定」才继续。
+##
+## `next` 是关掉之后要做的事 —— 遭遇战靠它把「先看提示再开打」串起来。
+## 自动模式下**不弹**，直接执行 `next`：自动化不会点按钮，弹出来就是卡死。
+func _event_dialog(title: String, body: String, col: Color,
+		sub: String = "", next: Callable = Callable()) -> void:
+	if _auto or _selftest:
+		if next.is_valid():
+			next.call()
+		return
+	_dlg_open = true
+	_dlg_title = title
+	_dlg_body = body
+	_dlg_sub = sub
+	_dlg_col = col
+	_dlg_next = next
+	# 弹窗一开，底下的横幅就没必要再抢位置了
+	_map_banner_t = 0.0
+	queue_redraw()
+
+
+func _dlg_close() -> void:
+	if not _dlg_open:
+		return
+	_dlg_open = false
+	var f: Callable = _dlg_next
+	_dlg_next = Callable()
+	# 先关再执行：`next` 里可能立刻弹出下一个框（连着两个事件），
+	# 反过来的话会被这里的赋值清掉。
+	if f.is_valid():
+		f.call()
+	queue_redraw()
+
+
+## 事件弹窗。画在 `_draw_map()` 最后，**并且清掉底下的按钮**——
+## 不清的话点空白照样能命中「撤退」「补给」，玩家想确认事件却退了队。
+func _draw_event_dialog() -> void:
+	if not _dlg_open:
+		return
+	_buttons.clear()
+	var m: float = DdTheme.MARGIN
+	var w: float = minf(size.x - m * 2.0, 520.0)
+	var h: float = 232.0
+	var x: float = (size.x - w) * 0.5
+	var y: float = (size.y - h) * 0.5 - 36.0
+	var r := Rect2(x, y, w, h)
+	# 遮罩：0.62 够暗，还能看见底下是哪一屏 —— 完全黑掉会让人以为切场景了
+	draw_rect(Rect2(Vector2.ZERO, size), Color(0.0, 0.0, 0.0, 0.62))
+	draw_rect(r, Color(0.055, 0.06, 0.072, 0.985))
+	draw_rect(r, Color(_dlg_col.r, _dlg_col.g, _dlg_col.b, 0.55), false, 1.5)
+	draw_rect(Rect2(x, y, w, 3.0), _dlg_col)
+	_text(Vector2(x + 24.0, y + 44.0), _dlg_title, DdTheme.FONT_BD, _dlg_col,
+		HORIZONTAL_ALIGNMENT_LEFT, w - 48.0)
+	_text(Vector2(x + 24.0, y + 78.0), _dlg_body, DdTheme.FONT_MD, DdTheme.TEXT,
+		HORIZONTAL_ALIGNMENT_LEFT, w - 48.0)
+	if not _dlg_sub.is_empty():
+		_text(Vector2(x + 24.0, y + 104.0), _dlg_sub, DdTheme.FONT_TAG, DdTheme.DIM,
+			HORIZONTAL_ALIGNMENT_LEFT, w - 48.0)
+	_dlg_btn = Rect2(x + 24.0, y + h - 62.0, w - 48.0, 46.0)
+	_add_button(_dlg_btn, "dlg_ok", "确定", true, false, true)
 
 
 ## 地图横幅（M75）。放在网格区顶部：那是「你刚走到的地方」，
@@ -1894,6 +2803,24 @@ func _draw_map_banner() -> void:
 
 ## 去掉日志行的「【奇物】」前缀（M74）：卡片上那行本来就写在房间语境里，
 ## 再带一个方括号像在念后台日志。日志里保留前缀，那边要能扫得快。
+## 奇物交互的**专用动词**（M195）。返回空 = 这道具没有专用说法，
+## 退回「对〈奇物〉用了〈道具〉」—— 这句话对任何组合都通顺。
+##
+## 为什么需要它：素材里的交互只表示「这道具对这件东西有效」，
+## 统一写成「用 X 打开 Y」会出病句（「用解毒剂打开遗失的行囊」）。
+## 只有真正意义上的"打开"才配这个词：钥匙、撬锁工具。
+static func _curio_verb(item: String) -> String:
+	match item:
+		"skeleton_key", "key":
+			return "打开了"
+		"shovel":
+			return "铲开了"
+		"torch":
+			return "点着了"
+		_:
+			return ""
+
+
 func _strip_log_tag(t: String) -> String:
 	if t.begins_with("【"):
 		var close: int = t.find("】")
@@ -2045,10 +2972,21 @@ func _consume_exp_event(e: Dictionary) -> void:
 				verb = "、".join(tail)
 			elif outcome == "nothing":
 				verb = "什么也没有"
-			var item_txt: String = ""
+			# 文案（M195）：原来一律写「用「X」打开 Y」，于是出现
+			# 「用解毒剂打开遗失的行囊」—— 玩家第一反应是"凭什么"。
+			#
+			# 数据里的交互只表示「这道具对这件东西有效」，**不等于"打开"**：
+			# 钥匙是打开，铁锹是铲，火把是烧，药剂是处理。所以动词按道具分，
+			# 没有专用动词的退回「对〈奇物〉用了〈道具〉」—— 这句话对任何组合都通顺。
+			var head: String = "【奇物】%s" % cname
 			if not used.is_empty():
-				item_txt = "（用了%s）" % DdNames.supply_name(used)
-			_add_log("【奇物】%s%s：%s" % [cname, item_txt, verb],
+				var iname: String = DdNames.supply_name(used)
+				var cv: String = _curio_verb(used)
+				if cv.is_empty():
+					head = "【奇物】对「%s」用了%s" % [cname, iname]
+				else:
+					head = "【奇物】用%s%s「%s」" % [iname, cv, cname]
+			_add_log("%s → %s" % [head, verb],
 				DdTheme.WARN if float(e.get("stress", 0.0)) > 0.0 or float(e.get("hp_lost", 0.0)) > 0.0 else DdTheme.TEXT)
 		"affliction":
 			_add_log("【崩溃】%s 陷入 %s" % [_hero_label(str(e.get("hero", ""))), str(e.get("kind", ""))], DdTheme.WARN)
@@ -2081,11 +3019,22 @@ func _consume_exp_event(e: Dictionary) -> void:
 				_hazard_name(str(e.get("kind", ""))),
 				db.rules.trap_scout_disarm_bonus * 100.0], DdTheme.OK)
 		"trap":
-			var sc: String = "已察觉" if bool(e.get("scouted", false)) else "没察觉"
+			# 文案原来拼成「没察觉，队伍避开了（40%）」——
+			# 「没察觉」和「避开」看着自相矛盾，其实说的是两件事：
+			#   前半 = **有没有提前侦察到**；后半 = **踩上去那一下有没有躲过**。
+			# 拼成一句就成了病句（用户报的原文）。拆成四种组合各写一句。
+			var seen: bool = bool(e.get("scouted", false))
+			var pct: float = float(e["chance"]) * 100.0
 			if bool(e.get("dodged", false)):
-				_add_log("【陷阱】%s，队伍避开了（%.0f%%）" % [sc, float(e["chance"]) * 100.0], DdTheme.OK)
+				if seen:
+					_add_log("【陷阱】提前发现了，绕了过去（躲开率 %.0f%%）" % pct, DdTheme.OK)
+				else:
+					_add_log("【陷阱】没看见，踩上去的瞬间躲开了（躲开率 %.0f%%）" % pct, DdTheme.OK)
 			else:
-				_add_log("【陷阱】%s，全队掉血并加压（躲避率 %.0f%%）" % [sc, float(e["chance"]) * 100.0], DdTheme.WARN)
+				if seen:
+					_add_log("【陷阱】发现了，但没拆成 —— 全队掉血加压", DdTheme.WARN)
+				else:
+					_add_log("【陷阱】没察觉，全队掉血加压（躲开率 %.0f%%）" % pct, DdTheme.WARN)
 				_flash_msg("踩中陷阱")
 		"obstacle":
 			if bool(e.get("cleared", false)):
@@ -2105,9 +3054,17 @@ func _add_log(text: String, col: Color = DdTheme.TEXT) -> void:
 		_log = _log.slice(_log.size() - LOG_MAX)
 
 
+## 最近一条日志的正文（M194）。弹窗用它当「结果」那一行 ——
+## 玩家点开奇物最想知道的是「拿到了什么」，而不是「你翻了一下」。
+func _last_log_text() -> String:
+	if _log.is_empty():
+		return ""
+	return _strip_log_tag(str((_log[_log.size() - 1] as Dictionary).get("text", "")))
+
+
 func _flash_msg(text: String) -> void:
 	_flash = text
-	_flash_life = 1.8
+	_flash_life = 3.2   # 1.8 → 3.2（M155）：遭遇战那种一行字，1.8 秒根本读不完
 
 
 # ============================================================
@@ -2118,6 +3075,17 @@ func _flash_msg(text: String) -> void:
 ## 一次移动可能同时包含「走廊事件」和「房间内容」，不能只处理第一个。
 func _travel_to(room: int) -> void:
 	if exp == null or exp.ended:
+		return
+	# 点的是自己脚下这间、而且它还有内容没触发 → 那就是「进去」（M144）。
+	# 走廊遭遇战打完人已经站在门口，房间里的战斗/奇物等他点这一下才开。
+	if room == exp.current_room and exp.has_pending_room():
+		exp.enter_room()
+		_sync_exp_events()
+		_drain_queue()
+		return
+	if exp.has_pending_room():
+		# 门口那间还没进去（M145）：说清楚卡在哪，别让玩家以为是路径问题
+		_flash_msg("先进这间房 —— 点脚下这一格")
 		return
 	if not exp.travel(room):
 		_flash_msg("走不到那间房")
@@ -2172,19 +3140,29 @@ func _drain_queue() -> void:
 				_sync_exp_events()
 				# 走到这里的只可能是走廊奇物（房间里的被 `_room_should_pause` 拦住了）
 				if bool(step.get("corridor", false)):
-					_map_banner("走廊奇物", "路边有件东西，你们顺手翻了一下。", DdTheme.STAT)
+					# 弹窗而不是横幅（M194）：奇物是有收获的，玩家得真的看见
+					_event_dialog("走廊奇物", "路边有件东西，你们顺手翻了一下。",
+						DdTheme.STAT, _last_log_text(), Callable(self, "_drain_queue"))
+					return
 			"trap":
 				exp.resolve_trap(step)
 				_sync_exp_events()
-				_map_banner("陷阱！", "脚下的地砖陷了下去。", DdTheme.HP)
+				_event_dialog("陷阱！", "脚下的地砖陷了下去。", DdTheme.HP,
+					_last_log_text(), Callable(self, "_drain_queue"))
+				return
 			"obstacle":
 				exp.resolve_obstacle()
 				_sync_exp_events()
-				_map_banner("路障", "你们挪开了挡路的碎石。", DdTheme.WARN)
+				_event_dialog("路障", "挡路的碎石，你们挪开了。", DdTheme.WARN,
+					_last_log_text(), Callable(self, "_drain_queue"))
+				return
 			"walk":
 				pass
 			_:
 				_battle = exp.start_battle(step)
+				_battle_no += 1
+				_battle_corridor = bool(step.get("corridor", false))
+				_summoned_uids.clear()
 				_sync_exp_events()
 				if _battle == null:
 					continue
@@ -2199,18 +3177,39 @@ func _drain_queue() -> void:
 					_battle = null
 					_sync_exp_events()
 					continue
-				_step_timer = 0.20
-				# 新战斗的界面状态（M65）：行动序、瞄准、撤退上膛都不能带上一场的。
-				_order_ids = []
-				_order_cur = -1
-				_pending = {}
-				_retreat_arm = false
-				_info_uid = -1
-				_banner_t = 1.7
-				_state = S_BATTLE
+				# 遭遇弹窗（M194）：**只在走廊遭遇弹**。
+				#
+				# 房间战斗前面已经有一张房间卡片（「7 号房·战斗房」→ 点「走进去」
+				# 才走到这里），再弹一次等于连点四次才开打。走廊遭遇不一样：
+				# 它是走一步就撞上的，之前没有任何一屏告诉玩家「撞上了什么」。
+				if _battle_corridor:
+					_event_dialog("走廊遭遇", "有东西挡住了路。", DdTheme.CRIT,
+						", ".join(_monster_list(step.get("monsters", []))),
+						Callable(self, "_begin_encounter"))
+					return
+				_begin_encounter()
 				return
 	if exp != null and exp.ended:
 		_enter_result()
+
+
+## 遭遇弹窗点了「确定」（M194）：这才真的切到战斗屏。
+##
+## 里面这几行原来直接写在 `_drain_queue` 的分支尾部。抽出来的原因不是美观：
+## 弹窗要先 `return` 等玩家点，中间隔着一次回调，状态初始化必须跟着一起搬到这里，
+## 否则玩家在弹窗停留的这几秒里，上一场战斗的 `_order_ids` / `_pending` 还留着。
+func _begin_encounter() -> void:
+	if _battle == null or exp == null or exp.ended:
+		return
+	_step_timer = 0.20
+	# 新战斗的界面状态（M65）：行动序、瞄准、撤退上膛都不能带上一场的。
+	_order_ids = []
+	_order_cur = -1
+	_pending = {}
+	_retreat_arm = false
+	_info_uid = -1
+	_banner_t = 1.7
+	_state = S_BATTLE
 
 
 func _leave_dungeon() -> void:
@@ -2242,6 +3241,36 @@ func _do_camp() -> void:
 func _do_retreat() -> void:
 	if exp == null or exp.ended:
 		return
+	# 战斗中撤退**不是百分百**（M155）。查 DD1 的 `shared/rules.json`：
+	#   combat_retreat_chance = 0.70
+	#   combat_retreat_bonus_chance_per_attempt = 0.05
+	#   combat_retreat_stress = 20
+	# 也就是说原版里撤退是一**次掷骰**，失败要再吃一轮伤害。
+	# 我们原来是无条件成功 —— 那等于「打不过就跑、一分代价不付」，
+	# 战斗的资源压力全没了。
+	if _battle != null:
+		var ch: float = clampf(float(db.rules.retreat_chance)
+			+ float(_retreat_tries) * float(db.rules.retreat_chance_step), 0.0, 0.95)
+		_retreat_tries += 1
+		if randf() > ch:
+			# 失败：压力照扣（原版也扣），这一回合算白费
+			for hk in exp.state.keys():
+				var st: Dictionary = exp.state[hk]
+				if bool(st.get("dead", false)):
+					continue
+				st["stress"] = clampf(float(st.get("stress", 0.0))
+					+ float(db.rules.retreat_stress), 0.0, 200.0)
+			_add_log("【撤退】失败（%.0f%% 成功）全队 +%.0f 压力" % [
+				ch * 100.0, float(db.rules.retreat_stress)], DdTheme.WARN)
+			_flash_msg("撤退失败！(%.0f%%)" % (ch * 100.0))
+			_battle.step_turn()
+			_drain_battle_events()
+			queue_redraw()
+			return
+		_retreat_tries = 0
+		_flash_msg("撤退成功")
+	else:
+		_retreat_tries = 0
 	# 战斗中途撤退（M65）：先把这一场造成的伤害与压力落盘，再走。
 	# 原来直接 `exp.retreat()` 就把 `_battle` 丢掉了，那场里掉的血清零——
 	# 撤退等于免费重置，资源层立刻失去意义。`aborted` 让 finish_battle
@@ -2267,6 +3296,14 @@ func _do_retreat() -> void:
 # ============================================================
 
 func _process(delta: float) -> void:
+	# 长按计时（M183）：手机上没有鼠标悬停，技能/饰品的完整数值
+	# 只能靠「按住不放」来看。0.45 秒 —— 短了会和点击混淆，
+	# 长了玩家以为没反应。
+	if not _hold_id.is_empty() and _hold_shown.is_empty():
+		_hold_t += delta
+		if _hold_t >= 0.45:
+			_hold_shown = _hold_id
+			queue_redraw()
 	_elapsed += delta
 	_flash_life = maxf(0.0, _flash_life - delta)
 
@@ -2325,9 +3362,21 @@ func _process(delta: float) -> void:
 		else:
 			_hit_t[k] = left
 
+	# 守护探身计时（M200）：和受击抖动同一套写法 —— 到点就删，
+	# 留着 0 秒的条目会让 `_guard_shift` 一直算出 0 偏移、白白遍历。
+	for k in _guard_fx.keys():
+		var gleft: float = float((_guard_fx[k] as Dictionary).get("t", 0.0)) - delta
+		if gleft <= 0.0:
+			_guard_fx.erase(k)
+		else:
+			(_guard_fx[k] as Dictionary)["t"] = gleft
+
 	# 站位补间（M37/M38）：立绘朝「rank 该在的位置」滑动。
 	# 这是位移技能能被看懂的关键——没有插值的话，rank 一变就是瞬移，
 	# 玩家只能从日志里猜「谁换了位置」。
+	# **每帧无条件重绘是这里最贵的开销**（M150）：整屏 750×1334
+	# 有几十张纹理 + 上百段文字，hover 一下就是一次全量重画。
+	# 改成「只在真的有东西在动的时候重绘」，其余靠输入事件触发。
 	if _battle != null and _state == S_BATTLE:
 		if _slot_anim_battle != _battle:
 			_slot_anim.clear()
@@ -2397,6 +3446,12 @@ func _process(delta: float) -> void:
 			_step_timer -= delta
 			if _step_timer <= 0.0:
 				_battle_step()
+	elif _state == S_MAP and exp != null and exp.has_pending_room() \
+			and _map_layer != null and _map_layer.visible:
+		# 「互动」标签在呼吸（M190）：动画要动就必须每帧重画地图层。
+		# 只在**真的有 pending 房间**时才这么做 —— 平时地图是静止的，
+		# 每帧重画几十个格子会把这一屏拖回「很卡」的老路（M183 刚修过）。
+		_map_layer.queue_redraw()
 	elif _state == S_MAP and _auto:
 		_auto_timer += delta
 		if _auto_timer > 0.7:
@@ -2408,7 +3463,43 @@ func _process(delta: float) -> void:
 			_auto_timer = 0.0
 			_start_expedition(_size, _level)
 
-	queue_redraw()
+	# 事件弹窗样张（M194，仅 --dlg-demo）。放在 if-elif 链**之后**：
+	# 插在中间会把后面那个 `elif _state == S_MAP and _auto` 抢过来，
+	# 自动跑图就再也不动了（而且语法合法、不报错）。
+	if _dlg_demo and not _dlg_demo_done and _state == S_MAP:
+		_dlg_demo_done = true
+		_dlg_open = true
+		_dlg_title = "走廊奇物"
+		_dlg_body = "路边有件东西，你们顺手翻了一下。"
+		_dlg_sub = "用「解毒剂」打开 遗失的行囊 → 金币 1000、药草 ×1"
+		_dlg_col = DdTheme.STAT
+		queue_redraw()
+
+	# 长按浮层样张（M201，仅 --hold-demo）：顺手把第一个人的恢复期打开，
+	# 否则截图只能看到「生命 / 压力」两行，最想看的那段看不到。
+	if _hold_demo and not _hold_demo_done and _state == S_MAP and exp != null \
+			and not exp.hero_ids.is_empty():
+		_hold_demo_done = true
+		var hid_d: String = str(exp.hero_ids[0])
+		(exp.state[hid_d] as Dictionary)["recovering"] = true
+		_hold_shown = "hero_stat:" + hid_d
+		queue_redraw()
+
+	# 只有「还在动」的东西才需要下一帧（M150）。
+	#
+	# 原来这里是**无条件** `queue_redraw()` —— 每秒 60 次整屏重画，
+	# 而整屏有几十张纹理、上百段文字。表现是「鼠标划过技能卡会卡」，
+	# 但那不是 hover 的问题，是一直在重画。
+	# 鼠标 hover 现在由 `_input` 里的移动事件触发。
+	var moving: bool = not _floaters.is_empty() \
+		or _banner_t > 0.0 or _map_banner_t > 0.0 or _flash_life > 0.0 \
+		or _step_timer > 0.0 or _pose.size() > 0 or not _fx_active.is_empty() \
+		or (_state == S_BATTLE and _battle != null) \
+		or not _shot_path.is_empty()
+	if exp != null and absf(_light_vis - exp.light) > 0.3:
+		moving = true
+	if moving:
+		queue_redraw()
 
 
 func _battle_step() -> void:
@@ -2467,6 +3558,16 @@ func _continue_after_battle() -> void:
 	_options = []
 	_pending = {}
 	_retreat_arm = false
+	_exp_persist()
+	# 从房间卡打起来的（M103）：回到那张卡上弹结果，而不是直接回地图。
+	# 「打完连口气都不喘就继续走」正是原来那个突兀感的来源。
+	if _room_battle:
+		_room_battle = false
+		_room_phase = 1
+		_room_lines = ["这一间已经清干净了。"]
+		_state = S_ROOM
+		queue_redraw()
+		return
 	_state = S_MAP
 	# 战斗可能发生在走廊里，房间里还有内容没结算
 	_drain_queue()
@@ -2498,6 +3599,12 @@ func _loot_diff(before: Dictionary) -> Dictionary:
 
 
 func _begin_player_turn() -> void:
+	# 每回合开头存一次战斗快照（M118）。
+	#
+	# 只在这个点存，是为了让「快照 = 这一回合的开头」成立：
+	# 切后台时若正打到一半，恢复回来从回合开头重来，
+	# 血量/buff 和快照完全一致，不会出现「血恢复了但技能已经放掉」。
+	_exp_persist()
 	# 用 `all_options` 而不是 `player_options`（M65）：后者会把站位不符的招滤掉，
 	# 面板上直接少一格，玩家看不出「为什么少了一招」。
 	_options = _battle.all_options(_battle.awaiting_input)
@@ -2581,6 +3688,18 @@ func _submit(action: Dictionary, targets: Array) -> void:
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
 		_mouse = (event as InputEventMouseMotion).position
+		if not _drag_card.is_empty():
+			if (_mouse - (_drag_card["pos"] as Vector2)).length() > 12.0:
+				_drag_card["moved"] = true
+			_drag_card["cur"] = _mouse
+			queue_redraw()
+		# **只有 hover 目标变了才重绘**（M176）。原来每个 motion 事件都整屏重画，
+		# 公会屏右侧是 7 张技能卡（图标 + 4 段文字 + 底条），
+		# 鼠标在名单上划一下就把它们全画一遍 —— 玩家感受到的就是「这界面很卡」。
+		var hk: String = _hit_id_at(_mouse)
+		if hk != _hover_key:
+			_hover_key = hk
+			queue_redraw()
 		if _map_drag:
 			var dm: Vector2 = _mouse - _map_drag_pos0
 			if not _map_drag_moved and dm.length() > 10.0:
@@ -2588,13 +3707,23 @@ func _gui_input(event: InputEvent) -> void:
 			if _map_drag_moved:
 				_map_pan = _map_drag_pan0 + dm
 				_map_clamp_pan(_map_rect)
+		var prev_uid: int = _hover_uid
 		_hover_uid = -1
 		for s in _slots:
 			if (s.rect as Rect2).has_point(_mouse):
 				_hover_uid = int(s.uid)
+		# **这一行原来是无条件的 `queue_redraw()`**（M183）——
+		# 于是上面刚做的「hover 目标变了才重绘」被它整个盖掉，
+		# 鼠标每动一像素就整屏重画一次。公会屏右侧 7 张技能卡 × 每张
+		# 图标 + 4 段文字 + 底条，玩家感受到的就是「这界面非常卡」。
+		# 只有**真的需要**重绘时才重绘：
+		#   1. 悬停的血条换了（`_hover_uid` 变化）
+		#   2. 正在拖动滚动条
+		#   3. 地图正在被拖（`_map_pan` 变了）
+		if _hover_uid != prev_uid or _map_drag_moved:
+			queue_redraw()
 		if not _drag_zone.is_empty():
 			_hscroll_drag_to(_mouse.x)
-		queue_redraw()
 	elif event is InputEventMouseButton:
 		var mb := event as InputEventMouseButton
 		if mb.button_index != MOUSE_BUTTON_LEFT:
@@ -2620,6 +3749,11 @@ func _gui_input(event: InputEvent) -> void:
 	elif event is InputEventScreenDrag:
 		var sd := event as InputEventScreenDrag
 		_mouse = sd.position
+		if not _drag_card.is_empty():
+			if (_mouse - (_drag_card["pos"] as Vector2)).length() > 12.0:
+				_drag_card["moved"] = true
+			_drag_card["cur"] = _mouse
+			queue_redraw()
 		if _drag_zone.is_empty() and _press_id.is_empty():
 			_press_begin(sd.position)
 		_hscroll_drag_to(sd.position.x)
@@ -2648,6 +3782,13 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _on_click(pos: Vector2) -> void:
+	# 弹窗是模态的（M194）：除了「确定」，点哪儿都不响应。
+	# 这里必须**先于** `_hit_id_at` 判断 —— 那个函数会遍历整屏按钮，
+	# 而弹窗只是把它们从绘制里清掉了，命中区还在。
+	if _dlg_open:
+		if _dlg_btn.has_point(pos):
+			_activate("dlg_ok")
+		return
 	var id: String = _hit_id_at(pos)
 	if id.is_empty():
 		# 点空白（M65）：退出瞄准态 / 放下撤退上膛。
@@ -2684,6 +3825,214 @@ func _pick_target(uid: int) -> void:
 func _activate(id: String) -> void:
 	if _sfx != null and not id.begins_with("skill:") and not id.begins_with("goto:"):
 		_sfx.play("click", 1.0, -12.0)
+	if id == "dlg_ok":
+		_dlg_close()
+		return
+	# 中间那颗「进去看看」（M194）。走的是和点房间同一条路 ——
+	# `enter_room()` 之后必须 `_drain_queue()`，否则房间里的奇物/战斗
+	# 只是标了已访问，内容永远不结算。
+	if id == "enter_room":
+		if exp != null and exp.has_pending_room():
+			exp.enter_room()
+			_sync_exp_events()
+			_drain_queue()
+			queue_redraw()
+		return
+	if id == "curio_use":
+		var st_c: Dictionary = (_curio_ask.get("step", {}) as Dictionary).duplicate(true)
+		var it_c: String = str(_curio_ask.get("item", ""))
+		_curio_ask = {}
+		_room_phase = 1
+		var before_c: int = _log.size()
+		exp.resolve_curio(st_c, it_c)
+		_fill_room_lines(before_c)
+		return
+	if id == "curio_skip":
+		var st_s: Dictionary = (_curio_ask.get("step", {}) as Dictionary).duplicate(true)
+		_curio_ask = {}
+		_room_phase = 1
+		var before_s: int = _log.size()
+		exp.resolve_curio(st_s, "__none__")
+		_fill_room_lines(before_s)
+		return
+	if id.begins_with("tk_swap:"):
+		_swap_ask = id.substr(8)
+		queue_redraw()
+		return
+	if id == "tk_swapcancel":
+		_swap_ask = ""
+		queue_redraw()
+		return
+	if id.begins_with("tk_swapsell:"):
+		var si: int = int(id.substr(11))
+		var want: String = _swap_ask
+		_swap_ask = ""
+		if si < 0 or si >= campaign.trinket_store.size() or want.is_empty():
+			queue_redraw()
+			return
+		var got_money: int = campaign.shop.trinket_sell_price(str(campaign.trinket_store[si])) if campaign.shop != null else 0
+		var why2: String = campaign.sell_trinket(si)
+		if not why2.is_empty():
+			_flash_msg("卖不掉（%s）" % why2)
+			queue_redraw()
+			return
+		var why3: String = campaign.add_trinket(want)
+		if not why3.is_empty():
+			_flash_msg("还是放不下（%s），已折价 +%d 金" % [why3, got_money])
+		else:
+			_flash_msg("已换入「%s」，卖了 +%d 金" % [DdNames.trinket_name(want), got_money])
+			# 从结算面板的待换列表里摘掉
+			var left: Array = []
+			for rr2 in (_settle_gain.get("trinket_refused", []) as Array):
+				if str((rr2 as Dictionary).get("id", "")) != want:
+					left.append(rr2)
+			_settle_gain["trinket_refused"] = left
+		campaign.save()
+		queue_redraw()
+		return
+	if id.begins_with("party_revive:"):
+		var rv_h: String = id.substr(13)
+		var rv_cost: int = int((campaign.effective_recruit_cost(rv_h) as Dictionary).get("gold", 0))
+		if not campaign.can_recruit(rv_h):
+			_flash_msg("复活要 %d 金（或这人还活着）" % rv_cost)
+			return
+		if campaign.recruit(rv_h):
+			# 捞回来直接放进出征名单：玩家的意图就是「我要用他」，
+			# 再让他自己去点一次「上阵」是多余的一步。
+			if not _prep_party.has(rv_h) and _prep_party.size() < Campaign.PARTY_MAX:
+				_prep_party.append(rv_h)
+				_party_persist()
+			campaign.save()
+			_flash_msg("%s 复活了（-%d 金）" % [_hero_label(rv_h), rv_cost])
+			queue_redraw()
+		return
+	if id.begins_with("party_up:") or id.begins_with("party_down:"):
+		var up: bool = id.begins_with("party_up:")
+		var hid_p: String = id.substr(11 if up else 13)
+		var i1: int = _prep_party.find(hid_p)
+		if i1 >= 0:
+			var j1: int = i1 - 1 if up else i1 + 1
+			if j1 >= 0 and j1 < _prep_party.size():
+				_prep_party.remove_at(i1)
+				_prep_party.insert(j1, hid_p)
+				_party_persist()
+				queue_redraw()
+		return
+	if id.begins_with("party_up:") or id.begins_with("party_down:"):
+		var up: bool = id.begins_with("party_up:")
+		var hid_p: String = id.substr(11 if up else 13)
+		var i1: int = _prep_party.find(hid_p)
+		if i1 >= 0:
+			var j1: int = i1 - 1 if up else i1 + 1
+			if j1 >= 0 and j1 < _prep_party.size():
+				_prep_party.remove_at(i1)
+				_prep_party.insert(j1, hid_p)
+				_party_persist()
+				queue_redraw()
+		return
+	if id.begins_with("dock:"):
+		match id.substr(5):
+			"prep":
+				# 「出征」先进**选关屏**（M197）。
+				#
+				# 原来这里直接 `S_PREP`，等于跳过了选区域/选难度这一整屏 ——
+				# 而那一屏（`_draw_gate`）是玩家决定「去哪、打多难」的唯一地方。
+				# 用户报「点出征没有选关界面了」就是这个：跳转没删，是被绕过。
+				if campaign.alive_ids().is_empty():
+					_flash_msg("名册里没有活人")
+					return
+				_state = S_GATE
+			"town":
+				_state = S_TOWN
+			"roster":
+				# 同上：这个 tab 已经从导航栏删掉，留着只是防别处还发这个 id
+				_state = S_PARTY
+			"party":
+				if campaign.alive_ids().is_empty():
+					_flash_msg("名册里没有活人")
+					return
+				_state = S_PARTY
+			"shop":
+				_state = S_SHOP
+			"guild":
+				if not _bld_unlocked("guild"):
+					_flash_msg("公会还没解锁（还差 %d 次任务）" % _bld_need("guild"))
+					return
+				_state = S_GUILD
+		_roster_open = ""
+		_sel_trinket = ""
+		queue_redraw()
+		return
+	if id == "supply_open":
+		_supply_open = true
+		queue_redraw()
+		return
+	if id == "supply_close":
+		_supply_open = false
+		queue_redraw()
+		return
+	if id.begins_with("supply_noop:"):
+		_flash_msg("这一项要在「%s」用" % str(SUPPLY_USE_HINT.get(id.substr(13), "对应场合")))
+		return
+	if id.begins_with("supply_use:"):
+		var su: String = id.substr(11)
+		var msg: String = ""
+		if su == "torch":
+			if exp.torch <= 0:
+				_flash_msg("没有火把了")
+				return
+			exp.torch -= 1
+			exp.light = clampf(exp.light + 40.0, 0.0, 100.0)
+			_want_light = exp.light
+			msg = "点了一支火把"
+		elif su == Shop.FOOD_KEY:
+			# 每间房只能随手吃一次（M188）：不限次的话，1 份口粮换 12% 血、
+			# 没有任何风险，而「休整」（2 份、+30~35%、还带减压和光照）
+			# 每趟只有 1 次、还有 33% 被偷袭 —— 玩家当然一直点吃口粮，
+			# 休整就彻底没用了。限制之后两者的取舍才成立。
+			if int(exp.food) <= 0:
+				_flash_msg("没有口粮了")
+				return
+			if int(exp.food_room_uses) >= 1:
+				_flash_msg("这间房已经吃过一次了 —— 还想补就用「休整」")
+				return
+			exp.food -= 1
+			exp.food_room_uses += 1
+			for hk in exp.state.keys():
+				var st5: Dictionary = exp.state[hk]
+				if bool(st5.get("dead", false)):
+					continue
+				st5["hp_ratio"] = clampf(float(st5.get("hp_ratio", 1.0)) + 0.12, 0.0, 1.0)
+			msg = "全队吃了点东西（+12% 生命）"
+		elif su == "laudanum":
+			if exp.supply_count("laudanum") <= 0:
+				_flash_msg("没有鸦片酊了")
+				return
+			exp.supplies["laudanum"] = exp.supply_count("laudanum") - 1
+			for hk2 in exp.state.keys():
+				var st6: Dictionary = exp.state[hk2]
+				if bool(st6.get("dead", false)):
+					continue
+				st6["stress"] = maxf(0.0, float(st6.get("stress", 0.0)) - 15.0)
+			msg = "全队用了鸦片酊（压力 -15）"
+		else:
+			_flash_msg("这一项要在对应场合用")
+			return
+		_add_log("【补给】%s" % msg)
+		_flash_msg(msg)
+		queue_redraw()
+		return
+	if id.begins_with("revive:"):
+		var rv: String = id.substr(7)
+		var rcost2: int = int((campaign.effective_recruit_cost(rv) as Dictionary).get("gold", 0))
+		if not campaign.can_recruit(rv):
+			_flash_msg("复活要 %d 金，或者这个人还活着" % rcost2)
+			return
+		if campaign.recruit(rv):
+			campaign.save()
+			_flash_msg("%s 复活了（-%d 金）" % [_hero_label(rv), rcost2])
+			queue_redraw()
+		return
 	if id.begins_with("hero_info:"):
 		_roster_open = id.substr(10)
 		queue_redraw()
@@ -2691,6 +4040,12 @@ func _activate(id: String) -> void:
 	if id == "sheet_close":
 		_roster_open = ""
 		queue_redraw()
+		return
+	# 作弊按钮（M104）。两套分发（`_activate` / `_activate_id`）都要挂：
+	# 真实点击走后者，`--click=` 验收走前者，只挂一边会出现
+	# 「手点有效、脚本验收无效」这种最难查的分裂。
+	if id == "cheat_res":
+		_cheat_resources()
 		return
 	if id.begins_with("del:"):
 		_del_slot = int(id.substr(4))
@@ -2726,6 +4081,22 @@ func _activate(id: String) -> void:
 		if campaign.recruit(hid_r):
 			campaign.save()
 			_flash_msg("%s 归队" % _hero_label(hid_r))
+		return
+	if id == "goto:guild":
+		if not _bld_unlocked("guild"):
+			_flash_msg("公会还没解锁（还差 %d 次任务）" % _bld_need("guild"))
+			return
+		# 「改技能（去公会）」的按钮（M143）。原来它落到下面 `goto:<数字>`
+		# 那条战斗换位分支上：`int("guild")` 是 0，而队伍屏没有战斗，
+		# 于是什么都不发生 —— 玩家点了没反应。
+		var gav: Array = campaign.alive_ids()
+		if gav.is_empty():
+			_flash_msg("名册里没有活人")
+			return
+		_guild_hero = _party_hero if not _party_hero.is_empty() \
+			and gav.has(_party_hero) else str(gav[0])
+		_state = S_GUILD
+		queue_redraw()
 		return
 	if id.begins_with("goto:"):
 		if _battle != null:
@@ -2785,10 +4156,10 @@ func _activate(id: String) -> void:
 			_prep_size = str(parts[1])
 			_prep_level = int(parts[2])
 			_prep_quest = str(parts[3]) if parts.size() > 3 else "explore"
-			_prep_pack = _default_prep_pack()
+			_prep_pack = _restore_prep_pack()
 			# 默认名单按**这一趟的等级**筛（M25），不能直接取 Campaign.default_party()：
 			# 那样会把等级太高的人排进去，玩家要按到「出发」才看到报错。
-			_prep_party = _party_for(_prep_level)
+			_prep_party = _party_restore(_prep_level)
 			_state = S_PREP
 			queue_redraw()
 		return
@@ -2799,6 +4170,11 @@ func _activate(id: String) -> void:
 		var add: bool = id.begins_with("prep_add:")
 		var sid: String = id.substr(9)
 		_adjust_pack(sid, 1 if add else -1)
+		return
+	if id == "shop_my_trinkets":
+		_sel_trinket = ""
+		_state = S_TRINKET
+		queue_redraw()
 		return
 	if id == "shop_tab:0" or id == "shop_tab:1":
 		_shop_tab = int(id.substr(9))
@@ -2816,17 +4192,62 @@ func _activate(id: String) -> void:
 			_flash_msg(_shop_reason(str(rb.get("reason", ""))))
 		queue_redraw()
 		return
+	if id == "shop_no":
+		_shop_ask = {}
+		queue_redraw()
+		return
+	if id == "shop_yes":
+		var kind: String = str(_shop_ask.get("kind", ""))
+		var ai: int = int(_shop_ask.get("idx", -1))
+		_shop_ask = {}
+		if kind == "buy":
+			var w1: String = campaign.buy_shop_trinket(ai)
+			if w1.is_empty():
+				_flash_msg("已买下")
+				campaign.save()
+			else:
+				_flash_msg(_shop_reason(w1))
+		elif kind == "sell":
+			var sold1: String = str(campaign.trinket_store[ai]) if ai >= 0 \
+				and ai < campaign.trinket_store.size() else ""
+			var e1: String = campaign.sell_trinket(ai)
+			if e1.is_empty():
+				_flash_msg("卖掉 %s，+%d 金币" % [DdNames.trinket_name(sold1),
+					campaign.shop.trinket_sell_price(sold1)])
+				campaign.save()
+			else:
+				_flash_msg(_shop_reason(e1))
+		queue_redraw()
+		return
 	if id.begins_with("shop_buy:"):
-		var why: String = campaign.buy_shop_trinket(int(id.substr(9)))
-		if why.is_empty():
-			_flash_msg("买下 %d 件" % 1)
-			campaign.save()
-		else:
-			_flash_msg(_shop_reason(why))
+		# 两步走（M183）：第一下只**选中并高亮**，第二下弹确认框。
+		# 原来点一下就直接扣钱 —— 饰品是限定掉落，买错了没法退；
+		# 而且手机上误触的概率比鼠标高得多。
+		var bi: int = int(id.substr(9))
+		if str(_shop_sel.get("kind", "")) != "buy" or int(_shop_sel.get("idx", -1)) != bi:
+			_shop_sel = {"kind": "buy", "idx": bi}
+			queue_redraw()
+			return
+		var bid_s: String = str(campaign.shop_stock[bi]) if bi >= 0 \
+			and bi < campaign.shop_stock.size() else ""
+		_shop_ask = {"kind": "buy", "idx": bi, "name": DdNames.trinket_name(bid_s),
+			"price": campaign.shop.trinket_buy_price(bid_s) if campaign.shop != null else 0}
+		_shop_sel = {}
 		queue_redraw()
 		return
 	if id.begins_with("shop_sell:"):
 		var si: int = int(id.substr(10))
+		if str(_shop_sel.get("kind", "")) != "sell" or int(_shop_sel.get("idx", -1)) != si:
+			_shop_sel = {"kind": "sell", "idx": si}
+			queue_redraw()
+			return
+		var sold_nm: String = str(campaign.trinket_store[si]) if si >= 0 \
+			and si < campaign.trinket_store.size() else ""
+		_shop_ask = {"kind": "sell", "idx": si, "name": DdNames.trinket_name(sold_nm),
+			"price": campaign.shop.trinket_sell_price(sold_nm) if campaign.shop != null else 0}
+		_shop_sel = {}
+		queue_redraw()
+		return
 		var sold: String = str(campaign.trinket_store[si]) if si >= 0 \
 			and si < campaign.trinket_store.size() else ""
 		var err2: String = campaign.sell_trinket(si)
@@ -2859,6 +4280,16 @@ func _activate(id: String) -> void:
 			var av2: Array = campaign.alive_ids()
 			_guild_hero = str(av2[0]) if not av2.is_empty() else ""
 			_state = S_GUILD
+		elif bid == "coach":
+			# 马车直接进商店（M182）。
+			#
+			# 原来点马车会进一张「目录屏」：标题 + 一句说明 + 两颗按钮
+			# （饰品仓库 / 补给与饰品买卖），剩下**整屏都是空的** ——
+			# 用户原话「这界面存在的意义是什么」。真正的内容本来就在那两颗按钮里。
+			# 而且这句话上面那条注释早就写着「不重复造一个只有两个按钮的中间屏」，
+			# 只是当时只给 guild 加了分支，马车漏了。
+			_state = S_SHOP
+			_shop_tab = 0
 		else:
 			_building = bid
 			var av3: Array = campaign.alive_ids()
@@ -2895,8 +4326,16 @@ func _activate(id: String) -> void:
 		queue_redraw()
 		return
 	if id == "roster_page":
+		# 名册屏已经并进队伍屏（M171），但城镇名册条的**表头**还在发这个 id，
+		# 于是「点表头」和「点导航栏」进的是两个完全不同的界面 —— 用户一眼就看出来了。
 		_roster_open = ""
-		_state = S_ROSTER
+		if not _party_hero.is_empty():
+			_state = S_PARTY
+		else:
+			var av_p: Array = campaign.hero_ids_deployed_first()
+			if not av_p.is_empty():
+				_party_hero = str(av_p[0])
+			_state = S_PARTY
 		queue_redraw()
 		return
 	if id == "roster_back":
@@ -2919,6 +4358,8 @@ func _activate(id: String) -> void:
 				_state = S_GATE
 			"shop":
 				_state = S_SHOP
+			"party":
+				_state = S_PARTY
 		queue_redraw()
 		return
 	if id == "gate_back":
@@ -3034,6 +4475,19 @@ func _activate(id: String) -> void:
 			campaign.new_game()
 			campaign.save()
 			back_to_town()
+		_:
+			# 兜底（M114 的初衷）：`_activate` 与 `_activate_id` 是**两套并行分发**，
+			# 真实点击走 `_on_click() → _activate_id()`，而 `--click=` 验收走这里。
+			# 新加的 id（队伍屏、饰品、作弊）只挂在后者，于是「手点有效、脚本验收无效」。
+			#
+			# **必须写在 match 里面**（M134 修）。原来放在 match 外面，
+			# 而 match 的分支里大部分**没有 return** —— 于是匹配成功的 id
+			# 执行完分支之后照样往下走，撞进兜底 → `_activate_id` → 又回 `_activate`
+			# → 无限递归、栈溢出。表现就是「点某个按钮，客户端直接崩」，
+			# 而且崩的按钮是随机的：取决于那个 id 在 `_activate_id` 里有没有对应分支。
+			#
+			# 注释里原来写着「上面每条分支都 return 了」——那句话是错的，别信。
+			_activate_id(id, true)
 
 ## 删掉一个槽的存档（M48）。
 ##
@@ -3079,6 +4533,7 @@ func back_to_town() -> void:
 
 func _draw() -> void:
 	draw_rect(Rect2(Vector2.ZERO, size), DdTheme.BG)
+	# Spine 试验是最外层：它不参与任何界面状态（M119）
 	_buttons.clear()
 	_slots.clear()
 	_room_hits.clear()
@@ -3089,8 +4544,20 @@ func _draw() -> void:
 	#   其它   —— 两层都收起来
 	if _map_layer != null:
 		if _state == S_MAP:
-			_map_layer.show()
-			_map_layer.modulate = Color(1.0, 1.0, 1.0, 1.0)
+			# 补给面板开着的时候要把地图层收起来（M180）。
+			#
+			# 子节点的层级**永远在 self 之上**，而补给面板是画在 self 上的
+			# （`_draw_supply_panel` 里的 `draw_rect`）。于是面板背景是实心的
+			# `#161920`，地图的房间图标和走廊金线照样从上面透过来 ——
+			# 看起来像「面板是半透明的」，其实是画序压反了。
+			if _supply_open or _dlg_open or _hold_shown.begins_with("hero_stat:"):
+				# 事件弹窗 / 补给面板 / 英雄长按浮层都要收地图层（M194/M201）。
+				# `_map_layer` 是**子节点**，永远画在 self 之上 —— 只画一层遮罩
+				# 根本盖不住它，房间格子会直接压在浮层文字上（截图里那块石头就是）。
+				_map_layer.hide()
+			else:
+				_map_layer.show()
+				_map_layer.modulate = Color(1.0, 1.0, 1.0, 1.0)
 		elif _state == S_ROOM:
 			_map_layer.hide()
 		else:
@@ -3109,6 +4576,8 @@ func _draw() -> void:
 			_draw_map()
 		S_BATTLE:
 			_draw_battle()
+		S_PARTY:
+			_draw_party()
 		S_BATTLE_END:
 			_draw_battle_end()
 		S_ROOM:
@@ -3137,14 +4606,68 @@ func _draw() -> void:
 			_draw_building()
 
 	_draw_buttons()
+	_draw_nav_bar()
+	# 长按详情画在最上层（M183）：盖住底下的界面，
+	# 但**不挡点击** —— 抬手就收，不需要按钮。
+	_draw_hold_tip()
 	_draw_floaters()
 	if _dump_hits:
 		_dump_hit_report()
 
 	if _flash_life > 0.0:
 		var a: float = clampf(_flash_life, 0.0, 1.0)
-		_text(Vector2(0, 96), _flash, DdTheme.FONT_HERO, Color(DdTheme.CRIT.r, DdTheme.CRIT.g, DdTheme.CRIT.b, a),
-			HORIZONTAL_ALIGNMENT_CENTER, size.x)
+		# 城镇里名册条压到 70~180，提示条写 96 会被盖住一半（M125 发现：
+		# 点作弊按钮、「金币 +10000」只露出下半截）。其他屏往上一点不冲突。
+		# 名册条从 92 开始、126 高 → 到 218。提示条压在 96 会被遮，
+		# 压在 196 还是在条里。放到条下面 232，正好是建筑区的上沿。
+		# 位置按屏分：城镇名册条到 218，公会/建筑屏标题在 88 也会被压，
+		# 只有地图和战斗那种顶部空旷的可以用 96。
+		var fy: float = 96.0
+		if _state == S_MAP:
+			# 地图屏顶部有一条资源条（光照 / 火把 / 口粮 …，基线 76），
+			# 下面紧跟着房间面板（约 130 起）——中间只有 ~54px。
+			# 136 会压住「入口房间」标题，96 会压住资源条。
+			# 所以位置取 118，并且**字号也跟着降到 34**（见下），
+			# 48 号字高就是 48，夹不进这条缝。
+			fy = 118.0
+		if _state == S_TOWN:
+			fy = _roster_y() + 140.0
+		elif _state == S_GUILD or _state == S_BUILDING or _state == S_ROSTER:
+			# 放底部按钮上方：这些屏顶部全是内容（名册页第一张卡从 64 开始、
+			# 公会屏标题在 88），150 会直接压在卡片上。
+			# 建筑屏还要再往上让 62：那里新加了升级条（M131），
+			# 否则提示正好压在「等级 0/3」上。
+			fy = size.y - 44.0 - 56.0 - (82.0 if _state == S_BUILDING else 18.0)
+		# 描边（M155）：深色背景上的红字几乎看不清 —— 遭遇战提示尤其明显。
+		# `_text` 不支持描边，所以**先画一圈黑字再压上彩色字**：
+		# 八个方向各偏移 2px，等于把描边做出来，比 Godot 的 outline 参数可控。
+		#
+		# 限宽 + 折行（M200）：长句会冲出屏幕、压住标题栏。
+		# 字号只在**放不下时**降：「踩中陷阱」这类短提示保持原来的大字
+		# —— 大正是它存在的理由；长句降到 34 再折行。
+		var maxw: float = size.x - 40.0
+		var fsz: int = DdTheme.FONT_HERO + 8
+		# 地图屏额外降一档（M201）：那条缝只有 54px 高，48 号字塞不进去。
+		if _state == S_MAP \
+				or _font.get_string_size(_flash, HORIZONTAL_ALIGNMENT_LEFT, -1, fsz).x > maxw:
+			fsz = 34
+		var flines: Array = _wrap_lines(_flash, fsz, maxw)
+		var fcol := Color(DdTheme.CRIT.r, DdTheme.CRIT.g, DdTheme.CRIT.b, a)
+		var ocol := Color(0.0, 0.0, 0.0, a * 0.95)
+		var lh: float = float(fsz) + 4.0
+		for li in flines.size():
+			var s: String = str(flines[li])
+			var tw: float = _font.get_string_size(s, HORIZONTAL_ALIGNMENT_LEFT, -1, fsz).x
+			var tx0: float = (size.x - tw) * 0.5
+			var ly: float = fy + float(li) * lh
+			for dx in [-2.0, 0.0, 2.0]:
+				for dy in [-2.0, 0.0, 2.0]:
+					if dx == 0.0 and dy == 0.0:
+						continue
+					draw_string(_font, Vector2(tx0 + dx, ly + dy), s,
+						HORIZONTAL_ALIGNMENT_LEFT, -1, fsz, ocol)
+			draw_string(_font, Vector2(tx0, ly), s,
+				HORIZONTAL_ALIGNMENT_LEFT, -1, fsz, fcol)
 
 
 # —— 基础绘制工具 ——
@@ -3256,18 +4779,89 @@ func _header(title: String, hint: String) -> void:
 		draw_rect(Rect2(0, 0, size.x, DdTheme.HEADER_H), DdTheme.PANEL)
 		draw_line(Vector2(0, DdTheme.HEADER_H), Vector2(size.x, DdTheme.HEADER_H),
 			DdTheme.PANEL_EDGE, 1.0)
-	_text(Vector2(DdTheme.MARGIN, 33), title, DdTheme.FONT_H1, DdTheme.TEXT)
-	_text(Vector2(size.x - 620, 32), hint, DdTheme.FONT_MD, DdTheme.FAINT,
-		HORIZONTAL_ALIGNMENT_RIGHT, 592)
+	# 两栏分宽度（M165）：原来 hint 占 `size.x-620` 起的 592（= 整条 79%），
+	# 长标题（「出发准备 · 荒野 · 短途 1 级」）横着压上去叠成一团。
+	# 反过来把标题限到 110 又会把区域信息整个切掉。
+	# 现在按 45% / 55% 分：标题降一档字号（H1→BD）才放得下完整的一句。
+	var hint_w: float = size.x * 0.46
+	_text(Vector2(DdTheme.MARGIN, 33), title, DdTheme.FONT_BD, DdTheme.TEXT,
+		HORIZONTAL_ALIGNMENT_LEFT, size.x - hint_w - DdTheme.MARGIN - 12.0)
+	_text(Vector2(size.x - hint_w - 12.0, 32), hint, DdTheme.FONT_MD, DdTheme.FAINT,
+		HORIZONTAL_ALIGNMENT_RIGHT, hint_w)
+
+
+## 名册抽屉是否正盖着屏幕（M147）。
+##
+## 这个判断原来在**两处各写一遍**：`_draw_buttons`（不画底下的按钮）
+## 和 `_hit_id_at`（不响应底下的点击）。M140 那次只补了后者，
+## 结果名册页的浮层能点穿 —— 而两份代码各写各的，靠人记着同步。
+func _sheet_modal() -> bool:
+	return (_state == S_TOWN or _state == S_ROSTER) and not _roster_open.is_empty()
+
+
+## 底部导航栏（M163）：城镇类界面常驻，切屏不消失。
+##
+## 之前每个界面底部都有一颗「返回城镇」，等于把「回主界面」当成唯一的导航 ——
+## 想看名册得先回城镇、再点名册，两跳。现在底部一条固定 tab，
+## 和微信底部导航一个意思。
+##
+## **地牢内不显示**（用户明确）：探索和战斗时屏幕高度是稀缺资源，
+## 而且那两块地方本来就不该有「去商店」这种出口。
+## **顺序按玩家一局的动线排**（M194 用户指定）：城镇 → 公会 → 出征 → 队伍 → 商店。
+##
+## 原来是「出征 / 城镇 / 队伍 / 商店 / 公会」——出征排第一，因为它是主要出口；
+## 但实际动线是「在城镇里招募、去公会接任务、配好队再出征」，
+## 把最后一环放在第一个位置，每局都要往左跳。
+const DOCK_TABS: Array = [
+	["dock:town", "城镇", 0],
+	["dock:guild", "公会", 7],
+	# 出征 tab 落到**选关屏**（S_GATE=12），不是准备屏（S_PREP=5）——
+	# 第三列只用来判高亮，实际跳转在 `dock:` 分支里。
+	["dock:prep", "出征", 12],
+	["dock:party", "队伍", 16],
+	["dock:shop", "商店", 6],
+]
+
+
+func _dock_visible() -> bool:
+	return _state == S_TOWN or _state == S_ROSTER or _state == S_PARTY \
+		or _state == S_SHOP or _state == S_GUILD or _state == S_BUILDING \
+		or _state == S_TRINKET or _state == S_PREP or _state == S_GATE
+
+
+func _draw_nav_bar() -> void:
+	if not _dock_visible():
+		return
+	var y: float = size.y - NAV_H
+	draw_rect(Rect2(0.0, y, size.x, NAV_H), Color(0.018, 0.018, 0.024, 0.98))
+	draw_line(Vector2(0.0, y), Vector2(size.x, y), DdTheme.PANEL_EDGE, 1.0)
+	var tw: float = size.x / float(DOCK_TABS.size())
+	for i in DOCK_TABS.size():
+		var t: Array = DOCK_TABS[i]
+		var r := Rect2(float(i) * tw, y, tw, NAV_H)
+		var active: bool = _state == int(t[2])
+		if active:
+			draw_rect(r, DdTheme.PANEL_HI)
+			draw_rect(Rect2(r.position.x, r.position.y, tw, 3.0), DdTheme.CRIT)
+		elif r.has_point(_mouse):
+			draw_rect(r, DdTheme.BTN_HOVER)
+		_text(Vector2(r.position.x, r.position.y + 40.0), str(t[1]),
+			DdTheme.FONT_BD, DdTheme.CRIT if active else DdTheme.DIM,
+			HORIZONTAL_ALIGNMENT_CENTER, tw)
+		_add_hit(r, str(t[0]))
 
 
 func _draw_buttons() -> void:
 	# 名册抽屉是模态的（M58）：它在 `_draw_town()` 里画，而按钮统一在
 	# `_draw()` 末尾画，所以不跳过的话，底下那排按钮会浮在抽屉上面 ——
 	# 第一版就是这样，「休整一周」压在关闭按钮底下露出来。
-	if (_state == S_TOWN or _state == S_ROSTER) and not _roster_open.is_empty():
+	if _sheet_modal():
 		return
 	for b in _buttons:
+		# 日志浮层铺了半屏（M202）：底下的技能 / 挪位 / 撤退照画，就会浮在浮层
+		# **上面**被看见、被点到。只放行浮层自己的「关闭」。
+		if _log_open and _state == S_BATTLE and str(b.get("id", "")) != "log_toggle":
+			continue
 		var r: Rect2 = b.rect
 		var label: String = str(b.get("label", ""))
 		if label.is_empty():
@@ -3279,6 +4873,9 @@ func _draw_buttons() -> void:
 		# 危险态（M28）：解雇的「再点一次确认」必须一眼看出和平常按钮不一样。
 		# 只改文字不改样式没用——玩家连点两下时不会读字。
 		var danger: bool = bool(b.get("danger", false))
+		# 强调态（M142）：离开地牢这种「这一趟的目的地」按钮，
+		# 和旁边的火把/休整长得一样不合适 —— 金底 + 金框。
+		var accent: bool = bool(b.get("accent", false))
 		var st: int = TILE_IDLE
 		if not enabled:
 			st = TILE_OFF
@@ -3290,18 +4887,22 @@ func _draw_buttons() -> void:
 			st = TILE_DANGER
 		elif hover:
 			st = TILE_HOVER
-		_tile(r, st, DdTheme.BTN)
+		_tile(r, st, DdTheme.PANEL_HI if accent else DdTheme.BTN)
+		if accent:
+			draw_rect(r, DdTheme.CRIT, false, 2.0)
 		# 文字跟着下沉 1px：只有底色变化时，49px 高的按钮在大屏上看不出「按进去」，
 		# 位移 1px 比换颜色便宜，但手感差别很大。
 		_text(Vector2(r.position.x, r.position.y + r.size.y * 0.5 + 5.0 + (1.0 if pressed else 0.0)),
 			label, DdTheme.FONT_BD,
-			DdTheme.FAINT if not enabled else (DdTheme.CRIT if danger else DdTheme.TEXT),
+			DdTheme.FAINT if not enabled else (
+				DdTheme.CRIT if (danger or accent) else DdTheme.TEXT),
 			HORIZONTAL_ALIGNMENT_CENTER, r.size.x)
 
 
 func _add_button(r: Rect2, id: String, label: String, enabled: bool = true,
-		danger: bool = false) -> void:
-	_buttons.append({"rect": r, "id": id, "label": label, "enabled": enabled, "danger": danger})
+		danger: bool = false, accent: bool = false) -> void:
+	_buttons.append({"rect": r, "id": id, "label": label, "enabled": enabled,
+		"danger": danger, "accent": accent})
 
 
 ## —— 横向滚动区（M58）——
@@ -3319,6 +4920,36 @@ func _add_button(r: Rect2, id: String, label: String, enabled: bool = true,
 ## 滚动区要在按下时就接管（否则拖动会被判成点击），所以两者都记。
 func _press_begin(pos: Vector2) -> void:
 	_mouse = pos
+	var hk0: String = _hit_id_at(pos)
+	if hk0.begins_with("skill:") or hk0.begins_with("guild_skill:") \
+			or hk0.begins_with("tk_store:"):
+		_hold_id = hk0
+		_hold_t = 0.0
+	else:
+		_hold_id = ""
+		_hold_t = 0.0
+	# 地图底部队伍条：按下 = 准备拖拽换位（M176）
+	if _state == S_MAP and not _strip_rects.is_empty():
+		for sr0 in _strip_rects:
+			if (sr0["rect"] as Rect2).has_point(pos):
+				_drag_card = {"id": str(sr0["id"]), "from": -1,
+					"pos": pos, "moved": false, "strip": true}
+				# 同一张卡也支持长按看状态（M201）：拖动和长按不冲突 ——
+				# 拖拽要「移动超过阈值」才成立，长按是「按住不动 0.45 秒」。
+				_hold_id = "hero_stat:%s" % str(sr0["id"])
+				_hold_t = 0.0
+				_press_id = ""
+				queue_redraw()
+				return
+	# 队伍屏：按下左侧卡片 = 准备拖拽换位（M173）
+	if _state == S_PARTY:
+		for pr in _party_rects:
+			if (pr["rect"] as Rect2).has_point(pos):
+				_drag_card = {"id": str(pr["id"]), "from": _prep_party.find(str(pr["id"])),
+					"pos": pos, "moved": false}
+				_press_id = ""
+				queue_redraw()
+				return
 	# 地图面板按下 = 准备拖拽（M78）。松手时位移不足 6px 才算点击，
 	# 否则拖动地图会顺手把手指底下那间房点掉。
 	if _state == S_MAP and _map_rect.has_point(pos):
@@ -3351,6 +4982,62 @@ func _press_begin(pos: Vector2) -> void:
 
 ## 抬手：位置没变才触发。
 func _press_end(pos: Vector2) -> void:
+	# 长按弹出来的详情，抬手就收（M183）
+	if not _hold_shown.is_empty():
+		_hold_shown = ""
+		_hold_id = ""
+		_hold_t = 0.0
+		queue_redraw()
+		return
+	_hold_id = ""
+	_hold_t = 0.0
+	# 队伍屏拖拽结束（M173）：落在哪张卡上就换到那个位置。
+	# 没移动 = 普通点击（选中），走原来的路径。
+	if not _drag_card.is_empty():
+		var moved: bool = bool(_drag_card.get("moved", false))
+		var did: String = str(_drag_card.get("id", ""))
+		# 地图队伍条（M176）：改的是 `exp.hero_ids` 的顺序 ——
+		# 地牢里的站位就是它，换完下一场战斗立刻按新顺序排。
+		if bool(_drag_card.get("strip", false)):
+			_drag_card = {}
+			# 真拖动了就不是长按（M201）：不清的话，松手后那张状态浮层还挂着，
+			# 而玩家以为自己只是换了个站位。
+			if moved:
+				_hold_id = ""
+				_hold_shown = ""
+			if moved and exp != null:
+				var to_i: int = -1
+				for sr1 in _strip_rects:
+					if (sr1["rect"] as Rect2).has_point(pos):
+						to_i = exp.hero_ids.find(str(sr1["id"]))
+						break
+				var from_i: int = exp.hero_ids.find(did)
+				if to_i >= 0 and from_i >= 0 and to_i != from_i:
+					var who2: String = str(exp.hero_ids[from_i])
+					exp.hero_ids.remove_at(from_i)
+					exp.hero_ids.insert(to_i, who2)
+					_exp_persist()
+					_flash_msg("%s 换到第 %d 号位" % [_hero_label(who2), to_i + 1])
+				queue_redraw()
+			return
+		_drag_card = {}
+		if moved:
+			var target: int = -1
+			for pr2 in _party_rects:
+				if (pr2["rect"] as Rect2).has_point(pos):
+					target = _prep_party.find(str(pr2["id"]))
+					break
+			var from: int = _prep_party.find(did)
+			if target >= 0 and from >= 0 and target != from:
+				var who: String = _prep_party[from]
+				_prep_party.remove_at(from)
+				_prep_party.insert(target, who)
+				_party_persist()
+				_flash_msg("%s 换到第 %d 号位" % [_hero_label(who), target + 1])
+			queue_redraw()
+			return
+		# 没拖动：当成普通点击继续往下走
+		_party_hero = did if not did.is_empty() else _party_hero
 	_mouse = pos
 	if _map_drag:
 		var moved_m: bool = _map_drag_moved
@@ -3525,7 +5212,34 @@ func _hit_overlay(r: Rect2, id: String, edge: bool = true) -> void:
 func _hit_id_at(pos: Vector2) -> String:
 	# 抽屉打开时它是模态的：只有抽屉里的东西能点，点别处就是关掉它。
 	# 必须在所有其它判定之前 —— 否则会点到抽屉底下的名册卡/建筑卡。
-	if _state == S_TOWN and not _roster_open.is_empty():
+	#
+	# **必须和 `_draw_buttons` 的模态判断保持一致**（M140）：
+	# 那边写的是 `S_TOWN or S_ROSTER`，这边原来只有 `S_TOWN`，
+	# 于是名册页打开详情之后，点面板的空白处会穿透到背后的名册卡上
+	# —— 面板看着盖住了，其实那一片还是「活的」。
+	# 补给面板也是模态的（M154）。绘制那边 `_draw_map` 一开头就 return 了，
+	# 命中这边不挡的话，点面板空白处会穿透到背后的房间格 ——
+	# 和 M140 的浮层穿透是**同一个错**，这次先想到了。
+	if _log_open and _state == S_BATTLE:
+		# 日志浮层是模态的（M202）。它铺了半屏，底下的技能 / 挪位 / 撤退
+		# 如果照常可点，玩家想关浮层却按到了「撤退」—— 那是丢掉整趟的动作。
+		# 和 M140（名册抽屉）、M154（补给面板）同一个错，这是第三次。
+		# **`_draw_buttons` 那边必须有同样的判断**，只拦一边就是「看着盖住了、其实能点」。
+		for b in _buttons:
+			if str(b["id"]) == "log_toggle" and (b["rect"] as Rect2).has_point(pos):
+				return "log_toggle"
+		return ""      # 点空白：`_on_click` 会当成「关掉浮层」
+	if not _curio_ask.is_empty():
+		for b in _buttons:
+			if (b["rect"] as Rect2).has_point(pos):
+				return str(b["id"])
+		return "curio_skip"   # 点空白 = 空手翻
+	if _supply_open:
+		for b in _buttons:
+			if (b["rect"] as Rect2).has_point(pos):
+				return str(b["id"])
+		return "supply_close"
+	if _sheet_modal():
 		for b in _sheet_hits:
 			if (b["rect"] as Rect2).has_point(pos):
 				return str(b["id"])
@@ -3560,7 +5274,12 @@ func _hit_id_at(pos: Vector2) -> String:
 	return ""
 
 
-func _activate_id(id: String) -> void:
+## `from_activate`（M136）：标明这次是**从 `_activate` 兜底过来的**。
+##
+## 两个分发函数都要兜底对方（真实点击走这里、`--click` 走那边），
+## 但两边都无条件回调就是死环 —— 只要 id 两边都不认识就会栈溢出。
+## 带上来源标记之后，兜底只走**一个来回**：过来的人不再回头。
+func _activate_id(id: String, from_activate: bool = false) -> void:
 	if id.begins_with("room:"):
 		_travel_to(int(id.substr(5)))
 	elif id.begins_with("tgt:"):
@@ -3568,6 +5287,61 @@ func _activate_id(id: String) -> void:
 	elif id.begins_with("atk:"):
 		# 目标面板上的一行（M89）：走和点战场单位同一条路
 		_pick_target(int(id.substr(4)))
+	elif id == "cheat_res":
+		_cheat_resources()
+	elif id.begins_with("roster_deploy:"):
+		_toggle_deploy(id.substr(14))
+	elif id.begins_with("bld_up:"):
+		var ub: String = id.substr(7)
+		var uerr: String = campaign.upgrade_building(ub)
+		if uerr.is_empty():
+			campaign.save()
+			_flash_msg("%s 升到 %d 级" % [str(_building_meta(ub)[1]),
+				campaign.building_level(ub)])
+		else:
+			_flash_msg(uerr)
+		queue_redraw()
+	elif id.begins_with("guild_up:"):
+		var us: String = id.substr(9)
+		var err: String = campaign.upgrade_skill(_guild_hero, us)
+		if err.is_empty():
+			campaign.save()
+			_flash_msg("%s 升到 %d 级" % [DdNames.skill_name(us),
+				campaign.skill_level_of(_guild_hero, us) + 1])
+		else:
+			_flash_msg(err)
+		queue_redraw()
+	elif id.begins_with("bld_locked:"):
+		var lb: String = id.substr(11)
+		_flash_msg("「%s」还没开放 —— 再完成 %d 次任务" % [
+			str(_building_meta(lb)[1]), _bld_need(lb)])
+		queue_redraw()
+	elif id == "party_back":
+		_state = S_TOWN
+		queue_redraw()
+	elif id.begins_with("party_sel:"):
+		_party_hero = id.substr(10)
+		queue_redraw()
+	elif id.begins_with("party_tk:"):
+		var tk: String = id.substr(9)
+		_sel_trinket = "" if _sel_trinket == tk else tk
+		queue_redraw()
+	elif id.begins_with("party_toggle:"):
+		# 名单可能还没初始化（`--click=` 在第一次绘制之前就跑了）。
+		# 不补这一句的话，点一下「上阵」会从一个空名单里 append，
+		# 出征队伍直接变成一个人，而且会被存进档案。
+		if _prep_party.is_empty():
+			_prep_party = _party_restore(_prep_level)
+		var ph: String = id.substr(13)
+		if _prep_party.has(ph):
+			if _prep_party.size() > 1:
+				_prep_party.erase(ph)
+		elif _prep_party.size() < Campaign.PARTY_MAX:
+			_prep_party.append(ph)
+		else:
+			_flash_msg("出征最多 %d 人，先下阵一个" % Campaign.PARTY_MAX)
+		_party_persist()
+		queue_redraw()
 	elif id == "cancel_pick":
 		_pending = {}
 		_retreat_arm = false
@@ -3579,6 +5353,10 @@ func _activate_id(id: String) -> void:
 		_log_open = false      # 两个浮层同时开只会互相盖
 		queue_redraw()
 	else:
+		if from_activate:
+			# 两边都不认识：这是真的没有实现，不是要回头再问一遍。
+			push_warning("未处理的按钮 id: " + id)
+			return
 		_activate(id)
 
 
@@ -3823,6 +5601,51 @@ func _draw_building_card(b: Array, rb: Rect2) -> void:
 ## 它原来是 2×2 里的一张 339×210，五行字纵着排；搬到右栏之后变宽变矮，
 ## 所以改成「左边四行信息、右上角一个够格人数」的横向布局 ——
 ## 卡变矮之后纵排五行会挤成一条，横排反而更清楚。
+## 按宽度切成若干行（M200），只做测量，不管绘制。
+##
+## 中文没有词边界，所以逐字加、超宽就断。抽出来是因为折行的需求散在几处
+## （任务卡、飘字提示），各写一份必然有一处忘了按字宽量。
+func _wrap_lines(s: String, fs: int, width: float) -> Array:
+	var out: Array = []
+	var line: String = ""
+	for i in s.length():
+		var ch: String = s.substr(i, 1)
+		var test: String = line + ch
+		if _font.get_string_size(test, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > width \
+				and not line.is_empty():
+			out.append(line)
+			line = ch
+		else:
+			line = test
+	if not line.is_empty():
+		out.append(line)
+	return out if not out.is_empty() else [s]
+
+
+## 按宽度折行画一段文字（M198），返回下一行的基线 y。
+##
+## `_text` 的 width 只影响对齐，**不换行**（`draw_string` 本身不会自动折）。
+## 任务卡的说明是长句，窄卡上不折就是原来那种「尾巴被切掉」。
+func _text_wrap(pos: Vector2, s: String, fs: int, col: Color,
+		width: float, max_lines: int = 3) -> float:
+	var lh: float = float(fs) + 6.0
+	var lines: Array = _wrap_lines(s, fs, width)
+	var n: int = mini(lines.size(), max_lines)
+	for i in n:
+		var line: String = str(lines[i])
+		# 放不下的部分用省略号收在最后一行
+		if i == n - 1 and lines.size() > max_lines:
+			line = DdTheme.ellipsis(line + "……", _font, width, fs)
+		_text(Vector2(pos.x, pos.y + float(i) * lh), line, fs, col,
+			HORIZONTAL_ALIGNMENT_LEFT, width)
+	return pos.y + float(n) * lh
+
+
+## 任务卡（M198 改竖卡）。
+##
+## 原来是四张横排、每张 ~166 宽：标题和说明都放不下，
+## 「清光全图战斗，支路」直接压到下一张卡上。改成窄竖卡 + 横向滚动区，
+## 一张卡把「做什么 / 会碰到谁 / 够不够格 / 打过没有」四件事说完。
 func _draw_board_card(row: Array, r: Rect2, alive: int) -> void:
 	_panel(r)
 	_hit_overlay(r, "prep:%s:%d:%s" % [str(row[0]), int(row[1]), str(row[4])])
@@ -3839,8 +5662,11 @@ func _draw_board_card(row: Array, r: Rect2, alive: int) -> void:
 		_draw_ico(rk, Vector2(r.position.x + 14.0, r.position.y + 8.0), 34.0,
 			Color(1, 1, 1, 1) if alive > 0 else Color(0.55, 0.55, 0.55, 0.8))
 		tx2 = r.position.x + 60.0
+	# 标题要让出右上角「够格 N 人」那 150px（M153）：字号放大后
+	# 「荒野 · 短途 · 1 级」正好压到「够格 4 人」上。
 	_text(Vector2(tx2, r.position.y + 32.0), str(row[2]),
-		DdTheme.FONT_LG, DdTheme.TEXT if alive > 0 else DdTheme.DIM)
+		DdTheme.FONT_BD, DdTheme.TEXT if alive > 0 else DdTheme.DIM,
+		HORIZONTAL_ALIGNMENT_LEFT, r.size.x - (tx2 - r.position.x) - 152.0)
 	_text(Vector2(tx2, r.position.y + 56.0), str(row[3]),
 		DdTheme.FONT_SM, DdTheme.DIM)
 	# 情报（M21）：这一档会遇到什么。玩家点进去之前唯一能看的信息。
@@ -4261,12 +6087,45 @@ func _draw_town_bg() -> void:
 func _draw_town() -> void:
 	# 场景（三层底图 + 建筑）先画，后面的 header / 资源条 / 名册条 / dock 都压在它上面
 	_draw_town_scene()
+	# 作弊按钮（M104）：开发期调资源用。
+	# 放在 dock 上方的空带里（城镇那一块本来就是背景），不压任何正式元素。
+	# 正式发行前要删掉——这里没有开关，因为它就是给自己用的。
+	# 位置（M104 第三版）：dock 右侧那条空带。
+	# 前两版分别压住了「商队」标签和名册条右端的「全部 ›」。
+	# dock 宽 264 居中，右边从 507 到 750 一直是空的。
+	_add_button(Rect2(size.x - 190.0, size.y - 74.0, 172.0, 44.0),
+		"cheat_res", "＋10000 资源")
+	# 「继续远征」按钮已删除（M137）。
+	#
+	# 它原来靠 `campaign.expedition_run` 非空来判断「有没打完的一趟」，
+	# 而 `settle()` **根本没清过这个字段** —— 打完最后一间房、结算发完奖励，
+	# 快照里还留着「结束前那一帧的地图」。回城存档把它写进档，
+	# 按钮就一直亮着：点一次回到最后一间房，再打一次、再结算一次，**刷奖励**。
+	#
+	# 切后台续玩这件事不需要按钮：M117 已经在启动时自动恢复（读同一个快照），
+	# 玩家按 Home 回来会直接落在原来的屏幕上。
 	# 副标题把「每周恢复多少」写出来：不写的话「休整一周」看起来只是浪费时间，
 	# 玩家不会知道那 50 金买到了什么。
 	var wk_relief: int = int((campaign.cfg.get("town_cycle", {}) as Dictionary).get(
 		"weekly_stress_relief", 0))
+	# 任务数写进副标题（M123）：建筑是按「完成任务数」开放的，
+	# 但玩家看不到那个数字的话，只会觉得「这座城怎么越来越空」。
+	# 差多少任务才开下一座（M123）：不写的话玩家只会觉得「城怎么这么空」。
+	var nx_bid: String = ""
+	var nx_need: int = 999
+	for b in ["abbey", "tavern", "smith", "guild", "sanitarium"]:
+		var need: int = int(BLD_UNLOCK.get(b, 0)) - campaign.quests_done
+		if need > 0 and need < nx_need:
+			nx_need = need
+			nx_bid = b
+	if not nx_bid.is_empty():
+		_text(Vector2(28.0, size.y - NAV_H - DOCK_H - 26.0),
+			"再完成 %d 次任务：「%s」开放" % [nx_need,
+				str(_building_meta(nx_bid)[1]) if not _building_meta(nx_bid).is_empty() else nx_bid],
+			DdTheme.FONT_MD, DdTheme.DIM)
 	_header("城镇 · 第 %d 周" % campaign.week,
-		"远征 %d 趟 · 每周恢复 %d 压力 · 任务板每周按名册重抽" % [campaign.expeditions, wk_relief])
+		"远征 %d 趟 · 完成任务 %d 次 · 每周恢复 %d 压力" % [
+			campaign.expeditions, campaign.quests_done, wk_relief])
 
 	# —— 资源 ——
 	# 纵向重排（M31）：视口是 1280×760，而内容原来只排到 586，
@@ -4314,8 +6173,7 @@ func _draw_town() -> void:
 	# —— 名册条：缩小居中，底部两角让给铁匠铺和马车 ——
 	_draw_roster_strip(ids, alive_n)
 
-	# —— 底部 dock ——
-	_draw_dock()
+	# 底部 dock 由 `_draw()` 统一画（M163），这里不再重复
 
 	# 抽屉画在最后：它要盖住整屏（含上面那条「休整一周」）
 	_draw_hero_sheet()
@@ -4431,6 +6289,20 @@ func _town_tint(st: int) -> Color:
 ## 平移量必须是**实际** `_safe_top`，不能写死 80：
 ## 桌面无安全区时它是 0，真机可能是 47/59 —— 写死的话
 ## 换一个设备建筑就整体偏掉同样的量，而底图不动。
+## 这座建筑解锁了没有（M123）。
+func _bld_unlocked(bid: String) -> bool:
+	if campaign == null:
+		return true
+	return campaign.quests_done >= int(BLD_UNLOCK.get(bid, 0))
+
+
+## 差多少个任务才开放（M123）。用于点击时的提示。
+func _bld_need(bid: String) -> int:
+	if campaign == null:
+		return 0
+	return maxi(0, int(BLD_UNLOCK.get(bid, 0)) - campaign.quests_done)
+
+
 func _town_canvas_rect() -> Rect2:
 	var h: float = size.x * TOWN_CANVAS_H / 750.0
 	return Rect2(0.0, -_safe_top, size.x, h)
@@ -4448,6 +6320,8 @@ func _draw_town_scene() -> void:
 	var back: Array = []
 	var front: Array = []
 	for slot in _town_slots:
+		# 未解锁也画（M124）：整块地空着比画个暗的更怪 ——
+		# 玩家会觉得「这里本来没东西」而不是「还没开放」。
 		if bool((slot as Array)[5]):
 			front.append(slot)
 		else:
@@ -4465,14 +6339,37 @@ func _draw_town_scene() -> void:
 		_draw_town_bld(slot)
 
 
+## 画一把锁（M124）。没有锁的素材，用两个基本图元拼 ——
+## 在 1334 宽的画布上显示 22px 大小，够读。
+func _draw_lock(c: Vector2, hot: bool) -> void:
+	var col: Color = Color(0.94, 0.80, 0.46, 1.0) if hot else Color(0.78, 0.68, 0.48, 0.96)
+	# 锁体 26×20：上一版 18×14 在 1334 宽画布上几乎看不见
+	draw_rect(Rect2(c.x - 13.0, c.y - 1.5, 26.0, 20.0), col, true)
+	# 锁梁（上半圆）
+	draw_arc(c + Vector2(0.0, -1.5), 9.5, PI, TAU, 16, col, 3.2)
+	# 钥匙孔
+	draw_circle(c + Vector2(0.0, 7.0), 2.8, Color(0.10, 0.08, 0.06, 0.92))
+	draw_rect(Rect2(c.x - 1.1, c.y + 7.0, 2.2, 5.0), Color(0.10, 0.08, 0.06, 0.92), true)
+
+
 func _draw_town_bld(slot: Array) -> void:
 	var bid: String = str(slot[0])
 	var flip: bool = bool(slot[4])
 	var r: Rect2 = _town_bld_rect(slot)
 	if r.size.x <= 0.0:
 		return
-	var st: int = _hit_state(r, "bld:" + bid)
+	var unlocked: bool = _bld_unlocked(bid)
+	var st: int = _hit_state(r, "bld_locked:" + bid if not unlocked else "bld:" + bid)
 	var tex: Texture2D = _town_tex("town", "bld_" + bid, flip)
+	if not unlocked:
+		# 未开放：压成暗灰剪影（保留轮廓，让人看出「这里有座楼」），
+		# 中央盖一把锁。指上来稍微提亮一点，表示「能点，只是点不开」。
+		if tex != null:
+			var dim_k: float = 0.30 if st == TILE_IDLE else 0.42
+			draw_texture_rect(tex, r, false, Color(dim_k, dim_k, dim_k * 1.04, 0.95))
+		_draw_lock(r.position + r.size * 0.5, st != TILE_IDLE)
+		_add_hit(r, "bld_locked:" + bid)
+		return
 	if tex != null:
 		draw_texture_rect(tex, r, false, _town_tint(st))
 	# 金色描边：常态 42%，指上来才全亮 —— 「这栋能点」要一眼看出来，
@@ -4492,12 +6389,19 @@ func _draw_town_bld(slot: Array) -> void:
 func _draw_town_labels() -> void:
 	var rects: Array = []
 	for slot in _town_slots:
+		# 没解锁的建筑不挂名牌（M123），但**要占位**：
+		# 下面按索引取 `rects[i]` 来对齐 `_town_slots`，直接 continue
+		# 会让后面所有牌子错位到隔壁建筑头上。
+		# 未解锁也要占位（索引对齐），但牌子的颜色另算
+
 		var r: Rect2 = _town_bld_rect(slot)
 		if r.size.x > 0.0:
 			rects.append(r)
+		else:
+			rects.append(Rect2())
 	# dock 只有中间一条（M67）：两侧不再有栏，名牌可以一直下到屏幕底部。
 	# 这三块 UI 禁止区全部按「真实占据的矩形」算，不再用整宽。
-	var dock_r := Rect2((size.x - DOCK_W) * 0.5, size.y - DOCK_H, DOCK_W, DOCK_H)
+	var dock_r := Rect2((size.x - DOCK_W) * 0.5, size.y - NAV_H - DOCK_H, DOCK_W, DOCK_H)
 	var ui: Array = [
 		Rect2(0, 0, size.x, 92.0),
 		Rect2(size.x * 0.5 - 176.0, _roster_y(), 352.0, 126.0),
@@ -4521,7 +6425,7 @@ func _draw_town_labels() -> void:
 		# 牌子离建筑老远，看着像别人的。
 		var over_dock: bool = own.end.x > dock_r.position.x \
 			and own.position.x < dock_r.end.x
-		var sunk: bool = over_dock and base_y > size.y - DOCK_H
+		var sunk: bool = over_dock and base_y > size.y - NAV_H - DOCK_H
 		var cands: Array = []
 		if sunk:
 			# 放在**建筑内部靠顶**，不是顶部外面：
@@ -4572,7 +6476,7 @@ func _draw_town_labels() -> void:
 		# 所有候选都被判越界，回退位置正好在 dock 后面 —— 等于没有名牌）。
 		# M67：只对**横向与 dock 重叠**的牌子生效，两侧的可以到底。
 		if pick.x + pw > dock_r.position.x and pick.x < dock_r.end.x:
-			pick.y = minf(pick.y, size.y - DOCK_H - 34.0)
+			pick.y = minf(pick.y, size.y - NAV_H - DOCK_H - 34.0)
 		else:
 			pick.y = minf(pick.y, size.y - 34.0)
 		var lr := Rect2(pick.x, pick.y, pw, 26.0)
@@ -4607,23 +6511,69 @@ func _draw_roster_strip(ids: Array, alive_n: int) -> void:
 		DdTheme.FONT_LG, DdTheme.TEXT)
 	# 「存活 5 · 上限 4」在字号提了两档之后会顶到右边的「全部 ›」（M72），
 	# 缩成「活 5/4」——这一条本来就只是给「我这趟能带几个」看的。
-	_text(Vector2(x0 + 116.0, y0 + 25.0),
-		"活 %d/%d" % [alive_n, Campaign.PARTY_MAX], DdTheme.FONT_TAG, DdTheme.DIM)
+	# 「活 5/4」这个写法本身就在制造误会（M94）：活着 5 个、上限 4 个，
+	# 读起来像「系统不让我带满」。真正该看的是**能出征几个**——
+	# 疗养院里的人活着，但这趟带不走。改成可出征数，一眼就对上。
+	# 只读展示，**不改** `_prep_party`：这一条是「本趟阵容」的镜子，
+	# 不该在这里决定了出征名单。
+	# 名单为空（还没选过）时退到「能出征的前 4 个」——
+	# 直接调 `_party_for` 会被课题等级过滤（高等级英雄进不了低级本），
+	# 结果整条显示成 4 个空槽（M127 第一版就是这样）。
+	# 名册条要**过滤死人和忙人**（M191）。
+	# 原来直接 `_prep_party.duplicate()`，而阵亡的人还留在出征名单里
+	# （解雇才移除，死亡不移除）—— 于是队伍已经死伤大半，
+	# 城镇这条名册还在显示「上阵 4/4」四个正常人。
+	# 用户原话：「我明明战死 2 个了，这里还是显示 4 个正常人」。
+	var show_ids: Array = []
+	if campaign != null:
+		for h_show in _prep_party:
+			var r_show: Dictionary = campaign.hero(str(h_show))
+			if bool(r_show.get("alive", false)) and campaign.busy_of(str(h_show)) <= 0:
+				show_ids.append(str(h_show))
+	if show_ids.is_empty() and campaign != null:
+		# 其次是**存档里的名单**（M114 存的那份）：刚启动/切后台回来时
+		# 内存里的 `_prep_party` 还是空的，但玩家的选择在档里。
+		show_ids = campaign.party_ids.duplicate()
+	if show_ids.is_empty() and campaign != null:
+		show_ids = campaign.selectable_ids().slice(0, Campaign.PARTY_MAX)
+	var can_go: int = campaign.selectable_ids().size()
+	# 标题右侧原本写「可出征 N/4」，但名册条画的是**上阵的 4 个格子**，
+	# 两个数字对不上会让人以为系统不让他带满。现在直接报「上阵 N/4」。
+	_text(Vector2(x0 + 152.0, y0 + 25.0),
+		"上阵 %d/%d" % [mini(show_ids.size(), Campaign.PARTY_MAX), Campaign.PARTY_MAX],
+		DdTheme.FONT_TAG,
+		DdTheme.DIM if can_go >= Campaign.PARTY_MAX else DdTheme.WARN)
 	# 用 TEXT 不用 PARTY：皮肤主色偏冷灰，压在深底上几乎看不见，
 	# 而这个入口是「怎么看全部人」的唯一线索，必须能看见。
 	_text(Vector2(x0 + w - 62.0, y0 + 25.0), "全部 ›", DdTheme.FONT_BD,
 		DdTheme.TEXT if head_r.has_point(_mouse) else DdTheme.DIM,
 		HORIZONTAL_ALIGNMENT_RIGHT, 50.0)
-	var n: int = mini(ids.size(), 5)
+	# 这条显示的是**上阵的 4 个人**（M127），不是名册前 5 个。
+	# 原来照着名册顺序排，玩家看不出「这周到底带谁下去」——
+	# 而这一条就在城镇正中，是每周看的第一眼。
+	var n: int = Campaign.PARTY_MAX
 	for i in n:
-		var hid: String = str(ids[i])
+		var hid: String = str(show_ids[i]) if i < show_ids.size() else ""
+		if hid.is_empty():
+			# 空位：虚线感的空槽 + 一个「空」字。名册里还有人也不补 ——
+			# 这 4 个格子表达的是「本趟阵容」，不是「我有哪些人」。
+			var er := Rect2(x0 + 14.0 + float(i) * 67.0, y0 + 38.0, 56.0, 56.0)
+			draw_rect(er, DdTheme.PANEL_EDGE, false, 1.0)
+			_text(Vector2(er.position.x, er.end.y - 18.0), "空", DdTheme.FONT_TAG,
+				DdTheme.FAINT, HORIZONTAL_ALIGNMENT_CENTER, 56.0)
+			continue
 		var pr := Rect2(x0 + 14.0 + float(i) * 67.0, y0 + 38.0, 56.0, 56.0)
 		var tex: Texture2D = _art.texture_of(campaign.def_of(hid))
+		# 在建筑里的人整张头像压暗（M94）：这条名册条原来完全看不出
+		# 「他这周不能用」，玩家的第一反应就是「我的人怎么不见了」。
+		var bz: int = campaign.busy_of(hid)
+		var tint: Color = Color(0.42, 0.42, 0.48, 1.0) if bz > 0 else Color(1, 1, 1, 1)
 		if tex != null:
-			draw_texture_rect(tex, pr, false)
+			draw_texture_rect(tex, pr, false, tint)
 		draw_rect(pr, DdTheme.PANEL_EDGE, false, 1.0)
 		_text(Vector2(pr.position.x, pr.end.y + 16.0), _hero_label(hid),
-			DdTheme.FONT_TAG, DdTheme.DIM, HORIZONTAL_ALIGNMENT_CENTER, 56.0)
+			DdTheme.FONT_TAG, DdTheme.FAINT if bz > 0 else DdTheme.DIM,
+			HORIZONTAL_ALIGNMENT_CENTER, 56.0)
 		_add_hit(pr, "hero_info:" + hid)
 
 
@@ -4684,9 +6634,13 @@ func _draw_dock() -> void:
 		Vector2(mx, my + 4.0), Vector2(mx - 4.0, my)]),
 		Color(0.56, 0.45, 0.22))
 
-	_dock_tab(dx + dw * 0.22, y0 + 66.0, 26.0, "town", "城镇", "town")
-	_dock_tab(dx + dw * 0.5, y0 + 60.0, 32.0, "gate", "出征", "gate", true)
-	_dock_tab(dx + dw * 0.78, y0 + 66.0, 26.0, "shop", "商店", "shop")
+	_dock_tab(dx + dw * 0.11, y0 + 66.0, 24.0, "town", "城镇", "town")
+	_dock_tab(dx + dw * 0.37, y0 + 60.0, 30.0, "gate", "出征", "gate", true)
+	# 队伍（M106）：装备、技能、上阵三件事放一屏。
+	# 原来它们分散在「商店→饰品货架」（装备）、「公会」（技能）、
+	# 「出发准备」（上阵）三个互不相干的地方，玩家根本拼不起来。
+	_dock_tab(dx + dw * 0.63, y0 + 66.0, 24.0, "guild", "队伍", "party")
+	_dock_tab(dx + dw * 0.89, y0 + 66.0, 24.0, "shop", "商店", "shop")
 
 
 ## dock 图标缓存。**不能每帧 load()**：在 `_draw()` 里同步加载，
@@ -4770,6 +6724,15 @@ func _dock_tab(cx: float, cy: float, rad: float, key: String, label: String,
 		var th: float = float(tex.get_height()) * k
 		draw_texture_rect(tex,
 			Rect2(cx - tw * 0.5, c.y - th * 0.5, tw, th), false, tint)
+	else:
+		# 没有图标就画个人形剪影（M123）：「队伍」这一项是后加的，
+		# 原素材里只有城镇/出征/商店三张图。留个空圆看起来像加载失败。
+		var hr: float = isz * 0.22
+		draw_circle(Vector2(cx, c.y - isz * 0.18), hr, tint)
+		draw_rect(Rect2(cx - hr * 1.5, c.y - isz * 0.02, hr * 3.0, isz * 0.30),
+			tint, true)
+		draw_circle(Vector2(cx - isz * 0.24, c.y + isz * 0.10), hr * 0.72, tint)
+		draw_circle(Vector2(cx + isz * 0.24, c.y + isz * 0.10), hr * 0.72, tint)
 
 	var lab_c: Color = DdTheme.LIGHT if active else (
 		Color(0.92, 0.82, 0.60) if (hot or primary) else DdTheme.DIM)
@@ -4792,7 +6755,7 @@ func _dock_tab(cx: float, cy: float, rad: float, key: String, label: String,
 ## 「该送谁去疗养院、谁在忙、谁带了病」要在一屏里看全，就是这屏。
 ## 点任意一行仍然走原来的详情抽屉 —— 这里只做一览，不重复造详情。
 func _draw_roster_page() -> void:
-	var ids: Array = campaign.hero_ids()
+	var ids: Array = campaign.hero_ids_deployed_first()
 	var alive_n: int = campaign.alive_ids().size()
 	var stress_hi: int = 0
 	var sick: int = 0
@@ -4808,12 +6771,14 @@ func _draw_roster_page() -> void:
 			sick += 1
 		if campaign.busy_of(h) <= 0:
 			idle_n += 1
-	_header("名册", "存活 %d / %d · 空闲 %d · 压力过百 %d · 带病 %d" % [
-		alive_n, ids.size(), idle_n, stress_hi, sick])
+	# 字号放大 1.5 倍后这一行放不下了（"带病 N"被截在边缘外）。
+	# 带病人数在每张卡的属性行里有，副标题不重复（M138）。
+	_header("名册", "存活 %d/%d · 可出征 %d · 压力过百 %d" % [
+		alive_n, ids.size(), idle_n, stress_hi])
 
 	var top: float = float(DdTheme.HEADER_H) + 16.0
 	var btn_h: float = 56.0
-	var by: float = size.y - 44.0 - btn_h
+	var by: float = size.y - 44.0 - btn_h - NAV_H
 	var n: int = ids.size()
 
 	if n == 0:
@@ -4946,25 +6911,59 @@ func _draw_roster_row(r: Rect2, hid: String) -> void:
 
 	# 右上角状态：阵亡 > 忙 > 病/负 > 空闲。只写一件最要紧的，
 	# 一行塞三个标签在窄卡里会互相压。
+	# 优先级：阵亡 > 上阵 > 修养 > 带病 > 空闲（M127）。
+	# 加「上阵」和「空闲」是用户提的：原来只写「忙 N 周」，
+	# 看不出谁在阵容里、谁只是待着。
 	var tag: String = ""
 	var tag_c: Color = DdTheme.FAINT
 	if not alive:
 		tag = "阵亡"
 		tag_c = DdTheme.CRIT
+	elif _is_deployed(hid):
+		tag = "上阵"
+		tag_c = DdTheme.OK
 	elif campaign.busy_of(hid) > 0:
-		tag = "忙 %d 周" % campaign.busy_of(hid)
-		tag_c = DdTheme.WARN
+		tag = "修养 %d 周" % campaign.busy_of(hid)
+		tag_c = DdTheme.PARTY
 	elif campaign.diseases_of(hid).size() > 0:
 		tag = "病 %d" % campaign.diseases_of(hid).size()
 		tag_c = DdTheme.WARN
-	elif campaign.negative_quirks_of(hid).size() > 0:
-		tag = "负 %d" % campaign.negative_quirks_of(hid).size()
-		tag_c = DdTheme.WARN
 	else:
+		# 「负 N」不再占这一格（M127）：几乎每个人都有负面怪癖，
+		# 它把「空闲」挤掉之后，四个人全显示「负 1」，等于没有状态。
+		# 怪癖明细在详情抽屉里，这里只回答「这人这周能不能用」。
 		tag = "空闲"
-		tag_c = DdTheme.OK
-	_text(Vector2(r.end.x - 92.0, r.position.y + 24.0), tag, DdTheme.FONT_TAG, tag_c,
+		tag_c = DdTheme.DIM
+	# 色点 + 文字（M127）：用户要「明确的图标标识」。
+	# 圆点用状态色，文字跟在右边 —— 比纯文字扫得快，也不占额外高度。
+	#
+	# 这一块**可点**（M128）：点「上阵」= 下阵，点「空闲」= 上阵。
+	# 名册页原来只能看，要改阵容得跑队伍屏，多一步且不直观。
+	var can_toggle: bool = alive and campaign.busy_of(hid) <= 0
+	var tag_r := Rect2(r.end.x - 128.0, r.position.y + 4.0, 116.0, 32.0)
+	var tag_hot: bool = can_toggle and tag_r.has_point(_mouse)
+	draw_circle(Vector2(r.end.x - 100.0, r.position.y + 20.0), 5.0,
+		tag_c.lightened(0.25) if tag_hot else tag_c)
+	_text(Vector2(r.end.x - 92.0, r.position.y + 24.0), tag, DdTheme.FONT_TAG,
+		tag_c.lightened(0.3) if tag_hot else tag_c,
 		HORIZONTAL_ALIGNMENT_RIGHT, 78.0)
+	if not alive:
+		# 阵亡的人右上角给一个**快捷复活**（M153）：原来只写「阵亡」两个字，
+		# 想复活得先跑马车、再在里面找这个人。死人排到末尾之后，
+		# 这一格正好空出来 —— 和公会的「升技能」是同一个道理。
+		var rcost: int = int((campaign.effective_recruit_cost(hid) as Dictionary).get("gold", 0))
+		var can_rv: bool = campaign.can_recruit(hid)
+		# 宽度 120 → 148：「复活 1000 金」五个字加数字放不进 120，
+		# 末尾的「金」被切掉 —— 而它正是单位（M153）。
+		_add_button(Rect2(r.end.x - 160.0, r.position.y + 4.0, 148.0, 32.0),
+			"revive:" + hid, "复活 %d 金" % rcost, can_rv)
+	if can_toggle:
+		# 悬停时在下面补一句动作提示：光靠「标签能点」这件事没人猜得到。
+		if tag_hot:
+			_text(Vector2(r.end.x - 128.0, r.position.y + 40.0),
+				"点此下阵" if _is_deployed(hid) else "点此上阵",
+				DdTheme.FONT_TAG, DdTheme.CRIT, HORIZONTAL_ALIGNMENT_RIGHT, 116.0)
+		_add_hit(tag_r, "roster_deploy:" + hid)
 
 	_hit_overlay(r, "hero_info:" + hid)
 	_add_hit(r, "hero_info:" + hid)
@@ -4983,7 +6982,7 @@ func _draw_gate() -> void:
 	var gap: float = 10.0
 	# 行高按剩余高度算：固定 150 会让整页下面空 400px（1334 的屏只用到 750）
 	var btn_h: float = 56.0
-	var by: float = size.y - 44.0 - btn_h
+	var by: float = size.y - 44.0 - btn_h - NAV_H
 	var row_h: float = clampf((by - 14.0 - top - gap * 3.0) / 4.0, 110.0, 240.0)
 	var lx: float = 24.0
 	var lw: float = 214.0
@@ -5063,6 +7062,198 @@ func _fit_count(quest_level: int) -> int:
 	return campaign.fit_count(quest_level)
 
 
+## 恢复出发准备屏的补给包（M116）。
+##
+## 存过就用存档那份；没存过（新档 / 旧档）才回退到保底包。
+## 只保留还认识的行 —— 补给表删过条目的话，旧档里会有已经不存在的 id。
+func _restore_prep_pack() -> Dictionary:
+	var d: Dictionary = _default_prep_pack()
+	if campaign == null or campaign.supply_pack.is_empty():
+		return d
+	for k in campaign.supply_pack.keys():
+		if d.has(str(k)):
+			d[str(k)] = int(campaign.supply_pack[k])
+	return d
+
+
+## 把名单从「内存 → 存档 → 默认」三层兜底里取出来，供**修改**用。
+##
+## 只读展示可以用 `_is_deployed` 现算，但一改就得有一份真的数组在手上，
+## 否则「显示 4 个人、改完发现名单是空的」。
+func _ensure_party() -> void:
+	if not _prep_party.is_empty() or campaign == null:
+		return
+	if not campaign.party_ids.is_empty():
+		_prep_party = campaign.party_ids.duplicate()
+	else:
+		_prep_party = _party_restore(_prep_level)
+
+
+## 名册页直接上下阵（M128）。每条拒绝都要说清原因 ——
+## 「点了没反应」比「点不动」糟得多。
+func _toggle_deploy(hid: String) -> void:
+	if campaign == null:
+		return
+	_ensure_party()
+	var row: Dictionary = campaign.hero(hid)
+	if not bool(row.get("alive", false)):
+		_flash_msg("他已经阵亡了 —— 去马车复活")
+		return
+	if campaign.busy_of(hid) > 0:
+		_flash_msg("他在修养（还剩 %d 周），这周不能出征" % campaign.busy_of(hid))
+		return
+	if _prep_party.has(hid):
+		if _prep_party.size() <= 1:
+			_flash_msg("至少要留一个人")
+			return
+		_prep_party.erase(hid)
+		_flash_msg("%s 下阵" % _hero_label(hid))
+	elif _prep_party.size() >= Campaign.PARTY_MAX:
+		_flash_msg("出征最多 %d 人 —— 先下阵一个" % Campaign.PARTY_MAX)
+		return
+	else:
+		_prep_party.append(hid)
+		_flash_msg("%s 上阵" % _hero_label(hid))
+	_party_persist()
+	queue_redraw()
+
+
+## 这个人在不在本趟阵容里（M127）。
+##
+## 三层兜底，和名册条的取法保持一致：内存名单 → 存档名单 → 能出征的前四个。
+## 只用 `_prep_party` 的话，直接从名册页进来（没经过城镇）时它是空的，
+## 所有人都被判成「没上阵」——而那时左上角还写着「名册 4 人」。
+func _is_deployed(hid: String) -> bool:
+	if campaign == null:
+		return false
+	if not _prep_party.is_empty():
+		return _prep_party.has(hid)
+	if not campaign.party_ids.is_empty():
+		return campaign.party_ids.has(hid)
+	return campaign.selectable_ids().slice(0, Campaign.PARTY_MAX).has(hid)
+
+
+## 恢复玩家的出战名单（M114）。
+##
+## 优先用存档里的 `campaign.party_ids`；只有它为空（从没定过）才现算。
+## 存档里的人会被过滤：名册里没了、死了、这周在建筑里 —— 这三种都不能出征。
+## 过滤后只要还剩一个就用它，不自动补满：玩家少一个人是玩家自己的选择。
+func _party_restore(level: int) -> Array:
+	var out: Array = []
+	if campaign != null:
+		for hv in campaign.party_ids:
+			var k2: String = str(hv)
+			if not campaign.roster.has(k2):
+				continue
+			if not bool((campaign.roster[k2] as Dictionary).get("alive", false)):
+				continue
+			if campaign.busy_of(k2) > 0:
+				continue
+			if out.has(k2):
+				continue
+			out.append(k2)
+			if out.size() >= Campaign.PARTY_MAX:
+				break
+	if out.is_empty():
+		return _party_for(level)
+	return out
+
+
+## 把「进行中的这趟远征」写进存档（M116）。
+##
+## 战斗不存（见 `Expedition.to_save_dict` 的注释）：切后台时若正在打，
+## 恢复到战斗开始前的地图状态，这一场重打。
+func _exp_persist() -> void:
+	if campaign == null:
+		return
+	if exp == null or exp.ended:
+		campaign.expedition_run = {}
+	else:
+		var snap: Dictionary = exp.to_save_dict()
+		# 记下「切出去时停在哪一屏」（M117）。
+		# 只存远征数据的话，回来只能落在城镇、让玩家再点一次「继续」——
+		# 那不是继续，那是重新进入。玩家按 Home 键回个消息，回来应该在原地。
+		snap["ui_state"] = _state
+		snap["room"] = {
+			"step": _room_step.duplicate(true), "phase": _room_phase,
+			"kind": _room_kind, "room": _room_room, "lines": _room_lines.duplicate(),
+		}
+		campaign.expedition_run = snap
+	campaign.save()
+
+
+## 从存档恢复上一次没打完的远征（M116）。
+func _resume_expedition() -> void:
+	if campaign == null or db == null or campaign.expedition_run.is_empty():
+		return
+	var e: Expedition = Expedition.new()
+	e.db = db
+	if not e.from_save_dict(campaign.expedition_run):
+		_flash_msg("存档里的远征读不出来，只能重新出发")
+		return
+	exp = e
+	_dungeon = e.dungeon
+	_size = e.size_name
+	_level = e.dungeon_level
+	# 界面状态全部重置：这些都是「上一场」的残留，带进恢复后的远征会直接错乱
+	_battle = null
+	_ev_pos = 0
+	_order_ids = []
+	_order_cur = -1
+	_pending = {}
+	_options = []
+	_room_step = {}
+	_room_battle = false
+	_summoned_uids.clear()
+	_step_timer = 0.0
+	_log.clear()
+	_add_log("继续上一次远征：第 %d 步 · 光照 %.0f · 补给 火把 %d / 口粮 %d" % [
+		exp.step_index, exp.light, exp.torch, exp.food], DdTheme.OK)
+	# 回到切出去时那一屏（M117）。战斗是唯一回不去的（见 `_exp_persist`），
+	# 那种情况退回地图 —— 这一场重打，但整趟还在。
+	var us: int = int(campaign.expedition_run.get("ui_state", S_MAP))
+	# 战斗（M118）：有快照就原地接着打，从这一回合开头。
+	# 重建走一遍 `exp.resume_battle()`，装配逻辑和正常开战完全一致。
+	var bs: Dictionary = campaign.expedition_run.get("battle", {})
+	if us == S_BATTLE and not bs.is_empty():
+		var rb: Battle = exp.resume_battle(bs)
+		if rb != null:
+			_battle = rb
+			_battle.decision_provider = func(_b: Battle, _a: Combatant) -> Dictionary: return {}
+			_battle_no += 1
+			_battle_corridor = false
+			_summoned_uids.clear()
+			_order_ids = []
+			_order_cur = -1
+			_ev_pos = 0
+			_state = S_BATTLE
+			queue_redraw()
+			return
+	if us == S_ROOM:
+		var rd: Dictionary = campaign.expedition_run.get("room", {})
+		_room_step = (rd.get("step", {}) as Dictionary).duplicate(true)
+		_room_phase = int(rd.get("phase", 0))
+		_room_kind = str(rd.get("kind", ""))
+		_room_room = int(rd.get("room", -1))
+		_room_lines = (rd.get("lines", []) as Array).duplicate()
+		# 卡背后没有地图可垫（M80 之后地图是子节点），但房间卡本身能正常显示
+		_state = S_ROOM if not _room_step.is_empty() or _room_phase == 1 else S_MAP
+	else:
+		_state = S_MAP
+	queue_redraw()
+
+
+## 把当前出战名单写回存档（M114）。
+##
+## 名单原来只活在界面变量里，切后台被系统回收 = 白改。现在每一次
+## 「上阵/下阵」都落盘：宁可多写几次存档，也不要让玩家的选择凭空消失。
+func _party_persist() -> void:
+	if campaign == null:
+		return
+	campaign.party_ids = _prep_party.duplicate()
+	campaign.save()
+
+
 ## 默认出战名单：够格的人里，**最能打的那 4 个**（M27）。
 ##
 ## 不能直接用 `Campaign.default_party()`——它不知道这一趟打几级。
@@ -5117,7 +7308,11 @@ func _draw_hero_tile(hid: String, r: Rect2) -> void:
 		tx = r.position.x + 46.0
 
 	# 名字最长四字（瘟疫医生），13px 约 52px
-	_text(Vector2(tx, r.position.y + 22), _hero_label(hid), DdTheme.FONT_BD, DdTheme.TEXT if alive else DdTheme.FAINT)
+	var busy: int = campaign.busy_of(hid)
+	# 忙的人名字降一档（M94）：原来他和空闲的人长得一模一样，
+	# 只有右上角一个小沙漏，玩家扫一眼分不出「这周谁能出征」。
+	_text(Vector2(tx, r.position.y + 22), _hero_label(hid), DdTheme.FONT_BD,
+		DdTheme.TEXT if (alive and busy <= 0) else DdTheme.DIM)
 
 	# 忙要单独标：名册里「忙」和「阵亡」看起来一样（都是不能出征），
 	# 但一个是等几周、一个是花钱重招。不区分玩家会点进去骂人。
@@ -5125,7 +7320,6 @@ func _draw_hero_tile(hid: String, r: Rect2) -> void:
 	# M63：改成「沙漏图标 + 周数」。卡片 150 宽、右上只剩 52px，
 	# 「忙 2 周」四个字正好占满，任何再长一点的文案都会顶掉名字；
 	# 图标之后只剩 12px，数字怎么涨都不会挤。
-	var busy: int = campaign.busy_of(hid)
 	if alive and busy > 0:
 		var bt_s: String = str(busy)
 		var bt_w: float = _font.get_string_size(bt_s, HORIZONTAL_ALIGNMENT_LEFT, -1,
@@ -5205,6 +7399,9 @@ func _draw_hero_tile(hid: String, r: Rect2) -> void:
 # ============================================================
 
 func _draw_map() -> void:
+	if _supply_open:
+		_draw_supply_panel()
+		return
 	if exp == null:
 		return
 	var tier: String = ExpeditionCfg.light_tier_name(exp.light)
@@ -5214,9 +7411,11 @@ func _draw_map() -> void:
 
 	# —— 资源条 ——
 	var y: float = 76.0
+	# 条从 60 改成 78（M142）：字号放大 1.5 倍后「光照」两个字宽到 64，
+	# 正好压在条头上 —— 数字 "65" 也跟着挤。整套一起右移。
 	_text(Vector2(24, y), "光照", DdTheme.FONT_MD, DdTheme.DIM)
-	_bar(Rect2(60, y - 10, 148, 12), exp.light / 100.0, DdTheme.LIGHT, DdTheme.PANEL_DEEP)
-	_text(Vector2(214, y), "%.0f · %s" % [exp.light, tier], DdTheme.FONT_MD, DdTheme.LIGHT if exp.light < 50.0 else DdTheme.DIM)
+	_bar(Rect2(78, y - 10, 132, 12), exp.light / 100.0, DdTheme.LIGHT, DdTheme.PANEL_DEEP)
+	_text(Vector2(216, y), "%.0f · %s" % [exp.light, tier], DdTheme.FONT_MD, DdTheme.LIGHT if exp.light < 50.0 else DdTheme.DIM)
 	# 资源条（M63）：口粮改成「图标 + 数字」，后面几项改成顺序排。
 	#
 	# 原来六项写死在 316 / 386 / 456 / 524 / 592 这几个 x 上，
@@ -5299,17 +7498,33 @@ func _draw_map() -> void:
 	if _map_layer != null:
 		_map_layer.position = grid_r.position
 		_map_layer.size = grid_r.size
-		_map_layer.show()
-		_map_layer.queue_redraw()
+		# 弹窗 / 补给面板 / 英雄长按浮层开着时**不能** show（M194 / M201）。
+		# `_draw()` 开头已经把子节点收起来了，这里原来无条件 `show()`，
+		# 一句就把那次 hide 抵消掉 —— 表现是「遮罩画了、格子照样压在弹窗上」，
+		# 而且代码看起来两处都对。
+		if not (_dlg_open or _supply_open or _hold_shown.begins_with("hero_stat:")):
+			_map_layer.show()
+			_map_layer.queue_redraw()
 	_draw_room_panel(room_r)
 	_draw_party_strip(party_r)
+	# 「能拖」这件事必须写出来（M185）：拖拽是没有视觉线索的交互，
+	# 不写玩家永远不知道；而队伍屏那行提示在地图上根本看不见。
+	_text(Vector2(party_r.position.x, party_r.position.y - 6.0),
+		"拖动卡片可换站位", DdTheme.FONT_TAG, DdTheme.FAINT,
+		HORIZONTAL_ALIGNMENT_LEFT, party_r.size.x)
 	_draw_log_bar(log_r)
+	# 背包余量（M105）：地图上原来**完全看不到**身上还有几支火把、几份口粮。
+	# 而「点火把」「休整」都是消耗品驱动的动作 —— 玩家点下去才知道没了，
+	# 这是回合制里最不该出现的信息缺口。放在操作区正上方，和消耗它的按钮同屏。
+	_supply_row(Vector2(m, act_r.position.y - 14.0), act_r.size.x)
 	_draw_map_actions(act_r)
 	_text(Vector2(m, size.y - 12.0),
 		"光照决定你能提前看见多远：明亮侦察 +15%、微光 +7.5%，昏暗以下基本摸黑。",
 		DdTheme.FONT_TAG, DdTheme.FAINT)
 	# 走廊事件横幅（M75）：画在最后，压在网格上，不拦操作
 	_draw_map_banner()
+	# 事件弹窗（M194）压在最上层：它会清掉底部按钮，所以必须在它们之后调
+	_draw_event_dialog()
 
 
 ## 房间图。只画「已经探明」的房间——没探明的连位置都不显示，
@@ -5424,7 +7639,13 @@ func _draw_grid_map_on(ci: CanvasItem, r: Rect2) -> void:
 		if bool(e.get("walked", false)):
 			_dci().draw_line(ca, cb, Color(DdTheme.LIGHT.r, DdTheme.LIGHT.g, DdTheme.LIGHT.b, 0.65), 5.0)
 		else:
-			_dci().draw_dashed_line(ca, cb, DdTheme.DIM, 2.0, 5.0)
+			# 未走过的走廊画**细实线**而不是虚线（M159）。
+			#
+			# 虚线在大地图上读作「这条路不通 / 只是示意」—— 而它其实**能走**，
+			# 斜着连的对角房间尤其明显（用户就是这么误解的）。
+			# 现在两条线只差明暗：走过的亮、没走过的暗，都明确是路。
+			_dci().draw_line(ca, cb, Color(DdTheme.DIM.r, DdTheme.DIM.g,
+				DdTheme.DIM.b, 0.45), 2.5)
 		_edge_badge((ca + cb) * 0.5, exp.edge_kind(ei_now))
 
 	# 房间
@@ -5439,6 +7660,10 @@ func _draw_grid_map_on(ci: CanvasItem, r: Rect2) -> void:
 		var kind: String = str(rr["kind"])
 		var visited: bool = bool(rr.get("visited", false))
 		var is_cur: bool = rid == exp.current_room
+		# 「站在门口、里面还有东西」这一格必须能点（M146）。
+		# 原来只有 `movable`（相邻房间）才注册命中区，而玩家自己脚下那间
+		# 永远不相邻于自己 —— 于是提示写着「点脚下这一格」，点半天没反应。
+		var enterable: bool = is_cur and exp.has_pending_room()
 		var movable: bool = _is_adjacent(rid)
 
 		_dci().draw_rect(box, DdTheme.PANEL_HI if visited else DdTheme.PANEL)
@@ -5498,13 +7723,85 @@ func _draw_grid_map_on(ci: CanvasItem, r: Rect2) -> void:
 		# 四个字要 44px 宽、11px 高，78 高的格子里会压在图标下缘。
 		# M79 框放大到 170×138 之后，这行字可以再大一号，但得垫一条暗底
 		# —— 直接压在房间图上读不出来。
-		if is_cur and box.size.x >= 46.0 and box.size.y >= 88.0:
-			_dci().draw_rect(Rect2(box.position.x + 6.0, box.position.y + box.size.y - 24.0,
-				box.size.x - 12.0, 20.0), Color(0.0, 0.0, 0.0, 0.55))
-			_text(Vector2(box.position.x, box.position.y + box.size.y - 8.0), "你在这里",
-				DdTheme.FONT_MD, DdTheme.CRIT, HORIZONTAL_ALIGNMENT_CENTER, box.size.x)
+		if is_cur:
+			# 印章（M160）：**整个落在格子内部**的右上角。
+			#
+			# M141 那版半径 21、圆心在框角外 4px，一半压在相邻格上 ——
+			# 选中的房间会画一圈外框，两者叠在一起时框会盖住印章
+			# （用户原话「有时候是框画在标签前面」）。缩到 r=15 并移进框内，
+			# 和任何外框都不会相交。
+			var sc := box.position + Vector2(box.size.x - 17.0, 17.0)
+			var srad: float = 15.0
+			_dci().draw_circle(sc, srad, Color(0.72, 0.15, 0.12, 0.96))
+			_dci().draw_arc(sc, srad, 0.0, TAU, 28, Color(0.98, 0.86, 0.55, 1.0), 2.0)
+			_dci().draw_arc(sc, 10.5, 0.0, TAU, 22, Color(0.98, 0.86, 0.55, 0.5), 1.2)
+			_text(Vector2(sc.x - 15.0, sc.y + 6.0), "你", DdTheme.FONT_TAG,
+				Color(1.0, 0.95, 0.82), HORIZONTAL_ALIGNMENT_CENTER, 30.0)
+		elif visited:
+			# 走过的房间：左上角一枚小实心点（M160）。
+			# 和「已探索」文字标签重复，但两者在不同缩放级别起作用 ——
+			# 地图缩小时字读不清，一个点还能看见。
+			_dci().draw_circle(box.position + Vector2(8.0, 8.0), 5.0,
+				Color(0.42, 0.62, 0.38, 0.95))
+			_dci().draw_arc(box.position + Vector2(8.0, 8.0), 5.0, 0.0, TAU, 16,
+				Color(0.85, 0.92, 0.8, 0.8), 1.2)
 
-		if movable:
+		if enterable:
+			# 门口待进入：金色描边 + 底部居中「互动」（M155）
+			_dci().draw_rect(box, DdTheme.CRIT, false, 3.0)
+		# 「已探索」标在**所有走过的房间**上（M159），不只当前那间。
+		# 原来只在 `is_cur` 时画，玩家扫一眼地图看不出哪几间已经翻过 ——
+		# 而「哪些还没去」正是选下一站时最需要的信息。
+		if visited or is_cur:
+			var pend: bool = is_cur and (exp.has_pending_room() or _show_interact)
+			var lb_txt: String = "互动" if pend else "已探索"
+			var lb_col: Color = DdTheme.CRIT if pend else DdTheme.OK
+			var lb_w: float = 64.0 if lb_txt == "已探索" else 44.0
+			var lb_x: float = box.position.x + (box.size.x - lb_w) * 0.5
+			var lb_y: float = box.position.y + box.size.y - 16.0
+			# 「互动」做成呼吸式闪烁（M190）+ 缩放呼吸（M192）：
+			# 这一格不点，整局就卡在这 —— 它不是一个提示，是一道**闸门**。
+			# 静态小标签太容易被略过（用户原话「最好做成动态动画性质，时刻提醒着玩家」）。
+			# 相位用绝对时间算，不靠累加 —— 重绘频率变了速度也不会变。
+			var lb_bg: Color = Color(0.0, 0.0, 0.0, 0.72)
+			var lb_scale: float = 1.0
+			var pulse: float = 0.0
+			if pend:
+				var ph: float = fmod(Time.get_ticks_msec() / 1000.0 * 2.2, TAU)
+				# 0→1→0，用 cos 起跳：标签从原大小开始，吸满再落回，
+				# 不会出现"一进这一屏就已经是大的"那种跳变。
+				pulse = 0.5 - 0.5 * cos(ph)
+				lb_bg = Color(0.0, 0.0, 0.0, 0.45 + 0.35 * pulse)
+				lb_col = DdTheme.CRIT.lerp(Color(1.0, 0.93, 0.75), pulse)
+				# 只放大、不缩小：标签底边贴着房间框，缩到 1.0 以下会离线看不清。
+				# 26% 是上限（44×16 → 55×20）：再大就会盖住格子里的图标。
+				lb_scale = 1.0 + 0.26 * pulse
+			# 缩放必须围绕标签中心，否则放大时右下角会顶出房间框。
+			# 用 draw_set_transform 而不是手动改矩形：字是 draw_string 画的，
+			# 只改矩形会出现"框变大了、字没变"的两层分离感。
+			var lb_c: Vector2 = Vector2(lb_x + lb_w * 0.5, lb_y + 8.0)
+			var tf: bool = pend and lb_scale > 1.001
+			if tf:
+				_dci().draw_set_transform(lb_c, 0.0, Vector2(lb_scale, lb_scale))
+			var ox: float = -lb_c.x if tf else 0.0
+			var oy: float = -lb_c.y if tf else 0.0
+			_dci().draw_rect(Rect2(lb_x + ox, lb_y + oy, lb_w, 16.0), lb_bg)
+			if pend:
+				# 外圈跟着同一个 pulse 亮，边缘亮起时整格都在"叫"。
+				# 线宽也跟着 pulse 走：只变亮度在扫视时不够扎眼，
+				# 加粗的那一瞬间整块标签会"顶"出来。
+				var ring_a: float = 0.35 + 0.65 * pulse
+				_dci().draw_rect(Rect2(lb_x + ox - 2.0, lb_y + oy - 2.0, lb_w + 4.0, 20.0),
+					Color(DdTheme.CRIT.r, DdTheme.CRIT.g, DdTheme.CRIT.b, ring_a), false,
+					1.5 + 1.0 * pulse)
+			_text(Vector2(lb_x + ox, lb_y + oy + 13.0), lb_txt, DdTheme.FONT_TAG, lb_col,
+				HORIZONTAL_ALIGNMENT_CENTER, lb_w)
+			if tf:
+				# 立刻复位：draw_set_transform 是全局的，漏掉会把后面所有格子
+				# 一起缩放（症状是"越往下画缩得越小"，而且不报错）。
+				_dci().draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+
+		if movable or enterable:
 			# 房间原来完全没反馈：网格里几十个格子，鼠标划过不知道哪个能去。
 			_hit_overlay(box, "room:%d" % rid)
 			# 命中区存**屏幕坐标**（M80）：`box` 是地图子节点的局部坐标，
@@ -5727,7 +8024,8 @@ func _room_panel_h() -> float:
 	if kind == MapGen.K_GOAL and not exp.quest_met():
 		lines_n = 2
 	var has_qi: bool = not _quest_items_line().is_empty()
-	var h: float = (98.0 if has_qi else 88.0) + float(lines_n) * 20.0 + 18.0
+	# 起点跟着任务行一起下移（M204）：任务行提到 FONT_MD 之后多占 10px。
+	var h: float = (108.0 if has_qi else 98.0) + float(lines_n) * 20.0 + 18.0
 	h += float(maxi(1, rows.size())) * 17.0
 	h += 30.0     # 「点地图上的绿框走过去」
 	h += 26.0     # 底部「出口在 N 步之外」+ 下边距
@@ -5748,18 +8046,31 @@ func _draw_room_panel(r: Rect2) -> void:
 	# 再塞一句会把两个数叠在一起（缩放窗口就复现）。
 	var ql: String = _quest_line()
 	if not ql.is_empty():
-		_text(Vector2(r.position.x + 14, r.position.y + 66), "任务 " + ql,
-			DdTheme.FONT_TAG, DdTheme.OK if exp.quest_met() else DdTheme.WARN,
-			HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 28.0)
+		# 字号 TAG → MD（M204）：这行是「这一趟到底要干什么、走到哪了」的唯一答案，
+		# 原来和「位置 0 · 已走 0 步」一个尺寸，扫一眼根本注意不到
+		# —— 用户说的是「完全没有任何进度提示」，其实有，只是看不见。
+		var qkind: String = str(exp.quest_goal.get("kind", ""))
+		var pr: Vector2i = QuestGoal.progress(exp.quest_goal, exp.quest_state())
+		var has_bar: bool = pr.y > 0 and qkind != QuestGoal.KIND_REACH
+		_text(Vector2(r.position.x + 14, r.position.y + 68), "任务 " + ql,
+			DdTheme.FONT_MD, DdTheme.OK if exp.quest_met() else DdTheme.WARN,
+			HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 28.0 - (100.0 if has_bar else 0.0))
+		# 进度条（M204）：清剿 3/4、收集 2/3 这类有分母的任务，数字之外再给一条 ——
+		# 扫一眼就知道还差多少，而不用逐字读数字。
+		if has_bar:
+			# 轨道用 `PANEL_EDGE` 而不是 `PANEL_DEEP`（M204）：进度 0/4 时只画轨道，
+			# 而深色轨道和面板底几乎同色 —— 看起来像「没画进度条」。
+			_bar(Rect2(r.end.x - 110.0, r.position.y + 59.0, 96.0, 9.0),
+				clampf(float(pr.x) / float(pr.y), 0.0, 1.0), DdTheme.OK, DdTheme.PANEL_EDGE)
 	# 任务物品（M35）：只有带道具的任务才有这一行。
 	# 不显示的话玩家无法判断「还剩几次能激活」——而那直接决定要不要绕路。
 	var qi: String = _quest_items_line()
 	if not qi.is_empty():
-		_text(Vector2(r.position.x + 14, r.position.y + 78), qi,
+		_text(Vector2(r.position.x + 14, r.position.y + 90), qi,
 			DdTheme.FONT_TAG, DdTheme.FAINT, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 28.0)
 
 	# 有物品行时整体下移一行，避免和下面的房间状态挤在一起
-	var lines_y: float = r.position.y + (98.0 if not qi.is_empty() else 88.0)
+	var lines_y: float = r.position.y + (106.0 if not qi.is_empty() else 96.0)
 	var lines: Array = []
 	if kind == MapGen.K_GOAL:
 		# 目标房间不再无条件写「可以离开」（M32）：清剿任务走到出口
@@ -5800,7 +8111,14 @@ func _draw_room_panel(r: Rect2) -> void:
 		_text(Vector2(r.position.x + 14, ly), "→ %d 号 · %s" % [int(row["room"]), str(row["room_kind"])], DdTheme.FONT_MD, DdTheme.TEXT)
 		_text(Vector2(r.position.x + 168, ly), str(row["label"]), DdTheme.FONT_MD, row["col"])
 		ly += 17.0
-	_text(Vector2(r.position.x + 14, ly + 4), "点地图上的绿框走过去", DdTheme.FONT_SM, DdTheme.HEAL)
+	# 门口有内容时换一句话（M144）：这时玩家站在房间里，要点的**是脚下这一格**，
+	# 还写「点绿框走过去」会让他往别处走 —— 而这一间的内容还没触发。
+	if exp != null and exp.has_pending_room():
+		_text(Vector2(r.position.x + 14, ly + 4), "点脚下这一格 · 进去看看",
+			DdTheme.FONT_SM, DdTheme.CRIT)
+	else:
+		_text(Vector2(r.position.x + 14, ly + 4), "点地图上的绿框走过去",
+			DdTheme.FONT_SM, DdTheme.HEAL)
 
 	_text(Vector2(r.position.x + 14, r.position.y + r.size.y - 12),
 		"出口在 %d 步之外（按最短路算）" % _dist_to_goal(), DdTheme.FONT_SM, DdTheme.FAINT)
@@ -5810,34 +8128,79 @@ func _draw_room_panel(r: Rect2) -> void:
 ##
 ## 原来它们挤在右面板里，每个 34 高、340 宽 —— 竖屏下右面板没了，
 ## 而且那四个按钮是这一屏唯一能按的东西，值得占住拇指落点。
+## 一行补给余量（M105）。火把/口粮/铁锹有独立字段，其余在 `supplies` 里。
+##
+## 只列**大于 0** 的：六个都摆出来时，「解毒剂 0 · 绷带 0」这种空条目
+## 比不显示更占地方，还会让人误以为本来就没有。
+func _supply_row(pos: Vector2, w: float) -> void:
+	if exp == null:
+		return
+	# 火把 / 铁铲不列：顶部那条光照栏里已经各有一个计数（「火把 4」）。
+	# 同一屏重复出现两个数字，玩家会怀疑哪个才是真的。
+	# 口粮要列 —— 顶部没有，而「休整」按钮上写的是「口粮 2」，
+	# 那个 2 是**这次休整要花几份**，不是库存。
+	var bits: Array = []
+	if exp.food > 0:
+		bits.append("口粮 %d" % exp.food)
+	for k in (exp.supplies as Dictionary).keys():
+		var n: int = int(exp.supplies[k])
+		if n > 0:
+			bits.append("%s %d" % [DdNames.supply_name(str(k)), n])
+	if bits.is_empty():
+		_text(pos, "背包空了", DdTheme.FONT_TAG, DdTheme.WARN)
+		return
+	_text(pos, "背包　" + " · ".join(bits), DdTheme.FONT_TAG, DdTheme.DIM,
+		HORIZONTAL_ALIGNMENT_LEFT, w)
+
+
 func _draw_map_actions(r: Rect2) -> void:
 	if exp == null:
 		return
-	var acts: Array = []
-	if exp.at_goal():
-		acts.append(["leave", "离开地牢（完成远征）", true])
-	acts.append(["torch", "点火把 +光（剩 %d）" % exp.torch, exp.torch > 0])
-	acts.append(["camp", "休整（口粮 %d）" % int(
-		(exp.cfg.get("camp", {}) as Dictionary).get("food_cost", 2)), exp.can_camp()])
-	acts.append(["retreat", "撤退（全队 +%.0f 压力）" % db.rules.retreat_stress, true])
-	var gap: float = 12.0
-	# 只有 3 个（没到出口）时排一行 —— 2×2 会空出一格，看着像少画了一个
-	if acts.size() <= 3:
-		var bw3: float = (r.size.x - gap * float(acts.size() - 1)) / float(acts.size())
-		for i in acts.size():
-			var a3: Array = acts[i]
-			_add_button(Rect2(r.position.x + float(i) * (bw3 + gap), r.position.y, bw3, r.size.y),
-				str(a3[0]), str(a3[1]), bool(a3[2]))
-		return
-	var bw: float = (r.size.x - gap) * 0.5
-	var bh: float = (r.size.y - gap) * 0.5
-	for i in acts.size():
-		var col: int = i % 2
-		var row: int = i / 2
-		var a: Array = acts[i]
-		_add_button(Rect2(r.position.x + float(col) * (bw + gap),
-			r.position.y + float(row) * (bh + gap), bw, bh),
-			str(a[0]), str(a[1]), bool(a[2]))
+	# 3 列 × 2 行，**中间那一列跨两行**（M194 定版）。
+	#
+	#   [点火把] [        ] [休整]
+	#   [撤退  ] [互动探索] [补给]
+	#
+	# 中间那颗是这一屏唯一「往前走」的动作，给足两行的高度；
+	# 四个功能各占一角，手的落点固定，不用每次找。
+	var gap: float = 10.0
+	var cw: float = (r.size.x - gap * 2.0) / 3.0
+	var rh: float = (r.size.y - gap) * 0.5
+	var x0: float = r.position.x
+	var y0: float = r.position.y
+	var x1: float = x0 + cw + gap
+	var x2: float = x1 + cw + gap
+	var y1: float = y0 + rh + gap
+	# 文案压到 7–9 个字（M194）：三等分后每格只有 ~227px，
+	# 「✦ 点火把 +光（剩 4）」这种 13 字会被切掉尾巴 —— 和 M142 同一个坑。
+	_add_button(Rect2(x0, y0, cw, rh), "torch",
+		"✦ 点火把（%d）" % exp.torch, exp.torch > 0)
+	_add_button(Rect2(x2, y0, cw, rh), "camp",
+		"⌂ 休整（粮 %d）" % int((exp.cfg.get("camp", {}) as Dictionary).get("food_cost", 2)),
+		exp.can_camp())
+	# 撤退是**放弃**，用 danger（红）而不是 accent（金）——
+	# 金色留给「离开地牢」，那是这一趟的目的地（M142）。
+	_add_button(Rect2(x0, y1, cw, rh), "retreat",
+		"↩ 撤退 +%.0f 压" % db.rules.retreat_stress, true, true)
+	_add_button(Rect2(x2, y1, cw, rh), "supply_open",
+		"◈ 补给（%d）" % _supply_kinds(), true)
+	# 中间：**有待互动优先**（M203）。
+	#
+	# 这里原来的顺序是 `at_goal > pending`，而 BOSS 房恰好两条同时成立：
+	# 它是终点（at_goal），也有一场**待触发**的首领战（pending）。
+	# 于是走到 BOSS 房时，中间那颗直接变成「离开地牢」，
+	# 「互动探索」被顶掉 —— 玩家没有任何入口触发首领战，只能点离开，
+	# 结算时任务判未完成。用户报的「到了 BOSS 房间没打就赢了」就是这条。
+	# **位置永远在**：一会儿有一会儿没有，按钮会跳，玩家记不住在哪儿。
+	if exp.has_pending_room() or _show_interact:
+		_add_button(Rect2(x1, y0, cw, r.size.y), "enter_room", "▸ 互动探索", true, false, true)
+	elif exp.at_goal():
+		# 文案要区分任务达没达成：首领还没打时写「完成远征」是在骗人。
+		var done: bool = exp.quest_met()
+		_add_button(Rect2(x1, y0, cw, r.size.y), "leave",
+			"▣ 离开地牢" if done else "▣ 离开（未完成）", true, false, true)
+	else:
+		_add_button(Rect2(x1, y0, cw, r.size.y), "enter_room", "▸ 互动探索", false)
 
 
 ## 任务目标的一句话（M33）。核心层不认识名字表，所以奇物名在这里补上：
@@ -5846,7 +8209,28 @@ func _quest_line() -> String:
 	if exp == null or exp.quest_goal.is_empty():
 		return ""
 	var cid: String = str(exp.quest_goal.get("curio", ""))
-	return exp.quest_line(DdNames.curio_name(cid) if not cid.is_empty() else "")
+	var base: String = exp.quest_line(DdNames.curio_name(cid) if not cid.is_empty() else "")
+	# 探索类任务要给出**距离**（M204）。
+	#
+	# 清剿 / 收集 / 激活都有分母，`quest_line()` 会带上「3/4」；
+	# 而「走到出口」是个二元判据，原来只写四个字 —— 玩家在图上走，
+	# 完全不知道自己离出口还有多远，这就是「任务进度看不到」的来源。
+	if str(exp.quest_goal.get("kind", "")) == QuestGoal.KIND_REACH:
+		var d: int = _dist_to_goal()
+		base = "%s（还差 %d 步）" % [base, d] if d > 0 else "%s（已到达）" % base
+	# 补上「这玩意儿在哪片区域」（M156）。
+	# 原来只写「在『老树』上收集 3 件东西」—— 玩家不知道老树只在荒野出，
+	# 跑去遗迹翻一整趟也见不到。奇物的 region 在数据里，界面上没人用。
+	if cid.is_empty() or db == null:
+		return base
+	# 奇物表挂在 `db.curio_lib` 上，`db` 本身没有 `curios` 字段（M156 差点写错）
+	var reg: String = ""
+	if db.curio_lib != null and db.curio_lib.is_loaded():
+		var cdef: Dictionary = (db.curio_lib.curios.get(cid, {}) as Dictionary)
+		reg = str(cdef.get("region", ""))
+	if reg.is_empty() or reg == "ALL":
+		return base
+	return "%s（只在%s）" % [base, DdNames.dungeon_name(reg.to_lower())]
 
 
 ## 名册里的人显示成什么（M34）。
@@ -5922,10 +8306,12 @@ func _draw_party_strip(r: Rect2) -> void:
 		return
 	var gap: float = 12.0
 	var cw: float = (r.size.x - gap * float(n - 1)) / float(n)
+	_strip_rects = []
 	for i in n:
 		var hid: String = str(exp.hero_ids[i])
 		var s: Dictionary = exp.state.get(hid, {})
 		var cr := Rect2(r.position.x + float(i) * (cw + gap), r.position.y, cw, r.size.y)
+		_strip_rects.append({"id": hid, "rect": cr})
 		var dead: bool = bool(s.get("dead", false))
 		_panel(cr)
 		draw_rect(Rect2(cr.position, Vector2(cr.size.x, 3)),
@@ -5938,23 +8324,32 @@ func _draw_party_strip(r: Rect2) -> void:
 		_draw_hero_badge(hid, av_r, not dead)
 		var cx2: float = av_r.end.x + 10.0
 
-		_text(Vector2(cx2, cr.position.y + 24), _hero_label(hid), DdTheme.FONT_BD, DdTheme.FAINT if dead else DdTheme.TEXT)
-		_text(Vector2(cr.position.x + cr.size.x - 64, cr.position.y + 24),
-			"装备 %d" % _hero_gear(hid), DdTheme.FONT_SM, DdTheme.FAINT)
+		# 基线 24 → 32（M142）：FONT_BD 提到 22 之后，基线 24 等于把
+		# 字顶顶在卡片上边框上，名字看着像"贴"在框线上。
+		_text(Vector2(cx2, cr.position.y + 32), _hero_label(hid), DdTheme.FONT_BD, DdTheme.FAINT if dead else DdTheme.TEXT)
+		# 「装备 N」删掉（M149）。它是**装备阶**（0~4 级，铁匠铺升的），
+		# 不是「身上有几件装备」—— 字号放大后它又和名字挤在一起，
+		# 玩家读到「装备 0」会以为这人光着。阶数在队伍屏和详情里都有。
 
 		var hp_r: float = float(s.get("hp_ratio", 0.0))
 		var max_hp: int = _max_hp(hid)
 		var bar := Rect2(cx2, cr.position.y + 34, cr.end.x - cx2 - 12, 14)
-		_bar(bar, hp_r, DdTheme.HP, DdTheme.HP_TRACK)
+		_bar(bar, hp_r, _hp_color(true), DdTheme.HP_TRACK)
 		_text(Vector2(bar.position.x, bar.position.y + 11),
 			"%d / %d" % [int(round(hp_r * float(max_hp))), max_hp], DdTheme.FONT_TAG,
 			Color("#f2eee2"), HORIZONTAL_ALIGNMENT_CENTER, bar.size.x)
 
 		var st: float = float(s.get("stress", 0.0))
-		# 压力只留条形 + 中点刻度（M72）。字号提了两档之后，
-		# 「压力 0」单独占一行会把卡片最后一点余量吃光，字直接压到边框上。
-		# 条本身能读出「离崩溃还有多远」，精确值在战斗屏和详情卡里都有。
-		var sb := Rect2(bar.position.x, bar.position.y + 20, bar.size.x, 8)
+		# 压力数值（M199）：原来只有一条 8px 的条 + 中点刻度。
+		# 条只能回答「离崩溃远不远」，回答不了「现在到底多少」——
+		# 而崩溃线是 100、上限是 200 这件事，光看长度更读不出来（用户报的原文）。
+		# 数字放左边、条相应缩短：16px 的字压在 8px 的条上会溢出条外。
+		var snum_w: float = 26.0
+		_text(Vector2(bar.position.x, bar.position.y + 28.0), "%.0f" % st,
+			DdTheme.FONT_TAG, DdTheme.STRESS if st >= 100.0 else DdTheme.DIM,
+			HORIZONTAL_ALIGNMENT_LEFT, snum_w)
+		var sb := Rect2(bar.position.x + snum_w, bar.position.y + 20,
+			maxf(10.0, bar.size.x - snum_w), 8)
 		_bar(sb, st / 200.0, DdTheme.STRESS, DdTheme.STRESS_TRACK)
 		var midx: float = sb.position.x + sb.size.x * 0.5
 		draw_line(Vector2(midx, sb.position.y - 1.0), Vector2(midx, sb.end.y + 1.0),
@@ -6001,8 +8396,8 @@ func _draw_battle() -> void:
 	# M70：不再画顶部 header。那条铁牌搬到了两军之间（`_draw_battle_strip`）——
 	# 血条上移之后敌人头顶本来就挤，header 压在那儿只会更挤；
 	# 而「第几轮 / 光照多少」正好在两军中间，读的时候不用来回找。
-	var title: String = "战斗 · 第 %d 轮 · 光照 %.0f（%s）" % [
-		_battle.round_index, exp.light, tier]
+	var title: String = "第 %d 场 · 第 %d 轮 · 光照 %.0f（%s）" % [
+		maxi(1, _battle_no), _battle.round_index, exp.light, tier]
 
 	if not _fx_pose.is_empty():
 		for pu in _battle.party:
@@ -6060,6 +8455,7 @@ func _draw_battle() -> void:
 	# 战斗信息条（M70）：从顶部 header 搬下来，占两军之间那条空档。
 	# 和行动序条一样，属于界面，必须画在光照之后。
 	_draw_battle_strip(title, "点技能 → 点目标    点单位看状态")
+	_draw_party_status()
 
 	# 行动序条（M65）：画在光照之后 —— 它属于界面，被暗处压住就没法读了。
 	_draw_order_strip()
@@ -6167,7 +8563,7 @@ func _draw_unit_info() -> void:
 	var bx: float = r.position.x + 20.0
 	var bw: float = r.size.x - 40.0
 	var by: float = r.position.y + 72.0
-	_bar(Rect2(bx, by, bw, 14.0), u.hp_ratio(), DdTheme.HP, DdTheme.HP_TRACK)
+	_bar(Rect2(bx, by, bw, 14.0), u.hp_ratio(), _hp_color(u.is_hero), DdTheme.HP_TRACK)
 	_text(Vector2(bx + 8.0, by + 11.0), "%d / %d" % [u.hp, u.base_hp],
 		DdTheme.FONT_TAG, Color("#f2eee2"))
 	if u.is_hero:
@@ -6210,6 +8606,182 @@ func _draw_unit_info() -> void:
 ##
 ## 现在放进两军之间的空档（M69 把这条空档拉开到 72px）。
 ## 两侧各留 24：贴边会读成「另一条地面线」。
+## 我方状态一览（M162）：两军之间那条空档原来什么都没画。
+##
+## 战斗里玩家要判断「这人还能不能打」时，看的是 buff/debuff ——
+## 而原来只有把鼠标移到单位身上、或者去翻日志才能知道。
+## 现在每个英雄一行，把当前的增益/减益都摆出来：
+## `[▲攻 2]` = 攻击增益、还剩 2 回合；红块是减益。
+##
+## 用文字块而不是图标：`buffs.json` 里 2020 条数据**没有 icon 字段**，
+## 临时找图只会出现「一堆长得一样的箭头」。
+func _draw_party_status() -> void:
+	if _battle == null:
+		return
+	# 位置（M162 第二版）：第一版放在信息条下方（GROUND_ENEMY+54），
+	# 那里正好是**立绘的上半身** —— 四行字直接糊在英雄脸上。
+	# 真正的空档是立绘脚下到地面线之间那一段（GROUND_PARTY 往上 120）。
+	var row_h: float = 28.0
+	# 状态条挪到**立绘下方**（M187）。
+	#
+	# 原来 `top = GROUND_PARTY - 8 - n*28` —— 四行正好叠在自己人身上
+	# （半透明黑条压着腿和血条），而脚下到日志条之间空着 184px 没人用。
+	# 用户截图问「这块空地干嘛的」，答案是「没干嘛」，那就让状态条住进去。
+	var top: float = GROUND_PARTY + 12.0
+	var x0: float = 24.0
+	var full_w: float = size.x - 48.0
+	for i in _battle.party.size():
+		var u: Combatant = _battle.party[i]
+		if u.dead:
+			continue
+		var y: float = top + float(i) * row_h
+		var row := Rect2(x0, y, full_w, row_h - 4.0)
+		draw_rect(row, Color(0.02, 0.02, 0.026, 0.72))
+		draw_rect(row, Color(0.16, 0.15, 0.13, 0.9), false, 1.0)
+		# 名字（左 84 宽）+ 当前生命比例的小条
+		_text(Vector2(row.position.x + 8.0, row.position.y + 19.0),
+			DdNames.hero_name(u.def_id), DdTheme.FONT_TAG, DdTheme.TEXT,
+			HORIZONTAL_ALIGNMENT_LEFT, 96.0)
+		var hb := Rect2(row.position.x + 106.0, row.position.y + 11.0, 44.0, 8.0)
+		draw_rect(hb, DdTheme.HP_TRACK)
+		draw_rect(Rect2(hb.position, Vector2(hb.size.x * clampf(u.hp_ratio(), 0.0, 1.0), hb.size.y)),
+			DdTheme.HP)
+		var tx: float = row.position.x + 158.0
+		# 先把 buff 归并再画（M196）。
+		#
+		# 一次减益往往同时压三条属性（`attack_rating_add` / `damage_low_multiply` /
+		# `damage_high_multiply`），`_buff_short` 把三条全映射成「攻」，
+		# 于是同一件事被画成三个「▼攻」—— 玩家会以为中了三次。
+		# 归并键是「类别 + 增减 + 是否永久」：数值本来就按类别显示，分开列没有信息量。
+		var groups: Array = []
+		for b in u.buffs:
+			var amt: float = float(b.get("amount", 0.0))
+			if is_zero_approx(amt):
+				continue
+			var tag: String = _buff_short(str(b.get("stat_type", "")), str(b.get("stat_sub_type", "")))
+			if tag.is_empty():
+				continue
+			var rem: int = int(b.get("remaining", 0))
+			var pos_s: bool = amt > 0.0
+			var found: bool = false
+			for g in groups:
+				if str(g["tag"]) == tag and bool(g["pos"]) == pos_s and int(g["rem"]) == rem:
+					found = true
+					break
+			if not found:
+				groups.append({"tag": tag, "pos": pos_s, "rem": rem})
+		var drawn: int = 0
+		for g in groups:
+			if drawn >= 6:
+				_text(Vector2(tx, row.position.y + 19.0), "…",
+					DdTheme.FONT_TAG, DdTheme.FAINT)
+				break
+			var rem2: int = int(g["rem"])
+			# 0 = 永久（`combatant.tick_round` 里 remaining 0 的条目永不递减）。
+			# 原来直接印 "0"，玩家读成「0 回合 / 0 效果」——这是 M195 用户报的原文。
+			var rem_txt: String = "永" if rem2 == 0 else str(rem2)
+			var bw2: float = 62.0
+			var bcol: Color = DdTheme.OK if bool(g["pos"]) else DdTheme.CRIT
+			var br2 := Rect2(tx, row.position.y + 4.0, bw2, 18.0)
+			draw_rect(br2, Color(bcol.r, bcol.g, bcol.b, 0.16))
+			draw_rect(br2, bcol, false, 1.0)
+			_text(Vector2(br2.position.x + 2.0, br2.position.y + 14.0),
+				"%s%s %s" % ["▲" if bool(g["pos"]) else "▼", str(g["tag"]), rem_txt],
+				DdTheme.FONT_TAG, bcol, HORIZONTAL_ALIGNMENT_CENTER, bw2 - 4.0)
+			tx += bw2 + 4.0
+			drawn += 1
+		# 状态（M197）：崩溃/中毒/流血/眩晕/标记原来**完全不进这一栏**，
+		# 于是出现「头顶写着崩溃、下面写无状态」的矛盾（用户报的原文）。
+		# 状态不分增减，统一按负面配色；未收录的键跳过，别画出看不懂的字。
+		for sk in u.statuses.keys():
+			if drawn >= 6:
+				_text(Vector2(tx, row.position.y + 19.0), "…",
+					DdTheme.FONT_TAG, DdTheme.FAINT)
+				break
+			var sd: int = int(u.statuses[sk])
+			if sd <= 0:
+				continue
+			var st_tag: String = _status_short(str(sk))
+			if st_tag.is_empty():
+				continue
+			var sw: float = 62.0
+			var scol: Color = DdTheme.WARN if str(sk) == "tagged" else DdTheme.CRIT
+			var sr := Rect2(tx, row.position.y + 4.0, sw, 18.0)
+			draw_rect(sr, Color(scol.r, scol.g, scol.b, 0.16))
+			draw_rect(sr, scol, false, 1.0)
+			_text(Vector2(sr.position.x + 2.0, sr.position.y + 14.0),
+				"%s %d" % [st_tag, sd], DdTheme.FONT_TAG, scol,
+				HORIZONTAL_ALIGNMENT_CENTER, sw - 4.0)
+			tx += sw + 4.0
+			drawn += 1
+		# 没有状态就写一句「无」—— 空着会让人以为「还没算完」
+		if drawn == 0:
+			_text(Vector2(tx, row.position.y + 19.0), "无状态",
+				DdTheme.FONT_TAG, DdTheme.FAINT)
+
+
+## 血条颜色（M197）：我方绿、敌方红。
+##
+## 原来全场一律 `DdTheme.HP`（红）。战斗里两边的血条长得一样，
+## 扫一眼分不清「这条快空了的是我的人还是它」；用治疗技能点队友时更别扭 ——
+## 目标列表上全是红条，看起来像在打自己人。
+static func _hp_color(is_hero: bool) -> Color:
+	return DdTheme.OK if is_hero else DdTheme.HP
+
+
+## 状态键 → 单字（M197）。
+##
+## 只收游戏里真实出现过的四个（`data/*.json` 的 `keyStatus` 全量扫描结果：
+## bleeding / poisoned / stunned / tagged）。未收录的返回空、跳过绘制 ——
+## 硬翻成「异」会让玩家以为是同一种状态，比不显示更误导。
+static func _status_short(k: String) -> String:
+	match k:
+		"bleeding":
+			return "血"
+		"poisoned":
+			return "毒"
+		"stunned":
+			return "晕"
+		"tagged":
+			return "标"
+		_:
+			return ""
+
+
+## buff 的 `stat_type` → 两个字的缩写（M162）。
+func _buff_short(t: String, sub: String = "") -> String:
+	# **`combat_stat_add` / `combat_stat_multiply` 是容器，真属性在 `stat_sub_type`**（M191）。
+	#
+	# 原来只按 `stat_type` 分支，于是这两种（战斗里绝大多 buff 都是它们，
+	# 技能写的 `attack_rating_add` / `damage_low_multiply` 最后都归一到这里）
+	# 全都匹配不上、`continue` 掉 —— 界面上就永远显示「无状态」，
+	# 而玩家明明中了一堆减益。用户报的就是这个。
+	if t == "combat_stat_add" or t == "combat_stat_multiply":
+		return _buff_short(sub)
+	# 用 if/elif 而不是 match：`match` 的多个 pattern 必须写在同一行，
+	# 而这十来个分类竖着排更好读（GDScript 的跨行 pattern 会直接 Parse Error）。
+	if t in ["attack_rating", "damage_percent", "damage_low", "damage_high"]:
+		return "攻"
+	if t in ["defense_rating", "protection"]:
+		return "防"
+	if t in ["hit_chance", "accuracy"]:
+		return "准"
+	if t in ["crit_chance", "crit"]:
+		return "暴"
+	if t in ["dodge", "evasion"]:
+		return "闪"
+	if t == "speed":
+		return "速"
+	if t in ["heal_percent", "heal"]:
+		return "疗"
+	if t in ["stress_percent", "stress_dmg"]:
+		return "压"
+	if t in ["stun_resist", "blight_resist", "bleed_resist", "disease_resist",
+			"move_resist", "debuff_resist"]:
+		return "抗"
+	return ""
+
+
 func _draw_battle_strip(title: String, hint: String) -> void:
 	var y: float = GROUND_ENEMY + 4.0
 	# 44 而不是 54（第一版）：54 加上我方状态块之后，两军之间像叠了两块黑牌，
@@ -6299,18 +8871,21 @@ func _draw_encounter_banner() -> void:
 	# （360~414），所以报幕改到**战场中段**（敌人剪影上）：压 1.7 秒，
 	# 背景是深色剪影，字反而最清楚。原来在 y=52，正好盖住敌方那排血条。
 	var y: float = 214.0
-	draw_rect(Rect2(0.0, y, size.x, 58.0), Color(0.02, 0.02, 0.022, 0.82 * a))
-	draw_line(Vector2(0.0, y + 58.0), Vector2(size.x, y + 58.0),
+	# 74 而不是 58（M102）：加了「走廊遭遇 / 房间遭遇」标题之后是**三行**
+	# （标题 / 怪物名 / 惊袭提示），58 高会把最后一行裁掉一半。
+	draw_rect(Rect2(0.0, y, size.x, 74.0), Color(0.02, 0.02, 0.022, 0.82 * a))
+	draw_line(Vector2(0.0, y + 74.0), Vector2(size.x, y + 74.0),
 		Color(DdTheme.ENEMY.r, DdTheme.ENEMY.g, DdTheme.ENEMY.b, 0.55 * a), 1.0)
-	_text(Vector2(0.0, y + 18.0), "遭 遇", DdTheme.FONT_TAG,
+	_text(Vector2(0.0, y + 20.0), "走廊遭遇" if _battle_corridor else "房间遭遇",
+		DdTheme.FONT_BD,
 		Color(DdTheme.ENEMY.r, DdTheme.ENEMY.g, DdTheme.ENEMY.b, a),
 		HORIZONTAL_ALIGNMENT_CENTER, size.x)
-	_text(Vector2(0.0, y + 44.0),
+	_text(Vector2(0.0, y + 48.0),
 		DdTheme.ellipsis("、".join(names), _font, size.x - 60.0, 16),
 		DdTheme.FONT_H1, Color(DdTheme.TEXT.r, DdTheme.TEXT.g, DdTheme.TEXT.b, a),
 		HORIZONTAL_ALIGNMENT_CENTER, size.x)
 	if str(_battle.surprised) == "party":
-		_text(Vector2(0.0, y + 56.0), "被惊袭 · 首轮不行动", DdTheme.FONT_TAG,
+		_text(Vector2(0.0, y + 66.0), "被惊袭 · 首轮不行动", DdTheme.FONT_TAG,
 			Color(DdTheme.WARN.r, DdTheme.WARN.g, DdTheme.WARN.b, a),
 			HORIZONTAL_ALIGNMENT_CENTER, size.x)
 
@@ -6354,7 +8929,10 @@ func _draw_battle_end() -> void:
 		DdTheme.FONT_TAG, DdTheme.FAINT)
 	var y: float = card.position.y + 56.0
 	for r in rows:
-		_text(Vector2(card.position.x + 24.0, y), str(r[0]), DdTheme.FONT_BD, DdTheme.DIM)
+		# 行首图标（M146）：和「这一趟」那块同一套判定 —— 那两块本来就是
+		# 同一件事的两种呈现，一块有图标一块没有，看着像两套系统。
+		var tx4: float = _reward_icon_x(card.position.x + 24.0, y, str(r[0]))
+		_text(Vector2(tx4, y), str(r[0]), DdTheme.FONT_BD, DdTheme.DIM)
 		_text(Vector2(card.position.x + 172.0, y), str(r[1]), DdTheme.FONT_BD, DdTheme.TEXT)
 		y += 26.0
 
@@ -7119,6 +9697,12 @@ func _draw_unit_status(u: Combatant, cx: float, gy: float, top: float,
 	# 状态标签的基线（M73 调过）：敌方那行要落在块内，
 	# 原来的 +14 会让「残骸 N」掉到块外、压在立绘头顶上，读不出来。
 	var mk_y: float = hp_r.end.y + (16.0 if is_h else 9.0)
+	# 召唤角标（M102）：尸体会被召唤顶替（这是 M12 的主动设计，有测试钉住），
+	# 所以玩家看到的是「打死一个又冒出来一个」。规则不动，把「它是被叫来的」
+	# 写在脸上——不然只能靠翻底部日志才知道刚才发生了什么。
+	if _summoned_uids.has(u.uid):
+		_text(Vector2(cx + 54.0, name_y + 14.0), "召", DdTheme.FONT_TAG,
+			DdTheme.WARN)
 
 	# 状态标签先算出来：它决定块的高度和 marks 的基线
 	var marks: Array = []
@@ -7192,7 +9776,9 @@ func _draw_unit_status(u: Combatant, cx: float, gy: float, top: float,
 		Color("#f2eee2"), HORIZONTAL_ALIGNMENT_CENTER, bsz)
 
 	# 血条 + 数字（数字仍压在条内，省一行高度）
-	_bar(hp_r, u.hp_ratio(), DdTheme.HP, DdTheme.HP_TRACK)
+	# 颜色按阵营分（M197）：我方绿、敌方红。原来两侧都是 `DdTheme.HP`（红），
+	# 战场上扫一眼分不出「哪条是我的、哪条是它的」。
+	_bar(hp_r, u.hp_ratio(), _hp_color(u.is_hero), DdTheme.HP_TRACK)
 	_text(Vector2(hp_r.position.x, hp_r.position.y + 9.5),
 		"%d / %d" % [u.hp, u.base_hp], DdTheme.FONT_TAG,
 		Color("#f2eee2"), HORIZONTAL_ALIGNMENT_CENTER, hp_r.size.x)
@@ -7349,10 +9935,23 @@ func _draw_skill_panel(r: Rect2) -> void:
 	if _show_move_demo and _battle != null and _battle.awaiting_input != null:
 		_move_mode = true
 
-	var cols: int = 4
+	# **2 列 × 2 行**（M164）。原来 4 张横排，每张 (750-32-30)/4 ≈ 172 ——
+	# 名字四字 + 摘要一句话，摘要必然被 ellipsis 截掉（「修正 +15%…」
+	# 这种半截话玩家读不出所以然）。改成两列后每张 350，摘要放得下。
+	# 行数靠 `bh` 自动排，技能超过 4 个也不会挤出去（超出会被下面那行 `break` 挡掉）。
+	var cols: int = 2
 	var gap: float = 10.0
 	var bw: float = (r.size.x - 32.0 - gap * float(cols - 1)) / float(cols)
-	var bh: float = 80.0
+	# 卡片高度按**可用空间**算（M141）：原来写死 80，而这块面板下面
+	# 常年空着 60~80px —— 卡片偏矮的直接后果是摘要被 ellipsis 截掉，
+	# 「修正 +15%…」这种半截话玩家读不出所以然。
+	var avail_h: float = r.size.y - 66.0 - 12.0
+	# 下限从 80 降到 44（M178）：战斗底部面板只有 ~180 高，
+	# `avail_h` 算出来约 102，而两行 80 高 + 间距 = 170 —— 第二行直接
+	# 被下面的 `if ... > r.end.y: break` 丢掉。
+	# 表现就是「装了 4 个技能、战斗里只画 2 张卡」，而且**不报错**。
+	# 用户报的「城镇 4/4、战斗只有 2 个」就是这个。
+	var bh: float = clampf((avail_h - gap) * 0.5, 44.0, 132.0)
 	var y0: float = r.position.y + 66.0
 
 	# 瞄准态：面板原地变成目标列表（M89）。
@@ -7411,13 +10010,23 @@ func _draw_skill_panel(r: Rect2) -> void:
 			draw_rect(br.grow(-1.0), DdTheme.DIM, false, 2.0)
 		# 技能图标（M64 第十六轮）：六类之一，放在卡片左侧。
 		# 有图标之后名字和摘要整体右移 38 —— 卡片 172 宽仍够放四字技能名。
-		var ico_tex: Texture2D = _skin.texture("icons", _skill_icon(action))
+		var ico_tex: Texture2D = _action_icon_tex(action, actor)
 		var tx0: float = br.position.x + 10.0
 		if ico_tex != null:
-			var isz: float = 46.0
+			var isz: float = minf(46.0, bh - 8.0)
+			# 和公会屏同一个理由：原版图标是黑底彩边，贴深色卡要提亮（M129）
 			draw_texture_rect(ico_tex, Rect2(br.position.x + 5.0,
-				br.position.y + (bh - isz) * 0.5, isz, isz), false)
+				br.position.y + (bh - isz) * 0.5, isz, isz), false,
+				Color(1.95, 1.95, 1.95))
 			tx0 = br.position.x + 52.0
+		# 施法者头像（M157）：四张卡长得一样，玩家分不清「这是谁在出手」。
+		# 放右上角 —— 左边是技能图标、下面两行被文字占满，只有这里空着。
+		if actor != null and actor.is_hero and not actor.hero_key.is_empty():
+			var htex: Texture2D = _art.texture_of(campaign.def_of(actor.hero_key))
+			if htex != null:
+				var hsz: float = 24.0
+				draw_texture_rect(htex, Rect2(br.end.x - hsz - 6.0,
+					br.position.y + 4.0, hsz, hsz), false)
 		# 位次提示挪到第二行（M87）。
 		#
 		# 原来它挂在名字行右上角（宽 54），名字区因此少 30px ——
@@ -7428,17 +10037,23 @@ func _draw_skill_panel(r: Rect2) -> void:
 		# 它是 `opt.why`（不可用原因）和 `_move_badge`（自带位移）两个来源。
 		var badge: String = _move_badge(action) if usable else str(opt.get("why", ""))
 		var name_w: float = br.end.x - tx0 - 10.0
-		_text(Vector2(tx0, br.position.y + 30.0),
+		_text(Vector2(tx0, br.position.y + 24.0),
 			DdTheme.ellipsis(DdNames.skill_name(str(action.id)), _font, name_w,
 				DdTheme.FONT_MD),
 			DdTheme.FONT_MD, DdTheme.TEXT if usable else DdTheme.FAINT)
 		var sum_line: String = _action_summary(action, actor)
 		if not badge.is_empty():
 			sum_line = badge + " · " + sum_line
-		_text(Vector2(tx0, br.position.y + 56.0),
-			DdTheme.ellipsis(sum_line, _font, br.end.x - tx0 - 10.0,
-				DdTheme.FONT_TAG),
-			DdTheme.FONT_TAG, DdTheme.WARN if not usable else DdTheme.FAINT)
+		# 卡片够高就折两行（M141）：80 高的卡塞两行会顶到边框，
+		# 100 以上的就放得下，而折行的目的正是「别再用省略号截断」。
+		var sum_lines: Array = _wrap_tokens(sum_line, br.end.x - tx0 - 10.0,
+			DdTheme.FONT_TAG, 2 if bh >= 100.0 else 1)
+		var sy2: float = br.position.y + 44.0
+		for sl in sum_lines:
+			_text(Vector2(tx0, sy2), str(sl), DdTheme.FONT_TAG,
+				DdTheme.WARN if not usable else DdTheme.FAINT,
+				HORIZONTAL_ALIGNMENT_LEFT, br.end.x - tx0 - 10.0)
+			sy2 += 22.0
 		_add_hit(br, "skill:%d" % i)
 
 	if not _pending.is_empty():
@@ -7491,12 +10106,56 @@ func _draw_target_panel(r: Rect2, actor: Combatant) -> void:
 		# 位次写在最左：战场上的位次方块和这里要能对上
 		_text(Vector2(rr.position.x + 12.0, mid + 6.0), str(t.rank + 1),
 			DdTheme.FONT_BD, DdTheme.DIM)
-		_text(Vector2(rr.position.x + 36.0, mid + 6.0), DdNames.unit_name(t.def_id),
-			DdTheme.FONT_BD, DdTheme.TEXT if t.is_hero else DdTheme.HARM)
+		# 头像（M141）：英雄有立绘就贴，怪物没有就用色块 + 首字占位。
+		# 一列名字读起来全靠认字，加了头像之后扫一眼就知道打谁。
+		var av := Rect2(rr.position.x + 34.0, mid - 17.0, 34.0, 34.0)
+		var atex: Texture2D = null
+		if t.is_hero and campaign != null and not t.hero_key.is_empty():
+			atex = _art.texture_of(campaign.def_of(t.hero_key))
+		if atex != null:
+			draw_texture_rect(atex, av, false)
+			draw_rect(av, DdTheme.PANEL_EDGE, false, 1.0)
+		else:
+			var pcol: Color = DdTheme.HARM.darkened(0.45) if not t.is_hero \
+				else DdTheme.PARTY.darkened(0.45)
+			draw_rect(av, pcol)
+			draw_rect(av, DdTheme.PANEL_EDGE, false, 1.0)
+			var nm0: String = DdNames.unit_name(t.def_id)
+			_text(Vector2(av.position.x, av.position.y + 24.0),
+				nm0.substr(0, 1), DdTheme.FONT_BD, DdTheme.DIM,
+				HORIZONTAL_ALIGNMENT_CENTER, av.size.x)
+		# 名字要限宽（M197）：这里原来不传宽度，长名字（「土匪火枪手」）会一路
+		# 画到右边的「0%」和血条上 —— 用户报的「文字重叠」就是这一处。
+		_text(Vector2(rr.position.x + 76.0, mid + 6.0),
+			DdTheme.ellipsis(DdNames.unit_name(t.def_id), _font, 168.0, DdTheme.FONT_BD),
+			DdTheme.FONT_BD, DdTheme.TEXT if t.is_hero else DdTheme.HARM,
+			HORIZONTAL_ALIGNMENT_LEFT, 168.0)
+		# 实际命中率（M112）：技能卡上写的「命中 +85%」是**己方**的修正，
+		# 对着这一只具体能不能打上，还要减去它的闪避、加上双方的 buff。
+		# 公式直接用规则层那一份（`DamageFormula.hit_chance`），界面**不自己算** ——
+		# 两套公式迟早会对不上，而玩家会以界面为准去骂规则。
+		var hc_pct: int = -1
+		if _battle != null and act is Dictionary and not (act as Dictionary).is_empty():
+			var sp2: Dictionary = _battle.build_spec(actor, act as Dictionary, t)
+			if not sp2.is_empty():
+				var hcv: float = DamageFormula.hit_chance(
+					float(sp2.get("acc", 0.0)), float(sp2.get("dodge", 0.0)),
+					float(sp2.get("cutoff_miss", 0.0)), float(sp2.get("cutoff_hit", 0.95)))
+				hc_pct = int(round(hcv * 100.0))
 		# 血条 + 数字贴右
 		var bw2: float = 170.0
 		var hb := Rect2(rr.end.x - bw2 - 84.0, mid - 7.0, bw2, 14.0)
-		_bar(hb, float(t.hp) / float(maxi(1, t.base_hp)), DdTheme.HP, DdTheme.HP_TRACK)
+		if hc_pct >= 0:
+			# 右边界再退 6px（M197）：原来贴着血条，两位数命中率会压到条头上
+			_text(Vector2(hb.position.x - 72.0, mid - 1.0), "%d%%" % hc_pct,
+				DdTheme.FONT_BD,
+				DdTheme.OK if hc_pct >= 85 else (DdTheme.WARN if hc_pct >= 60
+					else DdTheme.CRIT),
+				HORIZONTAL_ALIGNMENT_RIGHT, 60.0)
+		# 目标是我方队友时用绿色（M197）：治疗/增益技能对着自己人，
+		# 血条还长成敌人那样，玩家会以为选错了目标。
+		_bar(hb, float(t.hp) / float(maxi(1, t.base_hp)), _hp_color(t.is_hero),
+			DdTheme.HP_TRACK)
 		_text(Vector2(hb.end.x + 6.0, mid + 5.0), "%d/%d" % [t.hp, t.base_hp],
 			DdTheme.FONT_SM, DdTheme.TEXT, HORIZONTAL_ALIGNMENT_LEFT, 76.0)
 		if t.dead:
@@ -7530,6 +10189,52 @@ const SKILL_ICON_KEYS: Array = [
 ## 战斗屏拿到的是 `Combatant.build_actions()` 解析后的 action（friendly 已算好），
 ## 公会屏只有 `{id, levels:[...]}` 原始字典，所以这里再解一次 target 掩码。
 ## 两处判据必须一致，否则同一招在战斗里是号角、在公会里变成破盾。
+## 技能图标：原版优先，取不到退回「按类型猜」的那 6 张（M129）。
+func _skill_icon_tex(hid: String, sid: String) -> Texture2D:
+	var art: Texture2D = _skill_icon_art(hid, sid)
+	if art != null:
+		return art
+	return _skin.texture("icons", _skill_icon_level(_skill_level_of(hid, sid)))
+
+
+## 某个技能的**原版图标**（M129）。
+##
+## 原工程每个职业有 7 张 `heroes/<def>/<def>.ability.<one..seven>.png`
+## （72×72），顺序和 `heroes.json` 里 `skills` 数组一一对应。
+## 这比原来那 6 张「按类型猜」（近战/远程/治疗…）准确得多 ——
+## 同一套剑的技能，原版画的是各自的图案，不是同一个「近战」标记。
+##
+## 取不到（怪物技能、新加的技能）返回 null，调用方退回分类图标。
+func _skill_icon_art(hid: String, sid: String) -> Texture2D:
+	# 缓存（M133）：这个函数在战斗/公会/名册里**每帧**被调，每次都拼路径 + 查表。
+	# 桌面看不出，手机上（res:// 走 PCK）这些开销会叠在每帧绘制上。
+	var ck: String = hid + "|" + sid
+	if _skill_icon_cache.has(ck):
+		return _skill_icon_cache[ck]
+	if campaign == null or db == null:
+		return null
+	var def: String = campaign.def_of(hid)
+	var h: Dictionary = db.hero(def)
+	if h.is_empty():
+		return null
+	var idx: int = 0
+	for raw in (h.get("skills", []) as Array):
+		if typeof(raw) != TYPE_DICTIONARY:
+			continue
+		idx += 1
+		if str((raw as Dictionary).get("id", "")) == sid:
+			break
+	if idx <= 0:
+		return null
+	var path: String = "res://assets/art/ui/icons/skill/%s/%d.png" % [def, idx]
+	if not ResourceLoader.exists(path):
+		_skill_icon_cache[ck] = null
+		return null
+	var tex: Texture2D = load(path) as Texture2D
+	_skill_icon_cache[ck] = tex
+	return tex
+
+
 func _skill_icon_level(lv: Dictionary) -> String:
 	if lv.has("heal") and lv.get("heal") != null:
 		return "skill_heal"
@@ -7561,8 +10266,22 @@ func _skill_level_of(hid: String, sid: String) -> Dictionary:
 		if str(d.get("id", "")) != sid:
 			continue
 		var lvs: Array = d.get("levels", [])
-		return (lvs[0] as Dictionary) if not lvs.is_empty() else d
+		if lvs.is_empty():
+			return d
+		# 取**当前等级**那一份（M126）：描述和数值要跟着技能等级变，
+		# 否则升到 4 级之后卡上还写着 1 级的数字。
+		var lv_i: int = clampi(campaign.skill_level_of(hid, sid), 0, lvs.size() - 1)
+		return (lvs[lv_i] as Dictionary)
 	return {}
+
+
+## 战斗技能卡的图标：英雄的原版图标优先，怪物/取不到退回分类（M129）。
+func _action_icon_tex(action: Dictionary, actor: Combatant) -> Texture2D:
+	if actor != null and actor.is_hero and not actor.hero_key.is_empty():
+		var art: Texture2D = _skill_icon_art(actor.hero_key, str(action.get("id", "")))
+		if art != null:
+			return art
+	return _skin.texture("icons", _skill_icon(action))
 
 
 func _skill_icon(action: Dictionary) -> String:
@@ -7597,7 +10316,17 @@ func _action_summary(action: Dictionary, actor: Combatant) -> String:
 		bits.append("守护")
 	if bool(action.get("is_riposte", false)):
 		bits.append("反击")
-	bits.append("敌" if not bool(action.friendly) else "友")
+	# 位次（M186）：这一条是用户提出的核心缺口 ——
+	# 「这个技能要在几号位放、能打到对面几号位」，原来**一个字都没写**，
+	# 只能靠长按或者实战猜。DD1 的 tooltip 里这两项是必列的。
+	var lm2: int = int(action.get("launch_mask", 0))
+	var tm2: int = int(action.get("target_mask", 0))
+	if lm2 > 0:
+		bits.append("自发 %s" % _mask_text(lm2))
+	if tm2 > 0:
+		bits.append("%s %s" % ["友" if bool(action.friendly) else "敌", _mask_text(tm2)])
+	else:
+		bits.append("敌" if not bool(action.friendly) else "友")
 	if bool(action.target_aoe):
 		bits.append("全体")
 	return " · ".join(bits)
@@ -7697,6 +10426,63 @@ func _draw_victory() -> void:
 	_add_button(Rect2(cx + 10, 472.0 + vy, 240, 40), "victory_new", "开一档新的", true, true)
 	_text(Vector2(0, 538.0 + vy), "战役已完成，但城镇还开着 —— 剩下的时间是你的", DdTheme.FONT_SM,
 		DdTheme.FAINT, HORIZONTAL_ALIGNMENT_CENTER, size.x)
+
+
+## 换下弹窗（M168）：列仓库，点一件就「卖掉它、把带不走的换进来」。
+func _draw_swap_pick() -> void:
+	draw_rect(Rect2(Vector2.ZERO, size), Color(0.0, 0.0, 0.0, 0.66))
+	var w: float = minf(600.0, size.x - 50.0)
+	var h: float = 420.0
+	var r := Rect2((size.x - w) * 0.5, (size.y - h) * 0.5, w, h)
+	_panel(r, DdTheme.PANEL_DEEP)
+	draw_rect(r, DdTheme.PANEL_EDGE, false, 2.0)
+	# 带上「要换进来的那件」的图标（M184）：整屏都是图标的地方，
+	# 弹窗标题旁边空着反而认不出是哪件。
+	var want_ico: Texture2D = _trinket_icon(_swap_ask)
+	var wt: float = 20.0
+	if want_ico != null:
+		draw_texture_rect(want_ico, Rect2(r.position.x + 20.0, r.position.y + 14.0, 44.0, 44.0), false)
+		wt = 74.0
+	_text(Vector2(r.position.x + wt, r.position.y + 38.0),
+		"用仓库里的哪一件换「%s」？" % DdNames.trinket_name(_swap_ask),
+		DdTheme.FONT_BD, DdTheme.TEXT, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - wt - 20.0)
+	_text(Vector2(r.position.x + 20.0, r.position.y + 62.0),
+		"点哪件就卖掉哪件，换新的进来", DdTheme.FONT_SM, DdTheme.FAINT)
+
+	var y: float = r.position.y + 80.0
+	var n: int = 0
+	for i in campaign.trinket_store.size():
+		if y > r.end.y - 100.0:
+			break
+		var tid: String = str(campaign.trinket_store[i])
+		var row := Rect2(r.position.x + 16.0, y, r.size.x - 32.0, 34.0)
+		var st: int = _hit_state(row, "tk_swapsell:%d" % i)
+		draw_rect(row, DdTheme.BTN_HOVER if st == TILE_HOVER else DdTheme.BTN)
+		var row_ico: Texture2D = _trinket_icon(tid)
+		var rtx: float = row.position.x + 10.0
+		if row_ico != null:
+			draw_texture_rect(row_ico, Rect2(row.position.x + 6.0, row.position.y + 3.0, 28.0, 28.0), false)
+			rtx = row.position.x + 40.0
+		_text(Vector2(rtx, row.position.y + 23.0),
+			DdNames.trinket_name(tid), DdTheme.FONT_MD, DdTheme.TEXT,
+			HORIZONTAL_ALIGNMENT_LEFT, row.end.x - rtx - 110.0)
+		_text(Vector2(row.end.x - 108.0, row.position.y + 23.0),
+			"卖 %d 金" % _trinket_sell(tid), DdTheme.FONT_SM, DdTheme.WARN,
+			HORIZONTAL_ALIGNMENT_RIGHT, 100.0)
+		_add_hit(row, "tk_swapsell:%d" % i)
+		y += 38.0
+		n += 1
+	if n == 0:
+		_text(Vector2(r.position.x + 20.0, y + 20.0), "仓库是空的", DdTheme.FONT_MD, DdTheme.DIM)
+
+	_add_button(Rect2(r.position.x + 16.0, r.end.y - 52.0, r.size.x - 32.0, 38.0),
+		"tk_swapcancel", "算了，折价就行")
+
+
+func _trinket_sell(id: String) -> int:
+	if campaign.shop == null:
+		return 0
+	return campaign.shop.trinket_sell_price(id)
 
 
 func _draw_result() -> void:
@@ -7887,8 +10673,35 @@ func _draw_result() -> void:
 			_text(Vector2(ttx, y), "无", DdTheme.FONT_MD, DdTheme.CRIT)
 		if dropped > 0:
 			y += 18.0
-			_text(Vector2(loot_card.position.x + 34.0, y),
-				"另有 %d 件没能带走（仓库满或已达同名上限）" % dropped, DdTheme.FONT_MD, DdTheme.WARN)
+			var refund_n: int = int(_settle_gain.get("trinket_refund", 0))
+			# 文案要写清「哪个仓库」（M170）：原来写「仓库满或同名上限」，
+			# 玩家第一反应是「背包格子」—— 可我们根本没有背包格子。
+			# 卡住他的是**饰品仓库**（`campaign.store_slots` = 16，和原版一样 4×4）。
+			var dline: String = "另有 %d 件没能带走（饰品仓库 %d/%d 已满，或同名上限）" % [
+				dropped, campaign.trinket_store.size(), campaign.store_slots]
+			if refund_n > 0:
+				dline += "，已折价 +%d 金" % refund_n
+			_text(Vector2(loot_card.position.x + 34.0, y), dline,
+				DdTheme.FONT_MD, DdTheme.WARN,
+				HORIZONTAL_ALIGNMENT_LEFT, loot_card.size.x - 68.0)
+			# 「换下」入口（M168）：折价只是保底，玩家真正要的是**自己挑**
+			# ——用仓库里哪一件去换这趟掉的东西。
+			var refused: Array = _settle_gain.get("trinket_refused", [])
+			var yy: float = y + 24.0
+			var shown: int = 0
+			for rr in refused:
+				if shown >= 3:
+					break
+				var rid: String = str((rr as Dictionary).get("id", ""))
+				if rid.is_empty():
+					continue
+				_text(Vector2(loot_card.position.x + 34.0, yy),
+					"· " + DdNames.trinket_name(rid), DdTheme.FONT_MD, DdTheme.WARN,
+					HORIZONTAL_ALIGNMENT_LEFT, loot_card.size.x - 180.0)
+				_add_button(Rect2(loot_card.end.x - 138.0, yy - 18.0, 100.0, 26.0),
+					"tk_swap:" + rid, "换下", true)
+				yy += 30.0
+				shown += 1
 
 	var deaths: Array = _settle_gain.get("deaths", [])
 	if not deaths.is_empty():
@@ -7912,6 +10725,21 @@ func _draw_result() -> void:
 		_divider(loot_card.position.x + 30.0, y, loot_card.size.x - 60.0)
 		y += 26.0
 		_text(Vector2(loot_card.position.x + 34.0, y), "队伍状态", DdTheme.FONT_BD, DdTheme.DIM)
+		# 本趟染上什么（M113）：`settle()` 一直有 `quirks` / `diseases` 计数，
+		# 结算屏从来没读过它们 —— 玩家要回英雄面板一个个点开才知道谁中招了。
+		# 注意 diseases 是 quirks 的子集（染病时两个计数都 +1）。
+		var q_gain: int = int(_settle_gain.get("quirks", 0))
+		var d_gain: int = int(_settle_gain.get("diseases", 0))
+		var q_only: int = maxi(0, q_gain - d_gain)
+		if d_gain > 0 or q_only > 0:
+			var b2: Array = []
+			if d_gain > 0:
+				b2.append("疾病 %d" % d_gain)
+			if q_only > 0:
+				b2.append("怪癖 %d" % q_only)
+			_text(Vector2(loot_card.position.x + 190.0, y),
+				"本趟染上 " + " · ".join(b2), DdTheme.FONT_MD, DdTheme.WARN,
+				HORIZONTAL_ALIGNMENT_RIGHT, loot_card.size.x - 220.0)
 		for hid in exp.hero_ids:
 			var hk: String = str(hid)
 			y += 30.0
@@ -7927,8 +10755,14 @@ func _draw_result() -> void:
 			_text(Vector2(loot_card.position.x + 190.0, y),
 				"压力 %.0f" % st2, DdTheme.FONT_MD,
 				DdTheme.STRESS if st2 >= 100.0 else DdTheme.DIM)
-			_text(Vector2(loot_card.position.x + 330.0, y),
-				"Lv%d · 装备 %d 阶" % [campaign.resolve_of(hk), campaign.gear_of(hk)],
+			# 经验进度（M113）：结算屏原来只报「全队 +N」，个体差多少不知道。
+			# 而「再打一趟能不能升」直接决定下一趟带不带他 —— 装备阶在名册里随时能看，
+			# 这个进度只有这里能看，所以让位给它。
+			var xp_n: int = campaign.xp_of(hk)
+			var xp_need: int = campaign.xp_to_next(hk)
+			_text(Vector2(loot_card.position.x + 300.0, y),
+				("Lv%d · 经验 %d/%d" % [campaign.resolve_of(hk), xp_n, xp_need])
+					if xp_need > 0 else ("Lv%d · 满级" % campaign.resolve_of(hk)),
 				DdTheme.FONT_MD, DdTheme.DIM)
 			_text(Vector2(loot_card.position.x + 470.0, y),
 				"存活" if alive_h else "阵亡", DdTheme.FONT_TAG,
@@ -7999,6 +10833,7 @@ func _toggle_party(hid: String) -> void:
 		_prep_party.append(hid)
 	else:
 		_prep_party.append(hid)
+	_party_persist()
 	queue_redraw()
 
 
@@ -8009,6 +10844,8 @@ func _adjust_pack(id: String, delta: int) -> void:
 		if lim > 0:
 			cur = mini(cur, lim)
 	_prep_pack[id] = maxi(0, cur)
+	campaign.supply_pack = _prep_pack.duplicate()
+	campaign.save()
 	queue_redraw()
 
 
@@ -8023,9 +10860,12 @@ func _launch_with_pack() -> void:
 	if not bool(res.get("ok", false)):
 		var why: String = str(res.get("reason", ""))
 		if why == "no_gold":
-			_flash_msg("金币不足（需 %d，有 %d），按保底补给出发" % [
-				int(res.get("cost", 0)), campaign.gold])
-			_prep_pack = _default_prep_pack()
+			# 屏幕上只留结论（M200）：整句带数字会在 750 宽的屏上横着冲出去。
+			# 具体数字进日志，那里是横向可读的。
+			_flash_msg("金币不足，按保底补给出发")
+			_add_log("【补给】金币不足（需 %d，有 %d），按保底配给出发" % [
+				int(res.get("cost", 0)), campaign.gold], DdTheme.WARN)
+			_prep_pack = _restore_prep_pack()
 			_state = S_TOWN
 			_start_expedition(_prep_size, _prep_level, {}, _prep_party, _prep_quest)
 			return
@@ -8036,11 +10876,55 @@ func _launch_with_pack() -> void:
 	_start_expedition(_prep_size, _prep_level, _prep_pack, _prep_party, _prep_quest)
 
 
+## 出发准备屏的「行程」卡（M198）。
+##
+## 和选关屏那张 `_draw_board_card` 不是一回事：那边是横卡（一屏四行，宽 ~500），
+## 这边是一排里的一张（宽 216）。两处显示的是同一批信息，
+## 所以文案来源相同（`_board_rows()`），但**排版各自算** —— 硬套同一套坐标必然错位。
+func _draw_prep_card(row: Array, r: Rect2) -> void:
+	# 选中态要同时比尺寸、任务类型**和等级**（M29）：
+	#   · 中程与首领都是 medium —— 只比尺寸会让两张卡同时高亮
+	#   · 同一个尺寸每周的等级不同 —— 只比尺寸+类型会让「中程 1 级」
+	#     在标题写着「中程 3 级」时也亮着，玩家会以为自己选错了
+	var sel: bool = _prep_size == str(row[0]) and _prep_quest == str(row[4]) \
+		and _prep_level == int(row[1])
+	var key: String = "prep:%s:%d:%s" % [str(row[0]), int(row[1]), str(row[4])]
+	_panel(r, DdTheme.PANEL_HI if sel else DdTheme.PANEL_DEEP)
+	_hit_overlay(r, key)
+	if sel:
+		draw_rect(r, DdTheme.PARTY, false, 2.0)
+	var px: float = r.position.x + 10.0
+	var pw: float = r.size.x - 20.0
+	# 卡片实际只有 84 高（`_hscroll_zone` 上下各吃掉 8），所以行距按 84 排：
+	# 标题 22 / 说明 44、62，最后一行离底还有 6px。
+	var ty: float = r.position.y + 22.0
+	# 标题让出右上角 62px 给「✓ 通关」角标
+	_text(Vector2(px, ty), str(row[2]), DdTheme.FONT_MD,
+		DdTheme.TEXT if sel else DdTheme.DIM,
+		HORIZONTAL_ALIGNMENT_LEFT, pw - 62.0)
+	# 「已通关」角标（M198）。固定在右上角、不占说明的行：
+	# 说明本身已经要折行，再挤一行会被裁掉 —— 那正是这一轮要修的东西。
+	if campaign.is_quest_cleared(_dungeon, str(row[0]), str(row[4]), int(row[1])):
+		_text(Vector2(r.end.x - 72.0, ty - 2.0), "✓ 通关", DdTheme.FONT_TAG,
+			DdTheme.OK, HORIZONTAL_ALIGNMENT_RIGHT, 62.0)
+	# 说明折行（最多 2 行）：216 宽、16px，一行约 12 个汉字，
+	# 「清光全图战斗，支路也得去」正好一行放得下，长一点的会折第二行。
+	_text_wrap(Vector2(px, ty + 22.0), str(row[3]), DdTheme.FONT_TAG,
+		DdTheme.FAINT, pw, 2)
+	_add_hit(r, key)
+
+
 func _draw_prep() -> void:
+	# 忙的人（疗养院/减压建筑）**不出现在下面的出战名单里**。
+	# 原来这里只写「名册 5 人 · 上限 4 人」，玩家看到名册是满的、名单却少两个，
+	# 完全不知道为什么（M93 反馈：以为人"不见了"）。补一句计数。
+	var busy_n: int = campaign.alive_ids().size() - campaign.selectable_ids().size()
+	var sub: String = "名册 %d 人 · 出战 %d 人 · 金币 %d" % [
+		campaign.alive_ids().size(), Campaign.PARTY_MAX, campaign.gold]
+	if busy_n > 0:
+		sub = "⚠ %d 人在建筑里，本趟不能出征（可去马车补人）    " % busy_n + sub
 	_header("出发准备 · %s · %s %d 级" % [DdNames.dungeon_name(_dungeon),
-		_size_name_of(_prep_size), _prep_level],
-		"名册 %d 人 · 出战上限 %d 人 · 金币 %d    补给按份买，买完直接进背包" % [
-			campaign.alive_ids().size(), Campaign.PARTY_MAX, campaign.gold])
+		_size_name_of(_prep_size), _prep_level], sub)
 
 	# —— 左：补给清单 ——
 	if campaign.shop == null:
@@ -8133,35 +11017,40 @@ func _draw_prep() -> void:
 	# 行程区起点：补给区下面（补给 8 项 × 72）
 	var ry_top: float = y + 26.0
 	_text(Vector2(rx, ry_top - 12.0), "行程", DdTheme.FONT_BD, DdTheme.TEXT)
+	# 可拖动要写出来（M198）：右边缘被裁半张卡已经是提示，但不够明确 ——
+	# 玩家可能以为是排版坏了，而不是"还有"。
+	_text(Vector2(rx + 60.0, ry_top - 12.0), "← 左右拖动 →", DdTheme.FONT_TAG,
+		DdTheme.FAINT, HORIZONTAL_ALIGNMENT_RIGHT, rw - 60.0)
 	# 和城镇用同一块板子（M26）：这一屏是「换一张卡」的地方，
 	# 如果它自己另算一套等级，玩家在这里切一下就和城镇看到的对不上了。
 	var rows: Array = _board_rows()
 	var ry: float = ry_top
-	# M58：4 张横排（各 166 宽 × 100 高），原来是一列 4 行 44 高的窄条
-	var jw: float = (rw - 8.0 * float(maxi(1, rows.size() - 1))) / float(maxi(1, rows.size()))
-	for i in rows.size():
-		var row: Array = rows[i]
-		# 选中态要同时比尺寸、任务类型**和等级**（M29）：
-		#   · 中程与首领都是 medium —— 只比尺寸会让两张卡同时高亮
-		#   · 同一个尺寸每周的等级不同 —— 只比尺寸+类型会让「中程 1 级」
-		#     在标题写着「中程 3 级」时也亮着，玩家会以为自己选错了
-		var sel: bool = _prep_size == str(row[0]) and _prep_quest == str(row[4]) \
-			and _prep_level == int(row[1])
-		var rr2 := Rect2(rx + float(i) * (jw + 8.0), ry, jw, pick_step)
-		_panel(rr2, DdTheme.PANEL_HI if sel else DdTheme.PANEL_DEEP)
-		_hit_overlay(rr2, "prep:%s:%d:%s" % [str(row[0]), int(row[1]), str(row[4])])
-		if sel:
-			draw_rect(rr2, DdTheme.PARTY, false, 2.0)
-		_text(Vector2(rr2.position.x + 12, rr2.position.y + pick_step * 0.34), str(row[2]), DdTheme.FONT_BD, DdTheme.TEXT if sel else DdTheme.DIM)
-		_text(Vector2(rr2.position.x + 12, rr2.position.y + pick_step * 0.62), str(row[3]), DdTheme.FONT_SM, DdTheme.FAINT)
-		_add_hit(rr2, "prep:%s:%d:%s" % [str(row[0]), int(row[1]), str(row[4])])
+	# 横向滚动（M198）：四张挤在一行里每张只有 ~166 宽，
+	# 「清光全图战斗，支路也得去」直接压到下一张卡上 —— 用户截图指的就是这里。
+	# 改成固定 216 宽 + 左右拖动，一张卡把标题和说明都说完。
+	# 高一格（+16）是为了补回 `_hscroll_zone` 内部上下各 8 的内边距。
+	# 但这 16px **必须从预算里出**（`need_h` 已经按 100 算过），
+	# 否则行程卡下边缘会压到「出战（已选 4/4 人）」那一行上。
+	_hscroll_zone("prep_board", Rect2(rx, ry, rw, pick_step), rows.size(), 216.0, 10.0,
+		func(cr: Rect2, i: int) -> void:
+			_draw_prep_card(rows[i], cr))
 
 	# —— 出战名单（M18）——
 	# 名册 5 人、只能带 4 个，所以这里是一个真实的选择。
 	# 点一下切换；满员时加入会挤掉最后加进来的那个（不是拒绝）。
 	var py: float = ry + pick_step + 26.0
-	# 按强度排序（M27）：和默认名单同一个序，见 _sort_by_power 的注释
-	var ids_all: Array = _sort_by_power(campaign.selectable_ids())
+	# 排序（M176）：**上阵的人按出征顺序排在前面**，其余按强度。
+	# 原来整列按强度排，于是「已选 4/4」那四个和下面的没选的人混在一起，
+	# 玩家看不出「我这四个人是谁、谁站几号位」—— 而这一屏恰恰是定这个的地方。
+	# 这和队伍屏是同一个毛病（M174），只是那一屏改了、这一屏漏了。
+	var _pool: Array = _sort_by_power(campaign.selectable_ids())
+	var ids_all: Array = []
+	for _h_on in _prep_party:
+		if _pool.has(str(_h_on)):
+			ids_all.append(str(_h_on))
+	for _h_rest in _pool:
+		if not ids_all.has(str(_h_rest)):
+			ids_all.append(str(_h_rest))
 	# 够格的人数（M25）。等级锁之后「名册有几个活人」不再是可带人数——
 	# 太高级的人会被拒绝，所以门槛必须跟着**够格人数**走。
 	# 不这么改的话，一个 6 级的名册去打学徒本会永远显示「还缺 4 人」。
@@ -8210,8 +11099,12 @@ func _draw_prep() -> void:
 		if fit:
 			# 够格但等级不够（会吃惩罚）：这一行转警告色，具体代价在下面的队伍摘要里
 			var gap_h: int = campaign.level_gap(hid, _prep_level)
+			# 这里**不用显示血量**（M185 查证）：英雄在城镇里没有持久血量，
+			# `roster` 里根本没有 `hp` 字段 —— 生命是出征时按等级/装备算的，
+			# 每趟都从满血开始。所以「带伤上阵」这件事不存在。
 			_text(Vector2(txp, br.position.y + 38),
-				"Lv%d · 装备 %d 阶" % [campaign.resolve_of(hid), campaign.gear_of(hid)], DdTheme.FONT_TAG, DdTheme.WARN if gap_h > 0 else DdTheme.DIM)
+				"Lv%d · 装备 %d 阶" % [campaign.resolve_of(hid), campaign.gear_of(hid)],
+				DdTheme.FONT_TAG, DdTheme.WARN if gap_h > 0 else DdTheme.DIM)
 			_add_hit(br, "prep_pick:" + hid)
 		else:
 			# 「高出 2 级就拒绝」是原版唯一的硬门槛，所以这句话要直说：
@@ -8263,7 +11156,7 @@ func _draw_prep() -> void:
 		go_label = "还缺 %d 人 —— 名册里够格的人不够" % (want - _prep_party.size())
 	# M58：两个按钮贴底。原来写死 y=596 / 652，竖屏下整个悬在页面中段。
 	var back_h: float = 56.0
-	var back_y: float = size.y - 44.0 - back_h
+	var back_y: float = size.y - 44.0 - back_h - NAV_H
 	var go_y: float = back_y - 12.0 - 64.0
 	_add_button(Rect2(rx, go_y, rw, 64.0), "prep_go", go_label, ready)
 	_add_button(Rect2(rx, back_y, rw, back_h), "prep_back", "返回城镇")
@@ -8279,6 +11172,72 @@ func _draw_prep() -> void:
 ## 同样的「选中态」、同样的返回按钮。差别只在右侧那几行字和一个动作按钮。
 ## 拆开会得到六份几乎相同的代码，改一次排版要改六处——
 ## 而这类重复正是 M13~M19 反复踩的坑（同一套判定两处实现，然后分叉）。
+## 建筑升级条（M131）：等级 + 升级价，点一下升一阶。
+##
+## 放在底部按钮那块的上方 —— 各建筑屏的内容高度都不一样（疗养院 300、
+## 马车 520），塞在标题下面会挤到列表；底部这块每屏都是空的。
+func _building_upgrade_row(bid: String, y: float, w: float) -> float:
+	var lv: int = campaign.building_level(bid)
+	var cost: int = campaign.building_upgrade_cost(bid)
+	# 高度 44 → 74（M181）：多留一行写「升级后变成什么」。
+	# 原来这一条只有一个等级 + 一颗灰按钮，玩家点下去完全不知道买到什么 ——
+	# 而这一屏的每一块钱都关系到下周能不能打。
+	var box := Rect2(24.0, y, w, 74.0)
+	_panel(box, DdTheme.PANEL_DEEP)
+	_text(Vector2(box.position.x + 14.0, box.position.y + 28.0),
+		"%s · 等级 %d / %d" % [str(_building_meta(bid)[1]), lv, Campaign.BUILDING_MAX_LEVEL],
+		DdTheme.FONT_BD, DdTheme.TEXT)
+	# 「现在 → 下一级」的效果差
+	var now_t: String = _building_effect_text(bid, lv)
+	var next_t: String = _building_effect_text(bid, lv + 1)
+	var eff: String = now_t if cost < 0 else "%s　→　%s" % [now_t, next_t]
+	_text(Vector2(box.position.x + 14.0, box.position.y + 52.0), eff,
+		DdTheme.FONT_TAG, DdTheme.DIM if cost < 0 else DdTheme.OK,
+		HORIZONTAL_ALIGNMENT_LEFT, box.size.x - 160.0)
+	if cost < 0:
+		_text(Vector2(box.end.x - 130.0, box.position.y + 28.0), "已满级",
+			DdTheme.FONT_TAG, DdTheme.FAINT, HORIZONTAL_ALIGNMENT_RIGHT, 116.0)
+	else:
+		var br := Rect2(box.end.x - 138.0, box.position.y + 18.0, 124.0, 38.0)
+		var st: int = _hit_state(br, "bld_up:" + bid)
+		var can: bool = campaign.gold >= cost
+		# 按钮改成**实心主色**（M181）：原来用 `_tile` 的灰底，
+		# 在一条本来就灰的条上等于没有按钮，用户原话「太不显眼了」。
+		draw_rect(br, DdTheme.CRIT if can else DdTheme.BTN_OFF)
+		draw_rect(br, DdTheme.BTN_HOVER if st == TILE_HOVER and can else DdTheme.CRIT.darkened(0.35), false, 2.0)
+		_text(Vector2(br.position.x, br.position.y + 25.0), "升级 · %d 金" % cost,
+			DdTheme.FONT_BD, Color(1.0, 0.96, 0.88) if can else DdTheme.FAINT,
+			HORIZONTAL_ALIGNMENT_CENTER, br.size.x)
+		_add_hit(br, "bld_up:" + bid)
+	return box.end.y + 10.0
+
+
+## 某座建筑在某个等级下的效果文字（M181）。
+##
+## 原来升级条上只有一个「等级 N / 3」，玩家不知道升上去买到什么。
+## 这里把「这一级实际改了什么数值」写出来 —— 和 `campaign` 里真正生效的
+## 那几处一一对应（减压量、治疗费、库存、折扣），不是编的。
+func _building_effect_text(bid: String, lv: int) -> String:
+	match bid:
+		"tavern":
+			return "减压 %d / 次" % (70 + lv * 10)
+		"abbey":
+			return "减压 %d / 次" % (90 + lv * 10)
+		"sanitarium":
+			return "治疗费 -%d%%" % (5 * lv)
+		"smith":
+			return "升级折扣 %d%%" % int(round((1.0 - pow(0.9, float(lv))) * 100.0))
+		"wagon":
+			return "货架 %d 件" % (Shop.STOCK_SIZE + lv * 2)
+		"coach":
+			return "可征召 %d 人" % (3 + lv)
+		"guild":
+			return "技能位 %d" % (4 + lv)
+		"graveyard":
+			return "墓园位 %d" % (8 + lv * 2)
+	return "等级 %d" % lv
+
+
 func _draw_building() -> void:
 	var meta: Array = _building_meta(_building)
 	# 商队和墓园没有左栏名册，副标题就别再写「左侧点人」——
@@ -8311,7 +11270,7 @@ func _draw_building() -> void:
 	var alive: Array = campaign.alive_ids()
 	if alive.is_empty():
 		_text(Vector2(28, 120), "名册里没有活人，先去马车征召。", DdTheme.FONT_BD, DdTheme.WARN)
-		_add_button(Rect2(24.0, size.y - 100.0, size.x - 48.0, 56.0), "bld_back", "返回城镇")
+		_add_button(Rect2(24.0, size.y - 100.0 - NAV_H, size.x - 48.0, 56.0), "bld_back", "返回城镇")
 		return
 	# 马车要能选到死人（M28）：复活和「从墓园移除」都作用在他们身上。
 	# 其他建筑只列活人——铁匠铺对着一个死人没有可做的事。
@@ -8319,13 +11278,20 @@ func _draw_building() -> void:
 	if _building_hero.is_empty() or not who.has(_building_hero):
 		_building_hero = str(alive[0])
 
+	# 面板高度要**先算**（M181）：名册的步长要用它。
+	# 原来名册按 `minf(80, 1080/人数)` 排，10 个人就是 100~900，
+	# 而升级条固定落在 `88 + panel_h(700) + 10 = 798` ——
+	# 直接压在最后两三个人身上。截图里「强盗 II」就是这么被盖住的。
+	var _btn_y: float = size.y - 44.0 - 56.0 - NAV_H
+	var _panel_h: float = minf(_btn_y - 88.0 - 34.0 - 64.0, 700.0)
 	_text(Vector2(28, 88), "名册 %d 人" % who.size(), DdTheme.FONT_BD, DdTheme.TEXT)
 	# 名册列表（M27）：15 人按「68 高一列」排会直接溢出屏幕底部
 	# （15 × 78 = 1170，而可用高度只有 600 出头）。
 	# 改成两列 × 42 高：8 行 × 46 = 368，从 100 到 468，正好落在面板里。
 	# M58：名册改**单列 212 宽**（原来是 2 列 × 118 × 42 的小格子）。
 	# 竖屏左侧栏能到 212 宽，一人一行读起来比两列小格子清楚得多。
-	var rstep: float = minf(80.0, 1080.0 / float(maxi(1, who.size())))
+	# 步长按**面板内部可用高度**算，不再用写死的 1080
+	var rstep: float = minf(80.0, (_panel_h - 118.0) / float(maxi(1, who.size())))
 	for i in who.size():
 		var hid: String = str(who[i])
 		var sel: bool = hid == _building_hero
@@ -8357,8 +11323,19 @@ func _draw_building() -> void:
 		_add_hit(r, "bld_hero:" + hid)
 		_hit_overlay(r, "bld_hero:" + hid)
 
-	var btn_y: float = size.y - 44.0 - 56.0
-	_draw_building_panel(Rect2(rx, 88, rw, btn_y - 88.0 - 34.0))
+	var btn_y: float = _btn_y
+	# 面板高度按内容收缩（M100）。
+	#
+	# 六座建筑的实际内容只用到 300~520 高（疗养院约 300、马车约 520），
+	# 而面板原来一路拉到按钮上方（约 1100）——卡片内部空出 400~700px，
+	# 玩家看到的是「一张几乎全空的卡」，比留白更像没画完。
+	# 收到 700（内容 + 贴底区块 + 余量）之后，各屏都是一张完整卡片。
+	# 升级条跟着面板走（M131）：贴底放会离内容 500px 远，
+	# 玩家得先滑到屏幕最下面才知道这里还能升级。
+	var avail_h: float = btn_y - 88.0 - 34.0 - 64.0
+	var panel_h: float = minf(avail_h, 700.0)
+	_draw_building_panel(Rect2(rx, 88, rw, panel_h))
+	_building_upgrade_row(_building, 88.0 + panel_h + 10.0, rw)
 	_add_button(Rect2(rx, btn_y, rw, 56.0), "bld_back", "返回城镇")
 	# 页脚（M31）：建筑屏原来是唯一没有底注的屏，内容排到 470 就断了，
 	# 下面 290px 全空——看起来像「这屏还没画完」。城镇/地图/准备屏都有页脚，
@@ -8374,6 +11351,11 @@ func _draw_building() -> void:
 ## 你在疗养院看的是「他有没有病」，在铁匠铺才看装备。
 func _hero_flags(hid: String) -> String:
 	var bits: Array = []
+	# 「上阵」放最前面（M177）：建筑屏（疗养院/酒馆/铁匠铺）是在「按人头做决定」，
+	# 而「这人会不会跟我下去」是决定的前提 —— 病/负/忙都在标签里，
+	# 唯独缺了这一档，用户一眼就发现公会没有、建筑也没有。
+	if _prep_party.has(hid):
+		bits.append("上阵")
 	var dn: int = campaign.diseases_of(hid).size()
 	if dn > 0:
 		bits.append("病 %d" % dn)
@@ -8415,7 +11397,7 @@ func _draw_hero_sheet() -> void:
 	# 至少留三行：只带 1 个技能时抽屉扁得像张纸条，还不如不弹。
 	var skills_n: int = mini(campaign.equipped_skills(_roster_open).size(), 7)
 	var rows_sk: int = maxi(3, skills_n)
-	var sh: float = 464.0 + float(rows_sk) * 34.0
+	var sh: float = 464.0 + float(rows_sk) * 34.0 + 296.0
 	var r := Rect2(24.0, size.y - 44.0 - sh, size.x - 48.0, sh)
 	draw_rect(r.grow(2.0), Color(0.0, 0.0, 0.0, 0.45))
 	_panel(r, DdTheme.PANEL)
@@ -8473,8 +11455,7 @@ func _draw_hero_sheet() -> void:
 		var sid: String = str(skills[i])
 		# 技能图标（M64 第十六轮）：抽屉里七行技能全是名字，
 		# 和公会/战斗用同一套六分类，三处看到的是同一个图案。
-		var sico: Texture2D = _skin.texture("icons",
-			_skill_icon_level(_skill_level_of(hid, sid)))
+		var sico: Texture2D = _skill_icon_tex(hid, sid)
 		var stx: float = x
 		if sico != null:
 			draw_texture_rect(sico, Rect2(x, y + 4.0, 22.0, 22.0), false)
@@ -8512,10 +11493,65 @@ func _draw_hero_sheet() -> void:
 			DdNames.trinket_name(cur) if not cur.is_empty() else "空槽",
 			DdTheme.FONT_MD, DdTheme.TEXT if not cur.is_empty() else DdTheme.FAINT)
 
-	# —— 状态 ——
+	# —— 抗性（M110）——
+	#
+	# 原版英雄面板一定列这六项：它们决定「这个人在这个地牢里能扛住什么」。
+	# 我们之前**一项都没有** —— `resist_of()` 在整个 UI 里引用 0 次，
+	# 玩家只能靠踩坑记住谁的流血抗性低。
 	y += 104.0
 	_divider(x, y, r.size.x - 48.0)
-	var flags: String = _hero_flags(hid)
+	_text(Vector2(x, y + 26.0), "抗性", DdTheme.FONT_BD, DdTheme.TEXT)
+	var hdef: Dictionary = db.heroes.get(campaign.def_of(hid), {}) if db != null else {}
+	var res: Dictionary = hdef.get("resistances", {})
+	var r_order: Array = ["stun", "poison", "bleed", "disease", "move", "death_blow"]
+	var rcol_w: float = (r.size.x - 48.0) * 0.5
+	for i in r_order.size():
+		var key: String = str(r_order[i])
+		var val: float = float(res.get(key, 0.0)) * 100.0
+		var cx3: float = x + float(i % 2) * rcol_w
+		var cy3: float = y + 48.0 + float(i / 2) * 24.0
+		_text(Vector2(cx3, cy3), str(RES_CN.get(key, key)) + "抗", DdTheme.FONT_SM,
+			DdTheme.DIM)
+		_text(Vector2(cx3 + 90.0, cy3), "%.0f%%" % val, DdTheme.FONT_SM,
+			DdTheme.TEXT if val >= 30.0 else DdTheme.WARN)
+
+	# —— 怪癖与疾病（M110）——
+	#
+	# `_hero_flags()` 只拼「负 2」这种计数：玩家知道有问题，但不知道是哪两个、
+	# 各自扣什么。效果文本 `_quirk_effect_text()` 一直是现成的，只是没人调用。
+	var gy2: float = y + 48.0 + 3.0 * 24.0 + 22.0
+	_divider(x, gy2, r.size.x - 48.0)
+	_text(Vector2(x, gy2 + 26.0), "怪癖与疾病", DdTheme.FONT_BD, DdTheme.TEXT)
+	var qall: Array = campaign.quirks_of(hid)
+	if qall.is_empty():
+		_text(Vector2(x, gy2 + 50.0), "这一趟没沾上什么。", DdTheme.FONT_SM, DdTheme.FAINT)
+	var qy: float = gy2 + 50.0
+	for qv in qall:
+		var qid: String = str(qv)
+		var is_dis: bool = campaign.quirk_lib != null and campaign.quirk_lib.is_disease(qid)
+		var qcol: Color = DdTheme.CRIT if is_dis else DdTheme.WARN
+		var qn2: String = DdNames.quirk_name(qid)
+		_text(Vector2(x, qy), qn2, DdTheme.FONT_SM, qcol,
+			HORIZONTAL_ALIGNMENT_LEFT, 150.0)
+		var eff2: String = _quirk_effect_text(qid)
+		_text(Vector2(x + 158.0, qy),
+			DdTheme.ellipsis(eff2 if not eff2.is_empty() else "（无数值影响）",
+				_font, r.size.x - 48.0 - 158.0, 12),
+			DdTheme.FONT_SM, DdTheme.DIM, HORIZONTAL_ALIGNMENT_LEFT,
+			r.size.x - 48.0 - 158.0)
+		qy += 24.0
+	y = qy
+
+	# —— 状态 ——
+	y += 36.0
+	_divider(x, y, r.size.x - 48.0)
+	# 这里不再用 `_hero_flags()`（M110）：它拼的是「病 1 · 负 2」这种**计数**，
+	# 而上面已经把每个怪癖的名字和效果列出来了 —— 再写一遍数字等于重复，
+	# 而且会在抽屉底部留下一行孤零零的「负 2」。现在只留「在建筑里」。
+	var flags: String = ""
+	var bz3: int = campaign.busy_of(hid)
+	if bz3 > 0:
+		flags = "这周在建筑里（剩 %d 周）" % bz3
 	if not alive:
 		_text(Vector2(x, y + 28.0), "已阵亡 —— 去马车复活（要花钱）", DdTheme.FONT_MD, DdTheme.CRIT)
 	elif not flags.is_empty():
@@ -8583,8 +11619,7 @@ func _draw_building_panel(r: Rect2) -> void:
 		# 这个尺寸看不清细节，但「剑 / 号角 / 破盾」的轮廓还分得出来。
 		var cx0: float = r.position.x + 16.0 + (col_w if i % 2 == 1 else 0.0)
 		var cy0: float = ty0 + 48.0 + float(int(i / 2)) * 22.0
-		var sico: Texture2D = _skin.texture("icons",
-			_skill_icon_level(_skill_level_of(hid, str(ski[i]))))
+		var sico: Texture2D = _skill_icon_tex(hid, str(ski[i]))
 		var ox: float = cx0
 		if sico != null:
 			draw_texture_rect(sico, Rect2(cx0, cy0, 18.0, 18.0), false)
@@ -8623,13 +11658,44 @@ func _panel_coach(r: Rect2, hid: String) -> void:
 			else "这批都招走了，下周再来"
 		_text(Vector2(x, y + 22), why, DdTheme.FONT_MD, DdTheme.FAINT)
 	else:
+		# 候选做成卡片（M98）：原来只有一行文字按钮「麻风病人（1000 金币）」，
+		# 招之前看不到长相，也看不到招来是什么水平——玩家得先花钱才认识这个人。
+		# 左边名册每个人都有头像，右边「即将加入的人」却是一片空白，观感也是断的。
+		var ch: float = 84.0
 		for i in cands.size():
 			var cls: String = str(cands[i])
 			var cost: Dictionary = campaign.hire_cost()
-			_add_button(Rect2(x, y + 16.0 + float(i) * 48.0, 340, 42), "hire:" + cls,
-				"%s（%d 金币）" % [_hero_label(cls), int(cost.get("gold", 0))],
-				campaign.can_hire(cls))
-	y += 130.0
+			var ok: bool = campaign.can_hire(cls)
+			var cid2: String = "hire:" + cls
+			var cr2 := Rect2(x, y + 16.0 + float(i) * (ch + 8.0), 360.0, ch)
+			var st3: int = _hit_state(cr2, cid2)
+			draw_rect(cr2, DdTheme.BTN_ACTIVE if st3 != TILE_IDLE else DdTheme.BTN)
+			draw_rect(cr2, DdTheme.CRIT if st3 == TILE_HOVER else DdTheme.PANEL_EDGE,
+				false, 1.0)
+			if ok:
+				_add_hit(cr2, cid2)
+			# 头像：用职业定义取立绘，和左边名册同一套
+			var tx2: Texture2D = _art.texture_of(cls)
+			var ir := Rect2(cr2.position.x + 8.0, cr2.position.y + 8.0, 68.0, 68.0)
+			if tx2 != null:
+				draw_texture_rect(tx2, ir, false, Color(1, 1, 1, 1) if ok
+					else Color(0.45, 0.45, 0.5, 1.0))
+			else:
+				draw_rect(ir, DdTheme.PANEL_HI)
+			_text(Vector2(cr2.position.x + 88.0, cr2.position.y + 32.0),
+				_hero_label(cls), DdTheme.FONT_LG,
+				DdTheme.TEXT if ok else DdTheme.FAINT)
+			_text(Vector2(cr2.position.x + 88.0, cr2.position.y + 56.0),
+				"新招募 · Lv1 · 装备 0 阶", DdTheme.FONT_TAG, DdTheme.DIM)
+			_text(Vector2(cr2.end.x - 120.0, cr2.position.y + 36.0),
+				"%d 金币" % int(cost.get("gold", 0)), DdTheme.FONT_BD,
+				DdTheme.CRIT if ok else DdTheme.FAINT,
+				HORIZONTAL_ALIGNMENT_RIGHT, 104.0)
+			if not ok:
+				_text(Vector2(cr2.end.x - 120.0, cr2.position.y + 58.0),
+					_hire_why(cls), DdTheme.FONT_TAG, DdTheme.WARN,
+					HORIZONTAL_ALIGNMENT_RIGHT, 104.0)
+		y += 16.0 + float(cands.size()) * (ch + 8.0) + 18.0
 	draw_line(Vector2(x, y), Vector2(x + 340, y), DdTheme.PANEL_EDGE, 1.0)
 	y += 22.0
 
@@ -8686,7 +11752,21 @@ func _do_fire(hid: String) -> void:
 	_fire_pending = ""
 	var nm: String = _hero_label(hid)
 	var alive: bool = bool((campaign.hero(hid) as Dictionary).get("alive", true))
+	# 解雇前先把他从出征名单里摘掉（M177）。
+	#
+	# 原来直接 `dismiss`，而 `_prep_party` 是**另一份数据**，里面还留着他的 id ——
+	# 出征时按名单拉人，拉到一个已经不存在的人，轻则少一个人下地牢、
+	# 重则整条 `_start_expedition` 出错。这和 M174 那个「改了数据源、渲染没跟」
+	# 是同一类问题：**两份互相引用的数据，只改了一份**。
+	var was_on: bool = _prep_party.has(hid)
+	if was_on:
+		_prep_party.erase(hid)
+		_party_persist()
 	if not campaign.dismiss(hid):
+		# 解雇失败（还在修养 / 只剩一个人）：把名单恢复回去，别留下半截状态
+		if was_on:
+			_prep_party.append(hid)
+			_party_persist()
 		if campaign.busy_of(hid) > 0:
 			_flash_msg("这周他还在外面办事，下周再说")
 		elif alive and campaign.alive_ids().size() <= 1:
@@ -8988,13 +12068,25 @@ func _panel_rest(r: Rect2, hid: String) -> void:
 	var cost: int = int(opt.get("cost", 0))
 
 	_text(Vector2(r.position.x + 16, y), "当前压力 %.0f / 200 —— 待完这次是 %.0f" % [
-		cur, maxf(0.0, cur - float(relief))], DdTheme.FONT_BD, DdTheme.STRESS if cur >= 100.0 else DdTheme.DIM)
+		cur, maxf(0.0, cur - float(relief))], DdTheme.FONT_BD,
+		DdTheme.STRESS if cur >= 100.0 else DdTheme.DIM,
+		HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 32.0)
 	_bar(Rect2(r.position.x + 16, y + 10, 340, 12), cur / 200.0, DdTheme.STRESS,
 		DdTheme.STRESS_TRACK)
-	_text(Vector2(r.position.x + 16, y + 42),
-		"一次减 %d 点，%d 金币。压力过 100 就该来了——崩溃一次要赔进去的可不止这点。" % [
-			relief, cost], DdTheme.FONT_MD, DdTheme.DIM)
-	_add_button(Rect2(r.position.x + 16, y + 64, 320, 44), "bld_act:rest",
+	# 限宽 + 折行（M181）：原来这行 40 个字不限宽，一路画到面板外面
+	# （截图里「…崩」之后被切掉）。用户提的「界面有覆盖重叠」，一半是它。
+	var note: String = "一次减 %d 点，%d 金币。压力过 100 就该来了——崩溃一次要赔进去的可不止这点。" % [
+		relief, cost]
+	var nw: float = r.size.x - 32.0
+	if _font.get_string_size(note, HORIZONTAL_ALIGNMENT_LEFT, -1, DdTheme.FONT_MD).x > nw:
+		_text(Vector2(r.position.x + 16, y + 42), "一次减 %d 点，%d 金币" % [relief, cost],
+			DdTheme.FONT_MD, DdTheme.DIM, HORIZONTAL_ALIGNMENT_LEFT, nw)
+		_text(Vector2(r.position.x + 16, y + 66), "压力过 100 就该来了——崩溃的代价远不止这点",
+			DdTheme.FONT_TAG, DdTheme.FAINT, HORIZONTAL_ALIGNMENT_LEFT, nw)
+	else:
+		_text(Vector2(r.position.x + 16, y + 42), note,
+			DdTheme.FONT_MD, DdTheme.DIM, HORIZONTAL_ALIGNMENT_LEFT, nw)
+	_add_button(Rect2(r.position.x + 16, y + 92, 320, 44), "bld_act:rest",
 		"减压（%d 金币）" % cost, cur > 0.01 and campaign.gold >= cost \
 		and campaign.busy_of(hid) <= 0)
 
@@ -9026,8 +12118,11 @@ func _panel_rest(r: Rect2, hid: String) -> void:
 func _draw_graveyard(r: Rect2) -> void:
 	_panel(r, DdTheme.PANEL_DEEP)
 	_text(Vector2(r.position.x + 16, r.position.y + 30), "墓园", DdTheme.FONT_H1, DdTheme.TEXT)
+	# 副标题也要给宽度（M152）：没写宽度时 Godot 按单行画，
+	# 字号放大后「那一趟结成了什么样」直接画出面板。
 	_text(Vector2(r.position.x + 16, r.position.y + 54),
-		"每一位倒在这里的人：死在第几周、哪片区域、那一趟结成了什么样。", DdTheme.FONT_SM, DdTheme.FAINT)
+		"每一位倒在这里的人：死在第几周、哪片区域、那一趟结成了什么样。",
+		DdTheme.FONT_SM, DdTheme.FAINT, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 32.0)
 	var gv: Array = campaign.graveyard()
 	if gv.is_empty():
 		_text(Vector2(r.position.x + 16, r.position.y + 96), "还没有人死在这里。", DdTheme.FONT_BD, DdTheme.DIM)
@@ -9035,17 +12130,25 @@ func _draw_graveyard(r: Rect2) -> void:
 	var y: float = r.position.y + 88
 	for g in gv:
 		var row: Dictionary = g
+		# 三行竖排（M152）：原来名字在左、统计和死因都挤在 x+180 那一列，
+		# 而且**没有宽度上限** —— 字号放大后「阵亡 1 次 · 出征 4 次 · 未归队」
+		# 和「最近：第 4 周 · 荒野 · 短途 1 级 · 撤退退」直接画到面板外面。
+		# 这一屏右边全是空的，竖着排反而更好读。
+		var bw2: float = r.size.x - 32.0
 		_text(Vector2(r.position.x + 16, y), _hero_label(str(row["hero"])),
 			DdTheme.FONT_BD, DdTheme.TEXT if bool(row["alive"]) else DdTheme.DIM)
-		_text(Vector2(r.position.x + 180, y), "阵亡 %d 次 · 出征 %d 次 · %s" % [
+		y += 22.0
+		_text(Vector2(r.position.x + 16, y), "阵亡 %d 次 · 出征 %d 次 · %s" % [
 			int(row["deaths"]), int(row["runs"]),
-			"已归队" if bool(row["alive"]) else "未归队"], DdTheme.FONT_MD, DdTheme.FAINT)
+			"已归队" if bool(row["alive"]) else "未归队"],
+			DdTheme.FONT_MD, DdTheme.FAINT, HORIZONTAL_ALIGNMENT_LEFT, bw2)
+		y += 20.0
 		# 第二行：最近一次的死因（M48）。没有这一行，墓园就只是计数器。
 		var last: Dictionary = row.get("last", {})
 		if not last.is_empty():
-			_text(Vector2(r.position.x + 180, y + 17), "最近：%s" % _death_line(last),
-				DdTheme.FONT_SM, DdTheme.DIM)
-		y += 46.0
+			_text(Vector2(r.position.x + 16, y), "最近：%s" % _death_line(last),
+				DdTheme.FONT_SM, DdTheme.DIM, HORIZONTAL_ALIGNMENT_LEFT, bw2)
+		y += 30.0
 
 
 ## 一条阵亡记录变成一句话（M48）。
@@ -9094,7 +12197,9 @@ func _building_hint(bid: String) -> String:
 		"smith":
 			return "装备阶受等级限制：第 N 级才穿得上 N 阶。升级时技能等级同步 +1。"
 		"guild":
-			return "每人只能带 4 个技能：带上治疗就少一格输出，这是这一屏唯一的取舍。"
+			# 补一句「怎么升级」（M186）：右上角那颗按钮写着「需决心 3」，
+			# 但玩家不知道「决心」从哪来 —— 而它只能靠出征攒。
+			return "每人只能带 4 个技能。升级要决心等级够（每次出征涨），决心越高能升到的技能等级越高。"
 		"sanitarium":
 			return "一次只处理一条：先治病还是先清负面怪癖，本身就是要做的决定。"
 		"abbey", "tavern":
@@ -9186,6 +12291,49 @@ func _do_hire(cls: String) -> void:
 ## 这一屏存在的理由不是「配置」，是**取舍**：带上治疗就少一个输出位，
 ## 带满控制就没有回血。原来 7 个全开的时候，战斗里每个英雄都有 7 个按钮，
 ## 从来没有「必须放弃什么」的时刻——那不像原版，也不像决策。
+## 公会卡上那一行数值（M150）：伤害、命中、暴击。
+##
+## 复用的 `build_spec` 是规则层算「这一击会怎样」的唯一入口 ——
+## 界面自己再算一遍，迟早和战斗里对不上。
+func _guild_skill_summary(hid: String, sid: String) -> String:
+	if db == null:
+		return ""
+	var lv: Dictionary = _skill_level_of(hid, sid)
+	if lv.is_empty():
+		return ""
+	var bits: Array = []
+	# 数值一律先过 `_num()` 取，别直接 `float(x)`：技能等级表里缺字段时
+	# 拿到的是 null，而 GDScript 的 `float(null)` 会抛「Nonexistent constructor」，
+	# 报错信息完全不提是哪个字段（M150 第一次跑就撞上了）。
+	# 数据里的 `dmg` 是**修正值**（0.0 / -0.4），不是「打多少点」——
+	# 真实数字要过 `battle.build_spec`，那需要一个真实的 Combatant，
+	# 而公会屏里没有战斗单位。所以这里给修正值：玩家要的是「哪个技能更狠」，
+	# 加减号已经够比了（M150）。
+	var dmg: float = _num(lv.get("dmg", 0.0))
+	if dmg != 0.0:
+		bits.append("伤害 %+.0f%%" % (dmg * 100.0))
+	var acc: float = _num(lv.get("atk", 0.0))
+	if acc != 0.0:
+		# 「基础」两个字必须写（M151）：这一屏**没有目标单位**，
+		# 算不了实战命中率（那要减去目标闪避、加上双方 buff）。
+		# 写「命中 85%」会让玩家以为是这一刀真能打中的概率。
+		bits.append("基础命中 %.0f%%" % (acc * 100.0))
+	var crit: float = _num(lv.get("crit", 0.0))
+	if crit != 0.0:
+		bits.append("暴击 %+.0f%%" % (crit * 100.0))
+	var hlv: float = _num(lv.get("heal", 0.0))
+	if hlv > 0.0:
+		bits.append("治疗 %+.0f%%" % (hlv * 100.0))
+	return " · ".join(bits)
+
+
+## 把 Variant 安全地当数字用（M150）。null / 字符串 → 0.0。
+func _num(v: Variant) -> float:
+	if v is int or v is float:
+		return float(v)
+	return 0.0
+
+
 func _draw_guild() -> void:
 	_header("公会 · 技能组",
 		"每个英雄只能带 4 个 · 点技能卡切换 · 改完自动存档")
@@ -9193,7 +12341,7 @@ func _draw_guild() -> void:
 	var alive: Array = campaign.alive_ids()
 	if alive.is_empty():
 		_text(Vector2(28, 120), "名册里没有活人，先回城镇征召。", DdTheme.FONT_BD, DdTheme.WARN)
-		_add_button(Rect2(24.0, size.y - 100.0, size.x - 48.0, 56.0), "close_guild", "返回城镇")
+		_add_button(Rect2(24.0, size.y - 100.0 - NAV_H, size.x - 48.0, 56.0), "close_guild", "返回城镇")
 		return
 	if _guild_hero.is_empty() or not alive.has(_guild_hero):
 		_guild_hero = str(alive[0])
@@ -9257,36 +12405,89 @@ func _draw_guild() -> void:
 		_tile(r2, st2)
 		# 技能图标（M64 第十六轮）：同一套六分类，和战斗技能卡一致。
 		# 七个技能排一列，纯文字时很难扫——图标让人一眼分出「哪几个是打人的」。
-		var ico_tex: Texture2D = _skin.texture("icons",
-			_skill_icon_level(_skill_level_of(_guild_hero, sid)))
+		var ico_tex: Texture2D = _skill_icon_tex(_guild_hero, sid)
 		var tx: float = r2.position.x + 16.0
 		if ico_tex != null:
 			var isz: float = 46.0
 			# 贴文字块而不是卡片正中：卡片 96~130 高，文字只占 38~90，
 			# 居中会让图标看着掉到下半截去。
+			# 原版图标是深色描边设计（原本画在浅灰按钮上），直接贴深色卡片
+			# 会糊成一片，所以统一提亮 45%（M129）。
+			# 图标本身是**黑底 + 彩边**（原版画在浅灰按钮上），直接贴深色卡
+			# 会整块融进去、只剩几笔彩色线条。提亮到 1.95 让黑底变中灰，
+			# 图案才跳得出来 —— 1.45 几乎看不出差别（M129 第一版）。
 			draw_texture_rect(ico_tex, Rect2(r2.position.x + 14.0,
-				r2.position.y + 18.0, isz, isz), false)
+				r2.position.y + 18.0, isz, isz), false, Color(1.95, 1.95, 1.95))
 			tx = r2.position.x + 62.0
 		# ✓ / ＋ 同样是为了「一眼看出装没装」——M18 的出战卡就在这里栽过一次
 		_text(Vector2(tx, r2.position.y + 38),
 			("✓ " if on else "＋ ") + DdNames.skill_name(sid), DdTheme.FONT_BD,
 			DdTheme.TEXT if on else DdTheme.TEXT.darkened(0.22))
-		_text(Vector2(r2.position.x + r2.size.x - 112, r2.position.y + 38),
-			("全开" if not selectable else "已装备") if on else "未装备", DdTheme.FONT_TAG,
-			DdTheme.OK if on else DdTheme.DIM, HORIZONTAL_ALIGNMENT_RIGHT, 96)
+		# 右侧：等级 + 状态 + 升级按钮（M126）。
+		# 布局：38 行放「Lv2/5 · 已装备」，52~86 放升级按钮。
+		var cur_lv: int = campaign.skill_level_of(_guild_hero, sid) if selectable else 0
+		var lv_txt: String = ("Lv %d/5 · " % (cur_lv + 1)) if selectable else ""
+		_text(Vector2(r2.position.x + r2.size.x - 150, r2.position.y + 38),
+			lv_txt + (("全开" if not selectable else "已装备") if on else "未装备"),
+			DdTheme.FONT_TAG, DdTheme.OK if on else DdTheme.DIM,
+			HORIZONTAL_ALIGNMENT_RIGHT, 134)
+		if selectable:
+			# 放在「Lvx/5」正下方（38 行文字下面的 44~74）。
+			# 第一版写 52，高度 34 会顶到 86，而描述行从 78 开始 —— 和正文重叠。
+			var upr := Rect2(r2.end.x - 96.0, r2.position.y + 46.0, 82.0, 26.0)
+			var cap: int = campaign.skill_cap(_guild_hero)
+			var cost: int = campaign.skill_upgrade_cost(_guild_hero, sid)
+			var can_up: bool = cost >= 0 and cur_lv < cap
+			_add_hit(upr, "guild_up:" + sid)
+			# 画出按钮的样子（M186）：原来只有一行金色的「升级 120」小字，
+			# 用户根本没意识到那是能点的 —— 他问「升级的入口在哪」。
+			draw_rect(upr, DdTheme.BTN_OFF if not can_up else Color(0.42, 0.16, 0.12))
+			draw_rect(upr, DdTheme.CRIT if can_up else DdTheme.PANEL_EDGE, false, 1.5)
+			_text(Vector2(upr.position.x, upr.position.y + 19.0),
+				("满级" if cost < 0 else (
+					# 卡在决心等级：把**需要练到几级**算出来，别写「需 Lv2」——
+					# `cap` 是 0 基索引，写 cap+2 会说少一级。
+					("需决心 %d" % (2 * cur_lv + 3)) if cur_lv >= cap
+					else "升级 %d" % cost)),
+				DdTheme.FONT_TAG,
+				DdTheme.CRIT if can_up else DdTheme.FAINT,
+				HORIZONTAL_ALIGNMENT_CENTER, upr.size.x)
 		# 描述行（M90）：原来 12px + DIM(#8b8a84) 压在深灰卡上，
 		# 对比度低到「看着眼睛疼」。现在 13px + 提亮，并且**折成两行**
 		# ——字号一大，一行就放不下 40 个字了。
 		# 卡片够高才折两行：96 高的卡片塞两行会顶到边框。
-		var dlines: Array = _wrap_tokens(_skill_line(_guild_hero, sid),
-			r2.end.x - tx - 16.0, DdTheme.FONT_MD,
-			2 if r2.size.y >= 118.0 else 1)
+		# 字号放大后两行描述会顶到右上角的「Lv / 需 LvN」（M138），只留一行。
+		# 完整数值在战斗技能卡上能看到，这里负责「快速认技能」。
+		# 宽度要给右上角的「Lv1/5 · 需 Lv3」让出 100（M138）：
+		# 原来铺满整行，描述字一长就横着压到等级那一列上去。
+		# 描述补上数值（M150）：原来只有「近战 · 可从 1、2 位发动」，
+		# 而在公会的全部决策是「要不要花 2000 金升这个技能」——
+		# 不知道打多少伤害、命中多少，这个决策无从谈起。
+		# 数值用战斗卡同一个 `_action_summary`，两边不会说出不同的数。
+		# 数值没能接上（M150 未完成）：`_skill_level_of` 返回的字典里
+		# 取 `atk` / `dmg` 一直是 0，而我连着两版都没定位到原因。
+		# 宁可不显示，也不要显示「命中 0%」这种错的数。留 `_guild_skill_summary`
+		# 这个函数在这里，下一轮用调试打印确认字段名之后再接。
+		var gline: String = _skill_line(_guild_hero, sid)
+		var gsum: String = _guild_skill_summary(_guild_hero, sid)
+		# 数值放**前面**（M151）：描述本身就有「近战 · 可从 1、2 位发动 ·
+		# 打敌方 1、2 位」这么长，再接一段数值必然被行尾截掉 ——
+		# 而这几个数字正是玩家比技能时最想看的。
+		if not gsum.is_empty():
+			gline = gsum + " · " + gline
+		# 折两行（M186）：`gline` = 数值 + 「近战 · 可从 1、2 位发动 · 打敌方 1、2 位」，
+		# 一行根本放不下，而 `max_lines = 1` 会把**后半截直接丢掉** ——
+		# 丢掉的恰好是位次，也就是用户问的「哪些站位能放、能打到对面哪些位」。
+		var dlines: Array = _wrap_tokens(gline,
+			r2.end.x - tx - 106.0, DdTheme.FONT_TAG, 2)
 		var dy: float = r2.position.y + 78.0
 		for dl in dlines:
-			_text(Vector2(tx, dy), str(dl), DdTheme.FONT_MD, DdTheme.DIM,
-				HORIZONTAL_ALIGNMENT_LEFT, r2.end.x - tx - 16.0)
+			_text(Vector2(tx, dy), str(dl), DdTheme.FONT_TAG, DdTheme.DIM,
+				HORIZONTAL_ALIGNMENT_LEFT, r2.end.x - tx - 106.0)
 			dy += 20.0
 		if selectable:
+			# 命中按登记顺序**正序**匹配，整卡先登记的话子按钮永远点不到 ——
+			# 所以这里整卡最后登记，让上面那个 `guild_up:` 优先。
 			_add_hit(r2, "guild_skill:" + sid)
 
 	# M58：返回按钮贴底（原来写死 y=664，竖屏下悬在页面中间）
@@ -9295,6 +12496,23 @@ func _draw_guild() -> void:
 	_text(Vector2(DdTheme.MARGIN, btn_y - 16.0), _building_hint("guild"),
 		DdTheme.FONT_MD, DdTheme.FAINT)
 	_add_button(Rect2(24.0, btn_y, size.x - 48.0, 56.0), "close_guild", "返回城镇")
+
+
+## 招不了的原因（M98）。卡片灰掉之后必须说清为什么，
+## 否则玩家只会觉得「这个按钮坏了」。
+func _hire_why(cls: String) -> String:
+	if campaign == null:
+		return ""
+	if campaign.alive_ids().size() >= campaign.roster_max():
+		return "名册已满"
+	var cost: Dictionary = campaign.hire_cost()
+	if campaign.gold < int(cost.get("gold", 0)):
+		return "金币不足"
+	var lo: Dictionary = cost.get("heirlooms", {})
+	for k in lo.keys():
+		if campaign.heirlooms.get(str(k), 0) < int(lo[k]):
+			return "纹章不足"
+	return "招募失败"
 
 
 ## 把「A · B · C」这种串按宽度折成最多 `max_lines` 行（M58）。
@@ -9346,6 +12564,13 @@ func _guild_roster_card(hid: String, r: Rect2) -> void:
 	_text(Vector2(gtx, r.position.y + 46),
 		("%d / %d" % [n, mx]) if sel_ok else "全开", DdTheme.FONT_TAG,
 		DdTheme.OK if (not sel_ok or (mx > 0 and n >= mx)) else DdTheme.WARN)
+	# 上阵标记（M176）：这一屏要决定「给谁配技能」，
+	# 而「这人会不会跟我下去」是决定要不要现在配的前提 ——
+	# 原来这里完全没有这个信息，得退回队伍屏看一眼再进来。
+	var g_on: bool = _prep_party.has(hid)
+	_text(Vector2(r.end.x - 62.0, r.position.y + 24.0), "上阵" if g_on else "空闲",
+		DdTheme.FONT_TAG, DdTheme.OK if g_on else DdTheme.FAINT,
+		HORIZONTAL_ALIGNMENT_RIGHT, 54.0)
 	_add_hit(r, "guild_pick:" + hid)
 
 
@@ -9412,7 +12637,8 @@ func _skill_line(hid: String, sid: String) -> String:
 			bits.append("暴击 %+.0f%%" % (cr * 100.0))
 		if int(lv.get("per_battle_limit", 0)) > 0:
 			bits.append("每场 %d 次" % int(lv.get("per_battle_limit", 0)))
-		bits.append("Lv%d" % lv_i)
+		# 不再拼 `Lv0`（M186）：右上角已经有「Lv1/5」，
+		# 末尾再挂一个 Lv0 既重复又像是别的东西。
 		return " · ".join(bits)
 	return ""
 
@@ -9644,6 +12870,115 @@ const SUPPLY_ICONS: Dictionary = {
 }
 
 
+## 补给面板（M154）：地牢里查看 + 使用背包。
+##
+## 之前玩家在准备屏买了一堆补给，进地牢后**没有任何地方能看到它们** ——
+## 只有「点火把」和「休整」会自己扣两种，其余六种既看不到也用不了。
+##
+## 能直接用的只有三种（火把 / 口粮 / 鸦片酊），另外几种要么需要指定人
+## （绷带止血、解毒剂解毒），要么只能对奇物用 —— 那些在行尾写明去处，
+## 不让玩家点了才发现「这按钮怎么没反应」。
+const SUPPLY_USE_HINT: Dictionary = {
+	"bandage": "战斗中止血",
+	"antivenom": "战斗中解毒",
+	"medicinal_herbs": "战斗/奇物用",
+	"holy_water": "奇物上用",
+	"shovel": "奇物上用",
+	"skeleton_key": "奇物上用",
+}
+
+
+func _supply_kinds() -> int:
+	if exp == null:
+		return 0
+	var n: int = 0
+	for k in SUPPLY_ICONS.keys():
+		if exp.supply_count(str(k)) > 0:
+			n += 1
+	if int(exp.food) > 0:
+		n += 1
+	return n
+
+
+func _draw_supply_panel() -> void:
+	if exp == null:
+		return
+	draw_rect(Rect2(Vector2.ZERO, size), Color(0.0, 0.0, 0.0, 0.62))
+	var w: float = minf(560.0, size.x - 60.0)
+	var rows: int = SUPPLY_ICONS.size() + 1
+	var h: float = 104.0 + float(rows) * 48.0 + 108.0
+	var r := Rect2((size.x - w) * 0.5, maxf(20.0, (size.y - h) * 0.5), w, h)
+	_panel(r, DdTheme.PANEL_DEEP)
+	draw_rect(r, DdTheme.PANEL_EDGE, false, 2.0)
+	_text(Vector2(r.position.x + 20.0, r.position.y + 34.0), "补给", DdTheme.FONT_H1, DdTheme.TEXT)
+	_text(Vector2(r.end.x - 20.0, r.position.y + 34.0), "点「用」当场生效",
+		DdTheme.FONT_SM, DdTheme.FAINT, HORIZONTAL_ALIGNMENT_RIGHT, 260.0)
+
+	# 口粮排第一（它不在 SUPPLY_ICONS 里，走 Shop.FOOD_KEY）
+	var entries: Array = [[Shop.FOOD_KEY, "口粮", int(exp.food)]]
+	for k in SUPPLY_ICONS.keys():
+		entries.append([str(k), DdNames.supply_name(str(k)), exp.supply_count(str(k))])
+
+	var y: float = r.position.y + 52.0
+	for e in entries:
+		var sid: String = str(e[0])
+		var nm: String = str(e[1])
+		var cnt: int = int(e[2])
+		var row := Rect2(r.position.x + 16.0, y, r.size.x - 32.0, 42.0)
+		draw_rect(row, DdTheme.BTN)
+		draw_rect(row, DdTheme.PANEL_EDGE, false, 1.0)
+		var ic: Texture2D = _supply_icon(sid)
+		var tx: float = row.position.x + 12.0
+		if ic != null:
+			draw_texture_rect(ic, Rect2(row.position.x + 8.0, row.position.y + 8.0, 26.0, 26.0), false)
+			tx = row.position.x + 42.0
+		_text(Vector2(tx, row.position.y + 27.0), nm, DdTheme.FONT_BD,
+			DdTheme.TEXT if cnt > 0 else DdTheme.FAINT,
+			HORIZONTAL_ALIGNMENT_LEFT, row.size.x - 220.0)
+		_text(Vector2(row.end.x - 216.0, row.position.y + 27.0), "× %d" % cnt,
+			DdTheme.FONT_BD, DdTheme.OK if cnt > 0 else DdTheme.FAINT,
+			HORIZONTAL_ALIGNMENT_RIGHT, 56.0)
+		var hint: String = str(SUPPLY_USE_HINT.get(sid, ""))
+		if cnt <= 0:
+			hint = "没有"
+		if hint.is_empty() and cnt > 0:
+			_add_button(Rect2(row.end.x - 108.0, row.position.y + 5.0, 100.0, 32.0),
+				"supply_use:" + sid, "用", true)
+		else:
+			_text(Vector2(row.end.x - 116.0, row.position.y + 27.0), hint,
+				DdTheme.FONT_TAG, DdTheme.FAINT, HORIZONTAL_ALIGNMENT_RIGHT, 116.0)
+		_add_hit(row, "supply_noop:" + sid)
+		y += 48.0
+
+	# —— 本趟战利品（M169）——
+	#
+	# DD1 在地牢里能开背包看战利品，我们这一版没有。原因不是遗漏：
+	# 我们的补给**不限格**（没有「背包满了要丢」的压力）、战利品**结算时才入库**
+	# （不占地牢内的空间），所以没有「整理」这个动作。
+	# 但「看不到这趟捡了多少」是真的缺点 —— 这里补上只读的统计。
+	var ly: float = r.end.y - 140.0
+	draw_line(Vector2(r.position.x + 16.0, ly - 14.0),
+		Vector2(r.end.x - 16.0, ly - 14.0), DdTheme.PANEL_EDGE, 1.0)
+	_text(Vector2(r.position.x + 20.0, ly + 6.0), "本趟战利品",
+		DdTheme.FONT_MD, DdTheme.DIM)
+	var hcount: int = 0
+	for hk in (exp.loot_heirlooms as Dictionary).keys():
+		hcount += int(exp.loot_heirlooms[hk])
+	var gcount: int = 0
+	for gk in (exp.loot_gems as Dictionary).keys():
+		gcount += int(exp.loot_gems[gk])
+	_text(Vector2(r.position.x + 20.0, ly + 32.0),
+		"金币 %d · 传家宝 %d 件 · 宝石 %d 颗 · 饰品 %d 件" % [
+			int(exp.loot_gold), hcount, gcount, (exp.loot_trinket_ids as Array).size()],
+		DdTheme.FONT_BD, DdTheme.LIGHT, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 40.0)
+	_text(Vector2(r.position.x + 20.0, ly + 54.0),
+		"结算时自动入账 / 入仓库", DdTheme.FONT_TAG, DdTheme.FAINT,
+		HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 40.0)
+
+	_add_button(Rect2(r.position.x + 16.0, r.end.y - 50.0, r.size.x - 32.0, 38.0),
+		"supply_close", "关闭")
+
+
 func _supply_icon(id: String) -> Texture2D:
 	# 口粮在准备屏排第一，它走的是 Shop.FOOD_KEY 而不是普通补给 id，
 	# 图集里早就有 icon_food（第 8 轮就接进地图资源条了），直接复用。
@@ -9694,7 +13029,11 @@ func _draw_shop() -> void:
 	_header("城镇商店", "")
 	var tab_w: float = 110.0
 	var tab_x0: float = size.x - 24.0 - tab_w * 2.0 - 8.0
-	_text(Vector2(tab_x0 - 120.0, 32.0), "金币 %d" % campaign.gold,
+	# 「我的饰品」入口（M182）：马车中间屏删掉之后，换装备的入口挪到这里 ——
+	# 原来它在那个中间屏的按钮里，入口一删就没地方去了。
+	_add_button(Rect2(tab_x0 - 232.0, 8.0, 108.0, 34.0), "shop_my_trinkets", "我的饰品",
+		not campaign.trinket_store.is_empty())
+	_text(Vector2(tab_x0 - 116.0, 32.0), "金币 %d" % campaign.gold,
 		DdTheme.FONT_BD, DdTheme.CRIT)
 	for ti in 2:
 		var tr := Rect2(tab_x0 + float(ti) * (tab_w + 8.0), 8.0, tab_w, 34.0)
@@ -9709,7 +13048,10 @@ func _draw_shop() -> void:
 
 	if campaign.shop == null:
 		_text(Vector2(28, 100), "inventory.json / trinkets.json 没读到，商店不可用。", DdTheme.FONT_BD, DdTheme.WARN)
-		_add_button(Rect2(24.0, size.y - 100.0, size.x - 48.0, 56.0), "close_shop", "返回城镇")
+		_add_button(Rect2(24.0, size.y - 100.0 - NAV_H, size.x - 48.0, 56.0), "close_shop", "返回城镇")
+		return
+	if not _shop_ask.is_empty():
+		_draw_shop_ask()
 		return
 	if _shop_tab == 1:
 		_draw_shop_supplies()
@@ -9747,6 +13089,10 @@ func _draw_shop() -> void:
 		_text(Vector2(tx, r.position.y + 96), _trinket_rarity_name(
 			campaign.trinket_lib.rarity_of(id)), DdTheme.FONT_TAG, DdTheme.STAT)
 		_text(Vector2(tx, r.position.y + 132), "%d 金" % price, DdTheme.FONT_BD, DdTheme.CRIT if can else DdTheme.WARN)
+		# 选中的那颗描一道亮边（M183）——两步操作里，第一下必须**看得出来被选中了**，
+		# 否则玩家会以为「点了没反应」，然后连点两下变成直接购买。
+		if str(_shop_sel.get("kind", "")) == "buy" and int(_shop_sel.get("idx", -1)) == i:
+			draw_rect(r, DdTheme.CRIT, false, 3.0)
 		_add_hit(r, "shop_buy:%d" % i)
 		_hit_overlay(r, "shop_buy:%d" % i)
 
@@ -9779,6 +13125,8 @@ func _draw_shop() -> void:
 		_text(Vector2(tx2, rr.position.y + 34), DdNames.trinket_name(tid), DdTheme.FONT_MD, DdTheme.TEXT)
 		_text(Vector2(tx2, rr.position.y + 62),
 			"卖 %d 金" % campaign.shop.trinket_sell_price(tid), DdTheme.FONT_SM, DdTheme.DIM)
+		if str(_shop_sel.get("kind", "")) == "sell" and int(_shop_sel.get("idx", -1)) == j:
+			draw_rect(rr, DdTheme.CRIT, false, 3.0)
 		_add_hit(rr, "shop_sell:%d" % j)
 		_hit_overlay(rr, "shop_sell:%d" % j)
 
@@ -9788,6 +13136,210 @@ func _draw_shop() -> void:
 	_text(Vector2(28, btn_y - 26.0),
 		"货架每趟回来换一批；已被买走的格子留空，不会往前挤。", DdTheme.FONT_SM, DdTheme.FAINT)
 	_add_button(Rect2(24.0, btn_y, size.x - 48.0, 56.0), "close_shop", "返回城镇")
+
+
+## 长按详情浮层（M183）。
+##
+## 手机上没有 hover，所以技能/饰品的完整数值只能靠长按看。
+## 内容是**数据里全都有、但摘要放不下**的那些：命中、暴击、位次、效果名。
+## 恢复期减益的中文说明（M201）。
+##
+## 键来自 `heroes.json → deaths_door.recovery_buffs`，数值来自 `buffs.json`。
+## 没有像技能那样从数据现算：五个 buff 里 `attack_rating` 是 -0.02、
+## `speed_rating` 是 -1，一个是比例一个是点数，混在一起换算，
+## 算错的概率比写死更高，而算错的表现是「界面写着 -2% 但实际是 -2 点」。
+## **改数值时这里要一起改。**
+const RECOVERY_TIPS: Dictionary = {
+	"mortalityACCDebuff": "命中 −2%",
+	"mortalityDMGLowDebuff": "伤害下限 −5%",
+	"mortalityDMGHighDebuff": "伤害上限 −5%",
+	"mortalitySPDDebuff": "速度 −1",
+	"mortalitySRDebuff": "受到的压力伤害 +10%",
+	# 心脏骤停那一组更重。`stress_dmg_received_percent` 在数据里是 **-0.15**，
+	# 和上面对应项的符号相反（那意味着受压变少，更像好事），疑似抓取时的符号问题，
+	# 待核；这里按数据原样写，不在界面上编。
+	"heartattackACCDebuff": "命中 −3%",
+	"heartattackDMGLowDebuff": "伤害下限 −10%",
+	"heartattackDMGHighDebuff": "伤害上限 −10%",
+	"heartattackSPDDebuff": "速度 −2",
+	"heartattackSRDebuff": "受到的压力伤害 −15%",
+}
+
+
+func _recovery_tips(hid: String) -> Array:
+	var out: Array = []
+	if db == null or campaign == null:
+		return out
+	var dd: Dictionary = db.hero(campaign.def_of(hid)).get("deaths_door", {})
+	for bid in (dd.get("recovery_buffs", []) as Array):
+		var t: String = str(RECOVERY_TIPS.get(str(bid), ""))
+		if not t.is_empty():
+			out.append(t)
+	return out
+
+
+func _draw_hold_tip() -> void:
+	if _hold_shown.is_empty():
+		return
+	var lines: Array = []
+	var title: String = ""
+	if _hold_shown.begins_with("skill:") or _hold_shown.begins_with("guild_skill:"):
+		var si2: int = int(_hold_shown.substr(_hold_shown.find(":") + 1))
+		title = "技能"
+		if _state == S_BATTLE and si2 >= 0 and si2 < _options.size():
+			var op: Dictionary = _options[si2]
+			var act: Dictionary = op.get("action", {})
+			title = DdNames.skill_name(str(act.get("id", "")))
+			lines.append("可发动：%s 号位" % _mask_text(int(act.get("launch_mask", 0))))
+			lines.append("目标：%s 号位%s" % [
+				_mask_text(int(act.get("target_mask", 0))),
+				"（全体）" if bool(act.get("target_aoe", false)) else ""])
+			var dr: Array = act.get("dmg_range", [])
+			if dr.size() >= 2:
+				lines.append("伤害 %d-%d" % [int(dr[0]), int(dr[1])])
+			elif absf(float(act.get("dmg_mod", 0.0))) > 0.001:
+				lines.append("伤害修正 %+.0f%%" % (float(act.get("dmg_mod", 0.0)) * 100.0))
+			if float(act.get("heal", 0.0)) > 0.0:
+				var hr: Array = act.get("heal_range", [])
+				lines.append("治疗 %d-%d" % [int(hr[0]), int(hr[1])] if hr.size() >= 2 else "治疗")
+			lines.append("命中 %d%% · 暴击 %d%%" % [
+				int(round(float(act.get("atk", 0.0)) * 100.0)),
+				int(round(float(act.get("crit", 0.0)) * 100.0))])
+			var effs: Array = act.get("effects", [])
+			if not effs.is_empty():
+				lines.append("效果：" + ", ".join(effs.slice(0, 3)))
+			if not str(op.get("why", "")).is_empty():
+				lines.append("⚠ " + str(op.get("why", "")))
+	elif _hold_shown.begins_with("tk_store:"):
+		var tid3: String = str(campaign.trinket_store[int(_hold_shown.substr(9))]) \
+			if int(_hold_shown.substr(9)) < campaign.trinket_store.size() else ""
+		title = DdNames.trinket_name(tid3)
+		lines.append(_trinket_summary(tid3))
+		lines.append("卖价 %d 金" % (campaign.shop.trinket_sell_price(tid3) if campaign.shop != null else 0))
+	elif _hold_shown.begins_with("hero_stat:"):
+		# 长按队伍卡看状态（M201）。队伍卡上只有血、压力和几个两字标签，
+		# 「恢复期」三个字背后是五条减益 —— 不写出来，玩家只能凭感觉觉得"变弱了"。
+		var hid_h: String = _hold_shown.substr(10)
+		title = _hero_label(hid_h)
+		var st_h: Dictionary = exp.state.get(hid_h, {}) if exp != null else {}
+		var mhp: int = _max_hp(hid_h)
+		lines.append("生命 %d / %d" % [
+			int(round(float(st_h.get("hp_ratio", 1.0)) * float(mhp))), mhp])
+		lines.append("压力 %.0f / 200" % float(st_h.get("stress", 0.0)))
+		if bool(st_h.get("at_deaths_door", false)):
+			lines.append("死门：再受一次伤害即阵亡")
+		if bool(st_h.get("recovering", false)):
+			lines.append("恢复期（本趟地牢内有效，回城消失）")
+			for tip in _recovery_tips(hid_h):
+				lines.append("  " + str(tip))
+		if not str(st_h.get("affliction", "")).is_empty():
+			lines.append("崩溃：%s" % str(st_h.get("affliction", "")))
+		if not str(st_h.get("virtue", "")).is_empty():
+			lines.append("美德：%s" % str(st_h.get("virtue", "")))
+	if lines.is_empty():
+		return
+	var w: float = minf(420.0, size.x - 40.0)
+	var h: float = 64.0 + float(lines.size()) * 26.0
+	var r := Rect2((size.x - w) * 0.5, size.y * 0.18, w, h)
+	draw_rect(r, Color(0.05, 0.05, 0.07, 0.97))
+	draw_rect(r, DdTheme.CRIT, false, 2.0)
+	# 有图标就画（M184）：技能有技能图标、饰品有饰品图标，
+	# 长按浮层是「看清楚这是啥」的地方，没图标等于少一半信息。
+	var tip_tx: float = 16.0
+	# 图标按 id 现取（M184）：技能走技能图标表，饰品走饰品图标
+	var tic: Texture2D = null
+	if _hold_shown.begins_with("skill:") and _state == S_BATTLE \
+			and int(_hold_shown.substr(6)) < _options.size():
+		var bh_sk: Dictionary = _options[int(_hold_shown.substr(6))]["action"]
+		tic = _skill_icon_tex(str(_battle.awaiting_input.def_id) \
+			if _battle != null and _battle.awaiting_input != null else "",
+			str(bh_sk.get("id", "")))
+	elif _hold_shown.begins_with("guild_skill:"):
+		tic = _skill_icon_tex(campaign.def_of(_guild_hero), str(_hold_shown.substr(12)))
+	elif _hold_shown.begins_with("tk_store:"):
+		var ti4: int = int(_hold_shown.substr(9))
+		if ti4 < campaign.trinket_store.size():
+			tic = _trinket_icon(str(campaign.trinket_store[ti4]))
+	if tic != null:
+			draw_texture_rect(tic, Rect2(r.position.x + 16.0, r.position.y + 10.0, 34.0, 34.0), false)
+			tip_tx = 60.0
+	_text(Vector2(r.position.x + tip_tx, r.position.y + 32.0), title,
+		DdTheme.FONT_BD, DdTheme.TEXT, HORIZONTAL_ALIGNMENT_LEFT, w - tip_tx - 16.0)
+	var yy: float = r.position.y + 60.0
+	for ln in lines:
+		_text(Vector2(r.position.x + 16.0, yy), str(ln), DdTheme.FONT_MD,
+			DdTheme.DIM, HORIZONTAL_ALIGNMENT_LEFT, w - 32.0)
+		yy += 26.0
+
+
+## 位次掩码 → 「1/2」这种可读文本。
+func _mask_text(mask: int) -> String:
+	if mask == 0:
+		return "任意"
+	var out: Array = []
+	for i in 4:
+		if (mask & (1 << i)) != 0:
+			out.append(str(i + 1))
+	return "/".join(out)
+
+
+## 商店确认弹窗（M183）：选中之后第二下弹这个，点「确认」才真的交易。
+func _draw_shop_ask() -> void:
+	draw_rect(Rect2(Vector2.ZERO, size), Color(0.0, 0.0, 0.0, 0.68))
+	var w: float = minf(460.0, size.x - 60.0)
+	var h: float = 240.0
+	var r := Rect2((size.x - w) * 0.5, (size.y - h) * 0.5, w, h)
+	_panel(r, DdTheme.PANEL_DEEP)
+	draw_rect(r, DdTheme.PANEL_EDGE, false, 2.0)
+	var is_buy: bool = str(_shop_ask.get("kind", "")) == "buy"
+	# 把物品图标画出来（M184）：这一屏本来就有一整套饰品图标，
+	# 弹窗里却只有一行名字 —— 玩家得靠字去认这是哪件。
+	# 用户的原话：「有现成图标的地方尽量都展示出来」。
+	var ask_sid: String = ""
+	var ask_idx: int = int(_shop_ask.get("idx", -1))
+	if is_buy and ask_idx >= 0 and ask_idx < campaign.shop_stock.size():
+		ask_sid = str(campaign.shop_stock[ask_idx])
+	elif not is_buy and ask_idx >= 0 and ask_idx < campaign.trinket_store.size():
+		ask_sid = str(campaign.trinket_store[ask_idx])
+	var ask_tx: float = 20.0
+	if not ask_sid.is_empty():
+		var ico: Texture2D = _trinket_icon(ask_sid)
+		if ico != null:
+			draw_texture_rect(ico, Rect2(r.position.x + 20.0, r.position.y + 16.0, 52.0, 52.0), false)
+			ask_tx = 84.0
+	_text(Vector2(r.position.x + ask_tx, r.position.y + 40.0),
+		"买下「%s」？" % str(_shop_ask.get("name", "")) if is_buy
+		else "卖出「%s」？" % str(_shop_ask.get("name", "")),
+		DdTheme.FONT_BD, DdTheme.TEXT, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - ask_tx - 20.0)
+	_text(Vector2(r.position.x + 20.0, r.position.y + 76.0),
+		("%d 金" % int(_shop_ask.get("price", 0))) if is_buy
+		else ("收回 %d 金" % int(_shop_ask.get("price", 0))),
+		DdTheme.FONT_H1, DdTheme.CRIT)
+	_text(Vector2(r.position.x + 20.0, r.position.y + 112.0),
+		"当前金币 %d" % campaign.gold, DdTheme.FONT_MD, DdTheme.DIM)
+	_text(Vector2(r.position.x + 20.0, r.position.y + 140.0),
+		"饰品是限定掉落，买错了没法退" if is_buy else "卖掉之后这件就没了",
+		DdTheme.FONT_TAG, DdTheme.WARN)
+	# 买得起 / 仓库还有位置才能确认（M183）：金币 0 摆着 10000 的货，
+	# 「确认」照样亮着，点下去弹一句「金币不足」—— 那一步白走。
+	var can_do: bool = true
+	if is_buy:
+		var pr: int = int(_shop_ask.get("price", 0))
+		var sid_ask: String = ""
+		var ai2: int = int(_shop_ask.get("idx", -1))
+		if ai2 >= 0 and ai2 < campaign.shop_stock.size():
+			sid_ask = str(campaign.shop_stock[ai2])
+		can_do = campaign.gold >= pr and campaign.store_free() > 0 \
+			and campaign.can_add_trinket(sid_ask)
+	if can_do:
+		_add_button(Rect2(r.position.x + 20.0, r.end.y - 62.0, (r.size.x - 52.0) * 0.5, 44.0),
+			"shop_yes", "确认" if is_buy else "确认卖出")
+	else:
+		_add_button(Rect2(r.position.x + 20.0, r.end.y - 62.0, (r.size.x - 52.0) * 0.5, 44.0),
+			"shop_yes",
+			"金币不够" if campaign.gold < int(_shop_ask.get("price", 0)) else "仓库放不下", false)
+	_add_button(Rect2(r.position.x + 32.0 + (r.size.x - 52.0) * 0.5, r.end.y - 62.0,
+		(r.size.x - 52.0) * 0.5, 44.0), "shop_no", "再想想")
 
 
 ## 补给柜台（M66）。
@@ -9899,7 +13451,7 @@ func _draw_trinket() -> void:
 	if campaign.trinket_lib == null or not campaign.trinket_lib.is_loaded():
 		_header("饰品仓库", "数据未加载")
 		_text(Vector2(28, 100), "trinkets.json 没读到，饰品系统不可用。", DdTheme.FONT_BD, DdTheme.WARN)
-		_add_button(Rect2(24.0, size.y - 100.0, size.x - 48.0, 56.0), "close_trinkets", "返回城镇")
+		_add_button(Rect2(24.0, size.y - 100.0 - NAV_H, size.x - 48.0, 56.0), "close_trinkets", "返回城镇")
 		return
 	_header("饰品仓库",
 		"点左边一件 → 再点右边某个空槽    仓库 %d / %d" % [
@@ -9992,26 +13544,33 @@ func _draw_trinket() -> void:
 	_text(Vector2(28, ey - 12.0), "谁戴什么（点槽位卸下 / 先点上面一件再点空槽装上）",
 		DdTheme.FONT_MD, DdTheme.DIM)
 	# 列数跟着人数走：写死 4 列时第 5 个人直接被排到屏幕外
-	var n_hero: int = clampi(ids.size(), 1, 8)
-	var ew: float = (size.x - 56.0 - 8.0 * float(n_hero - 1)) / float(n_hero)
-	for hi in mini(ids.size(), n_hero):
+	# **最多 4 列 × 2 行**（M157）。原来 8 个人排一行，每列只有
+	# (750-56-56)/8 ≈ 80px —— 头像 + 名字 + 饰品名 + 「卸」全塞进 80px，
+	# 缩成一片看不清（用户原话「密密麻麻根本看不清」）。
+	# 改成两行四列之后每列 165，正好放得下。
+	var cols_h: int = mini(4, maxi(1, ids.size()))
+	var rows_h: int = int(ceil(float(ids.size()) / float(cols_h)))
+	var ew: float = (size.x - 56.0 - 8.0 * float(cols_h - 1)) / float(cols_h)
+	var cell_h: float = (168.0 - 8.0 * float(rows_h - 1)) / float(rows_h)
+	for hi in ids.size():
 		var hid: String = str(ids[hi])
 		var row2: Dictionary = campaign.hero(hid)
 		var alive: bool = bool(row2.get("alive", true))
 		var e: Array = campaign.equipped_of(hid)
-		var hx: float = 28.0 + float(hi) * (ew + 8.0)
+		var hx: float = 28.0 + float(hi % cols_h) * (ew + 8.0)
+		var ey2: float = ey + float(hi / cols_h) * (cell_h + 8.0)
 		# 头像（M64 第十三轮）：列宽只有 132，纹章缩到 12px 就认不出，
 		# 所以这里只放头像，纹章留给更宽的列表。
-		var ph4: float = minf(ew * 0.30, 40.0)
-		var pr4 := Rect2(hx, ey + 4.0, ph4 * 0.754, ph4)
+		var ph4: float = minf(ew * 0.22, 34.0)
+		var pr4 := Rect2(hx, ey2 + 4.0, ph4 * 0.754, ph4)
 		_draw_hero_badge(hid, pr4, alive)
 		var htx: float = pr4.end.x + 8.0
-		_text(Vector2(htx, ey + 20.0), _hero_label(hid), DdTheme.FONT_BD,
+		_text(Vector2(htx, ey2 + 18.0), _hero_label(hid), DdTheme.FONT_BD,
 			DdTheme.TEXT if alive else DdTheme.FAINT, HORIZONTAL_ALIGNMENT_LEFT, ew - (htx - hx) - 4.0)
-		_text(Vector2(htx, ey + 38.0), "装备 %d 阶" % int(row2.get("gear", 0)),
+		_text(Vector2(htx, ey2 + 36.0), "装备 %d 阶" % int(row2.get("gear", 0)),
 			DdTheme.FONT_TAG, DdTheme.DIM)
 		for s in campaign.equip_slots:
-			var sr := Rect2(hx, ey + 48.0 + float(s) * 58.0, ew, 52.0)
+			var sr := Rect2(hx, ey2 + 44.0 + float(s) * 50.0, ew, 46.0)
 			var cur: String = str(e[s]) if s < e.size() else ""
 			_panel(sr, DdTheme.PANEL_DEEP if cur.is_empty() else DdTheme.PANEL_HI)
 			_hit_overlay(sr, "tk_slot:%s:%d" % [hid, s])
@@ -10209,7 +13768,18 @@ func _quirk_effect_text(qid: String) -> String:
 		# 不去重会写成「伤害+15%；伤害+15%」。
 		if not line.is_empty() and not parts.has(line):
 			parts.append(line)
-	return "；".join(parts)
+	if not parts.is_empty():
+		return "；".join(parts)
+	# 空的时候要**说明为什么空**（M189）。
+	#
+	# 170 条怪癖里有 32 条 `buffs: []` —— 原版就是这样（苦修、黑暗诱惑…），
+	# 它们的作用在叙事或奇物标签上，没有战斗数值。
+	# 原来这里直接返回空串，界面上就是「· 苦修」后面一片空白，
+	# 看着像没写完。用户就是这么问的。
+	var tag: String = str(q.get("curio_tag", ""))
+	if not tag.is_empty():
+		return "奇物互动：%s（无战斗数值）" % tag
+	return "无战斗数值（背景设定）"
 
 
 ## 说不了的就报 buff 条数——不编造。
@@ -10246,6 +13816,33 @@ func _trinket_summary(id: String) -> String:
 	return " ".join(bits)
 
 
+## 这件饰品现在戴在谁身上（M111）。空字符串 = 没人戴。
+func _who_wears(tid: String) -> String:
+	if campaign == null or tid.is_empty():
+		return ""
+	for hid in campaign.hero_ids():
+		var eq: Array = campaign.equipped_of(str(hid))
+		for it in eq:
+			if str(it) == tid:
+				return str(hid)
+	return ""
+
+
+## 稀有度配色（M108）。原版用颜色区分档位，玩家扫一眼就知道哪件值钱；
+## 我们之前只有个「稀有」两个字，还得读一遍才知道档次。
+func _rarity_col(r: String) -> Color:
+	match r:
+		"uncommon":
+			return DdTheme.OK
+		"rare":
+			return DdTheme.PARTY
+		"very_rare":
+			return DdTheme.STAT
+		"ancestral", "trophy", "darkest_dungeon":
+			return DdTheme.CRIT
+	return DdTheme.DIM
+
+
 func _trinket_rarity_name(r: String) -> String:
 	match r:
 		"very_common": return "普通"
@@ -10277,6 +13874,31 @@ func _drain_battle_events() -> void:
 	while _ev_pos < _battle.events.size():
 		_consume_battle_event(_battle.events[_ev_pos])
 		_ev_pos += 1
+
+
+## 打残骸的出手表现（M193）。
+##
+## `corpse_hit` / `corpse_destroyed` 原来在界面上完全静音：没有出招帧、
+## 没有挥击特效、没有武器音。画面上只有「对面尸体掉一格耐久」，
+## 玩家分不清是技能打出去了还是自己点空了。
+func _corpse_strike_fx(actor_uid: int, target_uid: int, skill: String) -> void:
+	_pose_for_action(actor_uid, skill)
+	var u: Combatant = _unit_by_uid(actor_uid)
+	if u == null:
+		return
+	if _fx != null:
+		var pair: Dictionary = _fx.fx_for(u.def_id, skill)
+		_fx_play(str(pair.get("performer", "")), actor_uid, 0.0, "feet")
+		# 残骸不喷血，但**命中特效**要留：缺了它，挥击像打在空气里，
+		# 看不出这一下到底生效没有。
+		_fx_play(str(pair.get("target", "")), target_uid, 0.12, "chest")
+	if _sfx != null:
+		var imp: String = Sfx.impact_slot(_anim_of(actor_uid, skill))
+		if not _sfx.has_slot(imp):
+			imp = "imp_general"
+		if not _sfx.has_slot(imp):
+			imp = "hit"
+		_sfx.play(imp, randf_range(0.95, 1.05), -1.0)
 
 
 func _consume_battle_event(e: Dictionary) -> void:
@@ -10379,6 +14001,15 @@ func _consume_battle_event(e: Dictionary) -> void:
 					_sfx.play("heal", 1.0, -3.0)
 				_add_log("%s 治疗 %s  +%d" % [_nm(e["actor"]), _nm(e["target"]), int(e["amount"])], DdTheme.HEAL)
 				_spawn_float(int(e["target"]), "+%d" % int(e["amount"]), DdTheme.HEAL)
+				# 治疗的**动作和特效**（M158）。原来这个分支只有音效 + 一行字 +
+				# 一个数字，所以「回复类技能没动作」—— 素材包里
+				# `fx/battle_heal`（出手）和 `fx/battle_heal_target`（命中）
+				# 一直都在，只是从来没人播。
+				# 姿势跟着 `_pose_for_action` 走（修女这类没有 attack_heal 帧的，
+				# 姿势为空但特效照样出，至少不是「站着不动、血条涨一截」）。
+				_pose_for_action(int(e["actor"]), str(e.get("skill", "")))
+				_fx_play("battle_heal", int(e["actor"]), 0.0, "feet")
+				_fx_play("battle_heal_target", int(e["target"]), 0.12, "chest")
 		"effect":
 			if e.has("stress") and absf(float(e["stress"])) >= 1.0:
 				_spawn_float(int(e["target"]), "%+.0f 压力" % float(e["stress"]), DdTheme.STAT)
@@ -10428,6 +14059,10 @@ func _consume_battle_event(e: Dictionary) -> void:
 			# 否则玩家只会看到「打向奶妈的一击，奶妈却没掉血」。
 			_add_log("　%s 挡在 %s 前面" % [_nm(e["guard"]), _nm(e["target"])], DdTheme.OK)
 			_spawn_float(int(e["guard"]), "挡住", DdTheme.OK)
+			# 探身 + 被守护者标记（M200）：只有飘字的话，画面上两个人各站各的，
+			# 看不出「他替你挨了这一下」。探身只改绘制坐标，不动 rank。
+			_guard_fx[int(e["guard"])] = {"toward": int(e["target"]), "t": GUARD_FX_TIME}
+			_guard_fx[int(e["target"])] = {"blocked": true, "t": GUARD_FX_TIME}
 		"riposte_up":
 			_add_log("　%s 摆出反击姿态（%d 回合）" % [_nm(e["actor"]),
 				int(e.get("turns", 0))], DdTheme.CRIT)
@@ -10479,10 +14114,14 @@ func _consume_battle_event(e: Dictionary) -> void:
 			_add_log("【阵亡】%s" % _nm(e["actor"]), DdTheme.WARN)
 		"corpse_hit":
 			# 打残骸（M73）：它不掉血，只掉耐久，所以日志不能说「造成伤害」。
+			# 出手表现（M193）：这一支原来是全静音的，玩家看到的是
+			# 「人站着不动、对面尸体掉一格耐久」，和「点错了」分不开。
+			_corpse_strike_fx(int(e["actor"]), int(e["target"]), str(e.get("skill", "")))
 			_add_log("　%s 击中残骸，还剩 %d 下" % [_nm(e["actor"]), int(e.get("left", 0))],
 				DdTheme.DIM)
 			_spawn_float(int(e["target"]), "残骸 -1", DdTheme.DIM)
 		"corpse_destroyed":
+			_corpse_strike_fx(int(e["actor"]), int(e["target"]), str(e.get("skill", "")))
 			_add_log("　%s 清掉残骸 → 后排整体前移一格" % _nm(e["actor"]), DdTheme.OK)
 			_spawn_float(int(e["target"]), "清场", DdTheme.OK)
 			# 尸体从队列里被移除了，行动序里那个 uid 已经失效：
@@ -10492,6 +14131,7 @@ func _consume_battle_event(e: Dictionary) -> void:
 			# 召唤物是凭空出现的：没有这条日志，玩家只会看到敌人格子里
 			# 多了一个单位，却不知道是谁叫来的、站在第几位。
 			summons += 1
+			_summoned_uids[int(e["uid"])] = true
 			_add_log("　%s 召来了 %s（%d 号位）" % [
 				_nm(e["actor"]), DdNames.monster_name(str(e.get("monster", ""))),
 				int(e.get("rank", 0)) + 1], DdTheme.WARN)

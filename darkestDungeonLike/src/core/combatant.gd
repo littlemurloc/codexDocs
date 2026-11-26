@@ -120,7 +120,7 @@ var crit_mult_value: float = 1.5
 ## 这是 M1~M18 的历史行为，bench 与旧基线要靠它复现，
 ## 所以默认值不能改，只能在调用方显式传入时才收窄。
 func setup_from_hero(db: DdDb, hero_id: String, gear_level: int, skill_level: int,
-		selected: Array = []) -> bool:
+		selected: Array = [], levels_by_id: Dictionary = {}) -> bool:
 	var h: Dictionary = db.hero(hero_id)
 	if h.is_empty():
 		push_error("Combatant: 未知英雄 %s" % hero_id)
@@ -135,7 +135,8 @@ func setup_from_hero(db: DdDb, hero_id: String, gear_level: int, skill_level: in
 		resistances[str(k)] = float(h["resistances"][k])
 	enemy_types = []
 	tags = h.get("tags", [])
-	actions = build_actions(filter_actions(h.get("skills", []), selected), skill_level, true)
+	actions = build_actions(filter_actions(h.get("skills", []), selected), skill_level,
+		true, levels_by_id)
 	# 移动技能：数据里是单独一条扁平记录，不在 skills 数组里，
 	# M1~M8 一直没解析，所以英雄从来不能换位。
 	var ms: Variant = h.get("move_skill", {})
@@ -221,7 +222,8 @@ static func filter_actions(pool: Array, selected: Array) -> Array:
 ## 站位编码：`.launch 21` 表示可从己方 1、2 号位发动，`.target 12` 表示
 ## 可命中敌方 1、2 号位；前缀 `~` 表示对该集合全体生效（AOE）。
 ## 用位掩码表达后，判定就是 `mask & (1 << rank)`。
-static func build_actions(skills: Array, level: int, is_hero_action: bool) -> Array:
+static func build_actions(skills: Array, level: int, is_hero_action: bool,
+		levels_by_id: Dictionary = {}) -> Array:
 	var out: Array = []
 	for s in skills:
 		# 两种数据形状：英雄技能是 {id, levels:[...], art}，带 5 个等级；
@@ -232,7 +234,11 @@ static func build_actions(skills: Array, level: int, is_hero_action: bool) -> Ar
 		if levels.is_empty():
 			lv = s
 		else:
-			lv = levels[clampi(level, 0, levels.size() - 1)]
+			# 每个技能各自的等级（M126）。`levels_by_id` 为空时退回统一等级，
+			# 怪物和旧调用都走这条路。
+			var per: int = clampi(int(levels_by_id.get(str(s.get("id", "")), level)),
+				0, levels.size() - 1)
+			lv = levels[per]
 		var launch: Dictionary = _parse_rank_mask(str(lv.get("launch", "")))
 		var target: Dictionary = _parse_rank_mask(str(lv.get("target", "")))
 

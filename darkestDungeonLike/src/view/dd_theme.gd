@@ -85,15 +85,15 @@ static func pct(v: float, digits: int = 0) -> String:
 # 4.5~6.5 逻辑点；桌面上窗口按 1334 高等比缩到 0.74 之后，
 # 9px 只剩 6.7 个物理像素 —— 玩家反馈「字小、糊」就是这个。
 # 提两档是最小可感知的幅度（+22% / +15%），再大就要动布局间距了。
-const FONT_TAG: int = 11
-const FONT_SM: int = 12
-const FONT_MD: int = 13
-const FONT_BD: int = 15
-const FONT_LG: int = 17
-const FONT_H1: int = 18
-const FONT_HERO: int = 22
+const FONT_TAG: int = 16
+const FONT_SM: int = 18
+const FONT_MD: int = 20
+const FONT_BD: int = 22
+const FONT_LG: int = 25
+const FONT_H1: int = 27
+const FONT_HERO: int = 33
 ## 结算屏那种「一屏只有一个」的大标题
-const FONT_DISPLAY: int = 30
+const FONT_DISPLAY: int = 44
 
 # 间距只用 4 的倍数：4 / 8 / 12 / 16 / 24 / 32。
 # 之前 3、5、6、7、10、14 都有，凑出来的空隙看起来处处不一样。
