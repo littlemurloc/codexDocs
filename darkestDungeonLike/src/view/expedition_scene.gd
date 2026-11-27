@@ -209,6 +209,13 @@ var _dlg_demo_done: bool = false
 ## 长按要按住 0.45 秒，命令行没法模拟"按住不动"，只能这样验样式。
 var _hold_demo: bool = false
 var _hold_demo_done: bool = false
+## 截屏用（M205）：把战场上的敌人立绘换成这个 id 的图（只改绘制，不改数据）。
+## 补怪物美术时，每出一张就能立刻看比例，不用等随机抽到它。
+var _foe_demo: String = ""
+## 截屏用（M210）：敌人常驻某个动作帧 / 按死亡帧画。真实战斗里这两个时机很短，
+## 命令行抓不到，只能靠参数把画面钉住。
+var _pose_demo: String = ""
+var _dead_demo: bool = false
 ## 地图平移（M78）。格子固定 120 之后内容会超出面板，靠拖拽看。
 var _map_pan: Vector2 = Vector2.ZERO
 ## true = 下次绘制时把当前房间居中（进新房间时重置）。
@@ -277,6 +284,13 @@ var _slots: Array = []         # {rect, uid, side}
 
 ## 单位贴图（M36）。槽位与规格见 `unit_art.gd` 头部。
 var _art: UnitArt = UnitArt.new()
+
+## 怪物暂代资源（M213）：开发期先用骷髅兵这**一整套**（站/起手/命中/骸骨）
+## 顶掉全部怪物的黑色剪影，先把「战斗画面全是立绘」的样子看一遍。
+##
+## **量产前把这一行删掉**（或置空）。理由见 `UnitArt.placeholder_id` 的注释：
+## 留着它，缺图就永远看不出来 —— 每只怪长得都一样，而不是"这只还没做"。
+const PLACEHOLDER_UNIT: String = "skeleton_militia"
 ## 界面贴图槽位（M40）。`--no-skin` 会把它整个关掉，退回自绘。
 var _skin: UiSkin = UiSkin.new()
 ## 光照的可见范围层（M44）。`--no-light` 关掉，用于对照。
@@ -900,6 +914,9 @@ func _on_back_pressed() -> void:
 
 
 func _ready() -> void:
+	# 怪物暂代资源（M213）：这一行让**所有**怪物都用骷髅兵那套图。
+	# 删掉它就恢复「缺图 = 黑剪影」。体验期开关，不是永久设定。
+	_art.placeholder_id = PLACEHOLDER_UNIT
 	# **必须关**（M134）：默认 true 时安卓返回键会直接退出应用，
 	# 而全面屏手势的「返回」是从屏幕边缘往内滑 —— 点边上的按钮就会误触。
 	get_tree().quit_on_go_back = false
@@ -1093,6 +1110,12 @@ func _ready() -> void:
 			_dlg_demo = true
 		elif a == "--hold-demo":
 			_hold_demo = true
+		elif a.begins_with("--foe-demo="):
+			_foe_demo = a.substr(11)
+		elif a.begins_with("--pose-demo="):
+			_pose_demo = a.substr(12)
+		elif a == "--dead-demo":
+			_dead_demo = true
 		elif a == "--guild":
 			_boot_guild = true
 		elif a.begins_with("--save="):
@@ -6507,8 +6530,18 @@ func _draw_roster_strip(ids: Array, alive_n: int) -> void:
 	# 玩家想「看全部人」得先猜到有这么一个入口。
 	var head_r := Rect2(x0, y0, w, 32.0)
 	_add_hit(head_r, "roster_page")
+	# 全灭时标题转红（M214）。标题右侧放不下「存活 N」——
+	# 「名册 4 人」本身就占掉大半格，再挤会和「上阵 N/4」撞上。
+	# 真正的信息量压在**头像的阵亡标记**上（见下面的绘制循环）。
+	var all_dead: bool = true
+	for h_all in ids:
+		if bool((campaign.hero(str(h_all)) as Dictionary).get("alive", false)):
+			all_dead = false
+			break
+	# 全灭用暗红而不是 `CRIT`（那支是金黄，读起来像"高亮/奖励"）
+	var dead_red: Color = DdTheme.HP.lightened(0.42)
 	_text(Vector2(x0 + 14.0, y0 + 25.0), "名册 %d 人" % ids.size(),
-		DdTheme.FONT_LG, DdTheme.TEXT)
+		DdTheme.FONT_LG, dead_red if all_dead else DdTheme.TEXT)
 	# 「存活 5 · 上限 4」在字号提了两档之后会顶到右边的「全部 ›」（M72），
 	# 缩成「活 5/4」——这一条本来就只是给「我这趟能带几个」看的。
 	# 「活 5/4」这个写法本身就在制造误会（M94）：活着 5 个、上限 4 个，
@@ -6533,7 +6566,14 @@ func _draw_roster_strip(ids: Array, alive_n: int) -> void:
 	if show_ids.is_empty() and campaign != null:
 		# 其次是**存档里的名单**（M114 存的那份）：刚启动/切后台回来时
 		# 内存里的 `_prep_party` 还是空的，但玩家的选择在档里。
-		show_ids = campaign.party_ids.duplicate()
+		#
+		# **这份也要过滤死人和忙人**（M214）：存档里的名单是「上次出征的 4 个人」，
+		# 他们死了之后名单并不会被清 —— 于是团灭回城，这条名册还是显示
+		# 4 个正常头像、上阵 4/4，看起来像人全都还在（用户截图就是这个）。
+		for h2 in campaign.party_ids:
+			var r2: Dictionary = campaign.hero(str(h2))
+			if bool(r2.get("alive", false)) and campaign.busy_of(str(h2)) <= 0:
+				show_ids.append(str(h2))
 	if show_ids.is_empty() and campaign != null:
 		show_ids = campaign.selectable_ids().slice(0, Campaign.PARTY_MAX)
 	var can_go: int = campaign.selectable_ids().size()
@@ -6551,9 +6591,18 @@ func _draw_roster_strip(ids: Array, alive_n: int) -> void:
 	# 这条显示的是**上阵的 4 个人**（M127），不是名册前 5 个。
 	# 原来照着名册顺序排，玩家看不出「这周到底带谁下去」——
 	# 而这一条就在城镇正中，是每周看的第一眼。
+	#
+	# 绘制用的是**没过滤的名单**（M214）：`show_ids` 只用于「上阵 N/4」的计数，
+	# 死人被过滤掉之后，4 个格子会变成空槽 —— 玩家看到的是「没人编队」，
+	# 而不是「他们都死了」。腾出格子反而把最重要的信息抹掉了。
+	var draw_ids: Array = []
+	if not _prep_party.is_empty():
+		draw_ids = _prep_party.duplicate()
+	elif campaign != null:
+		draw_ids = campaign.party_ids.duplicate()
 	var n: int = Campaign.PARTY_MAX
 	for i in n:
-		var hid: String = str(show_ids[i]) if i < show_ids.size() else ""
+		var hid: String = str(draw_ids[i]) if i < draw_ids.size() else ""
 		if hid.is_empty():
 			# 空位：虚线感的空槽 + 一个「空」字。名册里还有人也不补 ——
 			# 这 4 个格子表达的是「本趟阵容」，不是「我有哪些人」。
@@ -6567,12 +6616,26 @@ func _draw_roster_strip(ids: Array, alive_n: int) -> void:
 		# 在建筑里的人整张头像压暗（M94）：这条名册条原来完全看不出
 		# 「他这周不能用」，玩家的第一反应就是「我的人怎么不见了」。
 		var bz: int = campaign.busy_of(hid)
+		# 阵亡（M214）：比「忙」更暗，并且叠一个「亡」字 + 红框。
+		# 只压暗不够 —— 压暗在深色皮肤上几乎读不出来，
+		# 而这一格必须能回答「这个人还在不在」。
+		var dead: bool = not bool((campaign.hero(hid) as Dictionary).get("alive", true))
 		var tint: Color = Color(0.42, 0.42, 0.48, 1.0) if bz > 0 else Color(1, 1, 1, 1)
+		if dead:
+			# 0.30 会把头像压成纯黑块，连是谁都看不出（第一版）；
+			# 0.45 还能辨认轮廓，同时明确"这个人不在了"。
+			tint = Color(0.45, 0.40, 0.40, 1.0)
 		if tex != null:
 			draw_texture_rect(tex, pr, false, tint)
-		draw_rect(pr, DdTheme.PANEL_EDGE, false, 1.0)
+		draw_rect(pr, dead_red if dead else DdTheme.PANEL_EDGE, false, 1.0 if not dead else 2.0)
+		if dead:
+			# 半透明底 + 「亡」：头像本身压暗之后字还得读得清
+			draw_rect(Rect2(pr.position.x, pr.position.y + 16.0, pr.size.x, 24.0),
+				Color(0.0, 0.0, 0.0, 0.45))
+			_text(Vector2(pr.position.x, pr.position.y + 35.0), "亡",
+				DdTheme.FONT_BD, DdTheme.HP.lightened(0.55), HORIZONTAL_ALIGNMENT_CENTER, pr.size.x)
 		_text(Vector2(pr.position.x, pr.end.y + 16.0), _hero_label(hid),
-			DdTheme.FONT_TAG, DdTheme.FAINT if bz > 0 else DdTheme.DIM,
+			DdTheme.FONT_TAG, DdTheme.FAINT if (bz > 0 or dead) else DdTheme.DIM,
 			HORIZONTAL_ALIGNMENT_CENTER, 56.0)
 		_add_hit(pr, "hero_info:" + hid)
 
@@ -7491,13 +7554,43 @@ func _draw_map() -> void:
 	var log_r := Rect2(m, party_r.end.y + 10.0, size.x - m * 2.0, log_h)
 	_map_banner_y = log_r.position.y
 	var act_r := Rect2(m, size.y - 44.0 - 204.0, size.x - m * 2.0, 204.0)
-	_map_rect = grid_r       # 拖拽热区（M78）
 	_panel(grid_r, DdTheme.PANEL_DEEP)
+
+	# —— 任务横幅（M216）——
+	#
+	# 进度原来只写在**房间信息面板**里（第三行小字）。那个面板在最上面，
+	# 而玩家的眼睛一直在网格上 —— 于是「探索时看不到任务进度」，
+	# 只有结算屏才被迫看见一次（用户的原话）。
+	# 现在从网格顶部切 28px 出来，横幅就压在玩家正在看的那块区域上。
+	var ql2: String = _quest_line(false)
+	var strip_h: float = 0.0
+	var grid_in: Rect2 = grid_r
+	if not ql2.is_empty():
+		strip_h = 28.0
+		grid_in = Rect2(grid_r.position.x, grid_r.position.y + strip_h,
+			grid_r.size.x, grid_r.size.y - strip_h)
+		var done: bool = exp.quest_met()
+		var qcol: Color = DdTheme.OK if done else DdTheme.WARN
+		draw_rect(Rect2(grid_r.position, Vector2(grid_r.size.x, strip_h)),
+			Color(0.0, 0.0, 0.0, 0.42))
+		# 左边说「做什么」，右边说「做到哪了」——两个信息分开，避免一行太长被截
+		_text(Vector2(grid_r.position.x + 10.0, grid_r.position.y + 20.0), ql2,
+			DdTheme.FONT_MD, qcol, HORIZONTAL_ALIGNMENT_LEFT, grid_r.size.x - 130.0)
+		var pr2: Vector2i = QuestGoal.progress(exp.quest_goal, exp.quest_state())
+		if pr2.y > 0 and str(exp.quest_goal.get("kind", "")) != QuestGoal.KIND_REACH:
+			_text(Vector2(grid_r.end.x - 118.0, grid_r.position.y + 20.0),
+				"%d/%d" % [mini(pr2.x, pr2.y), pr2.y], DdTheme.FONT_MD, qcol,
+				HORIZONTAL_ALIGNMENT_RIGHT, 46.0)
+			_bar(Rect2(grid_r.end.x - 66.0, grid_r.position.y + 10.0, 56.0, 9.0),
+				clampf(float(pr2.x) / float(pr2.y), 0.0, 1.0), qcol, DdTheme.PANEL_EDGE)
 	# 地图本身交给子节点画（M80）：它带 `clip_contents`，
 	# 超出面板的格子会被裁掉，而不是画到面板外面的背景上。
+	# 拖拽热区用 `grid_in` 而不是 `grid_r`（M216）：横幅那 28px 不属于地图，
+	# 算进去的话拖拽位移会整体偏 28px（手指往下拉、地图往上跑）。
+	_map_rect = grid_in
 	if _map_layer != null:
-		_map_layer.position = grid_r.position
-		_map_layer.size = grid_r.size
+		_map_layer.position = grid_in.position
+		_map_layer.size = grid_in.size
 		# 弹窗 / 补给面板 / 英雄长按浮层开着时**不能** show（M194 / M201）。
 		# `_draw()` 开头已经把子节点收起来了，这里原来无条件 `show()`，
 		# 一句就把那次 hide 抵消掉 —— 表现是「遮罩画了、格子照样压在弹窗上」，
@@ -8024,8 +8117,8 @@ func _room_panel_h() -> float:
 	if kind == MapGen.K_GOAL and not exp.quest_met():
 		lines_n = 2
 	var has_qi: bool = not _quest_items_line().is_empty()
-	# 起点跟着任务行一起下移（M204）：任务行提到 FONT_MD 之后多占 10px。
-	var h: float = (108.0 if has_qi else 98.0) + float(lines_n) * 20.0 + 18.0
+	# 任务行搬去地图横幅之后（M216），这里省下 24px。
+	var h: float = (86.0 if has_qi else 76.0) + float(lines_n) * 20.0 + 18.0
 	h += float(maxi(1, rows.size())) * 17.0
 	h += 30.0     # 「点地图上的绿框走过去」
 	h += 26.0     # 底部「出口在 N 步之外」+ 下边距
@@ -8044,33 +8137,16 @@ func _draw_room_panel(r: Rect2) -> void:
 	#
 	# 放在右面板而不是顶部状态条：顶条在 1080 宽下已经排到「侦察」，
 	# 再塞一句会把两个数叠在一起（缩放窗口就复现）。
-	var ql: String = _quest_line()
-	if not ql.is_empty():
-		# 字号 TAG → MD（M204）：这行是「这一趟到底要干什么、走到哪了」的唯一答案，
-		# 原来和「位置 0 · 已走 0 步」一个尺寸，扫一眼根本注意不到
-		# —— 用户说的是「完全没有任何进度提示」，其实有，只是看不见。
-		var qkind: String = str(exp.quest_goal.get("kind", ""))
-		var pr: Vector2i = QuestGoal.progress(exp.quest_goal, exp.quest_state())
-		var has_bar: bool = pr.y > 0 and qkind != QuestGoal.KIND_REACH
-		_text(Vector2(r.position.x + 14, r.position.y + 68), "任务 " + ql,
-			DdTheme.FONT_MD, DdTheme.OK if exp.quest_met() else DdTheme.WARN,
-			HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 28.0 - (100.0 if has_bar else 0.0))
-		# 进度条（M204）：清剿 3/4、收集 2/3 这类有分母的任务，数字之外再给一条 ——
-		# 扫一眼就知道还差多少，而不用逐字读数字。
-		if has_bar:
-			# 轨道用 `PANEL_EDGE` 而不是 `PANEL_DEEP`（M204）：进度 0/4 时只画轨道，
-			# 而深色轨道和面板底几乎同色 —— 看起来像「没画进度条」。
-			_bar(Rect2(r.end.x - 110.0, r.position.y + 59.0, 96.0, 9.0),
-				clampf(float(pr.x) / float(pr.y), 0.0, 1.0), DdTheme.OK, DdTheme.PANEL_EDGE)
-	# 任务物品（M35）：只有带道具的任务才有这一行。
-	# 不显示的话玩家无法判断「还剩几次能激活」——而那直接决定要不要绕路。
+	# 任务进度**不在这里画**了（M216）：地图网格顶部那条横幅才是玩家的视线落点，
+	# 同一个数字在三个地方各写一遍，读起来只会是噪声。
+	# 这一屏只保留「任务物品」，它回答的是「我还剩几次能激活」，和进度无关。
 	var qi: String = _quest_items_line()
 	if not qi.is_empty():
-		_text(Vector2(r.position.x + 14, r.position.y + 90), qi,
+		_text(Vector2(r.position.x + 14, r.position.y + 68), qi,
 			DdTheme.FONT_TAG, DdTheme.FAINT, HORIZONTAL_ALIGNMENT_LEFT, r.size.x - 28.0)
 
 	# 有物品行时整体下移一行，避免和下面的房间状态挤在一起
-	var lines_y: float = r.position.y + (106.0 if not qi.is_empty() else 96.0)
+	var lines_y: float = r.position.y + (84.0 if not qi.is_empty() else 74.0)
 	var lines: Array = []
 	if kind == MapGen.K_GOAL:
 		# 目标房间不再无条件写「可以离开」（M32）：清剿任务走到出口
@@ -8205,11 +8281,17 @@ func _draw_map_actions(r: Rect2) -> void:
 
 ## 任务目标的一句话（M33）。核心层不认识名字表，所以奇物名在这里补上：
 ## 收集/激活任务如果只说「在目标奇物上」，玩家不知道要找哪个。
-func _quest_line() -> String:
+## `with_progress = false` 时去掉「（0/4）」这类计数（M216）：
+## 地图顶部的横幅把计数和进度条放在右侧，文字里再带一遍就重复了。
+func _quest_line(with_progress: bool = true) -> String:
 	if exp == null or exp.quest_goal.is_empty():
 		return ""
 	var cid: String = str(exp.quest_goal.get("curio", ""))
 	var base: String = exp.quest_line(DdNames.curio_name(cid) if not cid.is_empty() else "")
+	if not with_progress:
+		var cut: int = base.rfind("（")
+		if cut > 0 and base.ends_with("）"):
+			base = base.substr(0, cut)
 	# 探索类任务要给出**距离**（M204）。
 	#
 	# 清剿 / 收集 / 激活都有分母，`quest_line()` 会带上「3/4」；
@@ -9097,11 +9179,23 @@ func _draw_lighting(center: Vector2) -> void:
 
 
 ## 单位的姿势帧（M38）。优先级：死亡 > 出招（计时内）> 待机。
+##
+## 出招支持**两段**（M211）：`seq = ["attack_windup", "attack_melee"]` 时，
+## 在 POSE_TIME 内按进度取前一帧 / 后一帧。
+## 只有"这张怪真的备了起手帧"才会走到这条路（见 `_set_pose`），
+## 其余情况仍是单帧 `anim`，行为不变。
 func _unit_anim(u: Combatant) -> String:
 	if u.dead:
 		return "dead"
 	var p: Dictionary = _pose.get(u.uid, {})
 	if float(p.get("t", 0.0)) > 0.0:
+		# 两段式：按时间进度切帧。前半段起手、后半段命中。
+		var seq: Array = p.get("seq", [])
+		if not seq.is_empty():
+			var dur: float = maxf(0.01, float(p.get("dur", POSE_TIME)))
+			var prog: float = clampf(1.0 - float(p["t"]) / dur, 0.0, 0.999)
+			var idx: int = mini(int(prog * float(seq.size())), seq.size() - 1)
+			return str(seq[idx])
 		var a: String = str(p.get("anim", ""))
 		if not a.is_empty():
 			return a
@@ -9186,9 +9280,24 @@ func _pose_for_action(uid: int, skill_id: String) -> void:
 	if u == null:
 		return
 	var anim: String = _art.anim_for_skill(u.def_id, skill_id)
+	# 两段式（M211）：这张怪若真备了 `attack_windup` 帧，就播「起手 → 命中」两帧。
+	#
+	# **时间配比 1:2，总时长 0.6 秒**（M215）。原来是 1:1、总 0.34 秒 ——
+	# 每帧只有 0.17 秒，命中帧一闪就过，玩家眼里只剩抬手，像"没打出去"。
+	# 英雄是**单帧** 0.34 秒，整段都停在命中姿势上，所以感觉更"重"。
+	# 怪物多一个起手动作，慢一点才对：起手 0.2s、命中 0.4s。
+	var seq: Array = []
+	var dur: float = POSE_TIME
+	# 判据用 `has_frame` 而不是 `frame() != null`（M217）：
+	# `frame()` 有"缺动作退自己站姿"的兜底，任何有立绘的单位都会返回非 null，
+	# 一用它判两段式就永远成立 —— 英雄会先站着不动 0.2 秒再出手。
+	if not anim.is_empty() and _art.has_frame(u.def_id, "attack_windup"):
+		# 用重复项表达权重：按进度取索引，重复的帧自然分到更多时间。
+		seq = ["attack_windup", anim, anim]
+		dur = POSE_TIME * 1.76      # 0.34 × 1.76 ≈ 0.6
 	# 即使没有姿势帧也要记 pose（M53）：怪物没有立绘帧，但**位移补间要照样走**。
 	# 只给「有帧的人」记 pose 的话，怪物出手永远是「站着不动、血条掉一截」。
-	_pose[uid] = {"anim": anim, "t": POSE_TIME, "dur": POSE_TIME}
+	_pose[uid] = {"anim": anim, "seq": seq, "t": dur, "dur": dur}
 	if anim.is_empty():
 		if _dev_ui:
 			print("[pose] %s/%s 没有对应动作帧" % [u.def_id, skill_id])
@@ -9569,17 +9678,44 @@ func _draw_unit(u: Combatant, cx: float, gy: float, is_enemy: bool) -> void:
 	if u.dead:
 		accent = Color("#3a3a3a")
 
-	# 脚下阴影：没有这一步，立绘看起来像浮在地上
-	draw_set_transform(Vector2(cx, gy + 2.0), 0.0, Vector2(1.0, 0.30))
-	draw_circle(Vector2.ZERO, 34.0, Color(0.0, 0.0, 0.0, 0.45))
-	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
-
 	var anim: String = _unit_anim(u)
-	var tex: Texture2D = _art.frame(u.def_id, anim)
+	# 动作帧样张（M210）：只给敌人换帧，不改状态。
+	#   --pose-demo=attack_melee  让敌人常驻攻击姿势（验挥剑帧）
+	#   --dead-demo               让敌人按死亡帧画（验骸骨堆）
+	# 真实战斗里这两个时机都很短，命令行截不到；有了参数才能稳定验收。
+	if is_enemy:
+		if _dead_demo:
+			anim = "dead"
+		elif not _pose_demo.is_empty():
+			anim = _pose_demo
+	# `--foe-demo=<id>`：把敌人的立绘换成指定 id 的图（M205）。
+	# 只改绘制、不改 `def_id` —— 属性、技能、AI 全部照旧，
+	# 目的是「补完一张图就能立刻看它站在场上的比例」，不用等随机抽到它。
+	var art_id: String = u.def_id
+	if is_enemy and not _foe_demo.is_empty():
+		art_id = _foe_demo
+	# 第三参数（M217）：占位资源只给敌人用。英雄缺动作帧时退到自己的站姿，
+	# 绝不能掉进怪物占位 —— 否则放技能的一瞬间会变成骷髅。
+	var tex: Texture2D = _art.frame(art_id, anim, is_enemy)
 	var mo: Vector2 = _pose_motion(u, is_enemy)
 	var sx: float = (SPRITE_H / BASE_H) * (1.0 + mo.y)
 	var top: float = gy - SPRITE_H
 	var hw: float = 60.0
+
+	# 脚下阴影（M209）：**半径要跟着立绘宽度走**。
+	#
+	# 原来写死 34 —— 那是给 60 宽的剪影用的。新立绘宽 120~180px，
+	# 一块 68×20 的小椭圆压在脚底根本托不住，看着就是「浮在半空」。
+	# 阴影是「接触」的唯一视觉证据，它比立绘本身更能决定站得实不实。
+	var sh_w: float = 34.0
+	if tex != null:
+		sh_w = clampf(tex.get_width() * sx * 0.42, 30.0, 96.0)
+	draw_set_transform(Vector2(cx, gy + 2.0), 0.0, Vector2(1.0, 0.30))
+	draw_circle(Vector2.ZERO, sh_w, Color(0.0, 0.0, 0.0, 0.5))
+	# 再压一层更小的深色核心：单层椭圆中间发虚，加一层才有「脚陷进去」的重量感
+	draw_circle(Vector2.ZERO, sh_w * 0.55, Color(0.0, 0.0, 0.0, 0.45))
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+
 	if tex != null:
 		var w: float = tex.get_width() * sx
 		var h: float = tex.get_height() * sx
@@ -9592,7 +9728,41 @@ func _draw_unit(u: Combatant, cx: float, gy: float, is_enemy: bool) -> void:
 			# 崩溃没有战斗姿势帧：素材里的 `afflicted` 是 2000×2000 的爆发插图，
 			# 不是站姿。硬塞一张不对的图比染色更糟。
 			tint = Color(1.0, 0.72, 0.68, 1.0)
-		draw_texture_rect(tex, Rect2(cx + mo.x - w * 0.5, top, w, h), false, tint)
+		var dst := Rect2(cx + mo.x - w * 0.5, top, w, h)
+		if is_enemy:
+			# 敌方镜像（M207）：英雄立绘天然朝右（面向敌人），敌人要朝左（面向我方）。
+			# 素材统一朝右，朝向由这一层负责翻。
+			#
+			# 做法：把坐标系原点挪到矩形**右边缘**，再沿 x 缩放 -1，
+			# 于是从 (0,0) 画一个 w×h 正好落在原位置。
+			# **必须紧跟着归位** —— 后面的地环 / 血条 / 名字都用 `cx` 算坐标，
+			# 变换没复位会让它们全部镜像到屏幕另一侧。
+			#
+			# 没用 `draw_texture_rect_region` 传负宽度：Godot 4 里那样画不出来，
+			# 表现是**整排敌人变空白**（第一版就是这个，截图才发现）。
+			draw_set_transform(Vector2(dst.position.x + w, dst.position.y), 0.0, Vector2(-1.0, 1.0))
+			# 边缘光（M208）：战场上方是暗的，立绘的暗部直接糊成一块黑。
+			# 做法是**先画一圈偏移的亮色副本，再盖原图** —— 只有超出轮廓的那部分
+			# 留下来，形成 1~2px 的暖色外发光。不用 shader、不用额外美术资源，
+			# 而且换任何一版立绘都自动生效。
+			#
+			# **必须在镜像变换之内画**：人物在画布里是不对称的（剑在一侧），
+			# 副本若按未镜像的位置偏移，光会跑到没有武器的那一侧去。
+			if not u.dead:
+				# alpha 0.42 → 0.55、偏移 1.8 → 2.2（M208 第二版）：
+				# 第一版在暗角里只亮了一点点，轮廓仍读不出来。
+				# 再高就不行了 —— 会变成「发光怪物」，和火把照明打架。
+				var rim: Color = Color(0.98, 0.90, 0.70, 0.55)
+				var rr: float = 2.2
+				for i in 8:
+					var ang: float = TAU * float(i) / 8.0
+					draw_texture_rect(tex,
+						Rect2(Vector2(cos(ang) * rr, sin(ang) * rr), Vector2(w, h)),
+						false, rim)
+			draw_texture_rect(tex, Rect2(0.0, 0.0, w, h), false, tint)
+			draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+		else:
+			draw_texture_rect(tex, dst, false, tint)
 	else:
 		# 没有立绘的单位（怪物）。死了就**塌成一堆**：
 		# 没有死亡帧可用，而「站着但变灰」读不出「它已经死了」。
